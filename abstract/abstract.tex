@@ -6,26 +6,54 @@ pdftitle={abstract}]
 {hyperref}
 
 \begin{document}
-Computing the Groebner basis of an ideal with respect to a term ordering is an essential step in solving systems of polynomials.
-Certain term orderings, such as the degree reverse lexicographical ordering (degrevlex), make the computation of the Groebner basis
-faster, while other orderings, such as the lexicographical ordering (lex), make it easier to interpret when
-used for polynomial system solving. Thus, the Groebner basis is often computed first using degrevlex ordering then convert to
-lex ordering.
+Computing the Groebner basis of an ideal with respect to a term ordering 
+is an essential step in solving systems of polynomials.
+Certain term orderings, such as the degree reverse lexicographical ordering (degrevlex),
+make the computation of the Groebner basis faster, while other orderings, 
+such as the lexicographical ordering (lex), make it easier to interpret when
+used for polynomial system solving. Thus, the Groebner basis is often computed
+first using degrevlex ordering then convert to lex ordering.
 
-One such algorithm is the sparse FGLM. Given a Groebner basis $G$ of a zero dimensional ideal $I \subset \mathbb{K}[x_1, \dots, x_n]$ 
-in shape position and the multiplication matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$, where $D$ is the number of 
-monomials in the canonical basis of $G$, it computes linear sequences of the form $s_1^{(i)} = (uT_1^iv_1)_{1\le i \le 2D}$ and
+One such algorithm is the sparse FGLM. Given a Groebner basis $G$ of a zero 
+dimensional ideal $I \subset \mathbb{K}[x_1, \dots, x_n]$ 
+in shape position and the multiplication matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$,
+where $D$ is the number of monomials in the canonical basis of $G$, it computes 
+linear sequences of the form $s_1^{(i)} = (uT_1^iv_1)_{1\le i \le 2D}$ and
 $s_j^{(i)} = (uT_1^iv_j)_{1\le i \le D}$, $2 \le j \le n$, for some vectors $u,v_j \in 
-\mathbb{K}^{D\times 1}$. One can view this as an application of the Wiedemann algorithm for sparse linear algebra The computation of these sequences is difficult to parallelize since previous terms are required
-to compute the next. 
+\mathbb{K}^{D\times 1}$. One can view this as an application of the Wiedemann algorithm 
+for sparse linear algebra The computation of these sequences is difficult to parallelize 
+since previous terms are required to compute the next. 
 
-When the ideal is radical, we are developing an algorithm that uses small matrices instead of single vectors inspired by the block Wiedemann
-algorithm of Coppersmith. The block Wiedemann algorithm has been widely studied and have shown to be successful in problems such
-as integer factorization.
-More precisely, given the same input as above, let $u,v_j \in \mathbb{K}^{D \times M}$ be matrices with random entries; we compute the matrix sequences $s_1^{(i)} = (uT_1^iv_1)_{1\le i \le \frac{2D}{M}}$ and $s_j^{(i)} (uT_1^i T_j v_1)_{1\le i \le \frac{D}{M}}$. Then, we find $C_0, \dots, C_D$ such that for any $t \ge 0$,
+When the ideal is radical, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
+that uses small matrices instead of single vectors. The block Wiedemann algorithm has been 
+widely studied and have shown to be successful in problems such as integer factorization.
+More precisely, given the same input as above, let $u,v \in \mathbb{K}^{D \times M}$ be 
+matrices with random entries; compute the matrix sequences $s_1^{(i)} := (uT_1^iv)_{1\le i \le \frac{2D}{M}}$. 
+Then, we find $C_0, \dots, C_\frac{D}{M}$ such that for any $t \ge 0$,
 $$ C_0 \cdot s_1^{(t)} + C_1 \cdot s_1^{(t+1)} + \cdots + C_{\frac{D}{M}} \cdot s_1^{(t+\frac{D}{M})}  = 0$$
+Then assign
+$$ S(x_1) := C_0  x_1^{\frac{D}{M}} + C_1  x_1^{\frac{D}{M} - 1} + \cdots C_{\frac{D}{M}} x_1^0$$
+$$ \bar{P} := \det(S) , P := \bar{P}^{(rev)}$$
+$$ N_1 := S * (\sum_{i\le D/M} s_1^{(i)} x_1^i) \mod x_1^D$$
+where $\bar{P}^{(rev)}$ is the reverse of $\bar{P}$. According to both Coppersmith and Villard,
+$P$ is the minimal polynomial of $T_1$. Next, compute the Smith normal form 
+of $S$ such that $D = A S B$ is a diagonal matrix of the form
+$$\begin{bmatrix}
+	1 &  &        & \\
+	  & 1&        &  \\ 
+	  &  & \ddots & \\
+	  &  &        & \bar{P}
+\end{bmatrix}$$
+and assign
+$$ n_1 := (A*N_1)[0,1]^{(rev)}$$
 
- 
+Now, for $j \in [2,n]$, compute 
+$$s_j^{(i)} = (uT_1^i T_j v)_{1\le i \le \frac{D}{M}}$$
+$$N_j := S*(\sum_{i\le D/M} s_j^{(i)} x_1^i) \mod x_1^D$$
+$$n_j := (A*N_j)[0,1]^{(rev)}$$
+$$F_j := \frac{n_j}{n_1} \mod P$$
+
+Finally, return $G2 = [P, x_2 - F_2, x_3 - F_3, \dots, x_n - F_n]$, which is $G$ with lex ordering.
 
 \end{document}
 
