@@ -24,7 +24,7 @@ $s_j^{(i)} = (uT_1^iv_j)_{1\le i \le D}$, $2 \le j \le n$, for some vectors $u,v
 for sparse linear algebra The computation of these sequences is difficult to parallelize 
 since previous terms are required to compute the next. 
 
-When the ideal is radical, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
+For radical ideals, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
 that uses small matrices instead of single vectors. The block Wiedemann algorithm has been 
 widely studied and have shown to be successful in problems such as integer factorization.
 More precisely, given the same input as above, let $u,v \in \mathbb{K}^{D \times M}$, $M < D$, be 
@@ -85,7 +85,12 @@ $$n_2 = 8649x_1^7 + 3840x_1^6 + 4938x_1^5 + 1734x_1^4 + 1525x_1^3 + 2362x_1^2 + 
 $$F_2 = 2287x_1^7 + 8269x_1^6 + 8475x_1^5 + 6889x_1^4 + 4785x_1^3 + 3960x_1^2 + 3902x_1 + 4153$$
 $$n_3 = 6771x_1^7 + 7066x_1^6 + 5042x_1^5 + 1134x_1^4 + 4434x_1^3 + 5715x_1^2 + 8773x_1 + 781$$
 $$F_3 = 3999x_1^7 + 8566x_1^6 + 2338x_1^5 + 1227x_1^4 + 4962x_1^3 + 7623x_1^2 + 4661x_1 + 4463$$
-Finally, we have that $G2 = [P, x_2-F_2, x_3-F_3]$ is the Groebner basis of I with lex ordering.
+Finally, we have that $G2 = [P, x_2-F_2, x_3-F_3]$ is the Groebner basis of $I$ with lex ordering.
+
+It is possible to verify the correctness of this algorithm algebraically, given that the Smith normal form of
+S is as described. We know experimentally that this is the case, but we do not know how to prove this relationship
+between the Smith normal form and the least common left multiple matrix $S$. Further work must also be done to
+make the algorithm work for ideals that are not radical.
 
 \end{document}
 
