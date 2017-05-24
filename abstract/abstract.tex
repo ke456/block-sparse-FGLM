@@ -27,14 +27,14 @@ since previous terms are required to compute the next.
 When the ideal is radical, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
 that uses small matrices instead of single vectors. The block Wiedemann algorithm has been 
 widely studied and have shown to be successful in problems such as integer factorization.
-More precisely, given the same input as above, let $u,v \in \mathbb{K}^{D \times M}$ be 
+More precisely, given the same input as above, let $u,v \in \mathbb{K}^{D \times M}$, $M < D$, be 
 matrices with random entries; compute the matrix sequences $s_1^{(i)} := (uT_1^iv)_{1\le i \le \frac{2D}{M}}$. 
 Then, we find $C_0, \dots, C_\frac{D}{M}$ such that for any $t \ge 0$,
 $$ C_0 \cdot s_1^{(t)} + C_1 \cdot s_1^{(t+1)} + \cdots + C_{\frac{D}{M}} \cdot s_1^{(t+\frac{D}{M})}  = 0$$
 Then assign
 $$ S(x_1) := C_0  x_1^{\frac{D}{M}} + C_1  x_1^{\frac{D}{M} - 1} + \cdots C_{\frac{D}{M}} x_1^0$$
 $$ \bar{P} := \det(S) , P := \bar{P}^{(rev)}$$
-$$ N_1 := S * (\sum_{i\le D/M} s_1^{(i)} x_1^i) \mod x_1^D$$
+$$ N_1 := S * (\sum_{i\le D/M} s_1^{(i)} x_1^i) \mod x_1^{\frac{D}{M}}$$
 where $\bar{P}^{(rev)}$ is the reverse of $\bar{P}$. According to both Coppersmith and Villard,
 $P$ is the minimal polynomial of $T_1$. Next, compute the Smith normal form 
 of $S$ such that $D = A S B$ is a diagonal matrix of the form
@@ -45,15 +45,47 @@ $$\begin{bmatrix}
 	  &  &        & \bar{P}
 \end{bmatrix}$$
 and assign
-$$ n_1 := (A*N_1)[0,1]^{(rev)}$$
+$$ n_1 := (A*N_1)[0,M-1]^{(rev)}$$
 
 Now, for $j \in [2,n]$, compute 
-$$s_j^{(i)} = (uT_1^i T_j v)_{1\le i \le \frac{D}{M}}$$
-$$N_j := S*(\sum_{i\le D/M} s_j^{(i)} x_1^i) \mod x_1^D$$
+$$s_j^{(i)} = (uT_1^i T_j v)_{1\le i \le D}$$
+$$N_j := S*(\sum_{i\le D/M} s_j^{(i)} x_1^i) \mod x_1^{\frac{D}{M}}$$
 $$n_j := (A*N_j)[0,1]^{(rev)}$$
 $$F_j := \frac{n_j}{n_1} \mod P$$
+Finally, return $G_2 = [P, x_2 - F_2, x_3 - F_3, \dots, x_n - F_n]$, which is the Groebner basis
+$I$ with respect to lex ordering.
 
-Finally, return $G2 = [P, x_2 - F_2, x_3 - F_3, \dots, x_n - F_n]$, which is $G$ with lex ordering.
+As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset GF(9001)[x_1,x_2,x_3]$,
+\begin{align*}
+f_1 &= 3536x_1^2 +6536x_1x_2 + 3900x_2^2 + 3722x_1x_3 + 580x_2x_3 + 7635x_3^2 + 4203x_1 + 1386x_2 + 2491x_3 + 250\\
+f_2 &= 3987x_1^2 + 3953x_1x_2 +6122x_2^2 +5115x_1x_3 +7660x_2x_3 +8669x_3^2 + 4098x_1 +7705x_2 + 2449x_3 + 1134\\
+f_3 &= 8589x_1^2 + 1291x_1x_2 +5321x_2^2 + 765x_1x_3 +6052x_2x_3 +8178x_3^2 + 2764x_1 + 957x_2 +7079x_3 + 517
+\end{align*}
+We choose $M = 2$ and two random matrices in $GF(9001)^{D\times M}$
+\begin{align*}
+u &= \begin{bmatrix}
+291&  22& 337& 924& 414& 666& 574& 707\\
+57& 801& 513& 135& 447& 107& 942& 320
+\end{bmatrix}\\
+v &= \begin{bmatrix}
+553&  81&  56& 261& 109& 890& 477&  53\\
+725& 642& 905& 612& 952& 158& 235& 783
+\end{bmatrix} ^ {t}\\
+\end{align*}
+The canonical basis is $[x_3^3, x_3^2, x_2x_3, x_1x_3, x_3, x_2, x_1, 1]$ and $D = 8$. Doing the above computations we get
+$$S= \begin{bmatrix}
+8226x_1^4 + 5622x_1^3 + 7693x_1^2 + 5033x_1 + 1&     2919x_1^4 + 8706x_1^3 + 3736x_1^2 + 4829x_1\\
+7928x_1^4 + 3675x_1^3 + 7471x_1^2 + 3510x_1& 3113x_1^4 + 5615x_1^3 + 2702x_1^2 + 3353x_1 + 1
+\end{bmatrix}$$
+$$P =x_1^8 + 8386x_1^7 + 8262x_1^6 + 7301x_1^5 + 318x_1^4 + 4870x_1^3 + 715x_1^2 + 8568x_1 + 8433$$
+$$n_1 = 5527x_1^7 + 2064x_1^6 + 4391x_1^5 + 1308x_1^4 + 6797x_1^3 + 1328x_1^2 + 6317x_1 + 8700$$
+It is easy to verify that $P$ is indeed the minimal polynomial of $T_1$.
+For $x_2$ and $x_3$, we get
+$$n_2 = 8649x_1^7 + 3840x_1^6 + 4938x_1^5 + 1734x_1^4 + 1525x_1^3 + 2362x_1^2 + 1780x_1 + 2397$$
+$$F_2 = 2287x_1^7 + 8269x_1^6 + 8475x_1^5 + 6889x_1^4 + 4785x_1^3 + 3960x_1^2 + 3902x_1 + 4153$$
+$$n_3 = 6771x_1^7 + 7066x_1^6 + 5042x_1^5 + 1134x_1^4 + 4434x_1^3 + 5715x_1^2 + 8773x_1 + 781$$
+$$F_3 = 3999x_1^7 + 8566x_1^6 + 2338x_1^5 + 1227x_1^4 + 4962x_1^3 + 7623x_1^2 + 4661x_1 + 4463$$
+Finally, we have that $G2 = [P, x_2-F_2, x_3-F_3]$ is the Groebner basis of I with lex ordering.
 
 \end{document}
 
