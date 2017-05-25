@@ -30,10 +30,11 @@ for sparse linear algebra The computation of these sequences is difficult to par
 since previous terms are required to compute the next. 
 
 For radical ideals, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
-that uses small matrices instead of single vectors. The block Wiedemann algorithm has been 
-widely studied and have shown to be successful in problems such as integer factorization.
+that uses small blocks of vectors instead of single vectors, 
+which makes parallelization possible. The block Wiedemann algorithm has been 
+widely studied and shown to be successful in problems such as integer factorization.
 More precisely, given the same input as above, let $u \in \mathbb{K}^{M \times D}$, $v \in \mathbb{K}^{D \times M}$, $M < D$, be 
-matrices with random entries; compute the matrix sequences $s_1^{(i)} := (uT_1^iv)_{1\le i \le \frac{2D}{M}}$. 
+matrices with random entries; we compute the matrix sequences $s_1^{(i)} := (uT_1^iv)_{1\le i \le \frac{2D}{M}}$. 
 Then, we find $C_0, \dots, C_\frac{D}{M}$ such that for any $t \ge 0$,
 $$ C_0 \cdot s_1^{(t)} + C_1 \cdot s_1^{(t+1)} + \cdots + C_{\frac{D}{M}} \cdot s_1^{(t+\frac{D}{M})}  = 0$$
 Then assign
