@@ -1,0 +1,103 @@
+\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+\ProvidesPackage{sigsam}
+
+% Start Page dimensions ========================
+
+\setlength{\topmargin}{-0.5in}
+\setlength{\headheight}{0.3in}
+\setlength{\headsep}{0.3in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\textwidth}{7in}
+\setlength{\textheight}{9in}
+
+% End Page dimensions   ========================
+
+\usepackage{latexsym}              % Additional LaTeX Symbols
+\usepackage{amssymb}               % AMS Fonts (superset of AMS Fonts)
+\usepackage{url}                   % The characters {}, which are used in email addresses
+                                   % generate warnings. Use \url instead
+%\usepackage{times}                % These fonts cause problems for ACM printers
+%\usepackage{mathptm}              % Standard CM fonts are better.
+
+\@twosidetrue  \@mparswitchtrue
+
+% The 3 section commands are copied from the article.cls file and 
+%   modified to reduce the space around them.
+
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-2.5ex \@plus -1ex \@minus -.2ex}%
+                                   {1.5ex \@plus .2ex}%
+                                   {\normalfont\Large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-1.5ex\@plus -1ex \@minus -.2ex}%
+                                     {1ex \@plus .2ex}%
+                                     {\normalfont\large\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-1ex\@plus -1ex \@minus -.2ex}%
+                                     {.2ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}                                   
+
+% The caption package is loaded to narrow the figure caption width to set
+% the caption off from the main text.
+\usepackage{caption}               
+\captionsetup{width=6in}
+
+% This section uses the fancyhdr package to define the headers and footers
+
+\usepackage{fancyhdr}
+% First re-define the plain page style that will be used on the title page
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\thepage}
+\fancyhead[L]{ \textsl{\footnotesize \thisissue} }
+\fancyhead[R]{ \textsl{\footnotesize \@articlehead} }
+}
+% Now define all the other pages
+\pagestyle{fancy} 
+\fancyhead[LO]{}
+\fancyhead[RO]{\textsl{\footnotesize \runningauthor}}
+\fancyhead[LE]{\textsl{\footnotesize \runningtitle}}
+\fancyhead[RE]{\textsl{\footnotesize \@articlehead}}
+\renewcommand{\headrulewidth}{0pt}
+% Finally, we define commands to set the headers, together with defaults
+% that prompt the editor if the commands are forgotten
+
+\newcommand{\titlehead}[1]{\gdef\runningtitle{#1}}
+\newcommand{\authorhead}[1]{\gdef\runningauthor{#1}}
+\newcommand{\issue}[1]{\gdef\thisissue{ACM Communications in Computer Algebra, #1}}
+\newcommand{\articlehead}[1]{\gdef\@articlehead{#1}}
+
+% If the editor forgets to set these, there is a reminder printed.
+\def\runningtitle{DEFINE SHORT TITLE USING $\backslash$ titlehead}
+\def\runningauthor{DEFINE SHORT AUTHOR HEADER USING $\backslash$ authorhead}
+\def\@articlehead{DEFINE TYPE OF PAPER USING $\backslash$ articlehead}
+\def\thisissue{DEFINE ISSUE using $\backslash$ issue}
+
+% This is copied from the article.cls file and modified to reduce the
+% space between the headers and the title
+
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 1.5em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    {\large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+
+\renewcommand\abstractname{\large\bfseries Abstract\vspace*{6pt}}
+% I have no idea what this next command is for
+%\long\def\unmarkedfootnote#1{{\long\def\@makefntext##1{##1}\footnotetext{#1}}}
+
+\date{}

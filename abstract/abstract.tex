@@ -1,9 +1,14 @@
 \documentclass[12pt]{article}
 
-\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace}
+\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,sigsam}
 \usepackage[
 pdftitle={abstract}]
 {hyperref}
+
+\titlehead{Block Sparse FGLM Algorithm}
+\articlehead{ISSAC 2017 poster abstract}
+\authorhead{Seung Gyu Hyun, \' Eric Schost}
+
 
 \begin{document}
 Computing the Groebner basis of an ideal with respect to a term ordering 
@@ -19,8 +24,8 @@ dimensional ideal $I \subset \mathbb{K}[x_1, \dots, x_n]$
 in shape position and the multiplication matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$,
 where $D$ is the number of monomials in the canonical basis of $G$, it computes 
 linear sequences of the form $s_1^{(i)} = (uT_1^iv_1)_{1\le i \le 2D}$ and
-$s_j^{(i)} = (uT_1^iv_j)_{1\le i \le D}$, $2 \le j \le n$, for some vectors $u,v_j \in 
-\mathbb{K}^{D\times 1}$. One can view this as an application of the Wiedemann algorithm 
+$s_j^{(i)} = (uT_1^iv_j)_{1\le i \le D}$, $2 \le j \le n$, for some vectors $u \in \mathbb{K}^{1 \times D}$,
+$v_j \in \mathbb{K}^{D\times 1}$. One can view this as an application of the Wiedemann algorithm 
 for sparse linear algebra The computation of these sequences is difficult to parallelize 
 since previous terms are required to compute the next. 
 
