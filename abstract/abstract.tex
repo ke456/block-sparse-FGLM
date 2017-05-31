@@ -1,73 +1,147 @@
 \documentclass[12pt]{article}
 
-\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,sigsam}
+\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,sigsam,mathrsfs}
 \usepackage[
 pdftitle={abstract}]
 {hyperref}
 
+\title{Sparse FGLM using the block Wiedemann algorithm}
+\author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \' Eric Schost}
+
 \titlehead{Block Sparse FGLM Algorithm}
 \articlehead{ISSAC 2017 poster abstract}
-\authorhead{Seung Gyu Hyun, \' Eric Schost}
+\authorhead{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \' Eric Schost}
+
 
 
 \begin{document}
-Computing the Groebner basis of an ideal with respect to a term ordering 
-is an essential step in solving systems of polynomials.
-Certain term orderings, such as the degree reverse lexicographical ordering (degrevlex),
-make the computation of the Groebner basis faster, while other orderings, 
-such as the lexicographical ordering (lex), make it easier to interpret when
-used for polynomial system solving. Thus, the Groebner basis is often computed
-first using degrevlex ordering then convert to lex ordering.
 
-One such algorithm is the sparse FGLM. Given a Groebner basis $G$ of a zero 
-dimensional ideal $I \subset \mathbb{K}[x_1, \dots, x_n]$ 
-in shape position and the multiplication matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$,
-where $D$ is the number of monomials in the canonical basis of $G$, it computes 
-linear sequences of the form $s_1^{(i)} = (uT_1^iv_1)_{1\le i \le 2D}$ and
-$s_j^{(i)} = (uT_1^iv_j)_{1\le i \le D}$, $2 \le j \le n$, for some vectors $u \in \mathbb{K}^{1 \times D}$,
-$v_j \in \mathbb{K}^{D\times 1}$. One can view this as an application of the Wiedemann algorithm 
-for sparse linear algebra The computation of these sequences is difficult to parallelize 
-since previous terms are required to compute the next. 
+\maketitle
 
-For radical ideals, we are developing an algorithm inspired by the block Wiedemann algorithm of Coppersmith
-that uses small blocks of vectors instead of single vectors, 
-which makes parallelization possible. The block Wiedemann algorithm has been 
-widely studied and shown to be successful in problems such as integer factorization.
-More precisely, given the same input as above, let $u \in \mathbb{K}^{M \times D}$, $v \in \mathbb{K}^{D \times M}$, $M < D$, be 
-matrices with random entries; we compute the matrix sequences $s_1^{(i)} := (uT_1^iv)_{1\le i \le \frac{2D}{M}}$. 
-Then, we find $C_0, \dots, C_\frac{D}{M}$ such that for any $t \ge 0$,
-$$ C_0 \cdot s_1^{(t)} + C_1 \cdot s_1^{(t+1)} + \cdots + C_{\frac{D}{M}} \cdot s_1^{(t+\frac{D}{M})}  = 0$$
-Then assign
-$$ S(x_1) := C_0  x_1^{\frac{D}{M}} + C_1  x_1^{\frac{D}{M} - 1} + \cdots C_{\frac{D}{M}} x_1^0$$
-$$ \bar{P} := \det(S) , P := \bar{P}^{(rev)}$$
-$$ N_1 := S * (\sum_{i\le D/M} s_1^{(i)} x_1^i) \mod x_1^{\frac{D}{M}}$$
-where $\bar{P}^{(rev)}$ is the reverse of $\bar{P}$. According to both Coppersmith and Villard,
-$P$ is the minimal polynomial of $T_1$. Next, compute the Smith normal form 
-of $S$ such that $D = A S B$ is a diagonal matrix of the form
-$$\begin{bmatrix}
-	1 &  &        & \\
-	  & 1&        &  \\ 
-	  &  & \ddots & \\
-	  &  &        & \bar{P}
-\end{bmatrix}$$
-and assign
-$$ n_1 := (A*N_1)[0,M-1]^{(rev)}$$
+\paragraph{Overview}
+Computing the Gr\"obner basis of an ideal with respect to a term
+ordering is an essential step in solving systems of polynomials (in
+what follows, we restrict our attention to systems with finitely many
+solutions.)  Certain term orderings, such as the degree reverse
+lexicographical ordering (degrevlex), make the computation of the
+Gr\"obner basis faster, while other orderings, such as the
+lexicographical ordering (lex), make it easier to find the coordinates
+of the solutions. Thus, one typically first compute a Gr\"obner basis
+using a degrevlex ordering, then converts it to either a lex Gr\"obner
+basis, or a related representation, such as Rouillier's Rational
+Univariate Representation~\cite{Rouillier99}.
 
-Now, for $j \in [2,n]$, compute 
-$$s_j^{(i)} = (uT_1^i T_j v)_{1\le i \le D}$$
-$$N_j := S*(\sum_{i\le D/M} s_j^{(i)} x_1^i) \mod x_1^{\frac{D}{M}}$$
-$$n_j := (A*N_j)[0,1]^{(rev)}$$
-$$F_j := \frac{n_j}{n_1} \mod P$$
-Finally, return $G_2 = [P, x_2 - F_2, x_3 - F_3, \dots, x_n - F_n]$, which is the Groebner basis
-$I$ with respect to lex ordering.
+Consider a zero-dimensional ideal $I \subset \mathbb{K}[x_1, \dots,
+  x_n]$, given by means of a monomial basis $\mathscr{B}$ of
+$Q=\mathbb{K}[x_1, \dots, x_n]/I$, together with the multiplication
+matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$ of respectively
+$x_1,\dots,x_n$ in $Q$ in $\mathscr{B}$, with
+$D=\dim_\mathbb{K}(Q)$. In all that follows, we assume that $x_n$ {\em
+  separates} the points of $V(I)$. However, we do not assume that $I$
+is radical, or that it is in {\em shape position} (that is, that its
+lex basis for the order $x_1 > \cdots > x_n$ has the form
+$(x_1-G_1(x_n),\dots,x_{n-1}-G_{n-1}(x_n),G_n(x_n))$); note that our
+assumption can be ensured by a generic change of coordinates, while
+the shape position one may not hold for any choice of
+coordinates. Under our assumption, the {\em radical} of $I$ is in
+shape position, with Gr\"obner basis
+$R=(x_1-R_1(x_n),\dots,x_{n-1}-R_{n-1}(x_n),R_n(x_n))$.
 
-As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset GF(9001)[x_1,x_2,x_3]$,
+The FGLM algorithm~\cite{FaGiLaMo93} computes the Gr\"obner basis of
+$I$ for the lex order $x_1 > \cdots > x_n$ with a runtime cubic in the dimension
+$D$. Although recent work has reduced the runtime exponent from $3$ to
+the exponent of matrix multiplication
+$\omega$~\cite{FaGaHuRe13,Neiger16}, linear algebra techniques based
+on duality often turn out to be more efficient. The basic idea behind
+these techniques is to compute values of one (or possibly several)
+linear forms $\ell: Q \to \mathbb{K}$ at well-chosen elements of $Q$,
+and to deduce our output by solving some well-structured linear system
+(typically, Hankel).
+
+Several forms of these ideas exist. The Rational Univariate
+Representation algorithm takes for $\ell$ the trace ${\rm tr}: Q \to
+\mathbb{K}$ and computes values of the form ${\rm tr}(x_n^i)$ and
+${\rm tr}(x_j x_n^i)$; from there, the output of the algorithm is
+equivalent to the data of $R$, together with the multiplicities of all
+points. Values such as ${\rm tr}(x_n^i)$ can be computed as $v T_n^i
+e_n$, where $v$ is the row vector of the traces of the monomial basis
+$\mathscr{B}$, and $e_n$ is the column vector of coordinates of $x_n$ on
+$\mathscr{B}$. Computing the values of the trace on $\mathscr{B}$ is
+however costly, so several algorithms use random linear forms
+instead. In~\cite{BoSaSc03}, the authors show how we can recover the
+Gr\"obner basis of $R$ of $\sqrt{I}$ (together with the nil-indices of
+all points) from the values $\ell(x_n^i)$ and $\ell(x_j x_n^i)$, for a
+random $\ell$, whereas Faug\`ere and Mou show in~\cite{FaMo17} how to
+compute the basis $G$ of $I$ itself using similar sets of values, when
+$I$ is in shape position (in general, the algorithm falls back on
+Berlekamp-Massey-Sakata techniques). Quite importantly, they also
+demonstrate that exploiting the sparsity of matrices $T_1,\dots,T_n$
+is critical for the efficiency of these algorithms.
+
+The computation of sequences such as $\ell(x_n^i)$ is difficult to
+parallelize.  In this work, in the continutation of~\cite{BoSaSc03},
+we use techniques inspired by Coppersmith's block Wiedemann
+algorithm~\cite{Coppersmith93} to compute the Gr\"obner basis $R$ of
+$\sqrt{I}$.
+
+\noindent{\bf Computing $R_{n}$.} We choose an integer $m$, random
+matrices $u \in \mathbb{K}^{m \times D}$, $v \in \mathbb{K}^{D \times
+  m}$, and we consider the matrix sequence $s = (uT_n^iv)_{i \ge
+  0}$. For generic matrices $u, v$, Theorem 2.12 in~\cite{KaVi04}
+shows that if $S \in \mathbb{K}[x]^{m\times m}$ is a minimal
+generating polynomial of $(s_i)_{i \ge 0}$, its determinant is a
+multiple of the minimal polynomial of $x_n$ in $Q$, and divides its
+characteristic polynomial. This polynomial must then factor as
+$\prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
+(x-\alpha_n)^{e_\alpha}$, for certain positive integers $e$; in
+particular, its squarefree part (written in the variable $x_n$) is the last polynomial $R_n$ in $R$.
+
+\medskip\noindent{\bf Using $u$-resultant techniques.} We propose  to recover the 
+whole Gr\"obner basis $R$ of $\sqrt{I}$ by computing a truncation of
+a polynomial akin to the $u$-resultant; we show here this idea for the computation
+of $R_{n-1}$.
+
+Let $\lambda$ be a new variable and consider the matrix $T_\lambda=T_n
++ \lambda T_{n-1}$; this is the multiplication matrix by $x_n +
+\lambda x_{n-1}$ in $Q \otimes_{\mathbb{K}}
+\mathbb{K}(\lambda)$. Applying the above algorithm to the sequence
+$s_\lambda=(uT_\lambda^iv)_{i \ge 0}$ gives us the polynomial
+$M_\lambda=\prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
+(x-(\alpha_n+\lambda \alpha_{n-1}))$; it is well-known that the
+polynomial $R_{n-1}$ can be deduced from the coefficients of
+$\lambda^0$ and $\lambda^1$ in $M_\lambda$ in quasi-linear time.
+
+Hence, it is enough to compute $M_\lambda \bmod \lambda^2$. For this,
+we compute the sequence $s_\lambda \bmod \lambda^2=(s_i + i s^*_i \lambda)_{i \ge 0}$,
+with $s^*_i= uT_n^{i-1} T_{n-1}v$, and we apply e.g.\ the matrix
+Berlekamp Massey algorithm to this sequence, over the coefficient ring
+$\mathbb{K}[\lambda]/\lambda^2$; in generic coordinates, we expect that
+the calculation carries over as if we were over a field.
+
+\medskip\noindent{\bf The case of radical ideals.} It is of course desirable to 
+avoid computing minimal matrix polynomials over non-reduced rings, if
+possible. For radical ideals, we propose an alternative solution that
+avoids this issue (extending this idea to arbitrary $I$ is work in progress).
+
+Suppose that we have computed the minimal generating polynomial $S$,
+together with its determinant (in the radical case, it coincides with
+$R_n(x_n)$); we can then compute the numerator matrix $N$ of the
+generating series $G=\sum_{i \ge 0} s_i/x^{i+1}$ by a single product
+of polynomial matrices $N=S G$. We repeat this operation with the
+generating series $\sum_{i \ge 0} s^*_i/x^{i+1}$, for $s^*_i$ as in
+the previous paragraph, to obtain a numerator matrix $N^*$. The Smith
+form of $S$, $D=A S B$, only has $R_n(x)$ as a non-trivial
+invariant factor. Then, let $n$ and $n^*$ be the entries of indices
+$(1,m)$ in respectively $AN$ and $AN^*$; we can verify that
+$R_{n-1}=n^*/n \bmod R_n$.
+
+As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{F}(9001)[x_1,x_2,x_1]$,
 \begin{align*}
-f_1 &= 3536x_1^2 +6536x_1x_2 + 3900x_2^2 + 3722x_1x_3 + 580x_2x_3 + 7635x_3^2 + 4203x_1 + 1386x_2 + 2491x_3 + 250\\
-f_2 &= 3987x_1^2 + 3953x_1x_2 +6122x_2^2 +5115x_1x_3 +7660x_2x_3 +8669x_3^2 + 4098x_1 +7705x_2 + 2449x_3 + 1134\\
-f_3 &= 8589x_1^2 + 1291x_1x_2 +5321x_2^2 + 765x_1x_3 +6052x_2x_3 +8178x_3^2 + 2764x_1 + 957x_2 +7079x_3 + 517
+f_1 &= 3536x_3^2 +6536x_3x_2 + 3900x_2^2 + 3722x_3x_1 + 580x_2x_1 + 7635x_1^2 + 4203x_3 + 1386x_2 + 2491x_1 + 250\\
+f_2 &= 3987x_3^2 + 3953x_3x_2 +6122x_2^2 +5115x_3x_1 +7660x_2x_1 +8669x_1^2 + 4098x_3 +7705x_2 + 2449x_1 + 1134\\
+f_3 &= 8589x_3^2 + 1291x_3x_2 +5321x_2^2 + 765x_3x_1 +6052x_2x_1 +8178x_1^2 + 2764x_3 + 957x_2 +7079x_1 + 517.
 \end{align*}
-We choose $M = 2$ and two random matrices
+We choose $m = 2$ and two random matrices
 \begin{align*}
 u &= \begin{bmatrix}
 291&  22& 337& 924& 414& 666& 574& 707\\
@@ -76,27 +150,41 @@ u &= \begin{bmatrix}
 v &= \begin{bmatrix}
 553&  81&  56& 261& 109& 890& 477&  53\\
 725& 642& 905& 612& 952& 158& 235& 783
-\end{bmatrix} ^ {t}\\
+\end{bmatrix} ^ {t}
 \end{align*}
-The canonical basis is $[x_3^3, x_3^2, x_2x_3, x_1x_3, x_3, x_2, x_1, 1]$ and $D = 8$. Doing the above computations we get
+The monomial basis of $Q$ is $\mathscr{B}=[x_1^3, x_1^2, x_2x_1, x_3x_1, x_1, x_2, x_3, 1]$, with $D = 8$. 
+Computing the minimal generating polynomial of $s_i=u T_3^i v$, we get
 $$S= \begin{bmatrix}
-8226x_1^4 + 5622x_1^3 + 7693x_1^2 + 5033x_1 + 1&     2919x_1^4 + 8706x_1^3 + 3736x_1^2 + 4829x_1\\
-7928x_1^4 + 3675x_1^3 + 7471x_1^2 + 3510x_1& 3113x_1^4 + 5615x_1^3 + 2702x_1^2 + 3353x_1 + 1
-\end{bmatrix}$$
-$$P =x_1^8 + 8386x_1^7 + 8262x_1^6 + 7301x_1^5 + 318x_1^4 + 4870x_1^3 + 715x_1^2 + 8568x_1 + 8433$$
-$$n_1 = 5527x_1^7 + 2064x_1^6 + 4391x_1^5 + 1308x_1^4 + 6797x_1^3 + 1328x_1^2 + 6317x_1 + 8700$$
-It is easy to verify that $P$ is indeed the minimal polynomial of $T_1$.
-For $x_2$ and $x_3$, we get
-$$n_2 = 8649x_1^7 + 3840x_1^6 + 4938x_1^5 + 1734x_1^4 + 1525x_1^3 + 2362x_1^2 + 1780x_1 + 2397$$
-$$F_2 = 2287x_1^7 + 8269x_1^6 + 8475x_1^5 + 6889x_1^4 + 4785x_1^3 + 3960x_1^2 + 3902x_1 + 4153$$
-$$n_3 = 6771x_1^7 + 7066x_1^6 + 5042x_1^5 + 1134x_1^4 + 4434x_1^3 + 5715x_1^2 + 8773x_1 + 781$$
-$$F_3 = 3999x_1^7 + 8566x_1^6 + 2338x_1^5 + 1227x_1^4 + 4962x_1^3 + 7623x_1^2 + 4661x_1 + 4463$$
-Finally, we have that $G2 = [P, x_2-F_2, x_3-F_3]$ is the Groebner basis of $I$ with lex ordering.
+8226 + 5622x + 7693x^2 + 5033x^3 + x^3&     2919 + 8706x + 3736x^2 + 4829x^3\\
+7928 + 3675x + 7471x^2 + 3510x^3  &        3113 + 5615x + 2702x^2 + 3353x^3 + x^4
+\end{bmatrix},$$
+with determinant
+$$R_3 =x^8 + 8386x^7 + 8262x^6 + 7301x^5 + 318x^4 + 4870x^3 + 715x^2 + 8568x + 8433.$$
+We compute the numerator matrix $N$ of the generating series $\sum_{i \ge 0} s_i/x^{i+1}$
+and multiply it by the change of basis of $A$ obtained from the Smith form computation of 
+$S$; the $(1,2)$-entry in the result is
+$$n = 5527x^7 + 2064x^6 + 4391x^5 + 1308x^4 + 6797x^3 + 1328x^2 + 6317x + 8700.$$
+Computing the numerator matrix $N^*$ of the generating series $\sum_{i \ge 0} s'_i/x^{i+1}$,
+with $s'_i = uT_3^{i-1} T_2 v$, and doing as above, we obtain
+$$n^* = 8649x^7 + 3840x^6 + 4938x^5 + 1734x^4 + 1525x^3 + 2362x^2 + 1780x + 2397.$$
+The polynomial $R_2(x_3)$ is then given by $n^*/n \bmod R_3$, written in the variable
+$x_3$, and
+is equal to 
+$$R_2 = 2287x_3^7 + 8269x_3^6 + 8475x_3^5 + 6889x_3^4 + 4785x_3^3 + 3960x_3^2 + 3902x_3 + 4153.$$
+Doing the same with the sequence $uT_3^{i-1} T_1 v$ gives us a polynomial $R_1(x_3)$,
+which finally leads us to the Gr\"obner basis $(x_1-R_1(x_3), x_2-R_2(x_3),R_3(x_3))$
+of $I$.
 
-It is possible to verify the correctness of this algorithm algebraically, given that the Smith normal form of
-S is as described. We know experimentally that this is the case, but we do not know how to prove this relationship
-between the Smith normal form and the least common left multiple matrix $S$. Further work must also be done to
-make the algorithm work for ideals that are not radical.
+
+
+%% It is possible to verify the correctness of this algorithm algebraically, given that the Smith normal form of
+%% S is as described. We know experimentally that this is the case, but we do not know how to prove this relationship
+%% between the Smith normal form and the least common left multiple matrix $S$. Further work must also be done to
+%% make the algorithm work for ideals that are not radical.
+
+\bibliographystyle{plain}
+\bibliography{abstract}
+
 
 \end{document}
 
