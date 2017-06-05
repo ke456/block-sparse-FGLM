@@ -1,3 +1,6 @@
+# Provides some functions for initialization (such as creating the multiplication matrices)
+# as well as converting to lex basis via sparse FGLM (non-blocked)
+
 var('I') # ideal
 var('B') # monomial basis
 var('G') # Groebner basis
@@ -9,6 +12,8 @@ mat_dict = []
 G2 = []
 G_one_var = []
 
+# This creates the multiplication matrices and stores in mul_mats and mat_dict
+# Needs to be called first before using any of the other functions
 def init(ideal, field):
   global I,B,G,l,W,MX
   W.<x>=PolynomialRing(field)
@@ -24,11 +29,10 @@ def init(ideal, field):
   l = vector([randint(1,1000) for i in range(B.nmonomials())])
   find_P()
   while (P.degree() < B.nmonomials()):
-    print("blah")
     l = vector([randint(1,1000) for i in range(B.nmonomials())])
     find_P()
 
-
+# Given the monomial, it creates the multiplication matrix for it
 def create_mult_mat(monomial):
   l = []
   for i in B:
@@ -39,6 +43,8 @@ def create_mult_mat(monomial):
     l.append(q)
   return Matrix(l).transpose()
   
+# finds P, the minimal polynomial, of Ti, where i = index, as well Ni such that
+# P*Ni = Z, Z = sum(s[i] * x^i)  
 def find_P(index=0):
 	global P,P_bar,N,N_bar,G2
 	m = mul_mats[0]
@@ -55,7 +61,8 @@ def find_P(index=0):
 		L += P.list()[i] * var^i
 	G2.append(L)
 	
-  
+# computes and stores the rest of the functions for the Groebner basis with respect to
+# lex ordering
 def find_rest():
   global P,P_bar,N,N_bar,index_used,G2
   m = mul_mats[0]
@@ -76,12 +83,6 @@ def find_rest():
   		L += G_i.list()[j] * var^j
   	G_one_var.append(L)
   	G2.append(v - L)
-
-#def check_sols():
-	
-
-
-
 
 
 
