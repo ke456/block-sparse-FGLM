@@ -3,15 +3,16 @@ var('B') # monomial basis
 var('G') # Groebner basis
 var('l') # linear mapping
 var('P','P_bar','N','N_bar')
-var('W')
+var('W','MX')
 mul_mats = []
 mat_dict = []
 G2 = []
 G_one_var = []
 
 def init(ideal, field):
-  global I,B,G,l,W
+  global I,B,G,l,W,MX
   W.<x>=PolynomialRing(field)
+  MX.<X> = PolynomialRing(field)
   I = ideal
   G = I.groebner_basis()
   B = I.normal_basis()
