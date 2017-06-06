@@ -27,10 +27,7 @@ def init(ideal, field):
     mul_mats.append(mat)
   print(mul_mats)
   l = vector([randint(1,1000) for i in range(B.nmonomials())])
-  find_P()
-  while (P.degree() < B.nmonomials()):
-    l = vector([randint(1,1000) for i in range(B.nmonomials())])
-    find_P()
+  
 
 # Given the monomial, it creates the multiplication matrix for it
 def create_mult_mat(monomial):
@@ -65,6 +62,10 @@ def find_P(index=0):
 # lex ordering
 def find_rest():
   global P,P_bar,N,N_bar,index_used,G2
+  find_P()
+  while (P.degree() < B.nmonomials()):
+    l = vector([randint(1,1000) for i in range(B.nmonomials())])
+    find_P()
   m = mul_mats[0]
   var = mat_dict[0][0]
   n = I.random_element(1).parent().ngens()
