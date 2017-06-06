@@ -36,9 +36,9 @@ def find_lex_basis(ideal,field,M):
 	# finding rest of the functions
 	for i in [1 .. len(mul_mats)-1]:
 		Ti = mul_mats[i]
-		Z = [ U* T1^i * Ti * V* X^i for i in range(ceil(D/M))] # probably should be stored...
+		Z = [ U* T1^i * Ti * V* X^i for i in range(d)] # probably should be stored...
 		Z = add(Z)
-		N = (S*Z) % X^(ceil(D/M))
+		N = (S*Z) % X^(d)
 		f = vector([N[i,0] for i in range(N.nrows())])
 		n_bar = (u*f)[N.nrows()-1] % P_bar
 		n = n_bar.reverse()
