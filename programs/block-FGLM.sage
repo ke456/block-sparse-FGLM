@@ -3,10 +3,8 @@ load("poly-solv.sage")
 load("matrix-berlekamp-massey.sage")
 load("create_block_matrix.sage")
 
-var('Mx')
-
 def find_lex_basis(ideal,field,M):
-	global mul_mats, B, Mx
+	global mul_mats, B
 	Mx.<X> = PolynomialRing(field)
 	init(ideal,field)
 	D = len(B)
