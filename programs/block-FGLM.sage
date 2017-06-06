@@ -35,6 +35,7 @@ def find_lex_basis(ideal,field,M):
 	result.append(mX)
 	# finding rest of the functions
 	for i in [1 .. len(mul_mats)-1]:
+		index = i
 		Ti = mul_mats[i]
 		Z = [ U* T1^i * Ti * V* X^i for i in range(d)] # probably should be stored...
 		Z = add(Z)
@@ -47,8 +48,7 @@ def find_lex_basis(ideal,field,M):
 		mX = 0
 		for i in range(len(func.coefficients())):
 			mX += func.coefficients()[i] * m^i
-		print("finished")
-		result.append(mX)
+		result.append(monomials[index] - mX)
 	return result
 	
 	
