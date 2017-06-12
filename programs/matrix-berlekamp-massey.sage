@@ -116,6 +116,7 @@ def matrix_berlekamp_massey( seq, shift=None ):
 	# actually holds for all nonnegative j
 
 	# Set dimensions, polynomial ring, and default shift
+	m = seq[0].nrows()
 	pR.<X> = seq[0].base_ring()[]
 	s = copy(shift) if shift != None else [0]*seq[0].nrows()
 	s = s + [max(s)]*seq[0].ncols()
@@ -123,17 +124,33 @@ def matrix_berlekamp_massey( seq, shift=None ):
 	# Compute minimum generating matrix as leading submatrix of approximant basis for the reversed series
 	d = len(seq)
 	series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
-	return iter_popov_appbas( series, d, s )[:seq[0].nrows(),:seq[0].nrows()]
-	
-def matrix_reverse( A, d ):
-     # input: polynomial matrix A(X) and nonnegative integer d bounding the degree of A
-     # output: X^d A(X^-1)
-     m = A.nrows()
-     n = A.ncols()
-     Arev = Matrix( A.base_ring(), m, n )
-     for j in range(n):
-         for i in range(m):
-             Arev[i,j] = A[i,j].reverse(d)
-     return Arev	
-	
-	
+	pappbas = iter_popov_appbas( series, d, s )
+	return (pappbas[:m,:m],pappbas[:m,m:])
+
+def matrix_berlekamp_massey_reverse( seq, shift=None ):
+	##Input:
+	#   * list 'seq' of length d containing m x n matrices over a field,
+	#   * shift 'shift' = tuple of m integers,
+	##Default:
+	#   * uniform shift [0]*m
+	##Output:
+	#  the unique m x m polynomial matrix P which is 
+	#   * in shift-Popov form
+	#   * a basis of the K[X]-module of rank m
+	#     formed by polynomial vectors p in K[X]^{1 x m} such that
+	#         p S  =  q  mod X^d,
+	#     for some vector q such that deg(q) < deg(p),
+	#     where S = seq[0] + seq[1] X + ... + seq[d-1] X^{d-1}
+	##Note: TODO relation with definition of recurrence relations in Thome 2002 ??
+
+	# Set dimensions, polynomial ring, and default shift
+	m = seq[0].nrows()
+	pR.<X> = seq[0].base_ring()[]
+	s = copy(shift) if shift != None else [0]*seq[0].nrows()
+	s = s + [max(s)]*seq[0].ncols()
+
+	# Compute minimum generating matrix as leading submatrix of approximant basis for the reversed series
+	d = len(seq)
+	series = Matrix.block( [[sum( [seq[k] * X^k for k in range(d)] )],[-1]] )
+	pappbas = iter_popov_appbas( series, d, s )
+	return (pappbas[:m,:m],pappbas[:m,m:])
