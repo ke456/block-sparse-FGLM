@@ -1,0 +1,50 @@
+\begin{thebibliography}{1}
+
+\bibitem{BoSaSc03}
+A.~Bostan, B.~Salvy, and {\'E}.~Schost.
+\newblock Fast algorithms for zero-dimensional polynomial systems using
+  duality.
+\newblock {\em Applicable Algebra in Engineering, Communication and Computing},
+  14:239--272, 2003.
+
+\bibitem{Coppersmith93}
+Don Coppersmith.
+\newblock Solving linear equations over {GF}(2): block {L}anczos algorithm.
+\newblock {\em Linear Algebra and its Applications}, 192:33 -- 60, 1993.
+
+\bibitem{FaGaHuRe13}
+J.-C. Faug{\`e}re, P.~Gaudry, L.~Huot, and G.~Renault.
+\newblock {Polynomial Systems Solving by Fast Linear Algebra}.
+\newblock https://hal.archives-ouvertes.fr/hal-00816724, 2013.
+
+\bibitem{FaGiLaMo93}
+J.-C. Faug\`ere, P.~Gianni, D.~Lazard, and T.~Mora.
+\newblock Efficient computation of zero-dimensional {G}r\"obner bases by change
+  of ordering.
+\newblock {\em Journal of Symbolic Computation}, 16(4):329--344, 1993.
+
+\bibitem{FaMo17}
+J.-C. Faug{\`e}re and C.~Mou.
+\newblock Sparse {FGLM} algorithms.
+\newblock {\em Journal of Symbolic Computation}, 80(3):538--569, 2017.
+
+\bibitem{KaVi04}
+E.~Kaltofen and G.~Villard.
+\newblock On the complexity of computing determinants.
+\newblock {\em Comput. Complexity}, 13(3-4):91--130, 2004.
+
+\bibitem{Neiger16}
+V.~Neiger.
+\newblock {\em {Bases of relations in one or several variables: fast algorithms
+  and applications}}.
+\newblock PhD thesis, {{\'E}cole Normale Sup{\'e}rieure de Lyon}, November
+  2016.
+
+\bibitem{Rouillier99}
+F.~Rouillier.
+\newblock Solving zero-dimensional systems through the rational univariate
+  representation.
+\newblock {\em Applicable Algebra in Engineering, Communication and Computing},
+  9(5):433--461, 1999.
+
+\end{thebibliography}

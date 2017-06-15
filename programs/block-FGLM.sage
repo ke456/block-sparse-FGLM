@@ -1,9 +1,9 @@
 # provides functions for block-FGLM
-load("poly-solv.sage")
-load("matrix-berlekamp-massey.sage")
-load("create_block_matrix.sage")
 
 def find_lex_basis(ideal,field,M):
+	load("poly-solv.sage")
+	load("matrix-berlekamp-massey.sage")
+	load("create_block_matrix.sage")
 	global mul_mats, B
 	Mx.<X> = PolynomialRing(field)
 	init(ideal,field)
@@ -15,13 +15,13 @@ def find_lex_basis(ideal,field,M):
 	# finding the minimum generating matrix
 	T1 = mul_mats[0]
 	s1 = [U*T1^i*V for i in range(2*d)] # this is horribly inefficient...
-	S = matrix_reverse(matrix_berlekamp_massey(s1), d) # only a temporary fix, may not reduce
+	Spair = matrix_berlekamp_massey_reverse(s1)
+	S = Spair[0]
 	# finding P -the minimal polynomial of T1
 	P_bar = S.det()
 	P = P_bar.reverse()
 	# find the numerator
-	Z1 = add([s1[i]*X^i for i in range(len(s1))])
-	N1 = (S*Z1) % X^d
+	N1 = Spair[1]
 	u = S.smith_form()[1]
 	f = vector([N1[i,0] for i in range(M)])
 	n1_bar = (u*f)[M-1]
