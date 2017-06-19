@@ -1,0 +1,95 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,mathrsfs}
+\pagestyle{empty}
+
+\usepackage{fullpage}
+
+\thispagestyle{empty}
+
+\begin{document}
+
+\noindent\textbf{Lemma 1:} Let $U,V \in \mathbb{K}^{D\times M}$
+be matrices with random entries and $s = (UT_1^iV^T)_{i \ge 0}$. If 
+$Z = \sum_{i = 0}^{\infty} s^{(i)} t^i$, then each entry of $Z$ is
+in the form $\bar{n_*}/\bar{P}$, where $\bar{P}$ is the minimum scalar generator for
+$s$.\\
+
+\noindent\textit{Proof:} Rewrite $U,V$ as 
+$U = [u_1,u_2,\cdots,u_M], V= [v_1,v_2,\cdots,v_M]$, then 
+$$s^{(i)} = 
+\begin{bmatrix}
+u_1T_1^iv_1^T & u_1T_1^iv_2^T & \cdots   & u_1T_1^iv_M^T \\
+u_2T_1^iv_1^T & \cdots        & \cdots   & u_2T_1^iv_M^T \\
+\vdots        & \ddots        & \ddots   & \vdots \\
+u_MT_1^iv_1^T & \cdots        & \cdots   & u_MT_1^iv_M^T 
+\end{bmatrix}$$
+
+Thus, 	
+$$ Z = 
+\begin{bmatrix}
+\sum u_1T_1^iv_1^T t^i & \cdots  & \cdots & \sum u_1T_1^iv_M^T t^i \\
+\vdots                 & \ddots  & \ddots & \vdots \\
+\sum u_MT_1^iv_1^T t^i & \cdots  & \cdots & \sum u_MT_1^iv_M^T  t^i
+\end{bmatrix}$$
+So each entry separately is what would be computed in the scalar case. Therefore,
+we can rewrite each entry as $\bar{n_*}/\bar{P}$ for some numerator $\bar{n_*}$.\\
+
+\noindent\textbf{Lemma 2:} Let $S$ be the minimum generating polynomial matrix for $s$
+and $D = ASB$ be the Smith normal form of $S$. Furthermore, let $s_1, \cdots s_D$ be
+invariant factors of $S$ such that $s_1 | s_2 | \cdots | s_D$. Then, there exists a vector $\tilde{u}$
+such that $\tilde{u} S = [0, \cdots, 0, \bar{P}]$\\
+
+\noindent\textit{Proof:} By theorem 2.7 of KaYu06, $s_D$ is the minimum scalar generator of $s$; thus, $s_D = \bar{P}$. Now let
+$[b_1,\cdots,b_D]$ be the last row of $B$ and 
+$w = [\frac{\bar{P}b_1}{s1},\frac{\bar{P}b_2}{s2},\cdots,\frac{\bar{P}b_{D-1}}{s_{D-1}},b_D]$ (since $s_i | \bar{P}$ ), then
+\begin{align*}
+	(w A) A^{-1} D &=  [\frac{\bar{P}b_1}{s1},\frac{\bar{P}b_2}{s2},\cdots,\frac{\bar{P}b_{D-1}}{s_{D-1}},b_D]
+	\begin{bmatrix}
+	s_1 &        & \\
+	    & \ddots & \\
+	    &        & \bar{P}
+	\end{bmatrix}\\
+	    &= [\bar{P}b_1, \bar{P}b_2, \cdots, \bar{P}b_D]\\
+	    &= [0,\cdots,0,\bar{P}] B
+\end{align*}
+Therefore, if we choose $\tilde{u} = w A$, we get
+$ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,\bar{P}]$ as needed.\\
+
+\noindent\textbf{Lemma 3:} If $\sum_{i = 0}^{\infty} s^{(i)} t^i = S^{-1}N$, then $deg(N)$ is
+less than or equal to $deg(S)$. TODO\\
+
+\noindent\textbf{Theorem 1:} If 
+$S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, the first entry
+of the last row of $\tilde{u} N$ is  the numerator of the generating function for 
+$(u_{M} T_1^i v_{1}^T)_{i \ge 0}$.\\
+
+\noindent\textit{Proof:} Let $S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, then by lemma 1
+$$ N = S \sum_{i=0}^{\infty} s^{(i)} t^i = S 
+\begin{bmatrix}
+n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
+\vdots            & \ddots & \vdots \\
+n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+\end{bmatrix}
+$$
+Therefore,
+\begin{align*}
+\tilde{u} N &= \tilde{u} S
+				\begin{bmatrix}
+				n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
+				\vdots            & \ddots & \vdots \\
+				n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+				\end{bmatrix} \\
+\intertext{by lemma 2,}
+            &= [0,\cdots,0,\bar{P}]
+               \begin{bmatrix}
+               n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
+               \vdots            & \ddots & \vdots \\
+               n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+               \end{bmatrix}\\
+            &= [n_{M,1} , \cdots , n_{M,M}]
+\end{align*}
+
+\end{document}
+
+
+
