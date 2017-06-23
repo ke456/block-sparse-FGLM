@@ -7,9 +7,12 @@
 \thispagestyle{empty}
 
 \begin{document}
+\noindent NOTE: We don't actually require $\bar{P}$ to be the reverse of the minpoly of $T_1$ for
+these formulas to work (although we require it for the actual algorithm to work). The proof
+of $P = minpoly(T_1)$ is with the blocking.\\
 
 \noindent\textbf{Lemma 1:} Let $U,V \in \mathbb{K}^{D\times M}$
-be matrices with random entries and $s = (UT_1^iV^T)_{i \ge 0}$. If 
+be matrices with random entries and $s = (U^{tr}T_1^iV)_{i \ge 0}$. If 
 $Z = \sum_{i = 0}^{\infty} s^{(i)} t^i$, then each entry of $Z$ is
 in the form $\bar{n_*}/\bar{P}$, where $\bar{P}$ is the minimum scalar generator for
 $s$.\\
@@ -18,18 +21,18 @@ $s$.\\
 $U = [u_1,u_2,\cdots,u_M], V= [v_1,v_2,\cdots,v_M]$, then 
 $$s^{(i)} = 
 \begin{bmatrix}
-u_1T_1^iv_1^T & u_1T_1^iv_2^T & \cdots   & u_1T_1^iv_M^T \\
-u_2T_1^iv_1^T & \cdots        & \cdots   & u_2T_1^iv_M^T \\
-\vdots        & \ddots        & \ddots   & \vdots \\
-u_MT_1^iv_1^T & \cdots        & \cdots   & u_MT_1^iv_M^T 
+u_1^{tr}T_1^iv_1 & u_1^{tr}T_1^iv_2 & \cdots   & u_1^{tr}T_1^iv_M \\
+u_2^{tr}T_1^iv_1 & \cdots           & \cdots   & u_2^{tr}T_1^iv_M \\
+\vdots           & \ddots           & \ddots   & \vdots \\
+u_M^{tr}T_1^iv_1 & \cdots           & \cdots   & u_M^{tr}T_1^iv_M
 \end{bmatrix}$$
 
 Thus, 	
 $$ Z = 
 \begin{bmatrix}
-\sum u_1T_1^iv_1^T t^i & \cdots  & \cdots & \sum u_1T_1^iv_M^T t^i \\
-\vdots                 & \ddots  & \ddots & \vdots \\
-\sum u_MT_1^iv_1^T t^i & \cdots  & \cdots & \sum u_MT_1^iv_M^T  t^i
+\sum u_1^{tr}T_1^iv_1 t^i & \cdots  & \cdots & \sum u_1^{tr}T_1^iv_M t^i \\
+\vdots                    & \ddots  & \ddots & \vdots \\
+\sum u_M^{tr}T_1^iv_1 t^i & \cdots  & \cdots & \sum u_M^{tr}T_1^iv_M  t^i
 \end{bmatrix}$$
 So each entry separately is what would be computed in the scalar case. Therefore,
 we can rewrite each entry as $\bar{n_*}/\bar{P}$ for some numerator $\bar{n_*}$.\\
@@ -61,7 +64,7 @@ less than or equal to $deg(S)$. TODO\\
 \noindent\textbf{Theorem 1:} If 
 $S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, the first entry
 of the last row of $\tilde{u} N$ is  the numerator of the generating function for 
-$(u_{M} T_1^i v_{1}^T)_{i \ge 0}$.\\
+$(u_{M}^{tr} T_1^i v_{1})_{i \ge 0}$.\\
 
 \noindent\textit{Proof:} Let $S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, then by lemma 1
 $$ N = S \sum_{i=0}^{\infty} s^{(i)} t^i = S 
