@@ -2,7 +2,9 @@
 
 def find_lex_basis(ideal,field,M):
 	load("poly-solv.sage")
-	load("matrix-berlekamp-massey.sage")
+	load("polmat/utils.sage")
+	load("polmat/approximant-basis.sage")
+	load("polmat/recurrence-generator.sage")
 	load("create_block_matrix.sage")
 	global mul_mats, B
 	Mx.<X> = PolynomialRing(field)
