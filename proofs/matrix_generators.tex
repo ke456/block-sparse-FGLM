@@ -1,0 +1,148 @@
+%%%preamble.
+\documentclass[12pt]{article}
+
+\usepackage[english]{babel}
+\usepackage{enumerate}
+\usepackage{fullpage}
+\usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+
+\usepackage{amsthm,thmtools}
+\declaretheorem[style=plain]{definition}
+\declaretheorem[sibling=definition]{theorem}
+\declaretheorem[sibling=definition]{corollary}
+\declaretheorem[sibling=definition]{proposition}
+\declaretheorem[sibling=definition]{lemma}
+%\declaretheorem[style=remark,sibling=definition,qed={\Coffeecup}]{remark}
+%\declaretheorem[style=remark,sibling=definition,qed={\WritingHand}]{example}
+%\declaretheoremstyle[headpunct={},notebraces={\textbf{--}~}{}]{algorithm}
+%\declaretheorem[style=algorithm]{problem}
+%\declaretheorem[style=algorithm]{algorithm}
+
+
+\usepackage[capitalize]{cleveref}
+
+\title{Matrix Berlekamp-Massey}
+
+\author{}
+\date{\today}
+
+%%%notation
+%misc
+\newcommand{\storeArg}{} % aux, not to be used in document!!
+\newcounter{notationCounter}
+%integers
+\renewcommand{\ge}{\geqslant} % greater or equal
+\renewcommand{\le}{\leqslant} % lesser or equal
+%spaces
+\newcommand{\NN}{\mathbb{Z}_{\ge 0}} % nonnegative integers
+\newcommand{\var}{X} % variable for univariate polynomials
+\newcommand{\field}{\mathbb{K}} % base field
+\newcommand{\polRing}{\field[\var]} % polynomial ring
+\newcommand{\Pox}{[\mkern-3mu[ \var ]\mkern-3.2mu]}
+\newcommand{\psRing}{\field\Pox}
+\newcommand{\matSpace}[1][\rdim]{\renewcommand\storeArg{#1}\matSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\matSpaceAux}[1][\storeArg]{\field^{\storeArg \times #1}} % not to be used in document
+\newcommand{\polMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\polMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\polMatSpaceAux}[1][\storeArg]{\polRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\psMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\psMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\psMatSpaceAux}[1][\storeArg]{\psRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\mat}[1]{\mathbf{\MakeUppercase{#1}}} % for a matrix
+\newcommand{\row}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\col}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\matCoeff}[1]{\MakeLowercase{#1}} % for a coefficient in a matrix
+\newcommand{\rdim}{m} % row dimension
+\newcommand{\cdim}{n} % column dimension
+\newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
+\newcommand{\seqelt}[1]{S_{#1}} % element of sequence of matrices
+\newcommand{\seq}{\mathcal{S}} % sequence of matrices
+\newcommand{\seqpm}{\mat{S}} % power series matrix from a sequence
+\newcommand{\rel}{\col{p}} % linear relation
+\newcommand{\relbas}{\mat{p}} % linear relation
+\newcommand{\relSpace}{\polMatSpace[\cdim][1]} % space for linear relations
+\newcommand{\relbasSpace}{\polMatSpace[\cdim][\cdim]} % space for linear relations
+
+\begin{document}
+  \maketitle
+
+
+\section{Definition of recurrence relations}
+\label{sec:relations}
+
+First issue: which definition to use for matrix generator? There is one in
+\cite{KalYuh13}, and a different one in \cite{Thome02}; both are related as
+follows.
+
+\begin{definition}[\cite{Thome02}]
+  \label{dfn:relation_thome}
+  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
+  sequence of $\rdim\times\cdim$ matrices over $\field$. We define the power
+  series matrix $\seqpm = \sum_{k\ge 0} \seqelt{k} \var^k \in
+  \psMatSpace[\rdim][\cdim]$. Then, a vector $\rel \in \relSpace$ is said to be
+  a \emph{(linear recurrence) relation for $\seq$} if the product $\seqpm \rel$
+  has polynomial entries, that is, $\seqpm \rel \in \relSpace$.
+\end{definition}
+
+For some reason (which is unclear to me), in \cite{Thome02} the word
+``generator'' is used for such relations. Here we will reserve this word for
+sets of vectors that indeed generate the set of all relations.
+
+Assume there exists a nonzero relation for $\seq$, and let $\rel$ be such a
+relation. Writing $\rel = \sum_k p_k \var^k$ for matrices
+$p_k \in \matSpace[\cdim][1]$, then we have
+\begin{equation}
+  \label{eqn:relation_thome}
+  \sum_{k=0}^{d} \seqelt{\delta - k} p_{k} = 0 \quad \text{ for all } d \ge
+  \deg(\rel) \text{ and } \delta \ge \max(d,\deg(\seqpm \rel)+1).
+\end{equation}
+One may have in mind that $\deg(\seqpm \rel) < \deg(\rel)$ since this typically
+holds for the output of existing algorithms; in general, this does not
+necessary hold. For example, if $\seq$ has only finitely many nonzero terms,
+and thus $\seqpm$ already has polynomial entries, any coordinate vector is a
+relation $\rel$ such that $\seqpm \rel$ has degree larger than $\deg(\rel)$.
+
+\begin{definition}[\cite{KalYuh13}]
+  \label{dfn:relation_ky}
+  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
+  sequence of $\rdim\times\cdim$ matrices over $\field$. We define the power
+  series matrix $\seqpm = \sum_{k\ge 0} \seqelt{k} \var^k \in
+  \psMatSpace[\rdim][\cdim]$. Then, a vector $\rel \in \relSpace$ of degree at
+  most $d$ is said to be a \emph{(linear recurrence) relation for $\seq$} if
+  \[
+    \sum_{k=0}^{d} \seqelt{\delta + k} p_{k} = 0
+    \quad\text{ for all } \delta \ge 0.
+  \]
+  where $(p_k)_{k}$ are the matrices in $\matSpace[\cdim][1]$ such that $\rel =
+  \sum_{0\le k\le d} p_k \var^k$.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:link_defs}
+  For a given sequence $\seq \subset \matSpace[\rdim][\cdim]$, a nonzero vector
+  $\rel \in \relSpace$ is a relation for \cref{dfn:relation_thome} if and only
+  if there exists $d \ge \deg(\rel)$ such that the reverse $\var^{d}
+  \rel(\var^{-1})$ is a relation for \cref{dfn:relation_ky}.
+\end{lemma}
+\begin{proof}
+  First, we assume that $\var^{d} \rel(\var^{-1}) = \sum_{k=0}^{d} p_{d-k}
+  \var^k$ is a relation for \cref{dfn:relation_ky}, for some integer $d \ge
+  \deg(\rel)$. This means that, for all $\delta \ge 0$, we have $0 =
+  \sum_{k=0}^{d} \seqelt{\delta + k} p_{d-k} = \sum_{k=0}^{d} \seqelt{\delta+d
+  - k} p_{k}$. This implies that $\seqpm\rel$ has polynomial entries (and
+  $\deg(\seqpm\rel) \le d$).
+
+  Now, we assume that $\rel$ is a relation for \cref{dfn:relation_thome}.
+  Taking $d = \max(\deg(\rel),\deg(\seqpm \rel)+1)$ in
+  \cref{eqn:relation_thome}, we obtain $\sum_{k=0}^{d} \seqelt{\delta - k}
+  p_{k} = 0$ for all $\delta \ge d$. This implies $\sum_{k=0}^{d}
+  \seqelt{\delta-d + k} p_{d-k} = 0$ for all $\delta\ge d$, or equivalently,
+  $\sum_{k=0}^{d} \seqelt{\delta+k} p_{d-k} = 0$ for all $\delta\ge 0$.
+  Therefore the reverse $\var^{d} \rel(\var^{-1})$ is a relation for
+  \cref{dfn:relation_ky}.
+\end{proof}
+
+\bibliographystyle{plain}
+\bibliography{biblio.bib}
+
+\end{document}
