@@ -1,4 +1,9 @@
 # provides functions for block-FGLM
+def vec_reverse(vec,deg,l):
+	return vector([vec[i].reverse(deg) for i in range(l)])
+	
+def shift(vec,deg,l):
+	return vector([(vec[i].reverse() %X^deg).reverse() for i in range(l)])
 
 def find_lex_basis(ideal,field,M):
 	load("poly-solv.sage")
@@ -17,21 +22,18 @@ def find_lex_basis(ideal,field,M):
 	# finding the minimum generating matrix
 	T1 = mul_mats[0]
 	s1 = [U*T1^i*V for i in range(2*d)] # this is horribly inefficient...
-	Spair = matrix_berlekamp_massey_reverse(s1)
+	Spair = matrix_berlekamp_massey(s1)
 	S = Spair[0]
 	# finding P -the minimal polynomial of T1
-	P_bar = S.det()
-	P = P_bar.reverse()
-	print("P_bar:")
-	print(P_bar)
+	P = S.det()
+	P_bar = P.reverse()
 	# find the numerator
-	N1 = Spair[1]
+	Z1 = add([s1[i].columns()[0] * X^i for i in range(d)])
+	Z1 = vec_reverse(Z1,d,M)
+	N = S*Z1
+	N = shift(N,d,M)
 	u = S.smith_form()[1]
-	f = vector([N1[i,0] for i in range(M)])
-	n1_bar = (u*f)[M-1]
-	n1 = n1_bar.reverse()
-	print("n1:")
-	print(n1)
+	n1 = (u*N)[N.length()-1]
 	# adding P to the result
 	monomials = ideal.random_element(1).parent().gens()
 	m = monomials[0]
@@ -43,16 +45,12 @@ def find_lex_basis(ideal,field,M):
 	for i in [1 .. len(mul_mats)-1]:
 		index = i
 		Ti = mul_mats[i]
-		Z = [ U* T1^i * Ti * V* X^i for i in range(d)] # probably should be stored...
-		Z = add(Z)
-		N = (S*Z) % X^(d)
-		f = vector([N[i,0] for i in range(N.nrows())])
-		n_bar = (u*f)[N.nrows()-1] % P_bar
-		n = n_bar.reverse()
-		print("printing n:")
-		print(n)
+		Z = add([ (U* T1^i * Ti * V.columns()[0]* X^i) for i in range(d)]) # probably should be stored...
+		Z = vec_reverse(Z,d,M)
+		N = (S*Z)
+		N = shift(N,d,M)
+		n = (u*N)[N.length()-1]
 		func = (n*n1.inverse_mod(P))%P
-		print(func)
 		mX = 0
 		for i in range(len(func.coefficients(false))):
 			mX += func.coefficients(false)[i] * m^i
