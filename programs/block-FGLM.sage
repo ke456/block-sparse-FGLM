@@ -2,7 +2,9 @@
 
 def find_lex_basis(ideal,field,M):
 	load("poly-solv.sage")
-	load("matrix-berlekamp-massey.sage")
+	load("polmat/utils.sage")
+	load("polmat/approximant-basis.sage")
+	load("polmat/recurrence-generator.sage")
 	load("create_block_matrix.sage")
 	global mul_mats, B
 	Mx.<X> = PolynomialRing(field)
@@ -20,18 +22,22 @@ def find_lex_basis(ideal,field,M):
 	# finding P -the minimal polynomial of T1
 	P_bar = S.det()
 	P = P_bar.reverse()
+	print("P_bar:")
+	print(P_bar)
 	# find the numerator
 	N1 = Spair[1]
 	u = S.smith_form()[1]
 	f = vector([N1[i,0] for i in range(M)])
 	n1_bar = (u*f)[M-1]
 	n1 = n1_bar.reverse()
+	print("n1:")
+	print(n1)
 	# adding P to the result
 	monomials = ideal.random_element(1).parent().gens()
 	m = monomials[0]
 	mX = 0
-	for i in range(len(P.coefficients())):
-		mX += P.coefficients()[i] * m^i
+	for i in range(len(P.coefficients(false))):
+		mX += P.coefficients(false)[i] * m^i
 	result.append(mX)
 	# finding rest of the functions
 	for i in [1 .. len(mul_mats)-1]:
@@ -43,11 +49,13 @@ def find_lex_basis(ideal,field,M):
 		f = vector([N[i,0] for i in range(N.nrows())])
 		n_bar = (u*f)[N.nrows()-1] % P_bar
 		n = n_bar.reverse()
+		print("printing n:")
+		print(n)
 		func = (n*n1.inverse_mod(P))%P
 		print(func)
 		mX = 0
-		for i in range(len(func.coefficients())):
-			mX += func.coefficients()[i] * m^i
+		for i in range(len(func.coefficients(false))):
+			mX += func.coefficients(false)[i] * m^i
 		result.append(monomials[index] - mX)
 	return result
 	
