@@ -1,8 +1,7 @@
 \documentclass[12pt]{article}
-\usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,mathrsfs}
+\usepackage{amsmath,amsthm,amssymb,epsfig,color,xspace,mathrsfs}
 \pagestyle{empty}
 
-\usepackage{fullpage}
 
 \thispagestyle{empty}
 
@@ -28,9 +27,9 @@ degrees of the first $M$ invariant factors of $\lambda I -A$ (where $M$ is the s
 $F_X^{A,Y}$ divides $s_i$. Furthermore, there exist matrices $W,Z$ st $\forall i$, $1 \le i \le min(M,\phi)$, the $i^{th}$ invariant factor of
 $F_W^{A,Z}$ is equal to $s_i$ (all other remaining ones are equal to 1).\\
 
-\noindent We wil now prove that if we choose matrices $X,Y$ generically (generic in the 
-Schwartz/Zippel sense) and $s_i$ and $\bar{s_i}$ are $i^{th}$ invariant factor of 
-$\lambda I - A$ and $F_X^{A,Y}$ respectively, then for $1 \le i \le M$ ,
+\noindent We will now prove that if we choose two matrices $X,Y \in \mathbb{K}^{D\times M}$ generically 
+(generic in the Schwartz/Zippel sense) and $s_i$ and $\bar{s_i}$ are $i^{th}$ invariant factor of 
+$\lambda I - A$ and $F_X^{A,Y}$ respectively, then for $1 \le i \le M$,
 $s_i = \bar{s_i}$.
 
 \noindent First, by the definition of invariants factors, for any choice of $X,Y$
@@ -38,5 +37,63 @@ $s_i = \bar{s_i}$.
 	dim(span(X,A^{tr}X,(A^{tr})^2X, (A^{tr})^3X,\cdots)) &\le \sum_{i=1}^{M} deg(s_i)\\
 	dim(span(Y,AY,A^2Y,A^3Y,\dots)) &\le \sum_{i=1}^{M} deg(s_i)
 \end{align*}
+(Note: equality is possible for both inequalities). Then define two block Hankel matrices (with as many
+rows and columns as it takes to maximize the rank)
+$$ H_Y =
+\begin{bmatrix}
+I \\ A \\ A^2 \\ A^3 \\ \vdots
+\end{bmatrix}
+\begin{bmatrix}
+Y & AY &A^2Y & \cdots
+\end{bmatrix}
+$$
+$$ H_{X,Y} =
+\begin{bmatrix}
+X^{tr} \\ X^{tr}A \\ X^{tr} A^2 \\ X^{tr} A^3 \\ \vdots
+\end{bmatrix}
+\begin{bmatrix}
+Y & AY & A^2Y & A^3Y& \cdots
+\end{bmatrix}
+$$
+Now,
+\begin{align*}
+rank(H_Y) &= dim(span(Y,AY,A^2Y,A^3Y,\dots))\\ \intertext{and}
+rank(H_{X,Y}) &= dim(span(X^{tr}Y,X^{tr}AY,X^{tr}A^2Y,\cdots)) \le rank(H_Y)
+\end{align*} 
+Let $W,Z$ be generic choices for $X,Y$ respectively.
+A generic choice of $Y$ maximizes $dim(span(Y,AY,A^2Y,A^3Y,\dots))$; thus, we get
+$$rank(H_Z) = dim(span(Z,AZ,A^2Z,A^3Z,\dots)) = \sum_{i = 1}^{M} deg(s_i)$$
+A generic choice of $X$ makes $F_X^{A,Y} = F^{A,Y}$ and by (2.6), 
+$rank(H_{W,Z}) = deg(det(F_W^{A,Z})) = deg(det(F^{A,Z})) = rank(H_Z)$. Therefore,
+$$deg(det(F_W^{A,Z})) = \sum_{i=1}^{M} deg(s_i)$$
+Since $\bar{s_i}$ divides $s_i$, in order to have $deg(det(F_W^{A,Z})) = \sum_{i=1}^{M} deg(s_i)$,
+it must be the case that $\bar{s_i} = s_i$ for $1 \le i \le M$ as needed.
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
