@@ -14,7 +14,7 @@
 
 \maketitle
 
-\paragraph{Overview.}
+\noindent{\bf Overview.}
 Computing the Gr\"obner basis of an ideal with respect to a term
 ordering is an essential step in solving systems of polynomials; in
 what follows, we restrict our attention to systems with finitely many
@@ -69,28 +69,28 @@ instead. In~\cite{BoSaSc03}, the authors show how we can recover the
 Gr\"obner basis $R$ of $\sqrt{I}$ (together with the nil-indices of
 all points) from the values $\ell(x_n^i)$ and $\ell(x_j x_n^i)$, for a
 random $\ell$, whereas Faug\`ere and Mou show in~\cite{FaMo17} how to
-compute the basis $G$ of $I$ itself using similar sets of values, when
+compute the basis $G$ of $I$ using similar sets of values, when
 $I$ is in shape position (in general, the algorithm falls back on
 Berlekamp-Massey-Sakata techniques). Quite importantly, they also
-demonstrate that exploiting the sparsity of matrices $T_1,\dots,T_n$
+show that exploiting the sparsity of the matrices $T_1,\dots,T_n$
 is critical for the efficiency of these algorithms.
 
 The computation of sequences such as $\ell(x_n^i)$ is difficult to
-parallelize.  In this work, in the continutation of~\cite{BoSaSc03},
+parallelize.  In this work, in the continuation of~\cite{BoSaSc03},
 we use techniques inspired by Coppersmith's block Wiedemann
-algorithm~\cite{Coppersmith93} to compute the Gr\"obner basis $R$ of
+algorithm~\cite{Coppersmith93} to compute the lex Gr\"obner basis $R$ of
 $\sqrt{I}$.
 
-\noindent{\bf Computing $R_{n}$.} We choose an integer $m$, random
+\medskip\noindent{\bf Computing $R_{n}$.} We choose an integer $m$, random
 matrices $u \in \mathbb{K}^{m \times D}$, $v \in \mathbb{K}^{D \times
   m}$, and we consider the matrix sequence $s = (uT_n^iv)_{i \ge
-  0}$. For generic matrices $u, v$, Theorem 2.12 in~\cite{KaVi04}
+  0}$. For generic matrices $u, v$, \cite[Theorem 2.12]{KaVi04}
 shows that if $S \in \mathbb{K}[x]^{m\times m}$ is a minimal
 generating polynomial of $(s_i)_{i \ge 0}$, its determinant is a
 multiple of the minimal polynomial of $x_n$ in $Q$, and divides its
 characteristic polynomial. This polynomial must then factor as
-$\prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
-(x-\alpha_n)^{e_\alpha}$, for certain positive integers $e$; in
+$\det(S) = \prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
+(x-\alpha_n)^{e_\alpha}$, for some positive integers $(e_\alpha)_\alpha$; in
 particular, its squarefree part (written in the variable $x_n$) is the last polynomial $R_n$ in $R$.
 
 \medskip\noindent{\bf Using $u$-resultant techniques.} We propose  to recover the 
@@ -112,7 +112,7 @@ Hence, it is enough to compute $M_\lambda \bmod \lambda^2$. For this,
 we compute the sequence $s_\lambda \bmod \lambda^2=(s_i + i s^*_i \lambda)_{i \ge 0}$,
 with $s^*_i= uT_n^{i-1} T_{n-1}v$, and we apply e.g.\ the matrix
 Berlekamp Massey algorithm to this sequence, over the coefficient ring
-$\mathbb{K}[\lambda]/\lambda^2$; in generic coordinates, we expect that
+$\mathbb{K}[\lambda]/(\lambda^2)$; in generic coordinates, we expect that
 the calculation carries over as if we were over a field.
 
 \medskip\noindent{\bf The case of radical ideals.} It is of course desirable to 
@@ -121,8 +121,8 @@ possible. For radical ideals, we propose an alternative solution that
 avoids this issue (extending this idea to arbitrary $I$ is work in progress).
 
 Suppose that we have computed the minimal generating polynomial $S$,
-together with its determinant (in the radical case, it coincides with
-$R_n(x_n)$); we can then compute the numerator matrix $N$ of the
+together with its determinant (which, in the radical case, coincides with
+$R_n(x_n)$). We can then compute the numerator matrix $N$ of the
 generating series $G=\sum_{i \ge 0} s_i/x^{i+1}$ by a single product
 of polynomial matrices $N=S G$. We repeat this operation with the
 generating series $\sum_{i \ge 0} s^*_i/x^{i+1}$, for $s^*_i$ as in
@@ -132,7 +132,8 @@ invariant factor. Then, let $n$ and $n^*$ be the entries of indices
 $(1,m)$ in respectively $AN$ and $AN^*$; we can verify that
 $R_{n-1}=n^*/n \bmod R_n$.
 
-As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{F}(9001)[x_1,x_2,x_1]$,
+As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{F}_{9001}[x_1,x_2,x_3]$,
+where
 \begin{align*}
 f_1 &= 3536x_3^2 +6536x_3x_2 + 3900x_2^2 + 3722x_3x_1 + 580x_2x_1 + 7635x_1^2 + 4203x_3 + 1386x_2 + 2491x_1 + 250\\
 f_2 &= 3987x_3^2 + 3953x_3x_2 +6122x_2^2 +5115x_3x_1 +7660x_2x_1 +8669x_1^2 + 4098x_3 +7705x_2 + 2449x_1 + 1134\\
@@ -150,7 +151,7 @@ v &= \begin{bmatrix}
 \end{bmatrix} ^ {t}
 \end{align*}
 The monomial basis of $Q$ is $\mathscr{B}=[x_1^3, x_1^2, x_2x_1, x_3x_1, x_1, x_2, x_3, 1]$, with $D = 8$. 
-Computing the minimal generating polynomial of $s_i=u T_3^i v$, we get
+Computing the minimal generating polynomial of $s=(u T_3^i v)_{i\ge 0}$, we get
 $$S= \begin{bmatrix}
 8226 + 5622x + 7693x^2 + 5033x^3 + x^4&     2919 + 8706x + 3736x^2 + 4829x^3\\
 7928 + 3675x + 7471x^2 + 3510x^3  &        3113 + 5615x + 2702x^2 + 3353x^3 + x^4
@@ -169,10 +170,8 @@ $x_3$, and
 is equal to 
 $$R_2 = 2287x_3^7 + 8269x_3^6 + 8475x_3^5 + 6889x_3^4 + 4785x_3^3 + 3960x_3^2 + 3902x_3 + 4153.$$
 Doing the same with the sequence $uT_3^{i-1} T_1 v$ gives us a polynomial $R_1(x_3)$,
-which finally leads us to the Gr\"obner basis $(x_1-R_1(x_3), x_2-R_2(x_3),R_3(x_3))$
+which finally leads us to the lex Gr\"obner basis $(x_1-R_1(x_3), x_2-R_2(x_3),R_3(x_3))$
 of $I$.
-
-
 
 %% It is possible to verify the correctness of this algorithm algebraically, given that the Smith normal form of
 %% S is as described. We know experimentally that this is the case, but we do not know how to prove this relationship
