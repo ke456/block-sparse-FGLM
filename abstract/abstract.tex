@@ -1,9 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,sigsam,mathrsfs}
-\usepackage[
-pdftitle={abstract}]
-{hyperref}
+\usepackage[pdftitle={abstract}]{hyperref}
 
 \title{Sparse FGLM using the block Wiedemann algorithm}
 \author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \' Eric Schost}
@@ -12,53 +10,52 @@ pdftitle={abstract}]
 \articlehead{ISSAC 2017 poster abstract}
 \authorhead{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \' Eric Schost}
 
-
-
 \begin{document}
 
 \maketitle
 
-\paragraph{Overview}
+\noindent{\bf Overview.}
 Computing the Gr\"obner basis of an ideal with respect to a term
-ordering is an essential step in solving systems of polynomials (in
+ordering is an essential step in solving systems of polynomials; in
 what follows, we restrict our attention to systems with finitely many
-solutions.)  Certain term orderings, such as the degree reverse
-lexicographical ordering (degrevlex), make the computation of the
+solutions. Certain term orderings, such as the degree reverse
+lexicographical ordering (\emph{degrevlex}), make the computation of the
 Gr\"obner basis faster, while other orderings, such as the
-lexicographical ordering (lex), make it easier to find the coordinates
-of the solutions. Thus, one typically first compute a Gr\"obner basis
-using a degrevlex ordering, then converts it to either a lex Gr\"obner
-basis, or a related representation, such as Rouillier's Rational
+lexicographical ordering (\emph{lex}), make it easier to find the coordinates
+of the solutions. Thus, one typically first computes a Gr\"obner basis
+for the degrevlex ordering, and then converts it to either a lex Gr\"obner
+basis or a related representation, such as Rouillier's Rational
 Univariate Representation~\cite{Rouillier99}.
 
 Consider a zero-dimensional ideal $I \subset \mathbb{K}[x_1, \dots,
   x_n]$, given by means of a monomial basis $\mathscr{B}$ of
-$Q=\mathbb{K}[x_1, \dots, x_n]/I$, together with the multiplication
-matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$ of respectively
+$Q=\mathbb{K}[x_1, \dots, x_n]/I$ together with the multiplication
+matrices $T_1,\dots, T_n \in \mathbb{K}^{D \times D}$ of
 $x_1,\dots,x_n$ in $Q$ in $\mathscr{B}$, with
 $D=\dim_\mathbb{K}(Q)$. In all that follows, we assume that $x_n$ {\em
-  separates} the points of $V(I)$. However, we do not assume that $I$
-is radical, or that it is in {\em shape position} (that is, that its
-lex basis for the order $x_1 > \cdots > x_n$ has the form
-$(x_1-G_1(x_n),\dots,x_{n-1}-G_{n-1}(x_n),G_n(x_n))$); note that our
+  separates} the points of $V(I)$. However, we assume neither that $I$
+is radical nor that it is in {\em shape position}; we recall that the latter means that the
+Gr\"obner basis of $I$ for the lex ordering with $x_1 > \cdots > x_n$ has the form
+$(x_1-G_1(x_n),\dots,x_{n-1}-G_{n-1}(x_n),G_n(x_n))$. Note that our
 assumption can be ensured by a generic change of coordinates, while
 the shape position one may not hold for any choice of
 coordinates. Under our assumption, the {\em radical} of $I$ is in
-shape position, with Gr\"obner basis
+shape position, with lex Gr\"obner basis
 $R=(x_1-R_1(x_n),\dots,x_{n-1}-R_{n-1}(x_n),R_n(x_n))$.
 
 The FGLM algorithm~\cite{FaGiLaMo93} computes the Gr\"obner basis of
-$I$ for the lex order $x_1 > \cdots > x_n$ with a runtime cubic in the dimension
+$I$ for the lex ordering with a runtime cubic in the dimension
 $D$. Although recent work has reduced the runtime exponent from $3$ to
 the exponent of matrix multiplication
 $\omega$~\cite{FaGaHuRe13,Neiger16}, linear algebra techniques based
 on duality often turn out to be more efficient. The basic idea behind
-these techniques is to compute values of one (or possibly several)
-linear forms $\ell: Q \to \mathbb{K}$ at well-chosen elements of $Q$,
+these techniques is to compute values of a
+linear form $\ell: Q \to \mathbb{K}$ at well-chosen elements of $Q$,
+or possibly of several such forms,
 and to deduce our output by solving some well-structured linear system
-(typically, Hankel).
+(typically, a Hankel system).
 
-Several forms of these ideas exist. The Rational Univariate
+Several forms of this idea exist. The Rational Univariate
 Representation algorithm takes for $\ell$ the trace ${\rm tr}: Q \to
 \mathbb{K}$ and computes values of the form ${\rm tr}(x_n^i)$ and
 ${\rm tr}(x_j x_n^i)$; from there, the output of the algorithm is
@@ -69,31 +66,31 @@ $\mathscr{B}$, and $e_n$ is the column vector of coordinates of $x_n$ on
 $\mathscr{B}$. Computing the values of the trace on $\mathscr{B}$ is
 however costly, so several algorithms use random linear forms
 instead. In~\cite{BoSaSc03}, the authors show how we can recover the
-Gr\"obner basis of $R$ of $\sqrt{I}$ (together with the nil-indices of
+Gr\"obner basis $R$ of $\sqrt{I}$ (together with the nil-indices of
 all points) from the values $\ell(x_n^i)$ and $\ell(x_j x_n^i)$, for a
 random $\ell$, whereas Faug\`ere and Mou show in~\cite{FaMo17} how to
-compute the basis $G$ of $I$ itself using similar sets of values, when
+compute the basis $G$ of $I$ using similar sets of values, when
 $I$ is in shape position (in general, the algorithm falls back on
 Berlekamp-Massey-Sakata techniques). Quite importantly, they also
-demonstrate that exploiting the sparsity of matrices $T_1,\dots,T_n$
+show that exploiting the sparsity of the matrices $T_1,\dots,T_n$
 is critical for the efficiency of these algorithms.
 
 The computation of sequences such as $\ell(x_n^i)$ is difficult to
-parallelize.  In this work, in the continutation of~\cite{BoSaSc03},
+parallelize.  In this work, in the continuation of~\cite{BoSaSc03},
 we use techniques inspired by Coppersmith's block Wiedemann
-algorithm~\cite{Coppersmith93} to compute the Gr\"obner basis $R$ of
+algorithm~\cite{Coppersmith93} to compute the lex Gr\"obner basis $R$ of
 $\sqrt{I}$.
 
-\noindent{\bf Computing $R_{n}$.} We choose an integer $m$, random
+\medskip\noindent{\bf Computing $R_{n}$.} We choose an integer $m$, random
 matrices $u \in \mathbb{K}^{m \times D}$, $v \in \mathbb{K}^{D \times
   m}$, and we consider the matrix sequence $s = (uT_n^iv)_{i \ge
-  0}$. For generic matrices $u, v$, Theorem 2.12 in~\cite{KaVi04}
+  0}$. For generic matrices $u, v$, \cite[Theorem 2.12]{KaVi04}
 shows that if $S \in \mathbb{K}[x]^{m\times m}$ is a minimal
 generating polynomial of $(s_i)_{i \ge 0}$, its determinant is a
 multiple of the minimal polynomial of $x_n$ in $Q$, and divides its
 characteristic polynomial. This polynomial must then factor as
-$\prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
-(x-\alpha_n)^{e_\alpha}$, for certain positive integers $e$; in
+$\det(S) = \prod_{\alpha=(\alpha_1,\dots,\alpha_n) \in V(I)}
+(x-\alpha_n)^{e_\alpha}$, for some positive integers $(e_\alpha)_\alpha$; in
 particular, its squarefree part (written in the variable $x_n$) is the last polynomial $R_n$ in $R$.
 
 \medskip\noindent{\bf Using $u$-resultant techniques.} We propose  to recover the 
@@ -115,7 +112,7 @@ Hence, it is enough to compute $M_\lambda \bmod \lambda^2$. For this,
 we compute the sequence $s_\lambda \bmod \lambda^2=(s_i + i s^*_i \lambda)_{i \ge 0}$,
 with $s^*_i= uT_n^{i-1} T_{n-1}v$, and we apply e.g.\ the matrix
 Berlekamp Massey algorithm to this sequence, over the coefficient ring
-$\mathbb{K}[\lambda]/\lambda^2$; in generic coordinates, we expect that
+$\mathbb{K}[\lambda]/(\lambda^2)$; in generic coordinates, we expect that
 the calculation carries over as if we were over a field.
 
 \medskip\noindent{\bf The case of radical ideals.} It is of course desirable to 
@@ -124,8 +121,8 @@ possible. For radical ideals, we propose an alternative solution that
 avoids this issue (extending this idea to arbitrary $I$ is work in progress).
 
 Suppose that we have computed the minimal generating polynomial $S$,
-together with its determinant (in the radical case, it coincides with
-$R_n(x_n)$); we can then compute the numerator matrix $N$ of the
+together with its determinant (which, in the radical case, coincides with
+$R_n(x_n)$). We can then compute the numerator matrix $N$ of the
 generating series $G=\sum_{i \ge 0} s_i/x^{i+1}$ by a single product
 of polynomial matrices $N=S G$. We repeat this operation with the
 generating series $\sum_{i \ge 0} s^*_i/x^{i+1}$, for $s^*_i$ as in
@@ -135,12 +132,15 @@ invariant factor. Then, let $n$ and $n^*$ be the entries of indices
 $(1,m)$ in respectively $AN$ and $AN^*$; we can verify that
 $R_{n-1}=n^*/n \bmod R_n$.
 
-As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{F}(9001)[x_1,x_2,x_1]$,
+As an example, we will run the algorithm on $I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{F}_{9001}[x_1,x_2,x_3]$,
+where
+{\small
 \begin{align*}
 f_1 &= 3536x_3^2 +6536x_3x_2 + 3900x_2^2 + 3722x_3x_1 + 580x_2x_1 + 7635x_1^2 + 4203x_3 + 1386x_2 + 2491x_1 + 250\\
 f_2 &= 3987x_3^2 + 3953x_3x_2 +6122x_2^2 +5115x_3x_1 +7660x_2x_1 +8669x_1^2 + 4098x_3 +7705x_2 + 2449x_1 + 1134\\
 f_3 &= 8589x_3^2 + 1291x_3x_2 +5321x_2^2 + 765x_3x_1 +6052x_2x_1 +8178x_1^2 + 2764x_3 + 957x_2 +7079x_1 + 517.
 \end{align*}
+}%
 We choose $m = 2$ and two random matrices
 \begin{align*}
 u &= \begin{bmatrix}
@@ -150,10 +150,11 @@ u &= \begin{bmatrix}
 v &= \begin{bmatrix}
 553&  81&  56& 261& 109& 890& 477&  53\\
 725& 642& 905& 612& 952& 158& 235& 783
-\end{bmatrix} ^ {t}
+\end{bmatrix} ^ {t} .
 \end{align*}
+(In this specific example, we have restricted to random coefficients in $\{0,\ldots,999\}$ from the prime field $\mathbb{F}_{9001}$.)
 The monomial basis of $Q$ is $\mathscr{B}=[x_1^3, x_1^2, x_2x_1, x_3x_1, x_1, x_2, x_3, 1]$, with $D = 8$. 
-Computing the minimal generating polynomial of $s_i=u T_3^i v$, we get
+Computing the minimal generating polynomial of $s=(u T_3^i v)_{i\ge 0}$, we get
 $$S= \begin{bmatrix}
 8226 + 5622x + 7693x^2 + 5033x^3 + x^4&     2919 + 8706x + 3736x^2 + 4829x^3\\
 7928 + 3675x + 7471x^2 + 3510x^3  &        3113 + 5615x + 2702x^2 + 3353x^3 + x^4
@@ -172,10 +173,8 @@ $x_3$, and
 is equal to 
 $$R_2 = 2287x_3^7 + 8269x_3^6 + 8475x_3^5 + 6889x_3^4 + 4785x_3^3 + 3960x_3^2 + 3902x_3 + 4153.$$
 Doing the same with the sequence $uT_3^{i-1} T_1 v$ gives us a polynomial $R_1(x_3)$,
-which finally leads us to the Gr\"obner basis $(x_1-R_1(x_3), x_2-R_2(x_3),R_3(x_3))$
+which finally leads us to the lex Gr\"obner basis $(x_1-R_1(x_3), x_2-R_2(x_3),R_3(x_3))$
 of $I$.
-
-
 
 %% It is possible to verify the correctness of this algorithm algebraically, given that the Smith normal form of
 %% S is as described. We know experimentally that this is the case, but we do not know how to prove this relationship
