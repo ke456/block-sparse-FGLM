@@ -7,14 +7,10 @@
 \thispagestyle{empty}
 
 \begin{document}
-\noindent NOTE: We don't actually require $\bar{P}$ to be the reverse of the minpoly of $T_1$ for
-these formulas to work (although we require it for the actual algorithm to work). The proof
-of $P = minpoly(T_1)$ is with the blocking.\\
-
 \noindent\textbf{Lemma 1:} Let $U,V \in \mathbb{K}^{D\times M}$
 be matrices with random entries and $s = (U^{tr}T_1^iV)_{i \ge 0}$. If 
-$Z = \sum_{i = 0}^{\infty} s^{(i)} t^i$, then each entry of $Z$ is
-in the form $\bar{n_*}/\bar{P}$, where $\bar{P}$ is the minimum scalar generator for
+$Z = \sum_{i = 0}^{\infty} s^{(i)}/ t^{i+1}$, then each entry of $Z$ is
+in the form $n_*/P$, where $P$ is the minimum scalar generator for
 $s$.\\
 
 \noindent\textit{Proof:} Rewrite $U,V$ as 
@@ -30,64 +26,65 @@ u_M^{tr}T_1^iv_1 & \cdots           & \cdots   & u_M^{tr}T_1^iv_M
 Thus, 	
 $$ Z = 
 \begin{bmatrix}
-\sum u_1^{tr}T_1^iv_1 t^i & \cdots  & \cdots & \sum u_1^{tr}T_1^iv_M t^i \\
-\vdots                    & \ddots  & \ddots & \vdots \\
-\sum u_M^{tr}T_1^iv_1 t^i & \cdots  & \cdots & \sum u_M^{tr}T_1^iv_M  t^i
+\sum u_1^{tr}T_1^iv_1/t^{i+1} & \cdots  & \cdots & \sum u_1^{tr}T_1^iv_M/t^{i+1} \\
+\vdots                        & \ddots  & \ddots & \vdots \\
+\sum u_M^{tr}T_1^iv_1/t^{i+1} & \cdots  & \cdots & \sum u_M^{tr}T_1^iv_M/t^{i+1}
 \end{bmatrix}$$
 So each entry separately is what would be computed in the scalar case. Therefore,
-we can rewrite each entry as $\bar{n_*}/\bar{P}$ for some numerator $\bar{n_*}$.\\
+we can rewrite each entry as $n_*/P$ for some numerator $n_*$.\\
 
 \noindent\textbf{Lemma 2:} Let $S$ be the minimum generating polynomial matrix for $s$
 and $D = ASB$ be the Smith normal form of $S$. Furthermore, let $s_1, \cdots s_D$ be
 invariant factors of $S$ such that $s_1 | s_2 | \cdots | s_D$. Then, there exists a vector $\tilde{u}$
-such that $\tilde{u} S = [0, \cdots, 0, \bar{P}]$\\
+such that $\tilde{u} S = [0, \cdots, 0, s_D]$\\
 
-\noindent\textit{Proof:} By theorem 2.7 of KaYu06, $s_D$ is the minimum scalar generator of $s$; thus, $s_D = \bar{P}$. Now let
-$[b_1,\cdots,b_D]$ be the last row of $B$ and 
-$w = [\frac{\bar{P}b_1}{s1},\frac{\bar{P}b_2}{s2},\cdots,\frac{\bar{P}b_{D-1}}{s_{D-1}},b_D]$ (since $s_i | \bar{P}$ ), then
+\noindent\textit{Proof:} Let $[b_1,\cdots,b_D]$ be the last row of $B$ and 
+$w = [\frac{s_Db_1}{s1},\frac{s_Db_2}{s2},\cdots,\frac{s_Db_{D-1}}{s_{D-1}},b_D]$ (since $s_i | s_D$), then
 \begin{align*}
-	(w A) A^{-1} D &=  [\frac{\bar{P}b_1}{s1},\frac{\bar{P}b_2}{s2},\cdots,\frac{\bar{P}b_{D-1}}{s_{D-1}},b_D]
+	(w A) A^{-1} D &=  [\frac{s_Db_1}{s1},\frac{s_Db_2}{s2},\cdots,\frac{s_Db_{D-1}}{s_{D-1}},b_D]
 	\begin{bmatrix}
 	s_1 &        & \\
 	    & \ddots & \\
-	    &        & \bar{P}
+	    &        & s_D
 	\end{bmatrix}\\
-	    &= [\bar{P}b_1, \bar{P}b_2, \cdots, \bar{P}b_D]\\
-	    &= [0,\cdots,0,\bar{P}] B
+	    &= [s_Db_1, s_Db_2, \cdots, s_Db_D]\\
+	    &= [0,\cdots,0,s_D] B
 \end{align*}
 Therefore, if we choose $\tilde{u} = w A$, we get
-$ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,\bar{P}]$ as needed.\\
+$ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,s_D]$ as needed.\\
 
 \noindent\textbf{Lemma 3:} If $\sum_{i = 0}^{\infty} s^{(i)} t^i = S^{-1}N$, then $deg(N)$ is
 less than or equal to $deg(S)$. TODO\\
 
 \noindent\textbf{Theorem 1:} If 
-$S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, the first entry
+$S^{-1}N = \sum_{i=0}^{\infty} s^{(i)}/t^{i+1}$, the first entry
 of the last row of $\tilde{u} N$ is  the numerator of the generating function for 
 $(u_{M}^{tr} T_1^i v_{1})_{i \ge 0}$.\\
 
-\noindent\textit{Proof:} Let $S^{-1}N = \sum_{i=0}^{\infty} s^{(i)} t^i$, then by lemma 1
-$$ N = S \sum_{i=0}^{\infty} s^{(i)} t^i = S 
+\noindent\textit{Proof:} Let $S^{-1}N = \sum_{i=0}^{\infty} s^{(i)}/t^{i+1}$, 
+then by lemma 1 
+$$ N = S \sum_{i=0}^{\infty} s^{(i)}/t^{i+1} = S 
 \begin{bmatrix}
-n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
-\vdots            & \ddots & \vdots \\
-n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+n_{1,1} / P & \cdots & n_{1,M} / P \\
+\vdots      & \ddots & \vdots \\
+n_{M,1} / P & \cdots & n_{M,M} / P
 \end{bmatrix}
 $$
-Therefore,
+From theorem 1 of (randomXY-proof), we know that the $i^{th}$ invariant factor of
+$XI - A$ is equal to the $i^{th}$ invariant factor of $S$ for generic choice of
+$U,V$. Thus, $s_D = P$ and by lemma 2
 \begin{align*}
 \tilde{u} N &= \tilde{u} S
 				\begin{bmatrix}
-				n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
+				n_{1,1} / P & \cdots & n_{1,M} / P \\
 				\vdots            & \ddots & \vdots \\
-				n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+				n_{M,1} / P & \cdots & n_{M,M} / P
 				\end{bmatrix} \\
-\intertext{by lemma 2,}
-            &= [0,\cdots,0,\bar{P}]
+            &= [0,\cdots,0,P]
                \begin{bmatrix}
-               n_{1,1} / \bar{P} & \cdots & n_{1,M} / \bar{P} \\
+               n_{1,1} / P & \cdots & n_{1,M} / P \\
                \vdots            & \ddots & \vdots \\
-               n_{M,1} / \bar{P} & \cdots & n_{M,M} / \bar{P}
+               n_{M,1} / P & \cdots & n_{M,M} / P
                \end{bmatrix}\\
             &= [n_{M,1} , \cdots , n_{M,M}]
 \end{align*}

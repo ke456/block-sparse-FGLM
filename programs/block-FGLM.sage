@@ -26,7 +26,6 @@ def find_lex_basis(ideal,field,M):
 	S = Spair[0]
 	# finding P -the minimal polynomial of T1
 	P = S.det()
-	P_bar = P.reverse()
 	# find the numerator
 	Z1 = add([s1[i].columns()[0] * X^i for i in range(d)])
 	Z1 = vec_reverse(Z1,d,M)
