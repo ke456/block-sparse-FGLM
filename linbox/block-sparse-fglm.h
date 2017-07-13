@@ -15,7 +15,7 @@ class Block_Sparse_FGLM{
 	// the current field
 	GF field;
 	
-	int D; // the degree of the minpoly (also # of mul-mats)
+	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
 	
 	/* Helpers                                           */

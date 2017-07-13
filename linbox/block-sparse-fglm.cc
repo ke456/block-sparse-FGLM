@@ -32,7 +32,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
 	for (auto &i : U_rows)
 		create_random_matrix(i);
-		
+
 	vector<vector<DenseMatrix<GF>>> mat_seq(D);
 	for (auto &i : mat_seq){
 		i = vector<DenseMatrix<GF>>(M, DenseMatrix<GF>(field,1,D));
@@ -82,7 +82,23 @@ void Block_Sparse_FGLM::find_lex_basis(){
 }
 
 int main( int argc, char **argv ){
-	GF field(13);
-	Block_Sparse_FGLM l(2,128,field);
+	// default arguments
+	size_t p = 13;  // size of the base field
+	size_t M = 4;   // row dimension for the blocks
+	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
+	size_t D = 512; // vector space dimension / dimension of multiplication matrices
+
+	static Argument args[] = {
+		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
+		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
+		//{ 'N', "-N N", "Set the column block dimension to N.", TYPE_INT,       &N },
+		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
+		END_OF_ARGUMENTS
+	};	
+
+	parseArguments (argc, argv, args);
+
+	GF field(p);
+	Block_Sparse_FGLM l(M,D,field);
 	l.find_lex_basis();
 }
