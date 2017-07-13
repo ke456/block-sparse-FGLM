@@ -34,7 +34,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
 	for (auto &i : U_rows){
 		create_random_matrix(i);
-		i.write(cout,Tag::FileFormat::Maple)<<endl;
+		//i.write(cout,Tag::FileFormat::Maple)<<endl;
 	}
 	
 	// stores U_i*T1^j at mat_seq[i][j]
@@ -46,7 +46,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	// initialize the first multiplication matrix (random DxD)
 	DenseMatrix<GF> T1(field,D,D);
 	create_random_matrix(T1);
-	T1.write(cout << "T1:"<<endl, Tag::FileFormat::Maple)<<endl;
+	//T1.write(cout << "T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 
 	auto start = chrono::high_resolution_clock::now();
 
@@ -66,6 +66,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	}
 	auto end = chrono::high_resolution_clock::now();
 	cout << "Mat_seq took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	start = chrono::high_resolution_clock::now();
 	for (int i = 0; i < ceil(D/(double)M); i++){
 		auto &temp = v[i];
 		for (int row = 0; row < M; row++){
@@ -76,11 +77,13 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 			}
 		}
 	}
+	end = chrono::high_resolution_clock::now();
+	cout << "Copying took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 }
 
 void Block_Sparse_FGLM::find_lex_basis(){
-	vector<DenseMatrix<GF>> v(ceil(D/(double)M), DenseMatrix<GF>(field,M,D));
-	get_matrix_sequence_left(v);
+	vector<DenseMatrix<GF>> left_mat_seq(ceil(D/(double)M), DenseMatrix<GF>(field,M,D));
+	get_matrix_sequence_left(left_mat_seq);
 }
 
 int main( int argc, char **argv ){
@@ -88,7 +91,7 @@ int main( int argc, char **argv ){
 	size_t p = 13;  // size of the base field
 	size_t M = 4;   // row dimension for the blocks
 	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
-	size_t D = 9; // vector space dimension / dimension of multiplication matrices
+	size_t D = 512; // vector space dimension / dimension of multiplication matrices
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
