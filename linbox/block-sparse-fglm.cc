@@ -32,8 +32,10 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 
 	// initialize the left block (random MxD)
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
-	for (auto &i : U_rows)
+	for (auto &i : U_rows){
 		create_random_matrix(i);
+		i.write(cout,Tag::FileFormat::Maple)<<endl;
+	}
 	
 	// stores U_i*T1^j at mat_seq[i][j]
 	vector<vector<DenseMatrix<GF>>> mat_seq(M);
@@ -44,8 +46,9 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	// initialize the first multiplication matrix (random DxD)
 	DenseMatrix<GF> T1(field,D,D);
 	create_random_matrix(T1);
+	T1.write(cout << "T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 
-	auto start = clock();
+	auto start = chrono::high_resolution_clock::now();
 
 	// 1st version: compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
@@ -61,15 +64,23 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 		}
 		mat_seq[i] = temp_mat_seq;
 	}
-	double duration = (clock() - start) / (double)CLOCKS_PER_SEC;
-	cout << "Parallel took: " << duration << endl;
-}
-
-void Block_Sparse_FGLM::gather(vector<DenseMatrix<GF>> &v, const vector<DenseMatrix<GF>> &v2){
-
+	auto end = chrono::high_resolution_clock::now();
+	cout << "Mat_seq took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	for (int i = 0; i < ceil(D/(double)M); i++){
+		auto &temp = v[i];
+		for (int row = 0; row < M; row++){
+			for (int col = 0; col < D; col++){
+				GF::Element a;
+				mat_seq[row][i].getEntry(a,0,col);
+				temp.refEntry(row,col) = a;
+			}
+		}
+	}
 }
 
 void Block_Sparse_FGLM::find_lex_basis(){
+	vector<DenseMatrix<GF>> v(ceil(D/(double)M), DenseMatrix<GF>(field,M,D));
+	get_matrix_sequence_left(v);
 }
 
 int main( int argc, char **argv ){
@@ -77,7 +88,7 @@ int main( int argc, char **argv ){
 	size_t p = 13;  // size of the base field
 	size_t M = 4;   // row dimension for the blocks
 	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
-	size_t D = 512; // vector space dimension / dimension of multiplication matrices
+	size_t D = 9; // vector space dimension / dimension of multiplication matrices
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
