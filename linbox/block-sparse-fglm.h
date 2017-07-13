@@ -24,7 +24,7 @@ class Block_Sparse_FGLM{
 		
 	public:
 	/* CTOR                                              */
-	Block_Sparse_FGLM(int,int,GF);
+	Block_Sparse_FGLM(int,int,const GF &);
 
 	void find_lex_basis();
 };

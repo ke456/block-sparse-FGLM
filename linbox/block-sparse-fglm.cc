@@ -10,7 +10,7 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, GF field){
+Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field){
 	this->M = M;
 	this->D = D;
 	this->field = field;
@@ -20,12 +20,11 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, GF field){
 template<typename Matrix>
 void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 	GF::Element a;
-  for (size_t i = 0; i < m.rowdim(); i++)
-    for (size_t j = 0; j < m.coldim(); j++){
-      int r = rand();  // vincent: is this used?
-      field.init(a,rand());
-      m.refEntry(i,j) = a; 
-    }
+	for (size_t i = 0; i < m.rowdim(); i++)
+		for (size_t j = 0; j < m.coldim(); j++){
+			field.init(a,rand());
+			m.refEntry(i,j) = a; 
+		}
 }
 
 void Block_Sparse_FGLM::find_lex_basis(){
