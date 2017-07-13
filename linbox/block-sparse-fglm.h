@@ -27,7 +27,8 @@ class Block_Sparse_FGLM{
 	
 	// Given a sequence holding U_i*T1^j as the (i,j)-th entry, produces
 	// sequence of matrices such that the i-th entry is U*T1^i
-	void gather(std::vector<LinBox::DenseMatrix<GF>> &v);
+	void gather(std::vector<LinBox::DenseMatrix<GF>> &, 
+	            const std::vector<LinBox::DenseMatrix<GF>> &);
 
 	public:
 	/* CTOR                                              */

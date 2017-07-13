@@ -65,6 +65,10 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	cout << "Parallel took: " << duration << endl;
 }
 
+void Block_Sparse_FGLM::gather(vector<DenseMatrix<GF>> &v, const vector<DenseMatrix<GF>> &v2){
+
+}
+
 void Block_Sparse_FGLM::find_lex_basis(){
 }
 
