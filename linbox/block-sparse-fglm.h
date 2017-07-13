@@ -1,18 +1,17 @@
+#ifndef BLOCK_SPARSE_FGLM_H
+#define BLOCK_SPARSE_FGLM_H
+
+#include <linbox/integer.h>
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
 #include <linbox/matrix/matrix-domain.h>
-#include "linbox/algorithms/polynomial-matrix/order-basis.h"
-#include <linbox/integer.h>
-#include <vector>
-#include <ctime>
-#include <cstdlib>
-using namespace std;
-using namespace LinBox;
+#include <linbox/algorithms/polynomial-matrix/order-basis.h>
 
 typedef Givaro::Modular<int> GF;
+
 class Block_Sparse_FGLM{
 	// stores the multiplication matrices T_i
-	vector<SparseMatrix<GF>> mul_mats;
+	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	// the current field
 	GF field;
 	
@@ -29,3 +28,5 @@ class Block_Sparse_FGLM{
 
 	void find_lex_basis();
 };
+
+#endif

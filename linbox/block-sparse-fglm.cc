@@ -3,6 +3,12 @@
 #include <cmath>
 #include <chrono>
 #include <omp.h>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+
+using namespace LinBox;
+using namespace std;
 
 Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, GF field){
 	this->M = M;
@@ -16,7 +22,7 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 	GF::Element a;
   for (size_t i = 0; i < m.rowdim(); i++)
     for (size_t j = 0; j < m.coldim(); j++){
-      int r = rand();
+      int r = rand();  // vincent: is this used?
       field.init(a,rand());
       m.refEntry(i,j) = a; 
     }
@@ -76,8 +82,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	//}
 }
 
-int main(){
+int main( int argc, char **argv ){
 	GF field(13);
-	Block_Sparse_FGLM l(2,1000,field);
+	Block_Sparse_FGLM l(2,128,field);
 	l.find_lex_basis();
 }
