@@ -27,64 +27,45 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 		}
 }
 
-void Block_Sparse_FGLM::find_lex_basis(){
+void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	MatrixDomain<Givaro::Modular<int>> MD{field};
 
 	// initialize the left block (random MxD)
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
 	for (auto &i : U_rows)
 		create_random_matrix(i);
-
-	// initialize the matrix sequence (?? D matrices MxD ??)
-	vector<vector<DenseMatrix<GF>>> mat_seq(D);
+	
+	// stores U_i*T1^j at mat_seq[i][j]
+	vector<vector<DenseMatrix<GF>>> mat_seq(M);
 	for (auto &i : mat_seq){
-		i = vector<DenseMatrix<GF>>(M, DenseMatrix<GF>(field,1,D));
+		i = vector<DenseMatrix<GF>>(ceil(D/(double)M),DenseMatrix<GF>(field,1,D));
 	}
 
 	// initialize the first multiplication matrix (random DxD)
 	DenseMatrix<GF> T1(field,D,D);
 	create_random_matrix(T1);
-	//T1.write(cout, Tag::FileFormat::Maple) << endl;
-
-	//for (auto &i: U_rows)
-	//	i.write(cout, Tag::FileFormat::Maple) << endl;
 
 	auto start = clock();
 
 	// 1st version: compute sequence in a parallel fashion
-	omp_set_num_threads(M);
-#pragma omp parallel for
+#pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
-		mat_seq[0][i] = U_rows[i];
+		MatrixDomain<Givaro::Modular<int>> MD2{field};
+		vector<DenseMatrix<GF>> temp_mat_seq(ceil(D/(double)M), DenseMatrix<GF>(field,1,D)); 
+		temp_mat_seq[0] = U_rows[i];
+		auto &T1_temp = T1;
 		for (int j  = 1; j < ceil(D/(M*1.0)); j++){
-			//cout << "i,j: " << i << " " << j << endl;
-			auto &l = mat_seq[j-1][i];
-			auto &result = mat_seq[j][i];
-			MD.mul(result,l,T1);
+			auto &l = temp_mat_seq[j-1];
+			auto &result = temp_mat_seq[j];
+			MD2.mul(result,l,T1_temp);
 		}
+		mat_seq[i] = temp_mat_seq;
 	}
 	double duration = (clock() - start) / (double)CLOCKS_PER_SEC;
 	cout << "Parallel took: " << duration << endl;
+}
 
-	// 2nd version: compute sequence in a sequential fashion
-	start = clock();
-	for (int i  = 0; i < 1; i++){
-		mat_seq[0][i] = U_rows[i];
-		for (int j  = 1; j < D; j++){
-			//cout << "i,j: " << i << " " << j << endl;
-			auto &l = mat_seq[j-1][i];
-			auto &result = mat_seq[j][i];
-			MD.mul(result,l,T1);
-		}
-	}
-	duration = (clock() - start) / (double)CLOCKS_PER_SEC;
-	cout << "Direct took: " << duration << endl;
-
-	//for (auto &i : mat_seq){
-	//	cout << "New power:" << endl;
-	//	for (auto &j : i)
-	//		j.write(cout, Tag::FileFormat::Maple)<< endl;
-	//}
+void Block_Sparse_FGLM::find_lex_basis(){
 }
 
 int main( int argc, char **argv ){

@@ -21,6 +21,13 @@ class Block_Sparse_FGLM{
 	/* Helpers                                           */
 	template<typename Matrix>
 	void create_random_matrix(Matrix &m);
+	
+	// Computes sequence (UT1^i)
+	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
+	
+	// Given a sequence holding U_i*T1^j as the (i,j)-th entry, produces
+	// sequence of matrices such that the i-th entry is U*T1^i
+	void gather(std::vector<LinBox::DenseMatrix<GF>> &v);
 
 	public:
 	/* CTOR                                              */
