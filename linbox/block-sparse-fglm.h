@@ -14,14 +14,14 @@ class Block_Sparse_FGLM{
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	// the current field
 	GF field;
-	
+
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
-	
+
 	/* Helpers                                           */
 	template<typename Matrix>
 	void create_random_matrix(Matrix &m);
-		
+
 	public:
 	/* CTOR                                              */
 	Block_Sparse_FGLM(int,int,const GF &);

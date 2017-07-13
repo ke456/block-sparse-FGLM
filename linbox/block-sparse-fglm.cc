@@ -29,26 +29,31 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 
 void Block_Sparse_FGLM::find_lex_basis(){
 	MatrixDomain<Givaro::Modular<int>> MD{field};
+
+	// initialize the left block (random MxD)
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
 	for (auto &i : U_rows)
 		create_random_matrix(i);
 
+	// initialize the matrix sequence (?? D matrices MxD ??)
 	vector<vector<DenseMatrix<GF>>> mat_seq(D);
 	for (auto &i : mat_seq){
 		i = vector<DenseMatrix<GF>>(M, DenseMatrix<GF>(field,1,D));
 	}
-	
-  DenseMatrix<GF> T1(field,D,D);
-  create_random_matrix(T1);
-  //T1.write(cout, Tag::FileFormat::Maple) << endl;
-  
-  //for (auto &i: U_rows)
-  //	i.write(cout, Tag::FileFormat::Maple) << endl;
-  
-  auto start = clock();
-  
-  omp_set_num_threads(M);
-  #pragma omp parallel for
+
+	// initialize the first multiplication matrix (random DxD)
+	DenseMatrix<GF> T1(field,D,D);
+	create_random_matrix(T1);
+	//T1.write(cout, Tag::FileFormat::Maple) << endl;
+
+	//for (auto &i: U_rows)
+	//	i.write(cout, Tag::FileFormat::Maple) << endl;
+
+	auto start = clock();
+
+	// 1st version: compute sequence in a parallel fashion
+	omp_set_num_threads(M);
+#pragma omp parallel for
 	for (int i  = 0; i < M; i++){
 		mat_seq[0][i] = U_rows[i];
 		for (int j  = 1; j < ceil(D/(M*1.0)); j++){
@@ -60,7 +65,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	}
 	double duration = (clock() - start) / (double)CLOCKS_PER_SEC;
 	cout << "Parallel took: " << duration << endl;
-	
+
+	// 2nd version: compute sequence in a sequential fashion
 	start = clock();
 	for (int i  = 0; i < 1; i++){
 		mat_seq[0][i] = U_rows[i];
@@ -73,7 +79,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	}
 	duration = (clock() - start) / (double)CLOCKS_PER_SEC;
 	cout << "Direct took: " << duration << endl;
-	
+
 	//for (auto &i : mat_seq){
 	//	cout << "New power:" << endl;
 	//	for (auto &j : i)
