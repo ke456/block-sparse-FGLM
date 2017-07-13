@@ -22,7 +22,7 @@ class Block_Sparse_FGLM{
 	template<typename Matrix>
 	void create_random_matrix(Matrix &m);
 	
-	// Computes sequence (UT1^i)
+	// Computes sequence (U T1^i)
 	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
 
 	public:
@@ -30,6 +30,37 @@ class Block_Sparse_FGLM{
 	Block_Sparse_FGLM(int,int,const GF &);
 
 	void find_lex_basis();
+};
+
+class PolMat {
+
+	public:
+
+	typedef std::vector<typename GF::Element> Polynomial;
+	//typedef PolynomialMatrix<PMType::polfirst,PMStorage::plain,GF> MatrixP;
+	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
+
+	private:
+
+	const GF* _field;
+	LinBox::PolynomialMatrixMulDomain<GF> _PMD;
+	LinBox::BlasMatrixDomain<GF> _BMD;
+
+	public:
+
+	PolMat(const GF &f) : _field(&f), _PMD(f), _BMD(f) {	}
+
+	inline const GF& field() const {return *_field;}
+
+	// Smith form of a nonsingular matrix; also computes the unimodular factors
+	size_t SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat ) const;
+
+	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
+	template<typename Matrix>
+	size_t MatrixBerlekampMassey( PMatrix &matgen, std::vector<Matrix> seq ) const;
+
+	void print_pmat( const PMatrix &pmat ) const;
+
 };
 
 #endif
