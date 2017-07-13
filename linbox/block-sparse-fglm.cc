@@ -142,3 +142,26 @@ int main( int argc, char **argv ){
 	Block_Sparse_FGLM l(M,D,field);
 	l.find_lex_basis();
 }
+
+
+void PolMat::print_pmat( const PolMat::PMatrix &pmat ) const {
+	for ( size_t i=0; i<pmat.rowdim(); ++i )
+	{
+		for ( size_t j=0; j<pmat.coldim(); ++j )
+		{
+			for ( size_t d=0; d<pmat.size()-1; ++d )
+				cout << pmat.get(i,j,d) << "X^" << d << '+';
+			cout << pmat.get(i,j,pmat.size()-1) << "X^" << pmat.size()-1 << '\t';
+		}
+		cout << endl;
+	}
+}
+
+size_t PolMat::SmithForm( vector<PolMat::Polynomial> &smith, PolMat::PMatrix &lfac, PMatrix &rfac, const PolMat::PMatrix &pmat ) const {
+	return 0;
+}
+
+template<typename Matrix>
+size_t PolMat::MatrixBerlekampMassey( PolMat::PMatrix &matgen, std::vector<Matrix> seq ) const {
+	return 0;
+}
