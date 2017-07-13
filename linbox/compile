@@ -1,1 +1,1 @@
-g++ -std=gnu++11 block-sparse-fglm.cc -fopenmp  -llinbox -lntl -L/usr/local/lib -lopenblas -lgivaro -lgmp -lgmpxx -fopenmp
+g++ -std=gnu++11 block-sparse-fglm.cc -fopenmp  -llinbox -lntl -L/usr/local/lib -lopenblas -lgivaro -lgmp -lgmpxx -mavx -mavx2

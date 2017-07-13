@@ -1,6 +1,7 @@
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
 #include <linbox/matrix/matrix-domain.h>
+#include "linbox/algorithms/polynomial-matrix/order-basis.h"
 #include <linbox/integer.h>
 #include <vector>
 #include <ctime>
