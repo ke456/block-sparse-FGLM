@@ -10,7 +10,7 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field){
+Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): V(field,D,M){
 	this->M = M;
 	this->D = D;
 	this->field = field;
@@ -48,7 +48,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	create_random_matrix(T1);
 	//T1.write(cout << "T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 
-	auto start = chrono::high_resolution_clock::now();
+
 
 	// 1st version: compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
@@ -64,9 +64,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 		}
 		mat_seq[i] = temp_mat_seq;
 	}
-	auto end = chrono::high_resolution_clock::now();
-	cout << "Mat_seq took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
-	start = chrono::high_resolution_clock::now();
+	
 	for (int i = 0; i < ceil(D/(double)M); i++){
 		auto &temp = v[i];
 		for (int row = 0; row < M; row++){
@@ -76,14 +74,51 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 				temp.refEntry(row,col) = a;
 			}
 		}
+	} 
+}
+
+void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v){
+	// gather all the matrices of v in a single ceil(D/M)*M by D matrix
+	MatrixDomain<GF> MD(field);
+	DenseMatrix<GF> mat(field, ceil(D/(double)M)*M, D);
+	for (int i = 0; i < ceil(D/(double)M); i++){
+		auto &m = v[i];
+		for (int row = 0; row < M; row++){
+			int r = i * M + row; // starting point for mat
+			for (int col = 0; col < D; col++){
+				GF::Element a;
+				m.getEntry(a,row,col);
+				mat.refEntry(r,col) = a;
+			}
+		}
 	}
-	end = chrono::high_resolution_clock::now();
-	cout << "Copying took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	create_random_matrix(V);
+	DenseMatrix<GF> result(field, ceil(D/(double)M)*M,M);
+	MD.mul(result,mat,V);
+	
+	for (int i = 0; i < ceil(D/(double)M); i++){
+		v[i] = DenseMatrix<GF>(field, M, M);
+		for (int row = 0; row < M; row++){
+			int r = i * M + row;
+			for (int col = 0; col < M; col++){
+				GF::Element a;
+				result.getEntry(a,r,col);
+				v[i].refEntry(row,col) = a;
+			}
+		}
+	}
 }
 
 void Block_Sparse_FGLM::find_lex_basis(){
-	vector<DenseMatrix<GF>> left_mat_seq(ceil(D/(double)M), DenseMatrix<GF>(field,M,D));
-	get_matrix_sequence_left(left_mat_seq);
+	vector<DenseMatrix<GF>> mat_seq(ceil(D/(double)M), DenseMatrix<GF>(field,M,D));
+	auto start = chrono::high_resolution_clock::now();
+	get_matrix_sequence_left(mat_seq);
+	auto end = chrono::high_resolution_clock::now();
+	cout << "UT1^i took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	start = chrono::high_resolution_clock::now();
+	get_matrix_sequence(mat_seq);
+	end = chrono::high_resolution_clock::now();
+	cout << "(UT1^i)V took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 }
 
 int main( int argc, char **argv ){

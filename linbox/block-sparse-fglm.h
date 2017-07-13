@@ -17,6 +17,8 @@ class Block_Sparse_FGLM{
 
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
+	
+	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 
 	/* Helpers                                           */
 	template<typename Matrix>
@@ -24,6 +26,9 @@ class Block_Sparse_FGLM{
 	
 	// Computes sequence (UT1^i)
 	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
+	
+	// Computes sequence (UT1^i)V
+	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &);
 
 	public:
 	/* CTOR                                              */
