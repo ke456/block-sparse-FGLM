@@ -1,3 +1,4 @@
+#define TIMINGS_ON // comment if having timings is not relevant
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <cmath>
@@ -110,22 +111,30 @@ void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v){
 void Block_Sparse_FGLM::find_lex_basis(){
 	size_t d = 2*ceil(D/(double)M);
 	vector<DenseMatrix<GF>> mat_seq(d, DenseMatrix<GF>(field,M,D));
+#ifdef TIMINGS_ON
 	auto start = chrono::high_resolution_clock::now();
+#endif
 	get_matrix_sequence_left(mat_seq);
+#ifdef TIMINGS_ON
 	auto end = chrono::high_resolution_clock::now();
 	cout << "Left sequence (UT1^i): " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 	start = chrono::high_resolution_clock::now();
+#endif
 	get_matrix_sequence(mat_seq);
+#ifdef TIMINGS_ON
 	end = chrono::high_resolution_clock::now();
 	cout << "Sequence (UT1^i)V: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 
 	start = chrono::high_resolution_clock::now();
+#endif
 	PolMatDom PMD( field );
 	PolMatDom::MatrixP mat_gen(PMD.field(),M,M,d);
 	PolMatDom::MatrixP mat_num(PMD.field(),M,M,d);
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
+#ifdef TIMINGS_ON
 	end = chrono::high_resolution_clock::now();
 	cout << "Matrix Berlekamp Massey: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+#endif
 }
 
 int main( int argc, char **argv ){
@@ -188,7 +197,4 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 		mat_gen.ref(i,j,k) = app_bas.get(i,j,k);
 		mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
 	}
-
-	//pappbas = iter_popov_appbas( series, d, s )
-	//return (pappbas[:m,:m],pappbas[:m,m:])
 }
