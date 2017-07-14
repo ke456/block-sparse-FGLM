@@ -17,6 +17,8 @@ class Block_Sparse_FGLM{
 
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
+
+	size_t getLength() const { return 2*ceil(D/(double)M); };
 	
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	// Vincent: we store V and not U?
