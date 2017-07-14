@@ -119,6 +119,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	get_matrix_sequence(mat_seq);
 	end = chrono::high_resolution_clock::now();
 	cout << "(UT1^i)V took: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	PolMatDom PMD( field );
+	//PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_seq );
 }
 
 int main( int argc, char **argv ){
@@ -141,10 +143,10 @@ int main( int argc, char **argv ){
 	GF field(p);
 	Block_Sparse_FGLM l(M,D,field);
 	l.find_lex_basis();
-}
+}			
 
 
-void PolMat::print_pmat( const PolMat::PMatrix &pmat ) const {
+void PolMatDom::print_pmat( const PolMatDom::PMatrix &pmat ) const {
 	for ( size_t i=0; i<pmat.rowdim(); ++i )
 	{
 		for ( size_t j=0; j<pmat.coldim(); ++j )
@@ -157,11 +159,20 @@ void PolMat::print_pmat( const PolMat::PMatrix &pmat ) const {
 	}
 }
 
-size_t PolMat::SmithForm( vector<PolMat::Polynomial> &smith, PolMat::PMatrix &lfac, PMatrix &rfac, const PolMat::PMatrix &pmat ) const {
+size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PMatrix &rfac, const PolMatDom::PMatrix &pmat ) const {
 	return 0;
 }
 
 template<typename Matrix>
-size_t PolMat::MatrixBerlekampMassey( PolMat::PMatrix &matgen, std::vector<Matrix> seq ) const {
-	return 0;
+size_t PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &matgen, std::vector<Matrix> seq ) const {
+	size_t m = seq[0].rowdim();
+	OrderBasis<GF> OB( this->_field );
+
+	//s = [0]*(seq[0].nrows()+seq[0].ncols())
+	//d = len(seq)
+	//series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
+	//pappbas = iter_popov_appbas( series, d, s )
+	//return (pappbas[:m,:m],pappbas[:m,m:])
+
+
 }

@@ -19,6 +19,7 @@ class Block_Sparse_FGLM{
 	int M; // number of blocks (set to number of CPUs?)
 	
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
+	// Vincent: we store V and not U?
 
 	/* Helpers                                           */
 	template<typename Matrix>
@@ -37,7 +38,7 @@ class Block_Sparse_FGLM{
 	void find_lex_basis();
 };
 
-class PolMat {
+class PolMatDom {
 
 	public:
 
@@ -48,12 +49,12 @@ class PolMat {
 	private:
 
 	const GF* _field;
-	LinBox::PolynomialMatrixMulDomain<GF> _PMD;
+	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 
 	public:
 
-	PolMat(const GF &f) : _field(&f), _PMD(f), _BMD(f) {	}
+	PolMatDom(const GF &f) : _field(&f), _PMMD(f), _BMD(f) {	}
 
 	inline const GF& field() const {return *_field;}
 
