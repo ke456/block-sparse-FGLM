@@ -1,5 +1,5 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
-#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+//#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <cmath>
@@ -30,7 +30,7 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 }
 
 void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
-	MatrixDomain<Givaro::Modular<int>> MD{field};
+	MatrixDomain<GF> MD{field};
 
 	// initialize the left block (random MxD)
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
@@ -57,7 +57,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	// 1st version: compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
-		MatrixDomain<Givaro::Modular<int>> MD2{field};
+		MatrixDomain<GF> MD2{field};
 		vector<DenseMatrix<GF>> temp_mat_seq(this->getLength(), DenseMatrix<GF>(field,1,D)); 
 		temp_mat_seq[0] = U_rows[i];
 		auto &T1_temp = T1;
@@ -82,7 +82,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 }
 
 void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v){
-	// gather all the matrices of v in a single ceil(D/M)*M by D matrix
+	// gather all the matrices of v in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
 	DenseMatrix<GF> mat(field, this->getLength()*M, D);
 	for (size_t i = 0; i < this->getLength(); i++){
@@ -156,7 +156,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 
 int main( int argc, char **argv ){
 	// default arguments
-	size_t p = 13;  // size of the base field
+	//size_t p = 13;  // size of the base field
+	size_t p = 23068673;  // size of the base field
 	size_t M = 4;   // row dimension for the blocks
 	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices

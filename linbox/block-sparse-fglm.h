@@ -7,7 +7,7 @@
 #include <linbox/matrix/matrix-domain.h>
 #include <linbox/algorithms/polynomial-matrix/order-basis.h>
 
-typedef Givaro::Modular<int> GF;
+typedef Givaro::Modular<double> GF;
 
 class Block_Sparse_FGLM{
 	// stores the multiplication matrices T_i
