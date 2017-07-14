@@ -43,8 +43,8 @@ class PolMatDom {
 	public:
 
 	typedef std::vector<typename GF::Element> Polynomial;
-	//typedef PolynomialMatrix<PMType::polfirst,PMStorage::plain,GF> MatrixP;
-	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
+	typedef LinBox::PolynomialMatrix<LinBox::PMType::polfirst,LinBox::PMStorage::plain,GF> MatrixP;
+	//typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
 
 	private:
 
@@ -59,13 +59,13 @@ class PolMatDom {
 	inline const GF& field() const {return *_field;}
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
-	size_t SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat ) const;
+	size_t SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	size_t MatrixBerlekampMassey( PMatrix &matgen, std::vector<Matrix> seq ) const;
+	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq ) const;
 
-	void print_pmat( const PMatrix &pmat ) const;
+	void print_pmat( const MatrixP &pmat ) const;
 
 };
 
