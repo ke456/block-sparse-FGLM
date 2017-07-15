@@ -1,5 +1,5 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
-#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+//#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <cmath>
@@ -12,7 +12,9 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): field(field), D(D), M(M), V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) {
+Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n): field(field), D(D), M(M), n(n), mul_mats(n,SparseMatrix<GF>(field,D,D)), V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) {
+	for ( size_t k=0; k<n; ++k )
+		create_random_matrix(mul_mats[k]);
 	create_random_matrix(V);
 	srand(time(NULL));
 }
@@ -172,6 +174,7 @@ int main( int argc, char **argv ){
 	size_t M = 4;   // row dimension for the blocks
 	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices
+	size_t n = 2;
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
@@ -184,7 +187,7 @@ int main( int argc, char **argv ){
 	parseArguments (argc, argv, args);
 
 	GF field(p);
-	Block_Sparse_FGLM l(M,D,field);
+	Block_Sparse_FGLM l(field,D,M,n);
 	l.find_lex_basis();
 }			
 

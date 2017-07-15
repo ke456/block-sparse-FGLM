@@ -10,16 +10,18 @@
 typedef Givaro::Modular<double> GF;
 
 class Block_Sparse_FGLM{
-	// stores the multiplication matrices T_i
-	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	// the current field
 	GF field;
 
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
+	size_t n; // number of variables and size of vector mul_mats
 
 	size_t getLength() const { return 2*ceil(D/(double)M); };
 	
+	// stores the multiplication matrices T_i
+	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
 
@@ -38,7 +40,7 @@ class Block_Sparse_FGLM{
 
 	public:
 	/* CTOR                                              */
-	Block_Sparse_FGLM(int,int,const GF &);
+	Block_Sparse_FGLM(const GF &, int, int, size_t);
 
 	void find_lex_basis();
 };
