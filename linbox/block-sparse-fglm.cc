@@ -12,10 +12,7 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)){
-	this->M = M;
-	this->D = D;
-	this->field = field;
+Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): field(field), D(D), M(M), V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) {
 	create_random_matrix(V);
 	srand(time(NULL));
 }
@@ -49,7 +46,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	}
 
 	// initialize the first multiplication matrix (random DxD)
-	auto &T = mul_mats[0];
+	auto &T1 = mul_mats[0];
 #ifdef VERBOSE_ON
 	T1.write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 #endif
@@ -85,7 +82,7 @@ void Block_Sparse_FGLM::get_matrix_sequence
 (vector<DenseMatrix<GF>> &v, 
  vector<DenseMatrix<GF>> &l, 
  DenseMatrix<GF> &V,
- int to){
+ size_t to){
 	// gather all the matrices of v in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
 	DenseMatrix<GF> mat(field, to*M, D);
