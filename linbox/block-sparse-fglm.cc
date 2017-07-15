@@ -1,5 +1,5 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
-//#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <cmath>
@@ -12,10 +12,11 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): V(field,D,M){
+Block_Sparse_FGLM::Block_Sparse_FGLM(int M, int D, const GF &field): V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)){
 	this->M = M;
 	this->D = D;
 	this->field = field;
+	create_random_matrix(V);
 	srand(time(NULL));
 }
 
@@ -48,8 +49,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	}
 
 	// initialize the first multiplication matrix (random DxD)
-	DenseMatrix<GF> T1(field,D,D);
-	create_random_matrix(T1);
+	auto &T = mul_mats[0];
 #ifdef VERBOSE_ON
 	T1.write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 #endif
@@ -81,12 +81,16 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	} 
 }
 
-void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v){
+void Block_Sparse_FGLM::get_matrix_sequence
+(vector<DenseMatrix<GF>> &v, 
+ vector<DenseMatrix<GF>> &l, 
+ DenseMatrix<GF> &V,
+ int to){
 	// gather all the matrices of v in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
-	DenseMatrix<GF> mat(field, this->getLength()*M, D);
-	for (size_t i = 0; i < this->getLength(); i++){
-		auto &m = v[i];
+	DenseMatrix<GF> mat(field, to*M, D);
+	for (size_t i = 0; i < to; i++){
+		auto &m = l[i];
 		for (int row = 0; row < M; row++){
 			int r = i * M + row; // starting point for mat
 			for (int col = 0; col < D; col++){
@@ -96,11 +100,13 @@ void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v){
 			}
 		}
 	}
-	create_random_matrix(V);
-	DenseMatrix<GF> result(field, this->getLength()*M,M);
+	
+	// multiplication
+	DenseMatrix<GF> result(field, to*M,M);
 	MD.mul(result,mat,V);
 	
-	for (size_t i = 0; i < this->getLength(); i++){
+	v.resize(to, DenseMatrix<GF>(field,M,M));
+	for (size_t i = 0; i < to; i++){
 		v[i] = DenseMatrix<GF>(field, M, M);
 		for (int row = 0; row < M; row++){
 			int r = i * M + row;
@@ -118,15 +124,22 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	auto start = chrono::high_resolution_clock::now();
 #endif
 	// 1. compute the "left" matrix sequence (U T1^i)
-	vector<DenseMatrix<GF>> mat_seq(this->getLength(), DenseMatrix<GF>(field,M,D));
-	get_matrix_sequence_left(mat_seq);
+	get_matrix_sequence_left(mat_seq_left);
+	
+#ifdef VERBOSE_ON	
+	cout << "###OUTPUT### Matrix sequence (U T1^i)_i :" << endl;
+	cout << "length d = " << this->getLength() << ", and entries:" << endl;
+	for (auto &i: mat_seq_left)
+		i.write(cout, Tag::FileFormat::Maple)<<endl;
+#endif
 #ifdef TIMINGS_ON
 	auto end = chrono::high_resolution_clock::now();
 	cout << "###TIME### left sequence (UT1^i): " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 	start = chrono::high_resolution_clock::now();
 #endif
+	vector<DenseMatrix<GF>> mat_seq(getLength(), DenseMatrix<GF>(field,M,M));
 	// 2. compute the total matrix sequence (UT1^i)V
-	get_matrix_sequence(mat_seq);
+	get_matrix_sequence(mat_seq, mat_seq_left, V, getLength());
 #ifdef TIMINGS_ON
 	end = chrono::high_resolution_clock::now();
 	cout << "###TIME### sequence (UT1^i)V: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
@@ -135,7 +148,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
 	cout << "length d = " << this->getLength() << ", and entries:" << endl;
-	cout << mat_seq << endl;
+	for (auto &i: mat_seq)
+		i.write(cout, Tag::FileFormat::Maple)<<endl;
 #endif
 	// 3. compute generator and numerator in Matrix Berlekamp Massey: reversed sequence = mat_gen/mat_num
 	PolMatDom PMD( field );

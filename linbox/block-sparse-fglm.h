@@ -21,7 +21,7 @@ class Block_Sparse_FGLM{
 	size_t getLength() const { return 2*ceil(D/(double)M); };
 	
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
-	// Vincent: we store V and not U?
+	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
 
 	/* Helpers                                           */
 	template<typename Matrix>
@@ -31,7 +31,10 @@ class Block_Sparse_FGLM{
 	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
 	
 	// Computes sequence (UT1^i)V
-	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &);
+	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
+	                         std::vector<LinBox::DenseMatrix<GF>> &,
+	                         LinBox::DenseMatrix<GF> &,
+	                         int);
 
 	public:
 	/* CTOR                                              */
