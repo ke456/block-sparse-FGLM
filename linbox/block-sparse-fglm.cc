@@ -1,5 +1,6 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
 //#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+#define NAIVE_ON
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <cmath>
@@ -53,17 +54,14 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	T1.write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 #endif
 
-	// 1st version: compute sequence in a parallel fashion
+	// compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
 		MatrixDomain<GF> MD2{field};
 		vector<DenseMatrix<GF>> temp_mat_seq(this->getLength(), DenseMatrix<GF>(field,1,D)); 
 		temp_mat_seq[0] = U_rows[i];
-		auto &T1_temp = T1;
 		for (size_t j  = 1; j < this->getLength(); j++){
-			auto &l = temp_mat_seq[j-1];
-			auto &result = temp_mat_seq[j];
-			MD2.mul(result,l,T1_temp);
+			MD2.mul(temp_mat_seq[j],temp_mat_seq[j-1],T1);
 		}
 		mat_seq[i] = temp_mat_seq;
 	}
@@ -164,6 +162,25 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	cout << mat_gen << endl;
   	cout << "###OUTPUT### Matrix numerator:" << endl;
 	cout << mat_num << endl;
+#endif
+#ifdef NAIVE_ON
+	DenseMatrix<GF> U(field,M,D);
+	MatrixDomain<GF> MD(field);
+	vector<DenseMatrix<GF>> lst(this->getLength(), DenseMatrix<GF>(field,M,D));
+	auto &T1 = mul_mats[0];
+	create_random_matrix(U);
+	lst[0] = U;
+	start = chrono::high_resolution_clock::now();
+	for (int i = 1; i < this->getLength(); i++){
+		MD.mul(lst[i],lst[i-1],T1);
+		lst[i] = U;
+	}
+#ifdef VERBOSE_ON
+	for (auto &i : lst)
+		i.write(cout<<"U: ", Tag::FileFormat::Maple)<<endl;
+#endif
+	end = chrono::high_resolution_clock::now();
+	cout << "###TIME### sequence (UT1^i) naive: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl;
 #endif
 }
 
