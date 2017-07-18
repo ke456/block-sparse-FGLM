@@ -31,8 +31,16 @@ def find_lex_basis(ideal,field,M):
 	Z1 = vec_reverse(Z1,d,M)
 	N = S*Z1
 	N = shift(N,d,M)
-	u = S.smith_form()[1]
-	n1 = (u*N)[N.length()-1]
+	smith = S.smith_form()
+	inv_factors = smith[0].diagonal();
+	u = smith[1];
+	v = smith[2];
+	w = v.rows()[M-1]
+	w = P * w
+	for i in range(M):
+		w[i] = w[i] / inv_factors[i]
+	u_tilde = w*u
+	n1 = (u_tilde*N)
 	# adding P to the result
 	monomials = ideal.random_element(1).parent().gens()
 	m = monomials[0]
@@ -48,7 +56,7 @@ def find_lex_basis(ideal,field,M):
 		Z = vec_reverse(Z,d,M)
 		N = (S*Z)
 		N = shift(N,d,M)
-		n = (u*N)[N.length()-1]
+		n = (u_tilde*N)
 		func = (n*n1.inverse_mod(P))%P
 		mX = 0
 		for i in range(len(func.coefficients(false))):
