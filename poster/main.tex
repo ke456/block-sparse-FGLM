@@ -1,0 +1,306 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Jacobs Landscape Poster
+% LaTeX Template
+% Version 1.1 (14/06/14)
+%
+% Created by:
+% Computational Physics and Biophysics Group, Jacobs University
+% https://teamwork.jacobs-university.de:8443/confluence/display/CoPandBiG/LaTeX+Poster
+% 
+% Further modified by:
+% Nathaniel Johnston (nathaniel@njohnston.ca)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[final]{beamer}
+
+\usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
+
+\usetheme{confposter} % Use the confposter theme supplied with this template
+
+\setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
+\setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
+\setbeamercolor{block alerted title}{fg=white,bg=dblue!70} % Colors of the highlighted block titles
+\setbeamercolor{block alerted body}{fg=black,bg=dblue!10} % Colors of the body of highlighted blocks
+% Many more colors are available for use in beamerthemeconfposter.sty
+
+%-----------------------------------------------------------
+% Define the column widths and overall poster size
+% To set effective sepwid, onecolwid and twocolwid values, first choose how many columns you want and how much separation you want between columns
+% In this template, the separation width chosen is 0.024 of the paper width and a 4-column layout
+% onecolwid should therefore be (1-(# of columns+1)*sepwid)/# of columns e.g. (1-(4+1)*0.024)/4 = 0.22
+% Set twocolwid to be (2*onecolwid)+sepwid = 0.464
+% Set threecolwid to be (3*onecolwid)+2*sepwid = 0.708
+
+\newlength{\sepwid}
+\newlength{\onecolwid}
+\newlength{\twocolwid}
+\newlength{\threecolwid}
+\setlength{\paperwidth}{48in} % A0 width: 46.8in
+\setlength{\paperheight}{36in} % A0 height: 33.1in
+\setlength{\sepwid}{0.024\paperwidth} % Separation width (white space) between columns
+\setlength{\onecolwid}{0.22\paperwidth} % Width of one column
+\setlength{\twocolwid}{0.464\paperwidth} % Width of two columns
+\setlength{\threecolwid}{0.708\paperwidth} % Width of three columns
+\setlength{\topmargin}{-0.5in} % Reduce the top margin size
+%-----------------------------------------------------------
+
+\usepackage{graphicx}  % Required for including images
+
+\usepackage{booktabs} % Top and bottom rules for tables
+\definecolor{classicrose}{rgb}{0.98, 0.8, 0.91}
+\definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\title{Sparse FGLM using the block Wiedemann algorithm} % Poster title
+
+\author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost} % Author(s)
+
+\institute{University of Waterloo, DTU Compute} % Institution(s)
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
+\addtobeamertemplate{block alerted end}{}{\vspace*{2ex}} % White space under highlighted (alert) blocks
+
+\setlength{\belowcaptionskip}{2ex} % White space under figures
+\setlength\belowdisplayshortskip{2ex} % White space under equations
+
+\begin{frame}[t] % The whole poster is enclosed in one beamer frame
+
+\begin{columns}[t] % The whole poster consists of three major columns, the second of which is split into two columns twice - the [t] option aligns each column's content to the top
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The first column
+
+%----------------------------------------------------------------------------------------
+%	OBJECTIVES
+%----------------------------------------------------------------------------------------
+
+%\begin{alertblock}{Objectives}
+
+%Lorem ipsum dolor sit amet, consectetur, nunc tellus pulvinar tortor, commodo eleifend risus arcu sed odio:
+%\begin{itemize}
+%\item Mollis dignissim, magna augue tincidunt dolor, interdum vestibulum urna
+%\item Sed aliquet luctus lectus, eget aliquet leo ullamcorper consequat. Vivamus eros sem, iaculis %ut euismod non, sollicitudin vel orci.
+%\item Nascetur ridiculus mus.  
+%\item Euismod non erat. Nam ultricies pellentesque nunc, ultrices volutpat nisl ultrices a.
+%\end{itemize}
+
+%\end{alertblock}
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Introduction}
+
+\begin{itemize}
+	\item Gr\"obner basis of an ideal is essential in solving systems of polynomials
+	\item Orderings such as degree reverse lexicographical ordering \textit{(degrevlex)} make computing the Gr\"obner basis faster
+	\item Orderings such as lexicographical order \textit{(lex)} make finding
+	solution coordinates easier
+	\item Compute first for degrevlex ordering and convert to lex ordering
+	\item Sparse FGLM algorithm of \cite{FaMo17} computes lex basis of a radical
+	ideal $I$ when $I$ is in shape position (although they also provide an algorithm
+	for non-radical ideals)
+	\item $I \subset \mathbb{K}[x_1,\dots,x_n]$ is in \textit{shape position} if
+	its Gr\"obner basis has the form $(x_1-R_1(x_n), \dots, x_{n-1}-R_{n-1}(x_n), R(x_n))$
+	\item Difficult to parallelize
+\end{itemize}
+
+
+\end{block}
+
+\begin{alertblock}{Main Problem}
+	\textbf{Input: }
+	\begin{itemize}
+	\item Zero-dimensional ideal $I \subset
+	\mathbb{K}[x_1,\dots,x_n]$ by means of a monomial basis 
+	$\mathbb{B} \subset Q$,\\ 
+	$Q = \mathbb{K}[x_1,\dots,x_n]/I$
+	\item Multiplication matrices  $T_1,\dots, T_n \in 
+	\mathbb{K}^{D \times D}$ of $x_1,\dots,x_n$, with
+	$D = dim_{\mathbb{K}}(Q)$
+	\end{itemize}
+	\textbf{Output:}
+	\begin{itemize}
+		\item Lex Gr\"obner basis of $\sqrt{I}$
+	\end{itemize}
+\end{alertblock}
+
+%------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of the first column
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
+
+\begin{block}{Block Sparse FGLM}
+	\begin{itemize}
+		\item Inspired by Coppersmith's block Wiedemann Algorithm \cite{Coppersmith93}
+		\item \textbf{Key idea:} Compute sequences of small matrices that require less terms
+		than linear sequences
+	\end{itemize}
+	\setbeamercolor{block alerted title}{fg=white,bg=norange} % Change the alert block title colors
+	\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
+	
+	\begin{alertblock}{Algorithm}
+		\begin{itemize}
+			\item[1.] Choose $U,V \in \mathbb{K}^{D \times m}$, where $m$ is the number of threads supported
+			\item[2.] Compute $s = (UT_n^iV)_{0 \le i < \frac{2D}{M}}$, $S = MatrixBerlekampMassey(s)$,
+			and $N = S\sum s^{(i)}/x^{i+1}$
+			\item[3.] Find the Smith form of $S$, $D = ASB$ with invariant factors 
+			$I_1,\dots I_D$. Set
+			$\tilde{u} = \begin{bmatrix}
+			\frac{I_Db_1}{I_1} & \frac{I_Db_2}{I_2}&,&\cdots&,&\frac{I_Db_{D-1}}{I_{D-1}},b_D
+			\end{bmatrix} A$, where $b_i$ is the $i^{th}$ entry of the last row of $B$
+			\item[4.] Set $n^*$ to be the $(m,1)$-th entry of $\tilde{u}N$ and $R_n$ as $I_D$
+			written in $x_n$
+			\item[5.] For $j = 1 \dots n-1$:
+			\begin{itemize}
+				\item[5a.] Compute $s_j = (UT_n^i T_j V)_{0 \le i <
+				\frac{D}{M}}$ and 
+				$N_j = S\sum s_j^{(i)}/x^{i+1}$
+				\item[5b.] Set $n_j = \tilde{u}N_j$ and $R_j$ as $n_j/n^*$ mod $R_n$
+				written in $x_n$
+			\end{itemize}
+			\item[6.] Return $(x_1-R_1, \dots, x_{n-1} - R_{n-1}, R_n)$
+		\end{itemize}
+	\end{alertblock}
+	\begin{itemize}
+	\item Analysis for Coppersmith's algorithm has been provided by
+	[Kaltofen '95], [Villard '97], [Kaltofen, Villard '04], [Kaltofen, Yuhasz '06]
+	\end{itemize}
+	\begin{example}
+		We will demonstrate our new algorithm by running it on
+		$I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{K}[x_1,x_2,x_3]$,
+		\begin{align*}
+		f_1 &= 3426x_1^2 - 4443x_1x_2 + 2004x_2^2 + 2335x_1x_3 - 74x_2x_3 + 4215x_3^2 - 1405x_1 + 4108x_2 - 1838x_3 - 2741\\
+		f_2 &= -4303x_1^2 - 1401x_1x_2 - 2604x_2^2 + 2745x_1x_3 + 3440x_2x_3 + 3331x_3^2 + 2112x_1 - 271x_2 - 2272x_3 - 3090\\
+		f_3 &= -4160x_1^2 + 1056x_1x_2 - 252x_2^2 - 2842x_1x_3 - 3643x_2x_3 + 3024x_3^2 + 3353x_1 + 3908x_2 - 426x_3 + 4197
+		\end{align*}
+		We choose $m = 2$ and two random matrices (with coefficients in [0,\dots 999]
+		for this specific example)
+		\begin{align*}
+		U = 
+		\begin{bmatrix}
+		568 &651 &852 &933 &279 &835 &446 &135\\
+		485 &707 &441 &238 &678 &552  &95 &900
+		\end{bmatrix} \quad
+		V =
+		\begin{bmatrix}
+		338 &147 & 24 &526 &549 &806 &741 &966\\
+		243 &637 &563 &545 &580 &432 &544 &165
+		\end{bmatrix}^t
+		\end{align*}
+		Computing the minimal generating polynomial of $s = (UT_3^iV)_{0 \le i < 8}$,
+		$$S = \begin{bmatrix}
+        x^4 + 5848x^3 + 1193x^2 + 5800x + 4050 &5414x^3 + 6409x^2 + 223x + 783\\
+        4469x^3 + 7812x^2 + 80x + 554 &x^4 + 3102x^3 + 4076x^2 + 1871x + 3985
+		\end{bmatrix}
+		$$
+		After steps 4 and 5,
+		\begin{align*}
+		n &= 320x_3^7 + 3312x_3^6 + 38x_3^5 + 763x_3^4 + 5895x_3^3 + 6024x_3^2 + 8927x_3 + 1804
+		\\
+		R_3 &= x_3^8 + 8950x_3^7 + 8272x_3^6 + 2637x_3^5 + 3062x_3^4 + 7018x_3^3 + 6992x_3^2 + 8980x_3 + 7724
+		\end{align*}
+		For $j = 1$,
+		\begin{align*}
+		n_1 &= 7981x_3^7 + 7201x_3^6 + 1005x_3^5 + 1044x_3^4 + 3205x_3^3 + 6671x_3^2 + 7423x_3 + 832\\
+		R_1 &= 4200x_3^7 + 5082x_3^6 + 6769x_3^5 + 5671x_3^4 + 4288x_3^3 + 8885x_3^2 + 7423x_3 + 4930
+		\end{align*}
+		For $j = 2$,
+		\begin{align*}
+		n_2 &= 4648x_3^7 + 377x_3^6 + 5551x_3^5 + 1738x_3^4 + 2653x_3^3 + 7064x_3^2 + 3229x_3 + 8719\\
+		R_2 &= 1168x_3^7 + 5878x_3^6 + 2896x_3^5 + 4452x_3^4 + 3821x_3^3 + 7586x_3^2 + 7952x_3 + 28
+		\end{align*}
+	\end{example}
+\end{block}
+
+\end{column} % End of the second column
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The third column
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Conclusion}
+
+\end{block}
+
+%----------------------------------------------------------------------------------------
+%	ADDITIONAL INFORMATION
+%----------------------------------------------------------------------------------------
+
+%\begin{block}{Additional Information}
+
+%Maecenas ultricies feugiat velit non mattis. Fusce tempus arcu id ligula varius dictum. 
+%\begin{itemize}
+%\item Curabitur pellentesque dignissim
+%\item Eu facilisis est tempus quis
+%\item Duis porta consequat lorem
+%\end{itemize}
+
+%\end{block}
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+
+\begin{block}{References}
+
+\nocite{*} % Insert publications even if they are not cited in the poster
+\small{\bibliographystyle{unsrt}
+\bibliography{sample}\vspace{0.75in}}
+
+\end{block}
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+%\setbeamercolor{block title}{fg=red,bg=white} % Change the block title color
+
+%\begin{block}{Acknowledgements}
+
+%\small{\rmfamily{Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.}} \\
+
+%\end{block}
+
+%----------------------------------------------------------------------------------------
+%	CONTACT INFORMATION
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of the third column
+
+\end{columns} % End of all the columns in the poster
+
+\end{frame} % End of the enclosing frame
+
+\end{document}
