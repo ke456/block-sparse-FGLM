@@ -1,0 +1,13 @@
+load "init.mgm";
+
+name:="decker2.dat";
+x:=init(2);
+sys:=[
+x[1] + x[2]^3,
+x[1]^2*x[2] - x[2]^4
+];
+
+print_all(sys, name);
+quit;
+
+
