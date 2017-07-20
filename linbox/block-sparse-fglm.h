@@ -79,7 +79,16 @@ class PolMatDom {
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
 
+	// midproduct algorithm to compute the residual
+	// Note: not optimized (reason why not using LinBox's 'midproduct_gen': experienced bugs with it..)
+	template <typename PolMat>
+	void midproduct( PolMat &res, const PolMat &approx, const PolMat &series );
+
+	// mbasis algorithm to compute approximant bases
 	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() ) const;
+
+	// pmbasis divide and conquer algorithm to compute approximant bases
+	std::vector<int> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=1 );
 
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
