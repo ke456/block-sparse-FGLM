@@ -56,16 +56,23 @@
 %-----------------------------------------------------------
 
 \usepackage{graphicx}  % Required for including images
-
+\usepackage{multicol}
 \usepackage{booktabs} % Top and bottom rules for tables
+
+% Colors
 \definecolor{classicrose}{rgb}{0.98, 0.8, 0.91}
+\definecolor{antiquefuchsia}{rgb}{0.57, 0.36, 0.51}
 \definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
+
+\setbeamertemplate{itemize/enumerate body begin}{\normalsize}
+\setbeamertemplate{itemize/enumerate subbody begin}{\normalsize}
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION 
 %----------------------------------------------------------------------------------------
 
-\title{Sparse FGLM using the block Wiedemann algorithm} % Poster title
+\title{Sparse 
+	$\mathbf{\sqrt{FGLM}}$ using the block Wiedemann algorithm} % Poster title
 
 \author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost} % Author(s)
 
@@ -75,7 +82,7 @@
 
 \begin{document}
 
-\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
+%\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
 \addtobeamertemplate{block alerted end}{}{\vspace*{2ex}} % White space under highlighted (alert) blocks
 
 \setlength{\belowcaptionskip}{2ex} % White space under figures
@@ -111,18 +118,16 @@
 
 \begin{block}{Introduction}
 
+% add a block for sim/dif - compute something weaker, always works
+% doesn't require berlekamp-massey-sakata
+% base field needs to be higher than D, generic coordinate
+% Correctness also follows from 5
+% square free R_n
+% in example highlight D = ?
+% highlight parallel ...
+
 \begin{itemize}
-	\item Gr\"obner basis of an ideal is essential in solving systems of polynomials
-	\item Orderings such as degree reverse lexicographical ordering \textit{(degrevlex)} make computing the Gr\"obner basis faster
-	\item Orderings such as lexicographical order \textit{(lex)} make finding
-	solution coordinates easier
-	\item Compute first for degrevlex ordering and convert to lex ordering
-	\item Sparse FGLM algorithm of \cite{FaMo17} computes lex basis of a radical
-	ideal $I$ when $I$ is in shape position (although they also provide an algorithm
-	for non-radical ideals)
-	\item $I \subset \mathbb{K}[x_1,\dots,x_n]$ is in \textit{shape position} if
-	its Gr\"obner basis has the form $(x_1-R_1(x_n), \dots, x_{n-1}-R_{n-1}(x_n), R(x_n))$
-	\item Difficult to parallelize
+	\item Compute the Gr\"obner basis for degrevlex ordering first (fast) and convert to lex ordering (better structure)
 \end{itemize}
 
 
@@ -145,6 +150,38 @@
 	\end{itemize}
 \end{alertblock}
 
+\begin{alertblock}{Assumptions}
+	\begin{itemize}
+		\item Base field is larger than $D$
+		\item $x_n$ \textit{separates} the points of $V(I)$
+		\item Ensured by a generic change of coordinates
+		\item Under assumption, $\sqrt{I}$ is in shape position
+		\item $I \subset \mathbb{K}[x_1,\dots,x_n]$ is in \textit{shape position} if its Gr\"obner basis has the form $(x_1-R_1(x_n), 
+		\dots, x_{n-1}-R_{n-1}(x_n), R(x_n))$
+	\end{itemize}
+\end{alertblock}
+
+%\setbeamercolor{block alerted title}{fg=white,bg=antiquefuchsia}
+%\setbeamercolor{block alerted body}{fg=black,bg=white}
+
+\begin{alertblock}{Sparse FGLM}
+	\begin{itemize}
+	\item Sparse FGLM algorithm of \cite{FaMo17} computes lex basis of an ideal $I$ when $I$ is in shape position
+	\item Exploits the sparsity of $T_i$'s
+	\item Difficult to parallelize
+	\end{itemize}
+\end{alertblock}
+
+\begin{alertblock}{Differences}
+	\begin{itemize}
+		\item If $I$ is not in shape position, Sparse FGLM uses 
+		Berlekamp-Massey-Sakata to compute the lex basis
+		\item We compute lex basis of $\sqrt{I}$ (weaker), which is in shape position by 
+		assumption
+	\end{itemize}
+\end{alertblock}
+	
+
 %------------------------------------------------
 
 %----------------------------------------------------------------------------------------
@@ -155,88 +192,103 @@
 
 \begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
 
-\begin{block}{Block Sparse FGLM}
+\begin{block}{Block Sparse $\mathbf{\sqrt{FGLM}}$}
 	\begin{itemize}
 		\item Inspired by Coppersmith's block Wiedemann Algorithm \cite{Coppersmith93}
 		\item \textbf{Key idea:} Compute sequences of small matrices that require less terms
 		than linear sequences
 	\end{itemize}
-	\setbeamercolor{block alerted title}{fg=white,bg=norange} % Change the alert block title colors
-	\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
+	\setbeamercolor{block alerted title}{fg=white,bg=norange}
+	\setbeamercolor{block alerted body}{fg=black,bg=white} 
 	
 	\begin{alertblock}{Algorithm}
 		\begin{itemize}
-			\item[1.] Choose $U,V \in \mathbb{K}^{D \times m}$, where $m$ is the number of threads supported
-			\item[2.] Compute $s = (UT_n^iV)_{0 \le i < \frac{2D}{M}}$, $S = MatrixBerlekampMassey(s)$,
+			\item[1.] Choose $U,V \in \mathbb{K}^{m \times D}$, where $m$ is the number of threads supported
+			\item[2.] Compute $d = \frac{D}{M}$ and
+			$s = (UT_n^iV^t)_{0 \le i < 2d}$
+			\item[3.] Compute
+			 $S = MatrixBerlekampMassey(s)$,
 			and $N = S\sum s^{(i)}/x^{i+1}$
-			\item[3.] Find the Smith form of $S$, $D = ASB$ with invariant factors 
-			$I_1,\dots I_D$. Set
-			$\tilde{u} = \begin{bmatrix}
+			\item[4.] Find the Smith form of $S$, $ASB$ with invariant factors $I_1,\dots I_D$. Set $a = \begin{bmatrix}
 			\frac{I_Db_1}{I_1} & \frac{I_Db_2}{I_2}&,&\cdots&,&\frac{I_Db_{D-1}}{I_{D-1}},b_D
 			\end{bmatrix} A$, where $b_i$ is the $i^{th}$ entry of the last row of $B$
-			\item[4.] Set $n^*$ to be the $(m,1)$-th entry of $\tilde{u}N$ and $R_n$ as $I_D$
-			written in $x_n$
-			\item[5.] For $j = 1 \dots n-1$:
+			\item[5.] Set $N^*$ to be the $(m,1)$-th entry of $aN$ and $R_n$ as the square-free part of $I_D$
+			\item[6.] For $j = 1 \dots n-1$:
 			\begin{itemize}
-				\item[5a.] Compute $s_j = (UT_n^i T_j V)_{0 \le i <
-				\frac{D}{M}}$ and 
-				$N_j = S\sum s_j^{(i)}/x^{i+1}$
-				\item[5b.] Set $n_j = \tilde{u}N_j$ and $R_j$ as $n_j/n^*$ mod $R_n$
-				written in $x_n$
+			\item[6a.] Compute $s_j = (UT_n^i T_j V^t)_{0 \le i < d}$ and $N_j = S\sum s_j^{(i)}/x^{i+1}$
+			\item[6b.] Set $N^*_j = \tilde{u}N_j$ and $R_j$ as $N^*_j/N^*$ mod $R_n$ written in $x_n$
 			\end{itemize}
-			\item[6.] Return $(x_1-R_1, \dots, x_{n-1} - R_{n-1}, R_n)$
+			\item[7.] Return $(x_1-R_1, \dots, x_{n-1} - R_{n-1}, R_n)$
 		\end{itemize}
 	\end{alertblock}
 	\begin{itemize}
-	\item Analysis for Coppersmith's algorithm has been provided by
-	[Kaltofen '95], [Villard '97], [Kaltofen, Villard '04], [Kaltofen, Yuhasz '06]
+	\item Analysis for Coppersmith's algorithm done by
+	 [Villard '97], \cite{KaVi04}, other useful properties [Kaltofen '95],[Kaltofen, Yuhasz '06]; Correctness of the algorithm also follows from \cite{BoSaSc03}
 	\end{itemize}
 	\begin{example}
-		We will demonstrate our new algorithm by running it on
-		$I = \langle f_1, f_2, f_3 \rangle \subset \mathbb{K}[x_1,x_2,x_3]$,
-		\begin{align*}
-		f_1 &= 3426x_1^2 - 4443x_1x_2 + 2004x_2^2 + 2335x_1x_3 - 74x_2x_3 + 4215x_3^2 - 1405x_1 + 4108x_2 - 1838x_3 - 2741\\
-		f_2 &= -4303x_1^2 - 1401x_1x_2 - 2604x_2^2 + 2745x_1x_3 + 3440x_2x_3 + 3331x_3^2 + 2112x_1 - 271x_2 - 2272x_3 - 3090\\
-		f_3 &= -4160x_1^2 + 1056x_1x_2 - 252x_2^2 - 2842x_1x_3 - 3643x_2x_3 + 3024x_3^2 + 3353x_1 + 3908x_2 - 426x_3 + 4197
-		\end{align*}
-		We choose $m = 2$ and two random matrices (with coefficients in [0,\dots 999]
-		for this specific example)
-		\begin{align*}
-		U = 
-		\begin{bmatrix}
-		568 &651 &852 &933 &279 &835 &446 &135\\
-		485 &707 &441 &238 &678 &552  &95 &900
+		\textbf{Input: }$I = \langle f_1^2, f_2^2,f_3 \rangle \subset GF(9001)[x_1,x_2,x_3]$
+		and $D = 32$, with
+		$$ f_1 = -4022x_1^2 - 2799x_1x_2 + \dots, \;
+		   f_2 = -4319x_1^2 - 711x_1x_2 + \dots, \;
+		   f_3 = 4199x_1^2 + 2325x_1x_2 + \dots$$
+		\textcolor{red}{Step 1:} Choose $m = 2$ and $U,V \in GF(9001)^{32 \times 2}$ 
+		$$ U = \begin{bmatrix}
+		1898 &6830 &3494 & 169 &7991 &3352 \dots \\
+		3161 &8858 &8467 &5882 &8037 &3726 \dots
 		\end{bmatrix} \quad
-		V =
-		\begin{bmatrix}
-		338 &147 & 24 &526 &549 &806 &741 &966\\
-		243 &637 &563 &545 &580 &432 &544 &165
+		V = \begin{bmatrix}
+		7595 &8416 &2285 &8351 & 550 &7012 \dots \\
+		823 &5686 &6539 &7884 &7105 &3427 \dots 
 		\end{bmatrix}^t
-		\end{align*}
-		Computing the minimal generating polynomial of $s = (UT_3^iV)_{0 \le i < 8}$,
-		$$S = \begin{bmatrix}
-        x^4 + 5848x^3 + 1193x^2 + 5800x + 4050 &5414x^3 + 6409x^2 + 223x + 783\\
-        4469x^3 + 7812x^2 + 80x + 554 &x^4 + 3102x^3 + 4076x^2 + 1871x + 3985
+		$$
+		\textcolor{red}{Step 2 \& 3: } $d = 16$,
+		$$ s = \left(
+		\begin{bmatrix}
+		31  & 6977\\
+		1178& 1695
+		\end{bmatrix},
+		\begin{bmatrix}
+		8212&1663\\
+		4811&4837
+		\end{bmatrix}
+		\dots
+		\right)\,
+		S = \begin{bmatrix}
+		x^{16} + \dots & 423x^{15} +\dots\\
+		6426x^{15}+ \dots & x^{16} + \dots
+		\end{bmatrix} \,
+		N = \begin{bmatrix}
+		6191/x^{16} + \dots & 8101/x^{16} + \dots\\
+		7116/x^{16} + \dots & 2129/x^{16} + \dots
 		\end{bmatrix}
 		$$
-		After steps 4 and 5,
-		\begin{align*}
-		n &= 320x_3^7 + 3312x_3^6 + 38x_3^5 + 763x_3^4 + 5895x_3^3 + 6024x_3^2 + 8927x_3 + 1804
-		\\
-		R_3 &= x_3^8 + 8950x_3^7 + 8272x_3^6 + 2637x_3^5 + 3062x_3^4 + 7018x_3^3 + 6992x_3^2 + 8980x_3 + 7724
-		\end{align*}
-		For $j = 1$,
-		\begin{align*}
-		n_1 &= 7981x_3^7 + 7201x_3^6 + 1005x_3^5 + 1044x_3^4 + 3205x_3^3 + 6671x_3^2 + 7423x_3 + 832\\
-		R_1 &= 4200x_3^7 + 5082x_3^6 + 6769x_3^5 + 5671x_3^4 + 4288x_3^3 + 8885x_3^2 + 7423x_3 + 4930
-		\end{align*}
-		For $j = 2$,
-		\begin{align*}
-		n_2 &= 4648x_3^7 + 377x_3^6 + 5551x_3^5 + 1738x_3^4 + 2653x_3^3 + 7064x_3^2 + 3229x_3 + 8719\\
-		R_2 &= 1168x_3^7 + 5878x_3^6 + 2896x_3^5 + 4452x_3^4 + 3821x_3^3 + 7586x_3^2 + 7952x_3 + 28
-		\end{align*}
+		\textcolor{red}{Step 4 \& 5:}
+		$I_1 = x^{8} + 6990x^{7} + 191x^{6} + \dots$ and $I_2 = x^{24} + 2968x^{23}+ 8589x^{22} + \dots$, with
+		$$ a = \begin{bmatrix}
+		2575x^7+4809x^6+\dots & x^8 + 3391x^7+\dots
+		\end{bmatrix},\,
+		N^* = 1178x^{23} + 8727x^{22} + \dots, \,
+		R_3 = x^8 + 6990x^7 + \dots
+		$$
+		\textcolor{red}{Step 6: } For $j = 1$, $N^*_1 = 1178x^{23} + 8727x^{22} + \dots$ and
+		$R_1 = 7964x^7 + 4071x^6 + \dots$\\
+		\hspace{1cm}\hspace{1cm}\hspace{1cm}\hspace{1cm}\hspace{0.3cm}
+		For $j = 2$, $N^*_2 = 6587x^{23}+3987x^{22} + \dots$ and 
+		$R_2 = 1443x^7 + 7818x^6 + \dots$
+	
 	\end{example}
 \end{block}
+
+\setbeamercolor{block alerted title}{fg=white,bg=norange}
+\setbeamercolor{block alerted body}{fg=black,bg=white} 
+\begin{alertblock}{Parallel Computations}
+	\begin{itemize}
+		\item Bottleneck is computing the sequence $(UT_n^i)_{0 \le i < 2d}$
+		\item Can parallelize by computing the sequences $(U_1T_n^i),\dots,(U_mT_n^i)$
+		separately, where $U_i$ is the $i^{th}$ row of $U$
+		\item When $m=1$, same computation as Sparse FGLM
+	\end{itemize}
+\end{alertblock}
 
 \end{column} % End of the second column
 
