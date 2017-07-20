@@ -74,12 +74,13 @@ class PolMatDom {
 
 	inline const GF& field() const {return *_field;}
 
-	void print_degree_matrix( const MatrixP &pmat ) const;
+	template<typename PolMat>
+	void print_degree_matrix( const PolMat &pmat ) const;
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
 
-	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() );
+	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() ) const;
 
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices

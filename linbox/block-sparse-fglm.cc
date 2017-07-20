@@ -260,7 +260,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 }
 
-void PolMatDom::print_degree_matrix( const MatrixP &pmat ) const {
+template<typename PolMat>
+void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
 	const size_t d = pmat.degree();
 	for ( size_t i=0; i<pmat.rowdim(); ++i ) {
 		for ( size_t j=0; j<pmat.coldim(); ++j ) {
@@ -273,7 +274,7 @@ void PolMatDom::print_degree_matrix( const MatrixP &pmat ) const {
 	}
 }
 
-vector<int> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift )
+vector<int> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift ) const
 {
 	/** Algorithm M-Basis as detailed in Section 2.1 of
 	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
@@ -625,9 +626,10 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();
 	//OrderBasis<GF> OB( this->field() );
-	vector<size_t> shift( 2*M, 0 );  // dim = M + N = 2M
-	PolMatDom::MatrixP series( this->field(), 2*M, M, d );
-	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, d );
+	//vector<size_t> shift( 2*M, 0 );  // dim = M + N = 2M
+	vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
+	PolMatDom::PMatrix series( this->field(), 2*M, M, d );
+	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, d );
 
 	// 1. construct series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
 	// i.e. stacking reversed sequence and -Identity
@@ -651,10 +653,11 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 #endif
 
 	// 2. compute approximant basis in reduced form
-	OB.PM_Basis( app_bas, series, d, shift );
+	//OB.PM_Basis( app_bas, series, d, shift );
+	vector<int> rdeg = this->mbasis( app_bas, series, d, shift );
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Approximant basis: output shift and basis degrees" << endl;
-	cout << shift << endl;
+	cout << "###OUTPUT(MatrixBM)### Approximant basis: output rdeg and basis degrees" << endl;
+	cout << rdeg << endl;
 	this->print_degree_matrix( app_bas );
 #ifdef EXTRA_VERBOSE_ON
 	cout << "basis entries:" << endl;
@@ -668,7 +671,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	// This assumption could be avoided easily but implies to rewrite OrderBasis::M_Basis
 	bool test = true;
 	for ( size_t i=0; i<2*M-1; ++i )
-		if ( shift[i] != shift[i+1] )
+		if ( rdeg[i] != rdeg[i+1] )
 			test = false;
 	if (not test) {
 		cout << "~~~WARNING(MatrixBM)~~~ unexpected degrees in approximant basis" << endl;
@@ -677,14 +680,14 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 #endif
 
 	// 3. Transform app_bas into Popov form
-	// Right now, assuming the row degree 'shift' is constant
+	// Right now, assuming the row degree 'rdeg' is constant
 	// --> suffices to left-multiply by invert of leading matrix
 
 	// retrieve inverse of leading matrix
 	Matrix lmat( this->field(), 2*M, 2*M );
 	for ( size_t i=0; i<2*M; ++i )
 	for ( size_t j=0; j<2*M; ++j )
-		lmat.refEntry(i,j) = app_bas.get(i,j,shift[i]); // row i has degree shift[i]
+		lmat.refEntry(i,j) = app_bas.get(i,j,rdeg[i]); // row i has degree rdeg[i]
 #ifdef EXTRA_VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### leading matrix of reduced approximant basis:" << endl;
 	cout << lmat << endl;
@@ -692,33 +695,35 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	this->_BMD.invin( lmat ); // lmat is now the inverse of leading_matrix(app_bas)
 
 	// create Popov approximant basis and fill it
-	PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, shift[0]+1 );  //  shift[0] = deg(app_bas)
- 	for ( size_t k=0; k<d; ++k ) {
-		Matrix app_bas_coeff( app_bas[k] );
-		this->_BMD.mulin_right( lmat, app_bas_coeff );
-		for ( size_t i=0; i<2*M; ++i )
-		for ( size_t j=0; j<2*M; ++j )
-			popov_app_bas.ref(i,j,k) = app_bas_coeff.getEntry(i,j);
+	//PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, rdeg[0]+1 );  //  rdeg[0] = deg(app_bas)
+ 	for ( size_t k=0; k<app_bas.size(); ++k ) {
+		//Matrix app_bas_coeff( app_bas[k] );
+		this->_BMD.mulin_right( lmat, app_bas[k] );
+		//for ( size_t i=0; i<2*M; ++i )
+		//for ( size_t j=0; j<2*M; ++j )
+		//	popov_app_bas.ref(i,j,k) = app_bas_coeff.getEntry(i,j);
 	}
 
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Popov approximant basis degrees:" << endl;
-	this->print_degree_matrix(popov_app_bas);
+	this->print_degree_matrix(app_bas);
+	//this->print_degree_matrix(popov_app_bas);
 #ifdef EXTRA_VERBOSE_ON
 	cout << "Basis entries:" << endl;
-	cout << popov_app_bas << endl;
+	cout << app_bas << endl;
+	//cout << popov_app_bas << endl;
 #endif
 #endif
 
 	// 4. copy into mat_gen and mat_num
-	mat_gen.setsize( shift[0]+1 );
-	mat_num.setsize( shift[0]+1 );
+	mat_gen.setsize( rdeg[0]+1 );
+	mat_num.setsize( rdeg[0]+1 );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
-	for ( size_t k=0; k<=shift[0]; ++k )
+	for ( int k=0; k<=rdeg[0]; ++k )
 	{
-		mat_gen.ref(i,j,k) = popov_app_bas.get(i,j,k);
-		mat_num.ref(i,j,k) = popov_app_bas.get(i,j+M,k);
+		mat_gen.ref(i,j,k) = app_bas.get(i,j,k);
+		mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
 	}
 }
 
