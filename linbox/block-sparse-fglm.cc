@@ -3,6 +3,7 @@
 //#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
+#define SPARSITY_COUNT // shows the sparsity of the matrices
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <sstream>
@@ -32,9 +33,12 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, st
   getline(file, line);
   getline(file, line);
   getline(file, line);
-  
+ 
+  vector<double> sparsity_count;
+  long max_entries = D*D;
+ 
   int index = 0;
-
+  long count = 0;
   while (getline(file, line)){
     istringstream sline(line);
     vector<string> numbers{istream_iterator<string>{sline}, istream_iterator<string>{}};
@@ -43,13 +47,23 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, st
     int a_int = stoi(numbers[2]);
     if (i == D){
       index++;
+      sparsity_count.emplace_back((double)(count)/max_entries);
+      count = 0;
     }
     else{
+      count++;
       GF::Element a(a_int);
       mul_mats[index].refEntry(i,j) = a;
     }
   }
   file.close();
+  
+#ifdef SPARSITY_COUNT
+  cout << "sparsity: ";
+  for (auto i: sparsity_count)
+    cout << i << " ";
+  cout << endl;
+#endif
 }
 
 
@@ -583,6 +597,7 @@ int main( int argc, char **argv ){
 	  file.close();
 	  GF field(p);
 	  Block_Sparse_FGLM l(field, D, M, n, s);
+	  l.find_lex_basis();
 	  return 0;
 	}
 
