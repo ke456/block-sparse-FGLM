@@ -67,6 +67,8 @@ class PolMatDom {
 
 	inline const GF& field() const {return *_field;}
 
+	void print_degree_matrix( const MatrixP &pmat ) const;
+
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	size_t SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
 

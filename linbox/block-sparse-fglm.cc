@@ -1,5 +1,6 @@
 //#define TIMINGS_ON // comment out if having timings is not relevant
-#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+//#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
+#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #include "block-sparse-fglm.h"
@@ -84,7 +85,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
 	for (auto &i : U_rows){
 		create_random_matrix(i);
-#ifdef VERBOSE_ON
+#ifdef EXTRA_VERBOSE_ON
 		i.write(cout << "###OUTPUT### U_row: ",Tag::FileFormat::Maple)<<endl;
 #endif
 	}
@@ -97,7 +98,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 
 	// initialize the first multiplication matrix (random DxD)
 	auto &T1 = mul_mats[0];
-#ifdef VERBOSE_ON
+#ifdef EXTRA_VERBOSE_ON
 	T1.write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 #endif
 
@@ -172,9 +173,12 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	
 #ifdef VERBOSE_ON	
 	cout << "###OUTPUT### Matrix sequence (U T1^i)_i :" << endl;
-	cout << "length d = " << this->getLength() << ", and entries:" << endl;
+	cout << "Length d = " << this->getLength() << endl;
+#ifdef EXTRA_VERBOSE_ON	
+    cout << "Entries:" << endl;
 	for (auto &i: mat_seq_left)
 		i.write(cout, Tag::FileFormat::Maple)<<endl;
+#endif
 #endif
 #ifdef TIMINGS_ON
 	auto end = chrono::high_resolution_clock::now();
@@ -191,9 +195,12 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
-	cout << "length d = " << this->getLength() << ", and entries:" << endl;
+	cout << "Length d = " << this->getLength() << endl;
+#ifdef EXTRA_VERBOSE_ON
+	cout << "Entries:" << endl;
 	for (auto &i: mat_seq)
 		i.write(cout, Tag::FileFormat::Maple)<<endl;
+#endif
 #endif
 	// 3. compute generator and numerator in Matrix Berlekamp Massey: reversed sequence = mat_gen/mat_num
 	PolMatDom PMD( field );
@@ -205,9 +212,15 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	cout << "###TIME### Matrix Berlekamp Massey: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
 #endif
 #ifdef VERBOSE_ON
-  	cout << "###OUTPUT### Matrix generator:" << endl;
+  	cout << "###OUTPUT### Matrix generator degrees:" << endl;
+	PMD.print_degree_matrix( mat_gen );
+  	cout << "###OUTPUT### Matrix numerator degrees:" << endl;
+	PMD.print_degree_matrix( mat_num );
+#endif
+#ifdef EXTRA_VERBOSE_ON
+  	cout << "###OUTPUT### Matrix generator entries:" << endl;
 	cout << mat_gen << endl;
-  	cout << "###OUTPUT### Matrix numerator:" << endl;
+  	cout << "###OUTPUT### Matrix numerator entries:" << endl;
 	cout << mat_num << endl;
 #endif
 	vector<PolMatDom::Polynomial> smith( M );
@@ -226,13 +239,26 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		MD.mul(lst[i],lst[i-1],T1);
 		lst[i] = U;
 	}
-#ifdef VERBOSE_ON
+#ifdef EXTRA_VERBOSE_ON
 	for (auto &i : lst)
 		i.write(cout<<"U: ", Tag::FileFormat::Maple)<<endl;
 #endif
 	end = chrono::high_resolution_clock::now();
 	cout << "###TIME### sequence (UT1^i) naive: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl;
 #endif
+}
+
+void PolMatDom::print_degree_matrix( const MatrixP &pmat ) const {
+	const size_t d = pmat.degree();
+	for ( size_t i=0; i<pmat.rowdim(); ++i ) {
+		for ( size_t j=0; j<pmat.coldim(); ++j ) {
+			int deg = d;
+			while ( deg>=0 and pmat.get(i,j,deg) == 0 )
+				--deg;
+			cout << deg << "  ";
+		}
+		cout << endl;
+	}
 }
 
 size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
@@ -249,14 +275,14 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
 	vector<size_t> shift( 2*M, 0 );
 	for ( size_t i=M; i<2*M; ++i ) {
-		shift[i] = (i-M)*deg*M;
+		shift[i] = (i-M)*(deg*M+1);
 	}
 
 	// order d such that approximant basis contains kernel basis
 	const size_t order = 2*M*deg+1;
 
 	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
-	PolMatDom::MatrixP series( this->field(), 2*M, M, deg );
+	PolMatDom::MatrixP series( this->field(), 2*M, M, order ); // requirement of LinBox: degree of series = order-1 (even though here the actual degree is deg)
 
 	for ( size_t k=0; k<=deg; ++k )
 	for ( size_t i=0; i<M; ++i )
@@ -267,11 +293,16 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 		series.ref(i,i-M,0) = this->field().mOne;
 
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### First approximant basis: deg(pmat), input shift, input order, series:" << endl;
+	cout << "###OUTPUT(Smith)### First approximant basis: deg(pmat), input shift, input order..:" << endl;
 	cout << deg << endl;
 	cout << shift << endl;
 	cout << order << endl;
+	cout << "series degrees:" << endl;
+	this->print_degree_matrix(series);
+#ifdef EXTRA_VERBOSE_ON
+	cout << "series entries:" << endl;
 	cout << series << endl;
+#endif
 #endif
 
 	// compute approximant basis and extract kernel basis
@@ -279,9 +310,13 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 	OrderBasis<GF> OB( this->field() );
 	OB.PM_Basis( app_bas, series, order, shift );
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### First approximant basis: output shift and basis:" << endl;
+	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
 	cout << shift << endl;
+	this->print_degree_matrix(app_bas);
+#ifdef EXTRA_VERBOSE_ON
+	cout << "basis entries:" << endl;
 	cout << app_bas << endl;
+#endif
 #endif
 
 	return 0;
@@ -308,18 +343,26 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 		series.ref(i,j,k) = mat_seq[d-k-1].getEntry(i,j);
 
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Approximant basis: input order, shift, and series" << endl;
+	cout << "###OUTPUT(MatrixBM)### Approximant basis: input order, shift, series degrees" << endl;
 	cout << d << endl;
 	cout << shift << endl;
+	this->print_degree_matrix( series );
+#ifdef EXTRA_VERBOSE_ON
+	cout << "series entries:" << endl;
 	cout << series << endl;
+#endif
 #endif
 
 	// 2. compute approximant basis in reduced form
 	OB.PM_Basis( app_bas, series, d, shift );
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Approximant basis: output shift and basis" << endl;
+	cout << "###OUTPUT(MatrixBM)### Approximant basis: output shift and basis degrees" << endl;
 	cout << shift << endl;
+	this->print_degree_matrix( app_bas );
+#ifdef EXTRA_VERBOSE_ON
+	cout << "basis entries:" << endl;
 	cout << app_bas << endl;
+#endif
 #endif
 #ifdef WARNINGS_ON
 	// so far we are assuming the degrees are evenly balanced
@@ -345,7 +388,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	for ( size_t i=0; i<2*M; ++i )
 	for ( size_t j=0; j<2*M; ++j )
 		lmat.refEntry(i,j) = app_bas.get(i,j,shift[i]); // row i has degree shift[i]
-#ifdef VERBOSE_ON
+#ifdef EXTRA_VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### leading matrix of reduced approximant basis:" << endl;
 	cout << lmat << endl;
 #endif
@@ -362,8 +405,12 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	}
 
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Popov approximant basis:" << endl;
+	cout << "###OUTPUT(MatrixBM)### Popov approximant basis degrees:" << endl;
+	this->print_degree_matrix(popov_app_bas);
+#ifdef EXTRA_VERBOSE_ON
+	cout << "Basis entries:" << endl;
 	cout << popov_app_bas << endl;
+#endif
 #endif
 
 	// 4. copy into mat_gen and mat_num
@@ -382,18 +429,16 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 
 int main( int argc, char **argv ){
 	// default arguments
-	//size_t p = 13;  // size of the base field
 	size_t p = 23068673;  // size of the base field
 	size_t M = 4;   // row dimension for the blocks
-	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices
-	size_t n = 2;
+	size_t n = 2;  // number of variables / of multiplication matrices
 	string s = "";
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
+		{ 'n', "-n n", "Set number of variables to n.", TYPE_INT, &n },
 		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
-		//{ 'N', "-N N", "Set the column block dimension to N.", TYPE_INT,       &N },
 		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
 		{ 'F', "-F F", "Read input from file F", TYPE_STR,  &s },
 		END_OF_ARGUMENTS
