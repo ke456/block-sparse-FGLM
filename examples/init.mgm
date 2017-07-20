@@ -1,0 +1,37 @@
+p:=65537;
+
+function init(n)
+    M:=PolynomialRing(GF(p), n, "grevlex");
+    x:=[M.i : i in [1..n]];
+    return x;
+end function;
+
+procedure print_matrix_as_sparse(M)
+    for i in [1..NumberOfRows(M)] do
+	for j in [1..NumberOfColumns(M)] do
+	    if M[i][j] ne 0 then
+		print i-1, j-1, M[i][j];
+	    end if;
+	end for;
+    end for;
+end procedure;
+
+procedure print_all(sys, name)
+    M:=Universe(sys);
+    n:=Rank(M);
+    
+    Q:=quo<M | sys>;
+
+    SetOutputFile(name: Overwrite:=true);
+    k:=BaseRing(M);
+    #k;
+    n;
+    Dimension(Q);
+    for i in [1..n-1] do
+	print_matrix_as_sparse(RepresentationMatrix(Q!M.i));
+	print Dimension(Q), Dimension(Q), Dimension(Q);
+	print_matrix_as_sparse(&+[Random(k)*RepresentationMatrix(Q!M.i) : i in [1..n]]);
+    end for;
+    
+    UnsetOutputFile();
+end procedure;
