@@ -1,0 +1,54 @@
+\begin{thebibliography}{1}
+
+\bibitem{BoSaSc03}
+A.~Bostan, B.~Salvy, and {\'E}.~Schost.
+\newblock Fast algorithms for zero-dimensional polynomial systems using
+  duality.
+\newblock {\em AAECC},
+  14:239--272, 2003.
+
+\bibitem{Coppersmith94}
+D. Coppersmith.
+\newblock Solving homogeneous linear equations over {GF}(2) via block {W}iedemann algorithm.
+\newblock {\em Mathematics of Computation}, 62(205):330--350, 1994.
+
+\bibitem{FaGiLaMo93}
+J.-C. Faug\`ere, P.~Gianni, D.~Lazard, and T.~Mora.
+\newblock Efficient computation of zero-dimensional {G}r\"obner bases by change
+  of ordering.
+\newblock {\em JSC}, 16(4):329--344, 1993.
+
+\bibitem{FaMo17}
+J.-C. Faug{\`e}re and C.~Mou.
+\newblock Sparse {FGLM} algorithms.
+\newblock {\em JSC}, 80(3):538--569, 2017.
+
+\bibitem{Kaltofen95}
+E.~Kaltofen.
+\newblock Analysis of Coppersmith's block Wiedemann algorithm for the parallel solution of sparse linear systems.
+\newblock {\em Mathematics of Computation}, 64(210):777--806, 1995.
+
+\bibitem{KaVi04}
+E.~Kaltofen and G.~Villard.
+\newblock On the complexity of computing determinants.
+\newblock {\em Comput. Complexity}, 13(3-4):91--130, 2004.
+
+\bibitem{KaYu13}
+E.~Kaltofen and G.~Yuhasz.
+\newblock On the matrix {B}erlekamp-{M}assey algorithm.
+\newblock {\em ACM Trans. on Algorithms}, 9(4):33:1--33:24, 2013.
+
+\bibitem{Rouillier99}
+F.~Rouillier.
+\newblock Solving zero-dimensional systems through the Rational Univariate Representation.
+\newblock {\em AAECC}, 9(5):433--461, 1999.
+
+\bibitem{Villard97}
+G.~Villard.
+\newblock Further analysis of {C}oppersmith's block {W}iedemann algorithm for the solution of sparse linear systems.
+\newblock {\em ISSAC'97}, 32--39, 1997.
+
+
+
+
+\end{thebibliography}
