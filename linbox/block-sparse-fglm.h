@@ -88,7 +88,7 @@ class PolMatDom {
 	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() ) const;
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
-	std::vector<int> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=1 );
+	std::vector<int> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 ) const;
 
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices

@@ -1,8 +1,8 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
-#define EXTRA_VERBOSE_ON
+//#define EXTRA_VERBOSE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #define SPARSITY_COUNT // shows the sparsity of the matrices
 #include "block-sparse-fglm.h"
@@ -483,7 +483,7 @@ vector<int> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMat
 	return rdeg_out;
 }
 
-vector<int> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold )
+vector<int> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold ) const
 {
 	/** Algorithm PM-Basis as detailed in Section 2.2 of
 	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
@@ -550,7 +550,6 @@ void PolMatDom::midproduct( PolMat &res, const PolMat &approx, const PolMat &ser
 
 }
 
-
 void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
@@ -598,7 +597,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// compute first approximant basis
 	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, order );
-	vector<int> rdeg = this->mbasis( app_bas, series, order, shift );
+	vector<int> rdeg = this->pmbasis( app_bas, series, order, shift );
 	// Note: appbas size is likely order+1, although we know here no entry of degree order (we could reduce this size)
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
@@ -638,7 +637,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// compute second approximant basis
 	PolMatDom::PMatrix app_bas2( this->field(), 2*M, 2*M, order );
-	vector<int> rdeg2 = this->mbasis( app_bas2, series2, order, shift );
+	vector<int> rdeg2 = this->pmbasis( app_bas2, series2, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### Second approximant basis: shifted row degrees and matrix degrees:" << endl;
 	cout << rdeg2 << endl;
@@ -736,7 +735,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 #endif
 
 	// 2. compute approximant basis in reduced form
-	vector<int> rdeg = this->mbasis( app_bas, series, d, shift );
+	vector<int> rdeg = this->pmbasis( app_bas, series, d, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Approximant basis: output rdeg and basis degrees" << endl;
 	cout << rdeg << endl;

@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS= -I/usr/local/include -O2 -Wall -g -fopenmp -mmmx -mpopcnt -msse -msse2 -msse3 -msse4.1 -msse4.2 -mavx -mavx2 -mfma -mbmi -mbmi2 -mfpmath=sse -std=gnu++11 
+CXXFLAGS= -I/usr/local/include -O2 -Wall -g -fopenmp -mmmx -mpopcnt -msse -msse2 -msse3 -msse4.1 -msse4.2 -mavx -mavx2 -mfma -mbmi -mbmi2 -mfpmath=sse -std=gnu++11  -fpermissive
 LDFLAGS= -L/usr/local/lib -llinbox -fopenmp -lopenblas -lgivaro -lgmp -lgmpxx -lntl      
 
 HDR= $(wildcard *.h)
