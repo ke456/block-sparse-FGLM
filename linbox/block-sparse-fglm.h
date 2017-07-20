@@ -1,12 +1,16 @@
 #ifndef BLOCK_SPARSE_FGLM_H
 #define BLOCK_SPARSE_FGLM_H
 
-#include <string>
 #include <linbox/integer.h>
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
 #include <linbox/matrix/matrix-domain.h>
 #include <linbox/algorithms/polynomial-matrix/order-basis.h>
+#include <linbox/matrix/permutation-matrix.h>
+#include "linbox/matrix/polynomial-matrix.h"
+#include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
+#include "fflas-ffpack/fflas-ffpack.h"
+
 
 typedef Givaro::Modular<double> GF;
 
@@ -56,7 +60,7 @@ class PolMatDom {
 
 	typedef std::vector<typename GF::Element> Polynomial;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::polfirst,LinBox::PMStorage::plain,GF> MatrixP;
-	//typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
+	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
 
 	private:
 
@@ -74,6 +78,9 @@ class PolMatDom {
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
+
+	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() );
+
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
