@@ -1,17 +1,15 @@
-#define TIMINGS_ON // comment out if having timings is not relevant
+#define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
-//#define NAIVE_ON
-//#define EXTRA_VERBOSE_ON
-#define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
-#define SPARSITY_COUNT // shows the sparsity of the matrices
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+#define NAIVE_ON
+//#define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
+//#define SPARSITY_COUNT // shows the sparsity of the matrices
 #include "block-sparse-fglm.h"
 #include <algorithm>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <cmath>
-#include <chrono>
 #include <omp.h>
 #include <vector>
 #include <ctime>
@@ -22,68 +20,67 @@ using namespace std;
 
 // reads matrices from s
 Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, string& s):
-  field(field), 
-  D(D), 
-  M(M), 
-  n(n), 
-  mul_mats(n, SparseMatrix<GF>(field,D,D)), 
-  V(field,D,M), 
-  mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field,M,D)) 
+	field(field), 
+	D(D), 
+	M(M), 
+	n(n), 
+	mul_mats(n, SparseMatrix<GF>(field,D,D)), 
+	V(field,D,M), 
+	mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field,M,D)) 
 {
-  string line;
-  ifstream file;
-  file.open (s);
-  getline(file, line);
-  getline(file, line);
-  getline(file, line);
+	string line;
+	ifstream file;
+	file.open (s);
+	getline(file, line);
+	getline(file, line);
+	getline(file, line);
 
 	create_random_matrix(V);
- 
-  vector<double> sparsity_count;
-  long max_entries = D*D;
- 
-  int index = 0;
-  long count = 0;
-  while (getline(file, line)){
-    istringstream sline(line);
-    vector<string> numbers{istream_iterator<string>{sline}, istream_iterator<string>{}};
-    int i = stoi(numbers[0]);
-    int j = stoi(numbers[1]);
-    int a_int = stoi(numbers[2]);
-    if (i == D){
-      index++;
-      sparsity_count.emplace_back((double)(count)/max_entries);
-      count = 0;
-    }
-    else{
-      count++;
-      GF::Element a(a_int);
-      mul_mats[index].refEntry(i,j) = a;
-    }
-  }
-  file.close();
-  
+
+	vector<double> sparsity_count;
+	long max_entries = D*D;
+
+	int index = 0;
+	long count = 0;
+	while (getline(file, line)){
+	istringstream sline(line);
+	vector<string> numbers{istream_iterator<string>{sline}, istream_iterator<string>{}};
+	int i = stoi(numbers[0]);
+	int j = stoi(numbers[1]);
+	int a_int = stoi(numbers[2]);
+	if (i == D){
+	  index++;
+	  sparsity_count.emplace_back((double)(count)/max_entries);
+	  count = 0;
+	}
+	else{
+	  count++;
+	  GF::Element a(a_int);
+	  mul_mats[index].refEntry(i,j) = a;
+	}
+	}
+	file.close();
+	  
 #ifdef SPARSITY_COUNT
-  cout << "sparsity: ";
-  for (auto i: sparsity_count)
-    cout << i << " ";
-  cout << endl;
+	cout << "sparsity: ";
+	for (auto i: sparsity_count)
+		cout << i << " ";
+	cout << endl;
 #endif
 #ifdef EXTRA_VERBOSE_ON
-  for (auto &i : mul_mats)
-    i.write(cout << "mul mat", Tag::FileFormat::Maple)<<endl;
+	for (auto &i : mul_mats)
+		i.write(cout << "mul mat", Tag::FileFormat::Maple)<<endl;
 #endif
 }
 
-
 Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n): 
-  field(field), 
-  D(D), 
-  M(M), 
-  n(n), 
-  mul_mats(n, SparseMatrix<GF>(field,D,D)), 
-  V(field,D,M),
-  mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) 
+	field(field), 
+	D(D), 
+	M(M), 
+	n(n), 
+	mul_mats(n, SparseMatrix<GF>(field,D,D)), 
+	V(field,D,M),
+	mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) 
 {
 	for ( size_t k=0; k<n; ++k )
 		create_random_matrix(mul_mats[k]);
@@ -189,7 +186,8 @@ void Block_Sparse_FGLM::get_matrix_sequence
 
 void Block_Sparse_FGLM::find_lex_basis(){
 #ifdef TIMINGS_ON
-	auto start = chrono::high_resolution_clock::now();
+	Timer tm;
+	tm.clear(); tm.start();
 #endif
 	// 1. compute the "left" matrix sequence (U T1^i)
 	get_matrix_sequence_left(mat_seq_left);
@@ -204,17 +202,17 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 #endif
 #ifdef TIMINGS_ON
-	auto end = chrono::high_resolution_clock::now();
-	cout << "###TIME### left sequence (UT1^i): " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
-	start = chrono::high_resolution_clock::now();
+	tm.stop();
+	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << endl;
+	tm.clear(); tm.start();
 #endif
 	vector<DenseMatrix<GF>> mat_seq(getLength(), DenseMatrix<GF>(field,M,M));
 	// 2. compute the total matrix sequence (UT1^i)V
 	get_matrix_sequence(mat_seq, mat_seq_left, V, getLength());
 #ifdef TIMINGS_ON
-	end = chrono::high_resolution_clock::now();
-	cout << "###TIME### sequence (UT1^i)V: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
-	start = chrono::high_resolution_clock::now();
+	tm.stop();
+	cout << "###TIME### sequence (UT1^i)V: " << ": " << tm.usertime() << endl;
+	tm.clear(); tm.start();
 #endif
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
@@ -234,8 +232,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	PolMatDom::MatrixP mat_num(PMD.field(),M,M,this->getLength());
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
 #ifdef TIMINGS_ON
-	end = chrono::high_resolution_clock::now();
-	cout << "###TIME### Matrix Berlekamp Massey: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	tm.stop();
+	cout << "###TIME### Matrix Berlekamp Massey: " << tm.usertime() << endl; 
 #endif
 #ifdef VERBOSE_ON
   	cout << "###OUTPUT### Matrix generator degrees:" << endl;
@@ -249,35 +247,34 @@ void Block_Sparse_FGLM::find_lex_basis(){
   	cout << "###OUTPUT### Matrix numerator entries:" << endl;
 	cout << mat_num << endl;
 #endif
+#ifdef TIMINGS_ON
+	tm.clear(); tm.start();
+#endif
 	vector<PolMatDom::Polynomial> smith( M );
 	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength()+1);
 	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength()+1);
-#ifdef TIMINGS_ON
-	start = chrono::high_resolution_clock::now();
-#endif
 	PMD.SmithForm( smith, lfac, rfac, mat_gen );
 #ifdef TIMINGS_ON
-	end = chrono::high_resolution_clock::now();
-	cout << "###TIME### Smith form and transformations: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+	tm.stop();
+	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
 #ifdef NAIVE_ON
+	tm.clear(); tm.start();
 	DenseMatrix<GF> U(field,M,D);
 	MatrixDomain<GF> MD(field);
 	vector<DenseMatrix<GF>> lst(this->getLength(), DenseMatrix<GF>(field,M,D));
 	auto &T1 = mul_mats[0];
 	create_random_matrix(U);
 	lst[0] = U;
-	start = chrono::high_resolution_clock::now();
-	for (unsigned int i = 1; i < this->getLength(); i++){
+	for ( size_t i=1; i<this->getLength(); i++){
 		MD.mul(lst[i],lst[i-1],T1);
-		lst[i] = U;
 	}
 #ifdef EXTRA_VERBOSE_ON
 	for (auto &i : lst)
 		i.write(cout<<"U: ", Tag::FileFormat::Maple)<<endl;
 #endif
-	end = chrono::high_resolution_clock::now();
-	cout << "###TIME### sequence (UT1^i) naive: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl;
+	tm.stop();
+	cout << "###TIME### sequence (UT1^i) naive: " << tm.usertime() << endl;
 #endif
 }
 
@@ -837,11 +834,17 @@ int main( int argc, char **argv ){
 	  getline(file, line);
 	  D = stoi(line);
 	  cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
+	  cout << "blocking dimension:" << " M=" << M << endl;
 	  file.close();
+#ifdef WARNINGS_ON
+	if ( D%M != 0 ) {
+		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
+		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
+	}
+#endif
 	  GF field(p);
 	  Block_Sparse_FGLM l(field, D, M, n, s);
 	  l.find_lex_basis();
 	  return 0;
 	}
-
 }			
