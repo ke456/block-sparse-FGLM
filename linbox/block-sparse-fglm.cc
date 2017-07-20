@@ -270,8 +270,9 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 	// Algorithm:
 	//    - compute left Hermite form hmat1 = umat pmat
 	//    - compute right Hermite form hmat2 = hmat1 vmat
-	//    - then return (S,U,V) = (hmat2,umat,vmat)
-	// Note: this is not guaranteed to be correct, but seems to be in most cases
+	//      (which is Transpose(LeftHermite(Transpose(hmat1)))
+	//    - then return (smith,lfac,rfac) = (hmat2,umat,vmat)
+	// Note: this is not guaranteed to be correct, but seems to true generically
 	// Implementation: Hermite form computed via kernel basis, itself computed via approximant basis
 	const size_t M = pmat.rowdim();
 	const size_t deg = pmat.degree();
@@ -309,7 +310,7 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 #endif
 #endif
 
-	// compute approximant basis and extract kernel basis
+	// compute first approximant basis
 	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, order );
 	OrderBasis<GF> OB( this->field() );
 	OB.PM_Basis( app_bas, series, order, shift );
@@ -322,6 +323,18 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 	cout << app_bas << endl;
 #endif
 #endif
+
+	// extract the left factor lfac which is the bottom left block,
+	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
+	// (recall the bottom part of series is still -identity)
+	for ( size_t i=0; i<M; ++i )
+	for ( size_t j=0; j<M; ++j )
+	for ( size_t k=0; k<order; ++k ) {
+		lfac.ref(i,j,k) = app_bas.get(i+M,j,k);
+		series.ref(j,i,k) = app_bas.get(i+M,j+M,k);
+	}
+
+	// compute second approximant basis
 
 	return 0;
 }
