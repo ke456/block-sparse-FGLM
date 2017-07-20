@@ -18,7 +18,10 @@ class Block_Sparse_FGLM{
 	int M; // number of blocks (set to number of CPUs?)
 	size_t n; // number of variables and size of vector mul_mats
 
+	// length of the sequence:
 	size_t getLength() const { return 2*ceil(D/(double)M); };
+	// generic degree in matrix generator:
+	size_t getGenDeg() const { return ceil(D/(double)M); };
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;

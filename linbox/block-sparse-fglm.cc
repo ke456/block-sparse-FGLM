@@ -196,6 +196,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
 	cout << "Length d = " << this->getLength() << endl;
+	cout << "Generic generator degree: deg = " << this->getGenDeg() << endl;
 #ifdef EXTRA_VERBOSE_ON
 	cout << "Entries:" << endl;
 	for (auto &i: mat_seq)
@@ -203,10 +204,13 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 #endif
 	// 3. compute generator and numerator in Matrix Berlekamp Massey: reversed sequence = mat_gen/mat_num
+	// note: * generator is in Popov form
+	//       * degree of row i of numerator < degree of row i of generator
 	PolMatDom PMD( field );
 	PolMatDom::MatrixP mat_gen(PMD.field(),M,M,this->getLength());
 	PolMatDom::MatrixP mat_num(PMD.field(),M,M,this->getLength());
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
+	cout << "yesBM" << endl;
 #ifdef TIMINGS_ON
 	end = chrono::high_resolution_clock::now();
 	cout << "###TIME### Matrix Berlekamp Massey: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
@@ -418,14 +422,12 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	mat_num.setsize( shift[0]+1 );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
-	for ( size_t k=0; k<d; ++k )
+	for ( size_t k=0; k<=shift[0]; ++k )
 	{
 		mat_gen.ref(i,j,k) = popov_app_bas.get(i,j,k);
 		mat_num.ref(i,j,k) = popov_app_bas.get(i,j+M,k);
 	}
 }
-
-
 
 int main( int argc, char **argv ){
 	// default arguments
@@ -450,6 +452,10 @@ int main( int argc, char **argv ){
 	if ( D%M != 0 ) {
 		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
 		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
+	}
+	if ( p < 10000 ) {
+		cout << "~~~WARNING~~~ field cardinality is not very large" << endl;
+		cout << "     ----->>> Polynomial matrix computations may raise the error 'double free or corruption (!prev)'." << endl;
 	}
 #endif
 
