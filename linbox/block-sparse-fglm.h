@@ -74,8 +74,6 @@ class PolMatDom {
 	template<typename Matrix>
 	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq ) const;
 
-	void print_pmat( const MatrixP &pmat ) const;
-
 };
 
 #endif

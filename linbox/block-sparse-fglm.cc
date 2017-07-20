@@ -235,19 +235,6 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 }
 
-void PolMatDom::print_pmat( const PolMatDom::MatrixP &pmat ) const {
-	for ( size_t i=0; i<pmat.rowdim(); ++i )
-	{
-		for ( size_t j=0; j<pmat.coldim(); ++j )
-		{
-			for ( size_t d=0; d<pmat.size()-1; ++d )
-				cout << pmat.get(i,j,d) << "X^" << d << '+';
-			cout << pmat.get(i,j,pmat.size()-1) << "X^" << pmat.size()-1 << '\t';
-		}
-		cout << endl;
-	}
-}
-
 size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
@@ -365,7 +352,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	this->_BMD.invin( lmat ); // lmat is now the inverse of leading_matrix(app_bas)
 
 	// create Popov approximant basis and fill it
-	PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, d-1 );
+	PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, shift[0]+1 );  //  shift[0] = deg(app_bas)
  	for ( size_t k=0; k<d; ++k ) {
 		Matrix app_bas_coeff( app_bas[k] );
 		this->_BMD.mulin_right( lmat, app_bas_coeff );
@@ -379,6 +366,9 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	cout << popov_app_bas << endl;
 #endif
 
+	// 4. copy into mat_gen and mat_num
+	mat_gen.setsize( shift[0]+1 );
+	mat_num.setsize( shift[0]+1 );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
 	for ( size_t k=0; k<d; ++k )
