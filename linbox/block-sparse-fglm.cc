@@ -1,6 +1,6 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #define SPARSITY_COUNT // shows the sparsity of the matrices
@@ -243,8 +243,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	cout << mat_num << endl;
 #endif
 	vector<PolMatDom::Polynomial> smith( M );
-	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength());
-	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength());
+	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength()+1);
+	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength()+1);
 #ifdef TIMINGS_ON
 	start = chrono::high_resolution_clock::now();
 #endif
@@ -489,7 +489,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 	const size_t deg = pmat.degree();
 
 	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
-	vector<size_t> shift( 2*M, 0 );
+	vector<int> shift( 2*M, 0 );
 	for ( size_t i=M; i<2*M; ++i ) {
 		shift[i] = (i-M)*(deg*M+1);
 	}
@@ -498,7 +498,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 	const size_t order = 2*M*deg+1;
 
 	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
-	PolMatDom::MatrixP series( this->field(), 2*M, M, order ); // requirement of LinBox: degree of series = order-1 (even though here the actual degree is deg)
+	PolMatDom::PMatrix series( this->field(), 2*M, M, order ); // TODO order-->deg
 
 	for ( size_t k=0; k<=deg; ++k )
 	for ( size_t i=0; i<M; ++i )
@@ -522,12 +522,12 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 #endif
 
 	// compute first approximant basis
-	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, order );
-	OrderBasis<GF> OB( this->field() );
-	OB.PM_Basis( app_bas, series, order, shift );
+	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, order );
+	vector<int> rdeg = this->mbasis( app_bas, series, order, shift );
+	// Note: appbas size is likely order+1, although we know here no entry of degree order (we could reduce this size)
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
-	cout << shift << endl;
+	cout << rdeg << endl;
 	this->print_degree_matrix(app_bas);
 #ifdef EXTRA_VERBOSE_ON
 	cout << "basis entries:" << endl;
@@ -537,10 +537,10 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// extract the left factor lfac which is the bottom left block,
 	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
-	PolMatDom::MatrixP series2( this->field(), 2*M, M, order );
+	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
-	for ( size_t k=0; k<app_bas.size(); ++k ) {
+	for ( size_t k=0; k<order; ++k ) {
 		lfac.ref(i,j,k) = app_bas.get(i+M,j,k);
 		series2.ref(j,i,k) = app_bas.get(i+M,j+M,k);
 	}
@@ -548,11 +548,6 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 	for ( size_t i=0; i<M; ++i )
 		series2.ref(i+M,i,0) = this->field().mOne;
 
-	// reinitialize the shift
-	for ( size_t i=0; i<M; ++i ) {
-		shift[i] = 0;
-		shift[i+M] = i*(deg*M+1);
-	}
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### Second approximant basis: deg(pmat), input shift, input order..:" << endl;
 	cout << deg << endl;
@@ -567,11 +562,11 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 #endif
 
 	// compute second approximant basis
-	PolMatDom::MatrixP app_bas2( this->field(), 2*M, 2*M, order );
-	OB.PM_Basis( app_bas2, series2, order, shift );
+	PolMatDom::PMatrix app_bas2( this->field(), 2*M, 2*M, order );
+	vector<int> rdeg2 = this->mbasis( app_bas2, series2, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### Second approximant basis: shifted row degrees and matrix degrees:" << endl;
-	cout << shift << endl;
+	cout << rdeg2 << endl;
 	this->print_degree_matrix(app_bas2);
 #ifdef EXTRA_VERBOSE_ON
 	cout << "basis entries:" << endl;
@@ -603,15 +598,16 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// extract the Smith form
 	for ( size_t i=0; i<M; ++i ) {
-		int degAB = order-1;
-		while ( degAB>=0 and app_bas2.get(i+M,i+M,degAB) == 0 )
-			--degAB;
-		if ( degAB < 0 )
-			smith[i].push_back(0);
-		else {
-			for ( int k=0; k<=degAB; ++k )
-				smith[i].push_back( app_bas2.get(i+M,i+M,k) );
+		smith[i] = app_bas2(i+M,i+M);
+		while (!smith[i].empty() && smith[i][smith[i].size()-1] == 0) {
+			smith[i].pop_back();
 		}
+#ifdef WARNINGS_ON
+		if ( smith[i].empty() ) {
+			cout << "~~~WARNING(Smith)~~~ one of the Smith factors is zero" << endl;
+			cout << "   ------->>> something went wrong: check for other warnings above." << endl;
+		}
+#endif
 	}
 
 #ifdef VERBOSE_ON
@@ -639,7 +635,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	// 0. initialize dimensions, shift, matrices
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();
-	vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
+	const vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
 	PolMatDom::PMatrix series( this->field(), 2*M, M, d );
 	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, d );
 
@@ -751,10 +747,6 @@ int main( int argc, char **argv ){
 	if ( D%M != 0 ) {
 		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
 		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
-	}
-	if ( p < 10000 ) {
-		cout << "~~~WARNING~~~ field cardinality is not very large" << endl;
-		cout << "     ----->>> Polynomial matrix computations may raise the error 'double free or corruption (!prev)'." << endl;
 	}
 #endif
 
