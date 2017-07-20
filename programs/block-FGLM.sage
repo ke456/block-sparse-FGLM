@@ -24,8 +24,6 @@ def find_lex_basis(ideal,field,M):
 	s1 = [U*T1^i*V for i in range(2*d)] # this is horribly inefficient...
 	Spair = matrix_berlekamp_massey(s1)
 	S = Spair[0]
-	# finding P -the minimal polynomial of T1
-	P = S.det()
 	# find the numerator
 	Z1 = add([s1[i].columns()[0] * X^i for i in range(d)])
 	Z1 = vec_reverse(Z1,d,M)
@@ -33,6 +31,8 @@ def find_lex_basis(ideal,field,M):
 	N = shift(N,d,M)
 	smith = S.smith_form()
 	inv_factors = smith[0].diagonal();
+	# finding P -the minimal polynomial of T1
+	P = inv_factors[M-1]
 	u = smith[1];
 	v = smith[2];
 	w = v.rows()[M-1]
@@ -42,6 +42,7 @@ def find_lex_basis(ideal,field,M):
 	u_tilde = w*u
 	n1 = (u_tilde*N)
 	# adding P to the result
+	P = P.squarefree_decomposition().radical_value()
 	monomials = ideal.random_element(1).parent().gens()
 	m = monomials[0]
 	mX = 0
