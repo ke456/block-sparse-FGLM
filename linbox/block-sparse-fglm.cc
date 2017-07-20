@@ -203,7 +203,8 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 #ifdef TIMINGS_ON
 	tm.stop();
-	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << endl;
+	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << " (user time)" << endl;
+	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
 	tm.clear(); tm.start();
 #endif
 	vector<DenseMatrix<GF>> mat_seq(getLength(), DenseMatrix<GF>(field,M,M));
