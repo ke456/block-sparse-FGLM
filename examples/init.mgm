@@ -30,8 +30,9 @@ procedure print_all(sys, name)
     for i in [1..n-1] do
 	print_matrix_as_sparse(RepresentationMatrix(Q!M.i));
 	print Dimension(Q), Dimension(Q), Dimension(Q);
-	print_matrix_as_sparse(&+[Random(k)*RepresentationMatrix(Q!M.i) : i in [1..n]]);
     end for;
+    print_matrix_as_sparse(&+[Random(k)*RepresentationMatrix(Q!M.i) : i in [1..n]]);
+    print Dimension(Q), Dimension(Q), Dimension(Q);
     
     UnsetOutputFile();
 end procedure;
