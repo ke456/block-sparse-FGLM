@@ -1,0 +1,9 @@
+load "init.mgm";
+
+name:="";
+x:=init( );
+sys:=
+;
+
+print_all(sys, name);
+quit;
