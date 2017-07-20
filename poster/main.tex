@@ -38,6 +38,16 @@
 \def\myvdots{\vbox{\baselineskip=10pt \lineskiplimit=0pt 
 \kern6pt \hbox{.}\hbox{.}\hbox{.}}} 
 
+%% \node [shift={(-10 cm,-5cm)}] at (current page.north east) {\includegraphics[height=5cm]{DTU-3.pdf}}; 
+
+\addtobeamertemplate{headline}{} 
+{
+\begin{tikzpicture}[remember picture,overlay] 
+\node [shift={(-112 cm,-7cm)}] at (current page.north east) {\includegraphics[height=5cm]{UW.pdf}}; 
+\node [shift={(-10 cm,-7cm)}] at (current page.north east) {\includegraphics[height=7cm]{DTU-3.pdf}}; 
+\end{tikzpicture} 
+}
+
 %-----------------------------------------------------------
 % Define the column widths and overall poster size
 % To set effective sepwid, onecolwid and twocolwid values, first choose how many columns you want and how much separation you want between columns
@@ -67,6 +77,37 @@
 \definecolor{classicrose}{rgb}{0.98, 0.8, 0.91}
 \definecolor{antiquefuchsia}{rgb}{0.57, 0.36, 0.51}
 \definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
+\definecolor{col3}{rgb}{0.000,1.000,1.000}
+\definecolor{col4}{rgb}{1.000,0.000,0.000}
+\definecolor{col5}{rgb}{1.000,0.000,1.000}
+\definecolor{Yellow}{rgb}{1.000,1.000,0.000}
+\definecolor{col7}{rgb}{1.000,1.000,1.000}
+\definecolor{DarkBlue}{rgb}{0.000,0.000,0.560}
+\definecolor{Blue}{rgb}{0.000,0.000,0.690}
+\definecolor{Lightblue}{rgb}{0.000,0.000,0.820}
+\definecolor{VeryLightBlue}{rgb}{0.530,0.810,1.000}
+\definecolor{VeryLightGreen}{rgb}{0.930,1.0,0.93}
+\definecolor{DarkGreen}{rgb}{0.000,0.360,0.000}
+\definecolor{Green}{rgb}{0.000,0.690,0.000}
+\definecolor{LightGreen}{rgb}{0.000,0.820,0.000}
+\definecolor{Aquamarine}{rgb}{0.000,0.690,0.690}
+\definecolor{col17}{rgb}{0.000,0.820,0.820}
+\definecolor{RedViolet}{rgb}{0.560,0.000,0.000}
+\definecolor{RubineRed}{rgb}{0.690,0.000,0.000}
+\definecolor{WildStrawberry}{rgb}{0.820,0.000,0.000}
+\definecolor{Violet}{rgb}{0.560,0.000,0.560}
+\definecolor{col22}{rgb}{0.690,0.000,0.690}
+\definecolor{col23}{rgb}{0.820,0.000,0.820}
+\definecolor{Brown}{rgb}{0.500,0.190,0.000}
+\definecolor{col25}{rgb}{0.630,0.250,0.000}
+\definecolor{Bitter}{rgb}{0.750,0.380,0.000}
+\definecolor{Pink}{rgb}{1.000,0.500,0.500}
+\definecolor{col28}{rgb}{1.000,0.630,0.630}
+\definecolor{col30}{rgb}{1.000,0.880,0.880}
+\definecolor{Dandelion}{rgb}{1.000,0.840,0.000}
+
+\definecolor{Turquoise}{rgb}{1.00,0.860,0.860}
+
 
 \setbeamertemplate{itemize/enumerate body begin}{\normalsize}
 \setbeamertemplate{itemize/enumerate subbody begin}{\normalsize}
@@ -78,9 +119,9 @@
 \title{Sparse 
 	$\mathbf{\sqrt{FGLM}}$ using the block Wiedemann algorithm} % Poster title
 
-\author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost} % Author(s)
+\author{Seung Gyu Hyun$^\dagger$, Vincent Neiger$^\star$, Hamid Rahkooy$^\dagger$, \'Eric Schost$^\dagger$} % Author(s)
 
-\institute{University of Waterloo, DTU Compute} % Institution(s)
+\institute{$^\dagger$ University of Waterloo, $^\star$ DTU Compute} % Institution(s)
 
 %----------------------------------------------------------------------------------------
 
@@ -208,7 +249,6 @@ $$\begin{array}{l}
 \end{column} % End of the first column	
 
 
-
 \begin{column}{\sepwid}\end{column} % Empty spacer column
 
 \begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
@@ -216,10 +256,10 @@ $$\begin{array}{l}
 %% \begin{block}{Block Sparse $\mathbf{\sqrt{FGLM}}$}
 
 \textbf{Key idea:} use sequences of small matrices, requires less
-terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
- from the analysis of Coppersmith's algorithm [Villard '97],
-[Kaltofen, Villard '04] and generating series properties
-[Bostan {\it et al.} '03].  See also [Kaltofen '95], [Kaltofen, Yuhasz '06].
+terms than scalar sequences [Coppersmith'93]. \\ \textbf{Correctness}
+ from the analysis of Coppersmith's algorithm [Villard'97],
+[Kaltofen, Villard'04] and generating series properties
+[Bostan {\it et al.}'03].  See also [Kaltofen'95], [Kaltofen, Yuhasz'13].
 
 \vspace{1em}
 
@@ -228,17 +268,17 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 	
 	\begin{alertblock}{{\sf Algorithm}}
 		\begin{itemize}
-			\item[] {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
-			\item[] {\sf $s= (UT_n^iV^t)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
-			\item[] {\sf $S = {\sf MatrixBerlekampMassey}(s)$ and $N = S\sum_{i\ge 0} \frac{s_i}{x^{i+1}}$}
-			\item[] {\sf $P=$ largest invariant factor of $S$ and $R_n={\sf SquareFreePart}(P)$}
-                        \item[] {\sf $a = [0 ~\cdots 0 P] S^{-1}$}
-			\item[] {\sf $N^*=$ first entry of $aN$}
-			\item[] {\sf for $j = 1 \dots n-1$:}
+			\item[]\textcolor{red}{\bf 1.~} {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
+			\item[]\textcolor{red}{\bf 2.~} {\sf $s= (UT_n^iV^t)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+			\item[]\textcolor{red}{\bf 3.~} {\sf $S = {\sf MatrixBerlekampMassey}(s)$ and $N = S\sum_{i\ge 0} \frac{s_i}{x^{i+1}}$}
+			\item[]\textcolor{red}{\bf 4.~} {\sf $P=$ largest invariant factor of $S$ and $R_n={\sf SquareFreePart}(P)$}
+                        \item[]\textcolor{red}{\bf 5.~} {\sf $a = [0 ~\cdots 0 P] S^{-1}$}
+			\item[]\textcolor{red}{\bf 6.~} {\sf $N^*=$ first entry of $aN$}
+			\item[]\textcolor{red}{\bf 7.~} {\sf for $j = 1 \dots n-1$:}
 			\begin{itemize}
-			\item[] ~~{\sf $s_j = (UT_n^i T_j V^t)_{0 \le i < d}$ and $N_j = S\sum_{i\ge 0} \frac{s_{j,i}}{x^{i+1}}$}
-                        \item[] ~~{\sf $N^*_j=$ first entry of $aN_j$}
-			\item[] ~~{\sf $R_j=N^*_j/N^*$ mod $R_n$}
+			\item[]\textcolor{red}{\bf 7.1.} ~~{\sf $s_j = (UT_n^i T_j V^t)_{0 \le i < d}$ and $N_j = S\sum_{i\ge 0} \frac{s_{j,i}}{x^{i+1}}$}
+                        \item[]\textcolor{red}{\bf 7.2.} ~~{\sf $N^*_j=$ first entry of $aN_j$}
+			\item[]\textcolor{red}{\bf 7.3.} ~~{\sf $R_j=N^*_j/N^*$ mod $R_n$}
 			\end{itemize}
 		\end{itemize}
 	\end{alertblock}
@@ -246,13 +286,13 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 
         \begin{alertblock}{{\sf Example}}
 		\textbf{Input: }$I = \langle f_1^2, f_2^2,f_3 \rangle \subset \mathbb{F}_{9001}[x_1,x_2,x_3]$,
-                non radical
+                {\sf non radical
                 of degree $\boldsymbol{D=32}$,
-                with
+                with}
 		$$ f_1 = 4979x_1^2 + 6202x_1x_2 + \dots, \;
 		   f_2 = 4682x_1^2 + 8290x_1x_2 + \dots, \;
 		   f_3 = 4199x_1^2 + 2325x_1x_2 + \dots$$
-		\textcolor{red}{\bf Step 1} with $\boldsymbol{m = 2}$
+		\textcolor{red}{\bf Step 1} {\sf with} $\boldsymbol{m = 2}$
 		$$ U = \begin{bmatrix}
 		1898 &6830 &3494 & 169 &7991 &3352 \dots \\
 		3161 &8858 &8467 &5882 &8037 &3726 \dots
@@ -262,7 +302,7 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 		823 &5686 &6539 &7884 &7105 &3427 \dots 
 		\end{bmatrix}^t
 		$$
-		\textcolor{red}{\bf Step 2 \& 3} with $\boldsymbol{d = 16}$
+		\textcolor{red}{\bf Step 2 \& 3} {\sf with} $\boldsymbol{d = 16}$
 		$$ s = \left(
 		\begin{bmatrix}
 		31  & 6977\\
@@ -286,15 +326,20 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 		\end{bmatrix}
                 \end{array}
 		$$
-		\textcolor{red}{\bf Step 4:}
-		$%% I_1 = \boldsymbol{x^{8}} + 6990x^{7}+ \dots$, $I_2 = \boldsymbol{x^{24}} + 2968x^{23}+ \dots
-                %% \implies
-                a = \begin{bmatrix}
-		2575\boldsymbol{x^7}+\dots ~~&~~ \boldsymbol{x^8} + \dots
+		\textcolor{red}{\bf Step 4 \& 5:}
+		$        a = \begin{bmatrix}
+		2575\boldsymbol{x^7}+\dots ~~&~ \boldsymbol{x^8} + \dots
 		\end{bmatrix}$
+                {\sf and} 
+                $ R_3=\textcolor{DarkGreen}{\boldsymbol{x^{8}} + 6990x^{7}+ \dots}$\\
 
-		\textcolor{red}{\bf Step 5:}
-		$  [N^*] = \begin{bmatrix}
+\vspace{3mm}
+
+		\textcolor{red}{\bf Step 6:}
+
+\vspace{-2em}
+
+		$$  N^* = \begin{bmatrix}
 		2575\boldsymbol{x^7}+\dots ~~&~~ \boldsymbol{x^8} + \dots
 		\end{bmatrix}
                 \begin{bmatrix}
@@ -302,13 +347,16 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 		7116\boldsymbol{x^{15}} + \dots
 		\end{bmatrix}\,
 =                \begin{bmatrix}
-  1178\boldsymbol{x^{23}} + 8727x^{22} + \dots
-\end{bmatrix}
-		%% R_3 = x^8 + 6990x^7 + \dots
-		$
+ \textcolor{DarkBlue}{1178\boldsymbol{x^{23}} + 8727x^{22} + \dots}
+\end{bmatrix}$$
 
-		\textcolor{red}{\bf Step 6} for $\boldsymbol{j = 1}$
-	$$ s_1 = \left(
+\vspace{3mm}
+
+\textcolor{red}{\bf Step 7} {\sf for} $\boldsymbol{j = 1}$
+
+\vspace{-0.5em}
+
+	$$ ~~s_1 = \left(
 		\begin{bmatrix}
 		3029& 8903\\
 		1538& 5610
@@ -321,31 +369,25 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 		\right)\,
                 ~~\xRightarrow{~~~~~~~~~~}~~
 		N_1 = \begin{bmatrix}
-		1374\boldsymbol{x^{15}} + \dots & 3271\boldsymbol{x^{15}} + \dots\\
+		  1374\boldsymbol{x^{15}} + \dots & 3271\boldsymbol{x^{15}} + \dots\\
 		4027\boldsymbol{x^{15}} + \dots & 1575\boldsymbol{x^{15}} + \dots
 		\end{bmatrix}
 		$$
-	
-		\textcolor{red}{\bf Step 7:}
-		$  [N_1^*] = \begin{bmatrix}
-		2575\boldsymbol{x^7}+\dots ~~&~~ \boldsymbol{x^8} + \dots
+
+		$$  N_1^* = \begin{bmatrix}
+		2575\boldsymbol{x^7}+\dots ~~&~ \boldsymbol{x^8} + \dots
 		\end{bmatrix}
                 \begin{bmatrix}
 		1374\boldsymbol{x^{15}} + \dots\\
 		4027\boldsymbol{x^{15}} + \dots
 		\end{bmatrix}\,
 =                \begin{bmatrix}
-  1538\boldsymbol{x^{23}} + 6498x^{22} + \dots
+\textcolor{col4}{ 1538\boldsymbol{x^{23}} + 6498x^{22} + \dots}
 \end{bmatrix}
-		%% R_3 = x^8 + 6990x^7 + \dots
-		$
+		$$
 
- %% $N^*_1 = 1178x^{23} + 8727x^{22} + \dots$ and
- %%        	$R_1 = 7964x^7 + 4071x^6 + \dots$\\
- %%        	%% \hspace{1cm}\hspace{1cm}\hspace{1cm}\hspace{1cm}\hspace{0.3cm}
- %%        	%% For $j = 2$, $N^*_2 = 6587x^{23}+3987x^{22} + \dots$ and 
- %%        	%% $R_2 = 1443x^7 + 7818x^6 + \dots$
-	
+	$$R_1 =\frac{ \textcolor{col4}{  1538\boldsymbol{x^{23}} + 6498x^{22} + \dots }}{  \textcolor{DarkBlue}{1178\boldsymbol{x^{23}} + 8727x^{22} + \dots} } \bmod \textcolor{DarkGreen}{{\boldsymbol{x^{8}} + 6990x^{7}+ \dots }} = 7964{\bf x^7} + 4071x^6 + \dots$$
+
 
         \end{alertblock}
 
@@ -356,8 +398,8 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 
 \begin{column}{\onecolwid} % The third column
 
-\setbeamercolor{block alerted title}{fg=white,bg=norange}
-\setbeamercolor{block alerted body}{fg=black,bg=white} 
+\setbeamercolor{block alerted title}{fg=white,bg=DarkGreen}
+\setbeamercolor{block alerted body}{fg=black,bg=VeryLightGreen} 
 \begin{alertblock}{Parallel Computations}
 	\begin{itemize}
 		\item Bottleneck is computing the sequence $(UT_n^i)_{0 \le i < 2d}$
@@ -366,14 +408,6 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 		\item When $m=1$, same computation as Sparse FGLM
 	\end{itemize}
 \end{alertblock}
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
-
-\begin{block}{Conclusion}
-
-\end{block}
 
 %----------------------------------------------------------------------------------------
 %	ADDITIONAL INFORMATION
@@ -394,13 +428,12 @@ terms than scalar sequences [Coppersmith '93]. \\ \textbf{Correctness}
 %	REFERENCES
 %----------------------------------------------------------------------------------------
 
-\begin{block}{References}
 
+\begin{alertblock}{{\sf References}}
 \nocite{*} % Insert publications even if they are not cited in the poster
 \small{\bibliographystyle{unsrt}
-\bibliography{sample}\vspace{0.75in}}
-
-\end{block}
+\bibliography{sample}}
+\end{alertblock}
 
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
