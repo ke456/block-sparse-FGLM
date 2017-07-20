@@ -400,13 +400,33 @@ terms than scalar sequences [Coppersmith'93]. \\ \textbf{Correctness}
 
 \setbeamercolor{block alerted title}{fg=white,bg=DarkGreen}
 \setbeamercolor{block alerted body}{fg=black,bg=VeryLightGreen} 
-\begin{alertblock}{Parallel Computations}
-	\begin{itemize}
-		\item Bottleneck is computing the sequence $(UT_n^i)_{0 \le i < 2d}$
-		\item Can parallelize by computing the sequences $(U_1T_n^i),\dots,(U_mT_n^i)$
-		separately, where $U_i$ is the $i^{th}$ row of $U$
-		\item When $m=1$, same computation as Sparse FGLM
-	\end{itemize}
+\begin{alertblock}{{\sf Parallelization}}
+  {\sf {\bf Bottleneck:} computing $(UT_n^i)_{0 \le i < 2d}$}
+
+  {\sf \textcolor{white}{\bf Bottleneck:} easy to parallelize!}
+
+  {\sf experiments in {\bf LinBox} modulo $p=65537$}
+
+\vspace{1.5em}
+
+  \begin{center}
+\begin{tabular}{c||c|c|c|c}
+{\sf name} & $n$ & $D$ & {\sf ratio (8 cores)} & sparsity\\ \hline
+{\sf katsura8}  & 9 & 256 & 1136/213={\bf 5.33} & 0.63\\
+{\sf katsura9} &10 &512 &8903/1651= {\bf5.39} &0.64 \\
+{\sf cyclic7}  &7& 924&6585/1235={\bf5.33} &0.08 \\
+{\sf katsura10} &11  &1024 &70211/13019={\bf5.39} &0.63 \\
+{\sf gametwo7} &7&1854&35051/64673={\bf5.41}&0.54\\
+{\sf schwarz11} &11 & 2048&21699/4129={\bf5.25}&0.27\\
+{\sf eco12} &12 & 1024& 61605/11296={\bf5.45}&0.55\\
+\end{tabular}
+
+\vspace{0.5em}
+
+{\sf (parallel speed-up for the sequence computation)}
+
+  \end{center}
+
 \end{alertblock}
 
 %----------------------------------------------------------------------------------------
