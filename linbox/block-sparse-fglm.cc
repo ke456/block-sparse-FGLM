@@ -1,6 +1,7 @@
 //#define TIMINGS_ON // comment out if having timings is not relevant
-//#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
+#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
 //#define NAIVE_ON
+#define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <sstream>
@@ -290,7 +291,6 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, order );
 	OrderBasis<GF> OB( this->field() );
 	OB.PM_Basis( app_bas, series, order, shift );
-	cout << shift << endl;
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### First approximant basis: output shift and basis:" << endl;
 	cout << shift << endl;
@@ -302,7 +302,7 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 
 template<typename Matrix>
 void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::MatrixP &mat_num, const std::vector<Matrix> & mat_seq ) const {
-	// initialize dimensions, shift, matrices
+	// 0. initialize dimensions, shift, matrices
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();
 	OrderBasis<GF> OB( this->field() );
@@ -310,7 +310,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	PolMatDom::MatrixP series( this->field(), 2*M, M, d );
 	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, d );
 
-	// construct series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
+	// 1. construct series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
 	// i.e. stacking reversed sequence and -Identity
 	for ( size_t i=0; i<M; ++i )
 		series.ref(i+M,i,0) = this->field().mOne;
@@ -327,21 +327,64 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	cout << series << endl;
 #endif
 
-	// compute approximant and copy into mat_gen,mat_num
+	// 2. compute approximant basis in reduced form
 	OB.PM_Basis( app_bas, series, d, shift );
-	cout << shift << endl;
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Approximant basis: output shift and basis" << endl;
 	cout << shift << endl;
 	cout << app_bas << endl;
+#endif
+#ifdef WARNINGS_ON
+	// so far we are assuming the degrees are evenly balanced
+	// --> easily retrieve the Popov approximant basis
+	// This should hold in almost all cases (unless the field size is too small)
+	// This assumption could be avoided easily but implies to rewrite OrderBasis::M_Basis
+	bool test = true;
+	for ( size_t i=0; i<2*M-1; ++i )
+		if ( shift[i] != shift[i+1] )
+			test = false;
+	if (not test) {
+		cout << "~~~WARNING(MatrixBM)~~~ unexpected degrees in approximant basis" << endl;
+		cout << "   ------->>> rest of the computation may give wrong results." << endl;
+	}
+#endif
+
+	// 3. Transform app_bas into Popov form
+	// Right now, assuming the row degree 'shift' is constant
+	// --> suffices to left-multiply by invert of leading matrix
+
+	// retrieve inverse of leading matrix
+	Matrix lmat( this->field(), 2*M, 2*M );
+	for ( size_t i=0; i<2*M; ++i )
+	for ( size_t j=0; j<2*M; ++j )
+		lmat.refEntry(i,j) = app_bas.get(i,j,shift[i]); // row i has degree shift[i]
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(MatrixBM)### leading matrix of reduced approximant basis:" << endl;
+	cout << lmat << endl;
+#endif
+	this->_BMD.invin( lmat ); // lmat is now the inverse of leading_matrix(app_bas)
+
+	// create Popov approximant basis and fill it
+	PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, d-1 );
+ 	for ( size_t k=0; k<d; ++k ) {
+		Matrix app_bas_coeff( app_bas[k] );
+		this->_BMD.mulin_right( lmat, app_bas_coeff );
+		for ( size_t i=0; i<2*M; ++i )
+		for ( size_t j=0; j<2*M; ++j )
+			popov_app_bas.ref(i,j,k) = app_bas_coeff.getEntry(i,j);
+	}
+
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(MatrixBM)### Popov approximant basis:" << endl;
+	cout << popov_app_bas << endl;
 #endif
 
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
 	for ( size_t k=0; k<d; ++k )
 	{
-		mat_gen.ref(i,j,k) = app_bas.get(i,j,k);
-		mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
+		mat_gen.ref(i,j,k) = popov_app_bas.get(i,j,k);
+		mat_num.ref(i,j,k) = popov_app_bas.get(i,j+M,k);
 	}
 }
 
@@ -368,10 +411,12 @@ int main( int argc, char **argv ){
 
 	parseArguments (argc, argv, args);
 
+#ifdef WARNINGS_ON
 	if ( D%M != 0 ) {
 		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
 		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
 	}
+#endif
 
 	cout << "s=" << s<< endl;
 	if (s == ""){
