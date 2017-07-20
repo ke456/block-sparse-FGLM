@@ -1,6 +1,7 @@
 #ifndef BLOCK_SPARSE_FGLM_H
 #define BLOCK_SPARSE_FGLM_H
 
+#include <string>
 #include <linbox/integer.h>
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
@@ -41,6 +42,7 @@ class Block_Sparse_FGLM{
 	public:
 	/* CTOR                                              */
 	Block_Sparse_FGLM(const GF &, int, int, size_t);
+	Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, std::string& s);
 
 	void find_lex_basis();
 };

@@ -3,6 +3,7 @@
 #define NAIVE_ON
 #include "block-sparse-fglm.h"
 #include <iostream>
+#include <sstream>
 #include <cmath>
 #include <chrono>
 #include <omp.h>
@@ -13,7 +14,52 @@
 using namespace LinBox;
 using namespace std;
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n): field(field), D(D), M(M), n(n), mul_mats(n,SparseMatrix<GF>(field,D,D)), V(field,D,M), mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) {
+// reads matrices from s
+Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, string& s):
+  field(field), 
+  D(D), 
+  M(M), 
+  n(n), 
+  mul_mats(n, SparseMatrix<GF>(field,D,D)), 
+  V(field,D,M), 
+  mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field,M,D)) 
+{
+  string line;
+  ifstream file;
+  file.open (s);
+  getline(file, line);
+  getline(file, line);
+  getline(file, line);
+  
+  int index = 0;
+
+  while (getline(file, line)){
+    istringstream sline(line);
+    vector<string> numbers{istream_iterator<string>{sline}, istream_iterator<string>{}};
+    int i = stoi(numbers[0]);
+    int j = stoi(numbers[1]);
+    int a_int = stoi(numbers[2]);
+    if (i == D){
+      index++;
+    }
+    else{
+      GF::Element a(a_int);
+      mul_mats[index].refEntry(i,j) = a;
+    }
+  }
+  file.close();
+}
+
+
+Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n): 
+  field(field), 
+  D(D), 
+  M(M), 
+  n(n), 
+  mul_mats(n, SparseMatrix<GF>(field,D,D)), 
+  V(field,D,M),
+  mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) 
+{
 	for ( size_t k=0; k<n; ++k )
 		create_random_matrix(mul_mats[k]);
 	create_random_matrix(V);
@@ -171,7 +217,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	create_random_matrix(U);
 	lst[0] = U;
 	start = chrono::high_resolution_clock::now();
-	for (int i = 1; i < this->getLength(); i++){
+	for (unsigned int i = 1; i < this->getLength(); i++){
 		MD.mul(lst[i],lst[i-1],T1);
 		lst[i] = U;
 	}
@@ -183,31 +229,6 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	cout << "###TIME### sequence (UT1^i) naive: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl;
 #endif
 }
-
-int main( int argc, char **argv ){
-	// default arguments
-	//size_t p = 13;  // size of the base field
-	size_t p = 23068673;  // size of the base field
-	size_t M = 4;   // row dimension for the blocks
-	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
-	size_t D = 512; // vector space dimension / dimension of multiplication matrices
-	size_t n = 2;
-
-	static Argument args[] = {
-		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
-		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
-		//{ 'N', "-N N", "Set the column block dimension to N.", TYPE_INT,       &N },
-		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
-		END_OF_ARGUMENTS
-	};	
-
-	parseArguments (argc, argv, args);
-
-	GF field(p);
-	Block_Sparse_FGLM l(field,D,M,n);
-	l.find_lex_basis();
-}			
-
 
 void PolMatDom::print_pmat( const PolMatDom::MatrixP &pmat ) const {
 	for ( size_t i=0; i<pmat.rowdim(); ++i )
@@ -266,3 +287,52 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 		mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
 	}
 }
+
+
+
+int main( int argc, char **argv ){
+	// default arguments
+	//size_t p = 13;  // size of the base field
+	size_t p = 23068673;  // size of the base field
+	size_t M = 4;   // row dimension for the blocks
+	//size_t N = 4;   // column dimension for the blocks (useless right now: fixed to M)
+	size_t D = 512; // vector space dimension / dimension of multiplication matrices
+	size_t n = 2;
+	string s = "";
+
+	static Argument args[] = {
+		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
+		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
+		//{ 'N', "-N N", "Set the column block dimension to N.", TYPE_INT,       &N },
+		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
+		{ 'F', "-F F", "Read input from file F", TYPE_STR,  &s },
+		END_OF_ARGUMENTS
+	};	
+
+	parseArguments (argc, argv, args);
+
+	cout << "s=" << s<< endl;
+	if (s == ""){
+	  GF field(p);
+	  Block_Sparse_FGLM l(field, D, M, n);
+	  l.find_lex_basis();
+	}
+	else{
+	  // we read the first lines here 
+	  string line;
+	  ifstream file;
+	  file.open (s);
+	  getline(file, line);
+	  p = stoi(line);
+	  getline(file, line);
+	  n = stoi(line);
+	  getline(file, line);
+	  D = stoi(line);
+	  cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
+	  file.close();
+	  GF field(p);
+	  Block_Sparse_FGLM l(field, D, M, n, s);
+	  return 0;
+	}
+
+}			
