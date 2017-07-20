@@ -1,6 +1,6 @@
-//#define TIMINGS_ON // comment out if having timings is not relevant
+#define TIMINGS_ON // comment out if having timings is not relevant
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #include "block-sparse-fglm.h"
@@ -210,7 +210,6 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	PolMatDom::MatrixP mat_gen(PMD.field(),M,M,this->getLength());
 	PolMatDom::MatrixP mat_num(PMD.field(),M,M,this->getLength());
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
-	cout << "yesBM" << endl;
 #ifdef TIMINGS_ON
 	end = chrono::high_resolution_clock::now();
 	cout << "###TIME### Matrix Berlekamp Massey: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
@@ -230,7 +229,14 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	vector<PolMatDom::Polynomial> smith( M );
 	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength());
 	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength());
+#ifdef TIMINGS_ON
+	start = chrono::high_resolution_clock::now();
+#endif
 	PMD.SmithForm( smith, lfac, rfac, mat_gen );
+#ifdef TIMINGS_ON
+	end = chrono::high_resolution_clock::now();
+	cout << "###TIME### Smith form and transformations: " << chrono::duration_cast<chrono::milliseconds>(end-start).count() << endl; 
+#endif
 #ifdef NAIVE_ON
 	DenseMatrix<GF> U(field,M,D);
 	MatrixDomain<GF> MD(field);
@@ -265,7 +271,7 @@ void PolMatDom::print_degree_matrix( const MatrixP &pmat ) const {
 	}
 }
 
-size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
+void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
 	//    - compute left Hermite form hmat1 = umat pmat
@@ -326,17 +332,101 @@ size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Ma
 
 	// extract the left factor lfac which is the bottom left block,
 	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
-	// (recall the bottom part of series is still -identity)
+	PolMatDom::MatrixP series2( this->field(), 2*M, M, order );
+	for ( size_t i=0; i<M; ++i )
+	for ( size_t j=0; j<M; ++j )
+	for ( size_t k=0; k<app_bas.size(); ++k ) {
+		lfac.ref(i,j,k) = app_bas.get(i+M,j,k);
+		series2.ref(j,i,k) = app_bas.get(i+M,j+M,k);
+	}
+	// bottom part of series2 = -identity
+	for ( size_t i=0; i<M; ++i )
+		series2.ref(i+M,i,0) = this->field().mOne;
+
+	// reinitialize the shift
+	for ( size_t i=0; i<M; ++i ) {
+		shift[i] = 0;
+		shift[i+M] = i*(deg*M+1);
+	}
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(Smith)### Second approximant basis: deg(pmat), input shift, input order..:" << endl;
+	cout << deg << endl;
+	cout << shift << endl;
+	cout << order << endl;
+	cout << "series degrees:" << endl;
+	this->print_degree_matrix(series2);
+#ifdef EXTRA_VERBOSE_ON
+	cout << "series entries:" << endl;
+	cout << series2 << endl;
+#endif
+#endif
+
+	// compute second approximant basis
+	PolMatDom::MatrixP app_bas2( this->field(), 2*M, 2*M, order );
+	OB.PM_Basis( app_bas2, series2, order, shift );
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(Smith)### Second approximant basis: shifted row degrees and matrix degrees:" << endl;
+	cout << shift << endl;
+	this->print_degree_matrix(app_bas2);
+#ifdef EXTRA_VERBOSE_ON
+	cout << "basis entries:" << endl;
+	cout << app_bas2 << endl;
+#endif
+#endif
+
+	// extract the right factor rfac, which is the transpose of the bottom left block
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
 	for ( size_t k=0; k<order; ++k ) {
-		lfac.ref(i,j,k) = app_bas.get(i+M,j,k);
-		series.ref(j,i,k) = app_bas.get(i+M,j+M,k);
+		rfac.ref(j,i,k) = app_bas2.get(i+M,j,k);
 	}
 
-	// compute second approximant basis
+#ifdef WARNINGS_ON
+	// check if this second Hermite form is diagonal
+	bool test=true;
+	for ( size_t i=1; i<M; ++i )
+	for ( size_t j=0; j<i; ++j )
+	for ( size_t k=0; k<app_bas2.size(); ++k ) {
+		if ( app_bas2.get(i+M,j+M,k) != 0 )
+			test=false;
+	}
+	if ( not test ) {
+		cout << "~~~WARNING(Smith)~~~ double Hermite did not yield a diagonal matrix" << endl;
+		cout << "   ------->>> the matrix found is not the Smith form. Ask Vincent to add a third Hermite form." << endl;
+	}
+#endif
 
-	return 0;
+	// extract the Smith form
+	for ( size_t i=0; i<M; ++i ) {
+		int degAB = order-1;
+		while ( degAB>=0 and app_bas2.get(i+M,i+M,degAB) == 0 )
+			--degAB;
+		if ( degAB < 0 )
+			smith[i].push_back(0);
+		else {
+			for ( int k=0; k<=degAB; ++k )
+				smith[i].push_back( app_bas2.get(i+M,i+M,k) );
+		}
+	}
+
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(Smith)### Degrees of Smith factors:" << endl;
+	for ( size_t i=0; i<M; ++i )
+		cout << smith[i].size()-1 << "  " ;
+	cout << endl;
+	cout << "###OUTPUT(Smith)### Degrees in left Smith factor:" << endl;
+	this->print_degree_matrix( lfac );
+	cout << "###OUTPUT(Smith)### Degrees in right Smith factor:" << endl;
+	this->print_degree_matrix( rfac );
+#ifdef EXTRA_VERBOSE_ON
+	cout << "###OUTPUT(Smith)### Smith factors entries:" << endl;
+	cout << smith << endl;
+	cout << "###OUTPUT(Smith)### Left Smith factor entries:" << endl;
+	cout << lfac << endl;
+	cout << "###OUTPUT(Smith)### Right Smith factor entries:" << endl;
+	cout << rfac << endl;
+#endif
+#endif
 }
 
 template<typename Matrix>
