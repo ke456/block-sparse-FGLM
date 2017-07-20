@@ -1,0 +1,462 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Jacobs Landscape Poster
+% LaTeX Template
+% Version 1.1 (14/06/14)
+%
+% Created by:
+% Computational Physics and Biophysics Group, Jacobs University
+% https://teamwork.jacobs-university.de:8443/confluence/display/CoPandBiG/LaTeX+Poster
+% 
+% Further modified by:
+% Nathaniel Johnston (nathaniel@njohnston.ca)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[final]{beamer}
+
+\usepackage{mathtools}
+\usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
+
+\usetheme{confposter} % Use the confposter theme supplied with this template
+
+\setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
+\setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
+\setbeamercolor{block alerted title}{fg=white,bg=dblue!70} % Colors of the highlighted block titles
+\setbeamercolor{block alerted body}{fg=black,bg=dblue!10} % Colors of the body of highlighted blocks
+% Many more colors are available for use in beamerthemeconfposter.sty
+
+\def\myvdots{\vbox{\baselineskip=10pt \lineskiplimit=0pt 
+\kern6pt \hbox{.}\hbox{.}\hbox{.}}} 
+
+%% \node [shift={(-10 cm,-5cm)}] at (current page.north east) {\includegraphics[height=5cm]{DTU-3.pdf}}; 
+
+\addtobeamertemplate{headline}{} 
+{
+\begin{tikzpicture}[remember picture,overlay] 
+\node [shift={(-112 cm,-7cm)}] at (current page.north east) {\includegraphics[height=5cm]{UW.pdf}}; 
+\node [shift={(-10 cm,-7cm)}] at (current page.north east) {\includegraphics[height=7cm]{DTU-3.pdf}}; 
+\end{tikzpicture} 
+}
+
+%-----------------------------------------------------------
+% Define the column widths and overall poster size
+% To set effective sepwid, onecolwid and twocolwid values, first choose how many columns you want and how much separation you want between columns
+% In this template, the separation width chosen is 0.024 of the paper width and a 4-column layout
+% onecolwid should therefore be (1-(# of columns+1)*sepwid)/# of columns e.g. (1-(4+1)*0.024)/4 = 0.22
+% Set twocolwid to be (2*onecolwid)+sepwid = 0.464
+% Set threecolwid to be (3*onecolwid)+2*sepwid = 0.708
+
+\newlength{\sepwid}
+\newlength{\onecolwid}
+\newlength{\twocolwid}
+\newlength{\threecolwid}
+\setlength{\paperwidth}{48in} % A0 width: 46.8in
+\setlength{\paperheight}{36in} % A0 height: 33.1in
+\setlength{\sepwid}{0.024\paperwidth} % Separation width (white space) between columns
+\setlength{\onecolwid}{0.22\paperwidth} % Width of one column
+\setlength{\twocolwid}{0.464\paperwidth} % Width of two columns
+\setlength{\threecolwid}{0.708\paperwidth} % Width of three columns
+\setlength{\topmargin}{-0.5in} % Reduce the top margin size
+%-----------------------------------------------------------
+
+\usepackage{graphicx}  % Required for including images
+\usepackage{multicol}
+\usepackage{booktabs} % Top and bottom rules for tables
+
+% Colors
+\definecolor{classicrose}{rgb}{0.98, 0.8, 0.91}
+\definecolor{antiquefuchsia}{rgb}{0.57, 0.36, 0.51}
+\definecolor{blanchedalmond}{rgb}{1.0, 0.92, 0.8}
+\definecolor{col3}{rgb}{0.000,1.000,1.000}
+\definecolor{col4}{rgb}{1.000,0.000,0.000}
+\definecolor{col5}{rgb}{1.000,0.000,1.000}
+\definecolor{Yellow}{rgb}{1.000,1.000,0.000}
+\definecolor{col7}{rgb}{1.000,1.000,1.000}
+\definecolor{DarkBlue}{rgb}{0.000,0.000,0.560}
+\definecolor{Blue}{rgb}{0.000,0.000,0.690}
+\definecolor{Lightblue}{rgb}{0.000,0.000,0.820}
+\definecolor{VeryLightBlue}{rgb}{0.530,0.810,1.000}
+\definecolor{VeryLightGreen}{rgb}{0.930,1.0,0.93}
+\definecolor{DarkGreen}{rgb}{0.000,0.360,0.000}
+\definecolor{Green}{rgb}{0.000,0.690,0.000}
+\definecolor{LightGreen}{rgb}{0.000,0.820,0.000}
+\definecolor{Aquamarine}{rgb}{0.000,0.690,0.690}
+\definecolor{col17}{rgb}{0.000,0.820,0.820}
+\definecolor{RedViolet}{rgb}{0.560,0.000,0.000}
+\definecolor{RubineRed}{rgb}{0.690,0.000,0.000}
+\definecolor{WildStrawberry}{rgb}{0.820,0.000,0.000}
+\definecolor{Violet}{rgb}{0.560,0.000,0.560}
+\definecolor{col22}{rgb}{0.690,0.000,0.690}
+\definecolor{col23}{rgb}{0.820,0.000,0.820}
+\definecolor{Brown}{rgb}{0.500,0.190,0.000}
+\definecolor{col25}{rgb}{0.630,0.250,0.000}
+\definecolor{Bitter}{rgb}{0.750,0.380,0.000}
+\definecolor{Pink}{rgb}{1.000,0.500,0.500}
+\definecolor{col28}{rgb}{1.000,0.630,0.630}
+\definecolor{col30}{rgb}{1.000,0.880,0.880}
+\definecolor{Dandelion}{rgb}{1.000,0.840,0.000}
+
+\definecolor{Turquoise}{rgb}{1.00,0.860,0.860}
+
+
+\setbeamertemplate{itemize/enumerate body begin}{\normalsize}
+\setbeamertemplate{itemize/enumerate subbody begin}{\normalsize}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\title{Sparse 
+	$\mathbf{\sqrt{FGLM}}$ using the block Wiedemann algorithm} % Poster title
+
+\author{Seung Gyu Hyun$^\dagger$, Vincent Neiger$^\star$, Hamid Rahkooy$^\dagger$, \'Eric Schost$^\dagger$} % Author(s)
+
+\institute{$^\dagger$ University of Waterloo, $^\star$ DTU Compute} % Institution(s)
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
+\addtobeamertemplate{block alerted end}{}{\vspace*{2ex}} % White space under highlighted (alert) blocks
+
+\setlength{\belowcaptionskip}{2ex} % White space under figures
+\setlength\belowdisplayshortskip{2ex} % White space under equations
+
+\begin{frame}[t] % The whole poster is enclosed in one beamer frame
+
+\begin{columns}[t] % The whole poster consists of three major columns, the second of which is split into two columns twice - the [t] option aligns each column's content to the top
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The first column
+
+%----------------------------------------------------------------------------------------
+%	OBJECTIVES
+%----------------------------------------------------------------------------------------
+
+%\begin{alertblock}{Objectives}
+
+%Lorem ipsum dolor sit amet, consectetur, nunc tellus pulvinar tortor, commodo eleifend risus arcu sed odio:
+%\begin{itemize}
+%\item Mollis dignissim, magna augue tincidunt dolor, interdum vestibulum urna
+%\item Sed aliquet luctus lectus, eget aliquet leo ullamcorper consequat. Vivamus eros sem, iaculis %ut euismod non, sollicitudin vel orci.
+%\item Nascetur ridiculus mus.  
+%\item Euismod non erat. Nam ultricies pellentesque nunc, ultrices volutpat nisl ultrices a.
+%\end{itemize}
+
+%\end{alertblock}
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+% add a block for sim/dif - compute something weaker, always works
+% doesn't require berlekamp-massey-sakata
+% base field needs to be higher than D, generic coordinate
+% Correctness also follows from 5
+% square free R_n
+% in example highlight D = ?
+% highlight parallel ...
+
+ %% the Gr\"obner basis for degrevlex ordering first (fast) and convert to lex ordering (better structure)
+
+\begin{alertblock}{{\sf Main Problem}}
+	\textbf{Input:} {\sf  $I \subset
+	\mathbb{K}[x_1,\dots,x_n]$ zero-dimensional}
+	\begin{itemize}
+        \item {\sf monomial basis of
+	$Q = \mathbb{K}[x_1,\dots,x_n]/I$}
+	\item {\sf multiplication matrices  $T_1,\dots, T_n \in 
+	\mathbb{K}^{D \times D}$ of $x_1,\dots,x_n$, with
+	$D = \dim_{\mathbb{K}}(Q)$}
+	\end{itemize}
+	\textbf{Output:}
+	\begin{itemize}
+        \item {\sf lex Gr\"obner basis of $\sqrt{I}$}
+	\end{itemize}
+\end{alertblock}
+
+\begin{alertblock}{{\sf Assumptions}}
+	\begin{itemize}
+		\item {\sf characteristic of $\mathbb{K}$ larger than $D$}
+		\item {\sf $x_n$ generic coordinate}
+	\end{itemize}
+{\bf Consequence:} {\sf output is}
+$$\begin{array}{l}
+ x_1-R_1(x_n),   \\
+~~~ \myvdots \\
+ x_{n-1}-R_{n-1}(x_n),\\
+ R(x_n)
+\end{array}$$
+\end{alertblock}
+
+%\setbeamercolor{block alerted title}{fg=white,bg=antiquefuchsia}
+%\setbeamercolor{block alerted body}{fg=black,bg=white}
+
+\begin{alertblock}{{\sf Previous work}}
+{\sf [Faug\`ere {\it et al.}'93]} {\bf FGLM}
+\begin{itemize}
+\item {\sf dense matrix computations}
+\end{itemize}
+
+{\sf [Rouillier'99] {\bf RUR}}
+\begin{itemize}
+\item  {\sf linearly generated sequence using the trace}
+\end{itemize}
+
+{\sf [Bostan {\it et al.}'03]}
+\begin{itemize}
+\item {\sf  trace $\to$ random linear form}
+\end{itemize}
+
+{\sf [Faug\`ere, Mou'17]}  {\bf Sparse FGLM}
+\begin{itemize}
+\item {\sf lex basis of $I$}
+\item {\sf uses Berlekamp-Massey-Sakata in some cases}
+\end{itemize}
+\end{alertblock}
+
+%% 	\begin{itemize}
+%% 	\item Sparse FGLM algorithm of \cite{FaMo17} computes lex basis of an ideal $I$ when $I$ is in shape position
+%% 	\item Exploits the sparsity of $T_i$'s
+%% 	\item Difficult to parallelize
+%% 	\end{itemize}
+%% \end{alertblock}
+
+\begin{alertblock}{{\sf At a glance}}
+{\bf  Cons:}
+\begin{itemize}
+\item {\sf computes a lex basis of $\sqrt{I}$ (weaker output)}
+\end{itemize}
+{\bf Pros:}
+\begin{itemize}
+\item {\sf few assumptions}
+\item {\sf simple algorithm}
+\end{itemize}
+\end{alertblock}
+
+\end{column} % End of the first column	
+
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
+
+%% \begin{block}{Block Sparse $\mathbf{\sqrt{FGLM}}$}
+
+\textbf{Key idea:} use sequences of small matrices, requires less
+terms than scalar sequences [Coppersmith'93]. \\ \textbf{Correctness}
+ from the analysis of Coppersmith's algorithm [Villard'97],
+[Kaltofen, Villard'04] and generating series properties
+[Bostan {\it et al.}'03].  See also [Kaltofen'95], [Kaltofen, Yuhasz'13].
+
+\vspace{1em}
+
+	\setbeamercolor{block alerted title}{fg=white,bg=norange}
+	\setbeamercolor{block alerted body}{fg=black,bg=white} 
+	
+	\begin{alertblock}{{\sf Algorithm}}
+		\begin{itemize}
+			\item[]\textcolor{red}{\bf 1.~} {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
+			\item[]\textcolor{red}{\bf 2.~} {\sf $s= (UT_n^iV^t)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+			\item[]\textcolor{red}{\bf 3.~} {\sf $S = {\sf MatrixBerlekampMassey}(s)$ and $N = S\sum_{i\ge 0} \frac{s_i}{x^{i+1}}$}
+			\item[]\textcolor{red}{\bf 4.~} {\sf $P=$ largest invariant factor of $S$ and $R_n={\sf SquareFreePart}(P)$}
+                        \item[]\textcolor{red}{\bf 5.~} {\sf $a = [0 ~\cdots 0 P] S^{-1}$}
+			\item[]\textcolor{red}{\bf 6.~} {\sf $N^*=$ first entry of $aN$}
+			\item[]\textcolor{red}{\bf 7.~} {\sf for $j = 1 \dots n-1$:}
+			\begin{itemize}
+			\item[]\textcolor{red}{\bf 7.1.} ~~{\sf $s_j = (UT_n^i T_j V^t)_{0 \le i < d}$ and $N_j = S\sum_{i\ge 0} \frac{s_{j,i}}{x^{i+1}}$}
+                        \item[]\textcolor{red}{\bf 7.2.} ~~{\sf $N^*_j=$ first entry of $aN_j$}
+			\item[]\textcolor{red}{\bf 7.3.} ~~{\sf $R_j=N^*_j/N^*$ mod $R_n$}
+			\end{itemize}
+		\end{itemize}
+	\end{alertblock}
+
+
+        \begin{alertblock}{{\sf Example}}
+		\textbf{Input: }$I = \langle f_1^2, f_2^2,f_3 \rangle \subset \mathbb{F}_{9001}[x_1,x_2,x_3]$,
+                {\sf non radical
+                of degree $\boldsymbol{D=32}$,
+                with}
+		$$ f_1 = 4979x_1^2 + 6202x_1x_2 + \dots, \;
+		   f_2 = 4682x_1^2 + 8290x_1x_2 + \dots, \;
+		   f_3 = 4199x_1^2 + 2325x_1x_2 + \dots$$
+		\textcolor{red}{\bf Step 1} {\sf with} $\boldsymbol{m = 2}$
+		$$ U = \begin{bmatrix}
+		1898 &6830 &3494 & 169 &7991 &3352 \dots \\
+		3161 &8858 &8467 &5882 &8037 &3726 \dots
+		\end{bmatrix} \quad
+		V = \begin{bmatrix}
+		7595 &8416 &2285 &8351 & 550 &7012 \dots \\
+		823 &5686 &6539 &7884 &7105 &3427 \dots 
+		\end{bmatrix}^t
+		$$
+		\textcolor{red}{\bf Step 2 \& 3} {\sf with} $\boldsymbol{d = 16}$
+		$$ s = \left(
+		\begin{bmatrix}
+		31  & 6977\\
+		1178& 1695
+		\end{bmatrix},
+		\begin{bmatrix}
+		8212&1663\\
+		4811&4837
+		\end{bmatrix}
+		\dots
+		\right)\,
+                ~~\xRightarrow{\mathsf{MatrixBerlekampMassey}}~~
+                \begin{array}{l}
+		S = \begin{bmatrix}
+		\boldsymbol{x^{16}} + \dots & 423\boldsymbol{x^{15}} +\dots\\
+		6426\boldsymbol{x^{15}}+ \dots & \boldsymbol{x^{16}} + \dots
+		\end{bmatrix} \, \\[1em]
+		N = \begin{bmatrix}
+		6191\boldsymbol{x^{15}} + \dots & 8101\boldsymbol{x^{15}} + \dots\\
+		7116\boldsymbol{x^{15}} + \dots & 2129\boldsymbol{x^{15}} + \dots
+		\end{bmatrix}
+                \end{array}
+		$$
+		\textcolor{red}{\bf Step 4 \& 5:}
+		$        a = \begin{bmatrix}
+		2575\boldsymbol{x^7}+\dots ~~&~ \boldsymbol{x^8} + \dots
+		\end{bmatrix}$
+                {\sf and} 
+                $ R_3=\textcolor{DarkGreen}{\boldsymbol{x^{8}} + 6990x^{7}+ \dots}$\\
+
+\vspace{3mm}
+
+		\textcolor{red}{\bf Step 6:}
+
+\vspace{-2em}
+
+		$$  N^* = \begin{bmatrix}
+		2575\boldsymbol{x^7}+\dots ~~&~~ \boldsymbol{x^8} + \dots
+		\end{bmatrix}
+                \begin{bmatrix}
+		6191\boldsymbol{x^{15}} + \dots\\
+		7116\boldsymbol{x^{15}} + \dots
+		\end{bmatrix}\,
+=                \begin{bmatrix}
+ \textcolor{DarkBlue}{1178\boldsymbol{x^{23}} + 8727x^{22} + \dots}
+\end{bmatrix}$$
+
+\vspace{3mm}
+
+\textcolor{red}{\bf Step 7} {\sf for} $\boldsymbol{j = 1}$
+
+\vspace{-0.5em}
+
+	$$ ~~s_1 = \left(
+		\begin{bmatrix}
+		3029& 8903\\
+		1538& 5610
+		\end{bmatrix},
+		\begin{bmatrix}
+		1914&3734\\
+		5221&5431
+		\end{bmatrix}
+		\dots
+		\right)\,
+                ~~\xRightarrow{~~~~~~~~~~}~~
+		N_1 = \begin{bmatrix}
+		  1374\boldsymbol{x^{15}} + \dots & 3271\boldsymbol{x^{15}} + \dots\\
+		4027\boldsymbol{x^{15}} + \dots & 1575\boldsymbol{x^{15}} + \dots
+		\end{bmatrix}
+		$$
+
+		$$  N_1^* = \begin{bmatrix}
+		2575\boldsymbol{x^7}+\dots ~~&~ \boldsymbol{x^8} + \dots
+		\end{bmatrix}
+                \begin{bmatrix}
+		1374\boldsymbol{x^{15}} + \dots\\
+		4027\boldsymbol{x^{15}} + \dots
+		\end{bmatrix}\,
+=                \begin{bmatrix}
+\textcolor{col4}{ 1538\boldsymbol{x^{23}} + 6498x^{22} + \dots}
+\end{bmatrix}
+		$$
+
+	$$R_1 =\frac{ \textcolor{col4}{  1538\boldsymbol{x^{23}} + 6498x^{22} + \dots }}{  \textcolor{DarkBlue}{1178\boldsymbol{x^{23}} + 8727x^{22} + \dots} } \bmod \textcolor{DarkGreen}{{\boldsymbol{x^{8}} + 6990x^{7}+ \dots }} = 7964\boldsymbol{x^7} + 4071x^6 + \dots$$
+
+
+        \end{alertblock}
+
+
+\end{column} % End of the second column
+
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+
+\begin{column}{\onecolwid} % The third column
+
+\setbeamercolor{block alerted title}{fg=white,bg=DarkGreen}
+\setbeamercolor{block alerted body}{fg=black,bg=VeryLightGreen} 
+\begin{alertblock}{Parallel Computations}
+	\begin{itemize}
+		\item Bottleneck is computing the sequence $(UT_n^i)_{0 \le i < 2d}$
+		\item Can parallelize by computing the sequences $(U_1T_n^i),\dots,(U_mT_n^i)$
+		separately, where $U_i$ is the $i^{th}$ row of $U$
+		\item When $m=1$, same computation as Sparse FGLM
+	\end{itemize}
+\end{alertblock}
+
+%----------------------------------------------------------------------------------------
+%	ADDITIONAL INFORMATION
+%----------------------------------------------------------------------------------------
+
+%\begin{block}{Additional Information}
+
+%Maecenas ultricies feugiat velit non mattis. Fusce tempus arcu id ligula varius dictum. 
+%\begin{itemize}
+%\item Curabitur pellentesque dignissim
+%\item Eu facilisis est tempus quis
+%\item Duis porta consequat lorem
+%\end{itemize}
+
+%\end{block}
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+
+
+\begin{alertblock}{{\sf References}}
+\nocite{*} % Insert publications even if they are not cited in the poster
+\footnotesize{\bibliographystyle{unsrt}
+\bibliography{sample}}
+\end{alertblock}
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+%\setbeamercolor{block title}{fg=red,bg=white} % Change the block title color
+
+%\begin{block}{Acknowledgements}
+
+%\small{\rmfamily{Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.}} \\
+
+%\end{block}
+
+%----------------------------------------------------------------------------------------
+%	CONTACT INFORMATION
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of the third column
+
+\end{columns} % End of all the columns in the poster
+
+\end{frame} % End of the enclosing frame
+
+\end{document}
