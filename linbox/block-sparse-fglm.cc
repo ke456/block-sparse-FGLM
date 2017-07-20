@@ -1,6 +1,6 @@
-#define TIMINGS_ON // comment out if having timings is not relevant
+//#define TIMINGS_ON // comment out if having timings is not relevant
 //#define VERBOSE_ON // comment out unless you want many object printed (e.g. for testing purposes)
-#define NAIVE_ON
+//#define NAIVE_ON
 #include "block-sparse-fglm.h"
 #include <iostream>
 #include <sstream>
@@ -209,6 +209,10 @@ void Block_Sparse_FGLM::find_lex_basis(){
   	cout << "###OUTPUT### Matrix numerator:" << endl;
 	cout << mat_num << endl;
 #endif
+	vector<PolMatDom::Polynomial> smith( M );
+	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength());
+	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength());
+	PMD.SmithForm( smith, lfac, rfac, mat_gen );
 #ifdef NAIVE_ON
 	DenseMatrix<GF> U(field,M,D);
 	MatrixDomain<GF> MD(field);
@@ -244,6 +248,55 @@ void PolMatDom::print_pmat( const PolMatDom::MatrixP &pmat ) const {
 }
 
 size_t PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
+	// Heuristic computation of the Smith form and multipliers
+	// Algorithm:
+	//    - compute left Hermite form hmat1 = umat pmat
+	//    - compute right Hermite form hmat2 = hmat1 vmat
+	//    - then return (S,U,V) = (hmat2,umat,vmat)
+	// Note: this is not guaranteed to be correct, but seems to be in most cases
+	// Implementation: Hermite form computed via kernel basis, itself computed via approximant basis
+	const size_t M = pmat.rowdim();
+	const size_t deg = pmat.degree();
+
+	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
+	vector<size_t> shift( 2*M, 0 );
+	for ( size_t i=M; i<2*M; ++i ) {
+		shift[i] = (i-M)*deg*M;
+	}
+
+	// order d such that approximant basis contains kernel basis
+	const size_t order = 2*M*deg+1;
+
+	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
+	PolMatDom::MatrixP series( this->field(), 2*M, M, deg );
+
+	for ( size_t k=0; k<=deg; ++k )
+	for ( size_t i=0; i<M; ++i )
+	for ( size_t j=0; j<M; ++j )
+		series.ref(i,j,k) = pmat.get(i,j,k);
+
+	for ( size_t i=M; i<2*M; ++i )
+		series.ref(i,i-M,0) = this->field().mOne;
+
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(Smith)### First approximant basis: deg(pmat), input shift, input order, series:" << endl;
+	cout << deg << endl;
+	cout << shift << endl;
+	cout << order << endl;
+	cout << series << endl;
+#endif
+
+	// compute approximant basis and extract kernel basis
+	PolMatDom::MatrixP app_bas( this->field(), 2*M, 2*M, order );
+	OrderBasis<GF> OB( this->field() );
+	OB.PM_Basis( app_bas, series, order, shift );
+	cout << shift << endl;
+#ifdef VERBOSE_ON
+	cout << "###OUTPUT(Smith)### First approximant basis: output shift and basis:" << endl;
+	cout << shift << endl;
+	cout << app_bas << endl;
+#endif
+
 	return 0;
 }
 
@@ -268,15 +321,19 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 		series.ref(i,j,k) = mat_seq[d-k-1].getEntry(i,j);
 
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT### Series input to approximant basis:" << endl;
+	cout << "###OUTPUT(MatrixBM)### Approximant basis: input order, shift, and series" << endl;
+	cout << d << endl;
+	cout << shift << endl;
 	cout << series << endl;
 #endif
 
 	// compute approximant and copy into mat_gen,mat_num
 	OB.PM_Basis( app_bas, series, d, shift );
+	cout << shift << endl;
 #ifdef VERBOSE_ON
-	cout << "###OUTPUT### Computed approximant basis:" << endl;
-	cout << series << endl;
+	cout << "###OUTPUT(MatrixBM)### Approximant basis: output shift and basis" << endl;
+	cout << shift << endl;
+	cout << app_bas << endl;
 #endif
 
 	for ( size_t i=0; i<M; ++i )
@@ -310,6 +367,11 @@ int main( int argc, char **argv ){
 	};	
 
 	parseArguments (argc, argv, args);
+
+	if ( D%M != 0 ) {
+		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
+		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
+	}
 
 	cout << "s=" << s<< endl;
 	if (s == ""){
