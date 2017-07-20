@@ -476,6 +476,74 @@ vector<int> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMat
 	return rdeg_out;
 }
 
+vector<int> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold )
+{
+	/** Algorithm PM-Basis as detailed in Section 2.2 of
+	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
+	 *  of Polynomial Matrix Computations. ISSAC 2003]
+	 **/
+	/** Input:
+	 *   - approx: m x m square polynomial matrix, approximation basis
+	 *   - series: m x n polynomial matrix of degree < order, series to approximate
+	 *   - order: positive integer, order of approximation
+	 *   - shift: degree shift on the cols of approx
+	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
+	 **/
+	/** Action:
+	 *   - Compute and store in 'approx' a shifted minimal approximation basis for (series,order,shift)
+	 **/
+	/** Output: shifted row degrees of the computed approx **/
+	/** Complexity: O(m^w M(order) log(order) ) **/
+	/** TODO study the impact of the threshold **/
+
+	if ( order <= threshold )
+	{
+		std::vector<int> rdeg = mbasis( approx, series, order, shift );
+		return rdeg;
+	}
+	else
+	{
+		size_t m = series.rowdim();
+		size_t n = series.coldim();
+		size_t order1,order2;
+		order1 = order>>1; // order1 ~ order/2
+		order2 = order - order1; // order2 ~ order/2, order1 + order2 = order
+		vector<int> rdeg( shift );
+
+		PolMatDom::PMatrix approx1( this->field(), m, m, 0 );
+		PolMatDom::PMatrix approx2( this->field(), m, m, 0 );
+
+		{
+			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
+			res1.copy( series, 0, order1-1 );
+			rdeg = pmbasis( approx1, res1, order1, rdeg, threshold ); // first recursive call
+		} // end of scope: res1 is deallocated here
+		{
+			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
+			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			//midproduct( res2, approx1, series );
+			rdeg = pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
+		} // end of scope: res2 is deallocated here
+		
+		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
+		approx.resize( approx1.size()+approx2.size()-1 );
+		this->_PMMD.mul( approx, approx2, approx1 );
+		// the shifted row degree of approx is rdeg
+		//--> bound on deg(approx): max(rdeg)-min(shift) (FIXME a bit pessimistic..)
+		int maxdeg = *max_element( rdeg.begin(), rdeg.end() ) - *std::min_element( shift.begin(), shift.end() );
+		approx.resize( 1 + min( (int) order, maxdeg ) );
+		return rdeg;
+	}
+
+}
+
+template <typename PolMat>
+void PolMatDom::midproduct( PolMat &res, const PolMat &approx, const PolMat &series )
+{
+
+}
+
+
 void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat ) const {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
