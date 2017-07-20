@@ -1,6 +1,6 @@
 #define TIMINGS_ON // comment out if having timings is not relevant
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 #define SPARSITY_COUNT // shows the sparsity of the matrices
@@ -639,8 +639,6 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	// 0. initialize dimensions, shift, matrices
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();
-	//OrderBasis<GF> OB( this->field() );
-	//vector<size_t> shift( 2*M, 0 );  // dim = M + N = 2M
 	vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
 	PolMatDom::PMatrix series( this->field(), 2*M, M, d );
 	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, d );
@@ -667,7 +665,6 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 #endif
 
 	// 2. compute approximant basis in reduced form
-	//OB.PM_Basis( app_bas, series, d, shift );
 	vector<int> rdeg = this->mbasis( app_bas, series, d, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Approximant basis: output rdeg and basis degrees" << endl;
@@ -698,10 +695,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	// --> suffices to left-multiply by invert of leading matrix
 
 	// retrieve inverse of leading matrix
-	Matrix lmat( this->field(), 2*M, 2*M );
-	for ( size_t i=0; i<2*M; ++i )
-	for ( size_t j=0; j<2*M; ++j )
-		lmat.refEntry(i,j) = app_bas.get(i,j,rdeg[i]); // row i has degree rdeg[i]
+	Matrix lmat = app_bas[rdeg[0]];
 #ifdef EXTRA_VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### leading matrix of reduced approximant basis:" << endl;
 	cout << lmat << endl;
@@ -709,23 +703,16 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::M
 	this->_BMD.invin( lmat ); // lmat is now the inverse of leading_matrix(app_bas)
 
 	// create Popov approximant basis and fill it
-	//PolMatDom::MatrixP popov_app_bas( this->field(), 2*M, 2*M, rdeg[0]+1 );  //  rdeg[0] = deg(app_bas)
  	for ( size_t k=0; k<app_bas.size(); ++k ) {
-		//Matrix app_bas_coeff( app_bas[k] );
 		this->_BMD.mulin_right( lmat, app_bas[k] );
-		//for ( size_t i=0; i<2*M; ++i )
-		//for ( size_t j=0; j<2*M; ++j )
-		//	popov_app_bas.ref(i,j,k) = app_bas_coeff.getEntry(i,j);
 	}
 
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Popov approximant basis degrees:" << endl;
 	this->print_degree_matrix(app_bas);
-	//this->print_degree_matrix(popov_app_bas);
 #ifdef EXTRA_VERBOSE_ON
 	cout << "Basis entries:" << endl;
 	cout << app_bas << endl;
-	//cout << popov_app_bas << endl;
 #endif
 #endif
 
