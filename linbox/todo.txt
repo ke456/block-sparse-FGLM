@@ -1,0 +1,3 @@
+-- mbasis: do not permute rows so that output = ordered weak Popov
+-- Smith form: with modified (ordered weak Popov) mbasis, should not be problems with row order
+-- tune pmbasis threshold
