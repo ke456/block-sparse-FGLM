@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,mathrsfs}
 \pagestyle{empty}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
 
 \usepackage{fullpage}
 
@@ -53,6 +54,40 @@ $w = [\frac{s_Db_1}{s1},\frac{s_Db_2}{s2},\cdots,\frac{s_Db_{D-1}}{s_{D-1}},b_D]
 Therefore, if we choose $\tilde{u} = w A$, we get
 $ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,s_D]$ as needed.\\
 
+\noindent\textbf{Lemma 2 (bis):}
+Let $S$ be the minimum generating polynomial matrix for $s$.  Then, there
+exists a vector $\tilde{u}$ such that $\tilde{u} S = [0, \ldots, 0, s_D]$,
+where $s_D$ is the largest invariant factor of $S$.
+
+\medskip\noindent\textit{Proof:} Since $S$ is nonsingular, its first $M-1$
+columns are free. Then, a minimal left kernel basis for this $(M-1) \times M$
+submatrix of $S$ is a row vector $\tilde{v} \in \mathbb{K}^{1 \times M}$ such
+that $\tilde{v} S = [0,\ldots,0,\lambda]$, where the polynomial $\lambda$ is
+the GCD of the entries in the last column of $S$. By definition, $s_D$ is
+divisible by $\lambda$, so that $\tilde{u} = \frac{s_D}{\lambda}\tilde{v}$ has
+the wanted property.
+
+\medskip\noindent\textit{Remark:}
+One may alternatively:
+\begin{itemize}
+  \item compute the Smith form of $S$, along with the unimodular
+    transformations, and use the formulas in the proof of Lemma 2 (first
+    version);
+  \item compute $s_D$ via the inversion algorithm of Zhou-Labahn-Storjohann
+    (Sec. 5.1, 2015), and then solve the system to find $\tilde{u}$.
+\end{itemize}
+The first solution is significantly more expensive if the full transformations
+are needed. Here we might be happy with only the transformations with entries
+reduced modulo the corresponding invariant factors, in which case both
+solutions have the same theoretic speed. Yet, note that computing the Smith
+form efficiently is randomized (Storjohann, 2003) and uses high-order lifting
+(not in LinBox), while the second solution is deterministic and uses tools
+close to approximant basis computation (already partially implemented in
+LinBox). In the second solution, the system solving can be done via minimal
+kernel basis \todo{(and also via lifting since the matrix $S$ is reduced, but
+no issue with large degrees?)}.
+
+\bigskip
 \noindent\textbf{Lemma 3:} If $\sum_{i = 0}^{\infty} s^{(i)} t^i = S^{-1}N$, then $deg(N)$ is
 less than or equal to $deg(S)$. TODO\\
 
