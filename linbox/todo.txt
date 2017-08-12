@@ -1,3 +1,4 @@
 -- mbasis: do not permute rows so that output = ordered weak Popov
 -- Smith form: with modified (ordered weak Popov) mbasis, should not be problems with row order
 -- tune pmbasis threshold
+-- in Linbox, the mul / midproduct of polynomial matrices does not accept const... this is unfortunate since it is only touching the matrices entries, isn't it?
