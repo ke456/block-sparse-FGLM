@@ -5,4 +5,3 @@
 -- can we obtain the same output via the dense version?
 -- see about the proof of Lemma 3 in formula-proof
 -- check the output of Smith form
--- implement xgcd and division for polynomials via pmbasis
