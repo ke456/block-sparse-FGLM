@@ -76,6 +76,9 @@ class PolMatDom {
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
 
+	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
+	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
+
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat );
 

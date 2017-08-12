@@ -4,7 +4,9 @@
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
-#define TEST_APPROX // testing / timing approximant basis algos
+#define TEST_FGLM // testing / timing approximant basis algos
+//#define TEST_APPROX // testing / timing approximant basis algos
+//#define TEST_POL  // testing xgcd and division via pmbasis
 #include "block-sparse-fglm.h"
 #include <algorithm>
 #include <string>
@@ -292,6 +294,45 @@ void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
 		}
 		cout << endl;
 	}
+}
+
+void PolMatDom::xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v )
+{
+  const size_t deg = max(a.size(),b.size());
+  const size_t order = 1 + 2*deg;
+  vector<int> shift = { 0, 0, (int)deg };
+	PolMatDom::PMatrix series( this->field(), 3, 1, order );
+  for ( size_t d=0; d<a.size(); ++d )
+    series.ref(0,0,d) = a[d];
+  for ( size_t d=0; d<b.size(); ++d )
+    series.ref(1,0,d) = b[d];
+  series.ref(2,0,0) = this->field().mOne;
+
+  PolMatDom::PMatrix approx( this->field(), 3, 3, order-1 );
+  pmbasis( approx, series, order, shift );
+
+  g = approx(2,2);
+  u = approx(2,0);
+  v = approx(2,1);
+}
+
+void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial & q )
+{
+  const size_t deg = max(a.size(),b.size());
+  const size_t order = 1+deg;
+  vector<int> shift = { 0, (int)deg };
+	PolMatDom::PMatrix series( this->field(), 2, 1, order );
+  for ( size_t d=0; d<b.size(); ++d )
+    series.ref(0,0,d) = -b[d];
+  for ( size_t d=0; d<a.size(); ++d )
+    series.ref(1,0,d) = a[d];
+
+  PolMatDom::PMatrix approx( this->field(), 2, 2, order-1 );
+  pmbasis( approx, series, order, shift );
+
+  this->print_degree_matrix( approx );
+
+  q = approx(1,0);
 }
 
 vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
@@ -1101,8 +1142,10 @@ int main( int argc, char **argv ){
 	cout << "s=" << s<< endl;
 	if (s == ""){
 	  GF field(p);
+#ifdef TEST_FGLM
 	  Block_Sparse_FGLM l(field, D, M, n);
 	  l.find_lex_basis();
+#endif
 	}
 	else{
 		// we read the first lines here 
@@ -1119,15 +1162,17 @@ int main( int argc, char **argv ){
 		cout << "blocking dimension:" << " M=" << M << endl;
 		file.close();
 		GF field(p);
+#ifdef TEST_FGLM
 		Block_Sparse_FGLM l(field, D, M, n, s);
 		l.find_lex_basis();
+#endif
 	}
-#ifdef TEST_APPROX
-	cout << "~~~~~~~~~~~STARTING TESTS APPROXIMANTS~~~~~~~~~~~~~" << endl;
 	GF field(p);
 	long seed = time(NULL);
 	typename GF::RandIter rd(field,0,seed);
 	PolMatDom PMD( field );
+#ifdef TEST_APPROX
+	cout << "~~~~~~~~~~~STARTING TESTS APPROXIMANTS~~~~~~~~~~~~~" << endl;
 	size_t order = 2*ceil(D/(double)M);
 	cout << "order for approximant basis : " << order << endl;
 	cout << "dimensions of input series matrix : " << 2*M << " x " << M << endl;
@@ -1202,6 +1247,104 @@ int main( int argc, char **argv ){
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
     cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+  }
+#endif
+#ifdef TEST_POL
+  Timer tm2;
+	cout << "~~~~~~~~~~~STARTING TESTS POLY~~~~~~~~~~~~~" << endl;
+  {
+    cout << "small xgcd with coprime polynomials" << endl;
+    PolMatDom::Polynomial a = {1,1,-1,0,-1,1};
+    PolMatDom::Polynomial b = {-1,0,1,1,0,0,-1};
+    PolMatDom::Polynomial g,u,v;
+    // a = 1+X-X^2-X^4+X^5
+    // b = -1 + X^2 + X^3 -X^6
+    // xgcd(a,b) = (1,
+    //              15379115*X^5 + 15379116*X^2 + 7689558*X + 7689558,
+    //              15379115*X^4 + 7689558*X^3 + 15379116*X + 7689557)
+    // when over Z/pZ with p = 23068673 
+    tm2.clear(); tm2.start();
+    PMD.xgcd(a,b,g,u,v);
+    tm2.stop();
+    cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+#ifdef VERBOSE_ON
+    cout << "###OUTPUT### xgcd input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+    cout << "###OUTPUT### xgcd output: " << endl;
+    cout << g << endl;
+    cout << u << endl;
+    cout << v << endl;
+#endif
+  }
+  {
+    cout << "small xgcd with gcd of degree 1" << endl;
+    PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
+    PolMatDom::Polynomial b = {23068614,23068670,59,62,3,0,23068614,23068670};
+    PolMatDom::Polynomial g,u,v;
+    // same polynomials multiplied by 3*X + 59
+    // a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
+    // b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
+    // xgcd(a,b) = (X + 15379135,
+    //              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
+    //              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
+    // when over Z/pZ with p = 23068673 
+    tm2.clear(); tm2.start();
+    PMD.xgcd(a,b,g,u,v);
+    tm2.stop();
+    cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+#ifdef VERBOSE_ON
+    cout << "###OUTPUT### xgcd input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+    cout << "###OUTPUT### xgcd output: " << endl;
+    cout << g << endl;
+    cout << u << endl;
+    cout << v << endl;
+#endif
+  }
+  {
+    cout << "xgcd with random polynomials of degree: " << D-1 << endl;
+    PolMatDom::Polynomial a( D );
+    PolMatDom::Polynomial b( D );
+    for ( size_t d=0; d<D; ++d )
+    {
+      rd.random( a[d] );
+      rd.random( b[d] );
+    }
+    PolMatDom::Polynomial g,u,v;
+    // same polynomials multiplied by 3*X + 59
+    // a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
+    // b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
+    // xgcd(a,b) = (X + 15379135,
+    //              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
+    //              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
+    // when over Z/pZ with p = 23068673 
+    tm2.clear(); tm2.start();
+    PMD.xgcd(a,b,g,u,v);
+    tm2.stop();
+    cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+  }
+  {
+    cout << "division with quotient of degree 1" << endl;
+    PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
+    PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+    PolMatDom::Polynomial q;
+    // a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
+    // b = 1+X-X^2-X^4+X^5
+    // quotient should be X + 15379135,
+    // when over Z/pZ with p = 23068673 
+    tm2.clear(); tm2.start();
+    PMD.divide(a,b,q);
+    tm2.stop();
+    cout << "###TIME### divide: " << tm2.usertime() << endl;
+#ifdef VERBOSE_ON
+    cout << "###OUTPUT### divide input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+    cout << "###OUTPUT### divide output: " << endl;
+    cout << q << endl;
+#endif
   }
 #endif
 	return 0;
