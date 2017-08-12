@@ -1,4 +1,8 @@
--- mbasis: do not permute rows so that output = ordered weak Popov
--- Smith form: with modified (ordered weak Popov) mbasis, should not be problems with row order
 -- tune pmbasis threshold
 -- in Linbox, the mul / midproduct of polynomial matrices does not accept const... this is unfortunate since it is only touching the matrices entries, isn't it?
+
+-- implement dense "multi-Krylov" version
+-- can we obtain the same output via the dense version?
+-- see about the proof of Lemma 3 in formula-proof
+-- check the output of Smith form
+-- implement xgcd and division for polynomials via pmbasis

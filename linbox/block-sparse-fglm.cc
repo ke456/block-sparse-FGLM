@@ -1,6 +1,6 @@
 #define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
@@ -828,14 +828,12 @@ vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom:
 		{
 			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
 			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
-			// TODO: gives warning, had to add -fpermissive
 			rdeg = old_pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
 		} // end of scope: res2 is deallocated here
 		
 		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
 		approx.resize( approx1.size()+approx2.size()-1 );
 		this->_PMMD.mul( approx, approx2, approx1 );
-		// TODO: gives warning, had to add -fpermissive
 		// the shifted row degree of approx is rdeg
 		//--> bound on deg(approx): max(rdeg)-min(shift) (FIXME a bit pessimistic..)
 		int maxdeg = *max_element( rdeg.begin(), rdeg.end() ) - *std::min_element( shift.begin(), shift.end() );
@@ -905,6 +903,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// extract the left factor lfac which is the bottom left block,
 	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
+  app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
 	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
@@ -931,7 +930,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// compute second approximant basis
 	PolMatDom::PMatrix app_bas2( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg2 = this->pmbasis( app_bas2, series2, order, shift );
+	vector<size_t> mindeg2 = this->popov_pmbasis( app_bas2, series2, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### Second approximant basis: shifted minimal degree and matrix degrees:" << endl;
 	cout << mindeg2 << endl;
@@ -943,6 +942,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 #endif
 
 	// extract the right factor rfac, which is the transpose of the bottom left block
+  app_bas2.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
 	for ( size_t k=0; k<order; ++k ) {
@@ -1098,13 +1098,6 @@ int main( int argc, char **argv ){
 
 	parseArguments (argc, argv, args);
 
-#ifdef WARNINGS_ON
-	if ( D%M != 0 ) {
-		cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
-		cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
-	}
-#endif
-
 	cout << "s=" << s<< endl;
 	if (s == ""){
 	  GF field(p);
@@ -1125,12 +1118,6 @@ int main( int argc, char **argv ){
 		cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
 		cout << "blocking dimension:" << " M=" << M << endl;
 		file.close();
-#ifdef WARNINGS_ON
-		if ( D%M != 0 ) {
-			cout << "~~~WARNING~~~ block dimension M does not divide vector space dimension D" << endl;
-			cout << "     ----->>> results of approximant basis / Smith form unpredictable." << endl;
-		}
-#endif
 		GF field(p);
 		Block_Sparse_FGLM l(field, D, M, n, s);
 		l.find_lex_basis();
