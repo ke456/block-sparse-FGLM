@@ -1,0 +1,152 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsfonts,amsmath,amsthm}
+\usepackage{mathrsfs}
+\usepackage{fullpage}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{remark}[definition]{Remark}
+
+
+
+\def\K{\mathbb{K}}
+\def\Deg{D}
+\def\scrY{\mathscr{Y}}
+
+\begin{document}	
+
+Let $A$ be in $\K^{\Deg\times \Deg}$. Let $s_1,\dots,s_r$ be the
+invariant factors of $t I - A$, ordered in such a way that $s_2$
+divides $s_1$, $s_3$ divides $s_2$, etc, and let $d_i=\deg(s_i)$ for
+all $i$; for $i > r$, we let $s_i=1$, with $d_i=0$. 
+
+We fix an integer $M$ and we define $\nu=d_1 +\cdots +d_M \le \Deg$
+and $\delta =\lceil \nu/M\rceil \le \lceil \Deg/M\rceil$.
+We choose matrices $X,Y \in \mathbb{K}^{D\times M}$, and we let
+$F_X^{A,Y}$ be the minimal generator in Popov form of the sequence
+$(X^\perp\, A^i\, Y)_{i \ge 0}$. We also denote by $\sigma_1,\dots,\sigma_t$ the
+invariant factors of $F_X^{A,Y}$, for some $t \le M$. As above, for $i
+> t$, we let $\sigma_i =1$.
+
+\begin{theorem}
+  For a generic choice of $X$ and $Y$, we have:
+  \begin{itemize}
+  \item $F_X^{A,Y}$ has degree $\delta$;
+  \item $s_i = \sigma_i$ for $1 \le i \le M$.
+  \end{itemize}
+\end{theorem}
+\begin{proof}
+Let $\scrY$ be a matrix of indeterminates of size $N \times M$.
+Then, by~\cite[Proposition 6.1]{Villard97a}, the minimal generating
+polynomial $F_{A,\scrY}$ for the generic sequence $(A^i\scrY)_{i \ge
+  0}$ has determinantal degree $\nu$ and degree $\delta =\lceil
+\nu/n\rceil$.
+
+
+\begin{itemize}
+\item $\dim(\langle \scrY \rangle)=\nu$.
+  
+  This is proved in the proof of~\cite[Proposition~6.1]{Villard97a}.
+
+\item For a generic $Y$ in $\K^{N\times n}$, $N_Y=N_\scrY$, 
+  where $N_Y=\dim(\langle Y \rangle)$.
+
+  This is because $\langle \scrY\rangle$ is the span of $K_\scrY=[\scrY | A
+    \scrY | \cdots | A^{N-1} \scrY]$, whereas $\langle Y\rangle$ is the span of
+  $K_Y=[Y | A Y | \cdots |A^{N-1} Y]$. Take a maximal non-zero minor $\mu$ of $K_\scrY$;
+  as soon as $\mu(Y)\ne 0$, we have equality of the dimensions.
+
+\item For any $Y$ (including $\scrY$), the degree $\delta_Y$ of $F_{A,Y}$ is equal to the first 
+  index $d$ such that $\dim({\rm span}([Y | A Y | \cdots |A^{d-1} Y]))=N_Y$.
+
+  This is~\cite[Lemma~4.3]{Villard97a}.
+
+\item For a generic $Y$,  $\delta_Y=\lceil \nu/n\rceil$.
+
+  By~\cite[Proposition 6.1]{Villard97a}, the minimal generating
+  polynomial $F_{A,\scrY}$ for the generic sequence $(A^i\scrY)_{i \ge
+    0}$ has degree $\delta_\scrY =\lceil\nu/n\rceil$. The first
+  restriction on $Y$ is that $N_Y=N_\scrY$. Then the claim follows
+  from the previous item.
+
+\item For any $Y$ in $\K^{N \times n}$, for a generic $X$  in $\K^{n \times N}$, $F_{A,Y,X}=F_{A,Y}$.
+
+  By~\cite[Lemma~4.2]{Villard97a}, there exists matrices $P_Y$ in
+  $\K^{N\times N_Y}$ and $A_Y \in \K^{N_Y \times N_Y}$, with $P_Y$ of
+  full rank $N_Y$, such that $F_{A,Y,X}=F_{A,Y}$ if and only if the
+  dimension of the span of the rows of $X P_Y,X P_Y A_Y,X P_Y
+  A^2_Y,\cdots$ is equal to $N_Y$. 
+
+  Let $B_Y$ be the transpose of $A_Y$. Then, the dimension above is
+  the dimension of the span of $(X P_Y)^t, B_Y (X P_Y)^t, B_Y^2 (X
+  P_Y)^t, \dots$ The number of invariant factors of $A_Y$ (and thus of
+  $B_Y$) is at most $n$.  As a result, for a generic $Z$ in $\K^{N_Y
+    \times n}$, by the previous items, ${\rm span}([Z|B_Y Z| B_Y^2 Z|\cdots])$ has dimension $N_Y$ (since the number of columns in $Z$
+  is at least equal to the number of invariant factors of $B_Y$).
+
+\item ${\rm rank}({\rm Hk}(X,Y)) = \deg(\det(F_{A,Y,X}))$.
+
+  By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}) =
+  \deg(\det(F_{A,Y,X}))$ for $d \ge \deg(F_{A,Y,X})$ and $e \ge n$.
+  We take $e=n$, so that ${\rm rank}({\rm Hk}_{n,d}) =
+  \deg(\det(F_{A,Y,X}))$ for $d \ge \deg(F_{A,Y,X})$. On the other
+  hand, for fixed $n$, the sequence ${\rm rank}({\rm Hk}_{n,d})$ is
+  constant for $d \ge n$. As a result, 
+ ${\rm rank}({\rm Hk}_{n,n}) =
+  \deg(\det(F_{A,Y,X}))$.
+
+\item For generic $X,Y$, the invariant factors of $ F_{A,Y,X}$ are
+  $s_1,\dots,s_n$.
+
+  By~\cite[Theorem~2.12]{KaVi04}, for any $X$ and $Y$ in $\K^{n\times N}
+  \times \K^{N\times n}$, for $i=1,\dots,n$, the $i^{th}$ invariant
+  factor of $F_{A,Y,X}$ divides $s_i$, so that $ \deg(\det(F_{A,Y,X}))\le\nu$.
+
+  Furthermore, there exist matrices $X_0,Y_0$ such that for
+  $i=1,\dots,n$, the $i^{th}$ invariant factor of $F_{A,Y_0,X_0}$ is
+  equal to $s_i$. In this case,  $ \deg(\det(F_{A,Y_0,X_0}))=\nu$.
+
+  Thus, ${\rm rank}({\rm Hk}(X,Y))$ has rank at most $\nu$, and
+  exactly $\nu$ for at least one pair $(X_0,Y_0)$. So we have equality
+  for a generic $(X,Y)$.  When equality holds, the $i^{th}$ invariant
+  factor of $F_{A,Y,X}$ equals $s_i$ for all $i$.
+\end{itemize}
+\end{proof}
+
+
+
+
+
+%% \noindent\textit{2.7 of KaVi04:} $\nu = max\{ rank(Hk_{e,d}(A,X,Y))\}$ over all possible $e,d,X,Y$. Moreover, $\nu$ is equal to the sum of the
+%% degrees of the first $M$ invariant factors of $\lambda I -A$ (where $M$ is the size of $X,Y$)\\
+
+
+
+%% \noindent\textbf{Proposition 1:} If we choose random matrices $X,Y$, then $deg(det(F_X^{A,Y})) = \bar{\nu}$ 
+%% with high probability.\\
+
+%% \noindent\textbf{Proof:} Directly follows from the theorems 8.1 and 8.2 and proposition 6.1\\
+
+%% \noindent\textbf{Proposition 2:} For random choice of blocking matrices $W,Z$, the $i^{th}$ invariant factor of $F_W^{A,Z}$ is equal to the $i^{th}$ 
+%% invariant factor of $A$ for $1 \le i \le min(M,\phi)$ (with all other remaining factors equal to 1) with high probability.\\
+
+%% \noindent\textbf{Proof:} 
+%% We choose $\mathbb{X},\mathbb{Y}$ as the specialization of $\bar{X},\scrY$ given in (Villard, corollary 6.4). From equation
+%% (2.17) of theorem 2.12, we have that
+%% $$ deg(det(F_{\mathbb{X}}^{A,\mathbb{Y}})) = \bar{\nu} = max_{X,Y}(deg(det(F_X^{A,Y}))) = \nu $$
+%% Thus, by proposition 1, for any random matrices $W,Z$, with high probability,
+%% $$ deg(det(F_W^{A,Z})) = \nu$$
+%% Now, assume $deg(det(F_W^{A,Z})) = \nu$ and 
+%% let $\bar{s_i}$ be the $i^{th}$ invariant factor $F_W^{A,Z}$. Then, by the first assertion of theorem 2.12, $\bar{s_i}$ divides $s_i$. Since
+%% $\nu$ is the sum of the degrees of the invariant factors of $\lambda I - A$, this can only happen if $s_i = \bar{s_i}$ by the same reasoning as the end of theorem 2.12.
+
+
+\bibliographystyle{plain}
+\bibliography{abstract}
+
+
+\end{document}
