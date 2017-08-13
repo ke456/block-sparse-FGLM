@@ -262,10 +262,11 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	tm.stop();
 	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
+MatrixDomain<GF> MD(field);
 #ifdef NAIVE_ON
 	tm.clear(); tm.start();
 	DenseMatrix<GF> U(field,M,D);
-	MatrixDomain<GF> MD(field);
+	
 	vector<DenseMatrix<GF>> lst(this->getLength(), DenseMatrix<GF>(field,M,D));
 	auto &T1 = mul_mats[0];
 	create_random_matrix(U);
@@ -280,6 +281,15 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	tm.stop();
 	cout << "###TIME### sequence (UT1^i) naive: " << tm.usertime() << endl;
 #endif
+
+  // LOOP FOR OTHER VARIABLES
+  for (int i  = 1; i < mul_mats.size(); i++){
+		DenseMatrix<GF> right_mat(field, D, M); // Ti * V
+		auto &Ti = mul_mats[i];
+		MD.mul(right_mat, Ti, V);
+		vector<DenseMatrix<GF>> seq(this->getGenDeg(),DenseMatrix<GF>(field,M,M));
+		get_matrix_sequence(seq,mat_seq_left,right_mat,getGenDeg());
+	}
 }
 
 template<typename PolMat>
