@@ -43,6 +43,7 @@ class Block_Sparse_FGLM{
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
 	                         std::vector<LinBox::DenseMatrix<GF>> &,
 	                         LinBox::DenseMatrix<GF> &,
+													 int,
 	                         size_t);
 
 	public:

@@ -1,6 +1,6 @@
 #define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
-//#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
+#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
@@ -153,8 +153,9 @@ void Block_Sparse_FGLM::get_matrix_sequence
 (vector<DenseMatrix<GF>> &v, 
  vector<DenseMatrix<GF>> &l, 
  DenseMatrix<GF> &V,
+ int c,
  size_t to){
-	// gather all the matrices of v in a single (seq_length*M) x D matrix
+	// gather all the matrices of l in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
 	DenseMatrix<GF> mat(field, to*M, D);
 	for (size_t i = 0; i < to; i++){
@@ -168,17 +169,18 @@ void Block_Sparse_FGLM::get_matrix_sequence
 			}
 		}
 	}
-	
+
 	// multiplication
-	DenseMatrix<GF> result(field, to*M,M);
+	DenseMatrix<GF> result(field, to*M,c);
 	MD.mul(result,mat,V);
 	
-	v.resize(to, DenseMatrix<GF>(field,M,M));
+	v.resize(to, DenseMatrix<GF>(field,M,c));
+	cout << "C is: " << c << endl;
 	for (size_t i = 0; i < to; i++){
-		v[i] = DenseMatrix<GF>(field, M, M);
+		v[i] = DenseMatrix<GF>(field, M, c);
 		for (int row = 0; row < M; row++){
 			int r = i * M + row;
-			for (int col = 0; col < M; col++){
+			for (int col = 0; col < c; col++){
 				GF::Element a;
 				result.getEntry(a,r,col);
 				v[i].refEntry(row,col) = a;
@@ -212,13 +214,15 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #endif
 	vector<DenseMatrix<GF>> mat_seq(getLength(), DenseMatrix<GF>(field,M,M));
 	// 2. compute the total matrix sequence (UT1^i)V
-	get_matrix_sequence(mat_seq, mat_seq_left, V, getLength());
+	get_matrix_sequence(mat_seq, mat_seq_left, V, M, getLength());
 #ifdef TIMINGS_ON
 	tm.stop();
 	cout << "###TIME### sequence (UT1^i)V: " << ": " << tm.usertime() << endl;
 	tm.clear(); tm.start();
 #endif
 #ifdef VERBOSE_ON
+  cout << "###OUTPUT### Matrix V:" << endl;
+	V.write(cout,Tag::FileFormat::Maple)<<endl;
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
 	cout << "Length d = " << this->getLength() << endl;
 	cout << "Generic generator degree: deg = " << this->getGenDeg() << endl;
@@ -281,14 +285,21 @@ MatrixDomain<GF> MD(field);
 	tm.stop();
 	cout << "###TIME### sequence (UT1^i) naive: " << tm.usertime() << endl;
 #endif
+	DenseMatrix<GF> V_col(field,D,1); // a single column of V
+	for (int i = 0; i < D; i++){
+		auto el = V.refEntry(i,0);
+		V_col.refEntry(i,0) = el;
+	}
+	V_col.write(cout<<"V_col:"<<endl,Tag::FileFormat::Maple)<<endl;
 
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
-		DenseMatrix<GF> right_mat(field, D, M); // Ti * V
+		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
-		MD.mul(right_mat, Ti, V);
-		vector<DenseMatrix<GF>> seq(this->getGenDeg(),DenseMatrix<GF>(field,M,M));
-		get_matrix_sequence(seq,mat_seq_left,right_mat,getGenDeg());
+		MD.mul(right_mat, Ti, V_col);
+		vector<DenseMatrix<GF>> seq(this->getGenDeg(),DenseMatrix<GF>(field,M,1));
+		get_matrix_sequence(seq,mat_seq_left,right_mat,1,getGenDeg());
+		for (auto &j : seq) j.write(cout<<"From Ti seq"<<endl, Tag::FileFormat::Maple)<<endl;
 	}
 }
 
