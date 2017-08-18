@@ -12,7 +12,6 @@
 
 
 typedef Givaro::Modular<double> GF;
-
 class Block_Sparse_FGLM{
 	// the current field
 	GF field;
@@ -45,6 +44,7 @@ class Block_Sparse_FGLM{
 	                         LinBox::DenseMatrix<GF> &,
 													 int,
 	                         size_t);
+
 
 	public:
 	/* CTOR                                              */

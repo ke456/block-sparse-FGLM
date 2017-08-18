@@ -175,7 +175,6 @@ void Block_Sparse_FGLM::get_matrix_sequence
 	MD.mul(result,mat,V);
 	
 	v.resize(to, DenseMatrix<GF>(field,M,c));
-	cout << "C is: " << c << endl;
 	for (size_t i = 0; i < to; i++){
 		v[i] = DenseMatrix<GF>(field, M, c);
 		for (int row = 0; row < M; row++){
@@ -187,6 +186,22 @@ void Block_Sparse_FGLM::get_matrix_sequence
 			}
 		}
 	}
+}
+
+// reverses every entry of mat at degree d
+//PolMatDom::PMatrix matrix_poly_reverse
+//( const PolMatDom::PMatrix &mat, const int d){
+//}
+
+//shifts every entry by d
+void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, 
+int row, int col, int deg){
+	for (int i = 0; i < row; i++)
+	  for (int j = 0; j < col; j++)
+		  for (int d = 0; i < deg; i++){
+				auto element = mat.get(i,j,d+deg);
+				result.ref(i,j,d) = element;
+			}
 }
 
 void Block_Sparse_FGLM::find_lex_basis(){
@@ -291,7 +306,7 @@ MatrixDomain<GF> MD(field);
 		V_col.refEntry(i,0) = el;
 	}
 	V_col.write(cout<<"V_col:"<<endl,Tag::FileFormat::Maple)<<endl;
-
+  PolynomialMatrixMulDomain<GF> PMMD(field);
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
@@ -299,7 +314,24 @@ MatrixDomain<GF> MD(field);
 		MD.mul(right_mat, Ti, V_col);
 		vector<DenseMatrix<GF>> seq(this->getGenDeg(),DenseMatrix<GF>(field,M,1));
 		get_matrix_sequence(seq,mat_seq_left,right_mat,1,getGenDeg());
-		for (auto &j : seq) j.write(cout<<"From Ti seq"<<endl, Tag::FileFormat::Maple)<<endl;
+		for (auto &i : seq)
+		  i.write(cout << "seq:"<<endl, Tag::FileFormat::Maple)<<endl;
+		PolMatDom::PMatrix polys(PMD.field(),M,1,this->getGenDeg());
+		// creating the poly matrix from the sequence in reverse order
+		int index = 0;
+		for (int j = seq.size()-1; j >= 0; j--){
+			for (int q = 0; q < M; q++){
+				auto element = seq[j].refEntry(q,0);
+				polys.ref(q,0,index)= element;
+			}
+			index++;
+		}
+		cout << "Poly: " << endl << polys << endl;
+		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
+		PMMD.mul(N,mat_gen,polys);
+		cout << "N:" << endl << N << endl;
+		shift(N,N,M,1,getGenDeg());
+		cout << "Shifted N: " << endl<< N << endl;
 	}
 }
 
