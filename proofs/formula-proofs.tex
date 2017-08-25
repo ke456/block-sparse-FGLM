@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{fullpage,url,amsmath,amsthm,amssymb,epsfig,color,xspace,mathrsfs}
 \pagestyle{empty}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
 
 \usepackage{fullpage}
 
@@ -34,25 +35,66 @@ So each entry separately is what would be computed in the scalar case. Therefore
 we can rewrite each entry as $n_*/P$ for some numerator $n_*$.\\
 
 \noindent\textbf{Lemma 2:} Let $S$ be the minimum generating polynomial matrix for $s$
-and $D = ASB$ be the Smith normal form of $S$. Furthermore, let $s_1, \cdots s_D$ be
-invariant factors of $S$ such that $s_1 | s_2 | \cdots | s_D$. Then, there exists a vector $\tilde{u}$
-such that $\tilde{u} S = [0, \cdots, 0, s_D]$\\
+and $D = ASB$ be the Smith normal form of $S$. Furthermore, let $s_1, \cdots s_M$ be
+invariant factors of $S$ such that $s_1 | s_2 | \cdots | s_M$. Then, there exists a vector $\tilde{u}$
+such that $\tilde{u} S = [0, \cdots, 0, s_M]$\\
 
-\noindent\textit{Proof:} Let $[b_1,\cdots,b_D]$ be the last row of $B$ and 
-$w = [\frac{s_Db_1}{s1},\frac{s_Db_2}{s2},\cdots,\frac{s_Db_{D-1}}{s_{D-1}},b_D]$ (since $s_i | s_D$), then
+\noindent\textit{Proof:} Let $[b_1,\cdots,b_M]$ be the last row of $B$ and 
+$w = [\frac{s_Mb_1}{s1},\frac{s_Mb_2}{s2},\cdots,\frac{s_Mb_{M-1}}{s_{M-1}},b_M]$ (since $s_i | s_M$), then
 \begin{align*}
-	(w A) A^{-1} D &=  [\frac{s_Db_1}{s1},\frac{s_Db_2}{s2},\cdots,\frac{s_Db_{D-1}}{s_{D-1}},b_D]
+	(w A) A^{-1} D &=  [\frac{s_Mb_1}{s1},\frac{s_Mb_2}{s2},\cdots,\frac{s_Mb_{M-1}}{s_{M-1}},b_M]
 	\begin{bmatrix}
 	s_1 &        & \\
 	    & \ddots & \\
-	    &        & s_D
+	    &        & s_M
 	\end{bmatrix}\\
-	    &= [s_Db_1, s_Db_2, \cdots, s_Db_D]\\
-	    &= [0,\cdots,0,s_D] B
+	    &= [s_Mb_1, s_Mb_2, \cdots, s_Mb_M]\\
+	    &= [0,\cdots,0,s_M] B
 \end{align*}
 Therefore, if we choose $\tilde{u} = w A$, we get
-$ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,s_D]$ as needed.\\
+$ \tilde{u} S = (w A) A^{-1} D B^{-1} = [0,\cdots,0,s_M]$ as needed.\\
 
+\noindent\textbf{Lemma 2 (bis):}
+Let $S$ be the minimum generating polynomial matrix for $s$.  Then, there
+exists a vector $\tilde{u}$ such that $\tilde{u} S = [0, \ldots, 0, s_M]$,
+where $s_M$ is the largest invariant factor of $S$.
+
+\medskip\noindent\textit{Proof:} By definition, $s_M$ is the monic polynomial
+of least degree such that $s_M S^{-1}$ has polynomial entries (indeed, $s_M$ is
+a multiple of all the entries of the Smith form of $S$). Taking $\tilde{u}$ has
+the last row of $s_M S^{-1}$, we obtain $\tilde{u} S = [0 \; \cdots \; 0 \;
+s_M]$.
+
+\medskip\noindent\textit{Alternative proof:} The $(M+1)\times M$ matrix
+$\begin{bmatrix} S \\ 0 \; \cdots \; 0 \; 1 \end{bmatrix}$ has rank $M$.
+Writing $D = \deg(\det(S))$, the $(0,\ldots,0,D)$-Popov left kernel basis for
+this matrix is a row vector $[\tilde{v} \;\; \lambda] \in \mathbb{K}^{1 \times
+(M+1)}$ such that $\tilde{v} S = [0,\ldots,0,\lambda]$, where the polynomial
+$\lambda$ is the GCD of the entries in the last column of $S$. By definition,
+$s_D$ is divisible by $\lambda$, so that $\tilde{u} =
+\frac{s_D}{\lambda}\tilde{v}$ has the wanted property.
+
+\medskip\noindent\textit{Remark:}
+One may alternatively:
+\begin{itemize}
+  \item compute the Smith form of $S$, along with the unimodular
+    transformations, and use the formulas in the proof of Lemma 2 (first
+    version);
+  \item compute $s_D$ via the inversion algorithm of Zhou-Labahn-Storjohann
+    (Sec. 5.1, 2015), and then solve the system to find $\tilde{u}$.
+\end{itemize}
+The first solution is significantly more expensive if the full transformations
+are needed. Here we might be happy with only the transformations with entries
+reduced modulo the corresponding invariant factors, in which case both
+solutions have the same theoretic speed. Yet, note that computing the Smith
+form efficiently is randomized (Storjohann, 2003) and uses high-order lifting
+(not in LinBox), while the second solution is deterministic and uses tools
+close to approximant basis computation (already partially implemented in
+LinBox). In the second solution, the system solving can be done via minimal
+kernel basis \todo{(and also via lifting since the matrix $S$ is reduced, but
+no issue with large degrees?)}.
+
+\bigskip
 \noindent\textbf{Lemma 3:} If $\sum_{i = 0}^{\infty} s^{(i)} t^i = S^{-1}N$, then $deg(N)$ is
 less than or equal to $deg(S)$. TODO\\
 

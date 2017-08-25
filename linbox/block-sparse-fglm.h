@@ -12,7 +12,6 @@
 
 
 typedef Givaro::Modular<double> GF;
-
 class Block_Sparse_FGLM{
 	// the current field
 	GF field;
@@ -43,7 +42,9 @@ class Block_Sparse_FGLM{
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
 	                         std::vector<LinBox::DenseMatrix<GF>> &,
 	                         LinBox::DenseMatrix<GF> &,
+													 int,
 	                         size_t);
+
 
 	public:
 	/* CTOR                                              */
@@ -76,19 +77,26 @@ class PolMatDom {
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
 
+	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
+	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
+
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat ) const;
+	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat );
 
 	// mbasis algorithm to compute approximant bases
-	std::vector<int> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() ) const;
+	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
+	std::vector<int> old_mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() );
+	std::vector<size_t> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), bool resUpdate=false );
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
-	std::vector<int> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 ) const;
+	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
 
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq ) const;
+	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq );
 
 };
 
