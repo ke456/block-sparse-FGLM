@@ -1,0 +1,178 @@
+
+function rand(k)
+    if IsFinite(k) then
+	return Random(k);
+    else
+	return Random([-10..10]);
+    end if;
+end function;
+
+function rand_sparse(vars, deg, sparsity)
+    M:=Universe(vars);
+    f:=M!0;
+    for i in [1..sparsity] do
+	repeat 
+	    expo:=[Random([0..deg]) : j in [1..Rank(M)]];
+	until expo ne [0 : j in [1..Rank(M)]];
+	f:=f+Random(BaseRing(M))*&*[M.j^expo[j] : j in [1..Rank(M)]];
+    end for;
+    return f;
+end function;
+
+function rand_singularity(M, pt, mult)
+    n:=#pt;
+    if mult eq 1 then
+	return [M.i-pt[i] : i in [1..n]];
+    end if;
+    repeat
+	I:=[M.i^(mult) : i in [1..n]];
+	while Dimension(quo<M|I>) gt mult do
+	    I:=I cat [rand_sparse([M.i : i in [1..n]], 1+(mult div 3), 10)];
+	end while;
+    until (mult eq 2 or #GroebnerBasis(I) gt n) and Dimension(quo<M|I>) gt (mult div 2);
+    return GroebnerBasis([Evaluate(f, [M.i-pt[i] : i in [1..n]]) : f in I]);
+end function;
+
+function xfree_rand_singularity(M, pt, mult)
+    k:=BaseRing(M);
+    Mp:=PolynomialRing(k, Rank(M)-1);
+    I:=rand_singularity(Mp, pt[1..Rank(M)-1], mult);
+    return [Evaluate(f, [M.i : i in [1..Rank(M)-1]]) : f in I] cat [M.Rank(M)-pt[Rank(M)]];
+end function;
+
+function rand_form(I)
+    if Type(Universe(I)) eq RngMPol then
+	M:=Universe(I);
+	Q:=quo<M|I>;
+	B:=[x : x in MonomialBasis(Q)];
+	cf:=[rand(BaseRing(M)) : i in [1..#B]];
+	return func<P | &+[cf[i]*MonomialCoefficient(Q!M!P, B[i]) : i in [1..#B]]>;
+    else
+	fms:=[$$(x) : x in I];
+	return func<P | &+[f(P) : f in fms]>;
+    end if;
+end function;
+
+function numer(S, Pmin)
+    U<T>:=Parent(Pmin);
+    den:=U!Reverse(Pmin);
+    D:=Degree(Pmin);
+    Rnum:=U!S*den mod T^D;
+    return U![Coefficient(Rnum, D-1-i) : i in [0..D-1]];
+end function;
+
+k:=GF(9001);
+M<z,y,x>:=PolynomialRing(k,3);
+
+/* pt:=[Random(k) : i in [1..Rank(M)]]; */
+/* mult:=10; */
+/* I:=rand_singularity(M, pt, mult); */
+/* ell:=rand_form(I); */
+/* seq:=[ell(x^i) : i in [1..2*mult]]; */
+/* BerlekampMassey(seq); */
+/* seq_y:=[ell(y*x^i) : i in [1..2*mult]]; */
+/* BerlekampMassey(seq_y); */
+
+list_pt:=[
+    rand_singularity(M, [1,1,1], 1),
+    rand_singularity(M, [2,4,2], 1),
+    rand_singularity(M, [4,8,3], 1),
+    
+    rand_singularity(M, [1,1,4], 1),
+    rand_singularity(M, [2,4,5], 1),
+    rand_singularity(M, [4,8,6], 1),
+    rand_singularity(M, [10,10,4], 1),
+    rand_singularity(M, [20,40,5], 1),
+    rand_singularity(M, [40,80,6], 1),
+
+    xfree_rand_singularity(M, [11,11,7], 2),
+    xfree_rand_singularity(M, [21,41,8], 3),
+    xfree_rand_singularity(M, [41,81,9], 4),
+
+    xfree_rand_singularity(M, [14,14,10], 1),
+    xfree_rand_singularity(M, [24,44,11], 1),
+    xfree_rand_singularity(M, [44,84,12], 1),
+    xfree_rand_singularity(M, [104,104,10], 2),
+    xfree_rand_singularity(M, [204,404,11], 2),
+    xfree_rand_singularity(M, [404,804,12], 2),
+    
+    rand_singularity(M, [1,1,13], 2),
+    rand_singularity(M, [2,4,14], 3),
+    rand_singularity(M, [4,8,15], 4),
+
+    [z,(y-10)^2,(y-10)*(x-16),(x-16)^2]
+];
+
+ell:=rand_form(list_pt);
+U<T>:=PolynomialRing(k);
+mult:=40;
+
+seq:=[ell(x^i) : i in [0..2*mult]];
+Prev:=BerlekampMassey(seq);
+Pmin:=U!Reverse(Coefficients(Prev));
+D:=Degree(Pmin);
+
+seqy:=[ell(y*x^i) : i in [0..2*mult]];
+Prevy:=BerlekampMassey(seqy);
+Pminy:=U!Reverse(Coefficients(Prevy));
+
+seqy2:=[ell(y^2*x^i) : i in [0..2*mult]];
+Prevy2:=BerlekampMassey(seqy2);
+Pminy2:=U!Reverse(Coefficients(Prevy2));
+
+num:=numer(seq, Pmin);
+rnum:=U![Coefficient(num, D-i-1) : i in [0..D-1]];
+numy:=numer(seqy, Pmin);
+numy2:=numer(seqy2, Pmin);
+
+sq_P:=SquareFreeFactorization(Pmin)[1][1];
+Pmin_sep:=GCD(numy2*num-numy^2, sq_P);
+Pmin_other:=Pmin div Pmin_sep;
+rPmin_sep:=U!Reverse(Coefficients(Pmin_sep));
+rPmin_other:=Prev div rPmin_sep;
+
+para_y:=(numy*InverseMod(num, Pmin_sep)) mod Pmin_sep;
+para_x:=T;
+
+// split ell into two components
+D_sep:=Degree(Pmin_sep);
+
+rnum_sep:=(rnum*InverseMod(rPmin_other, rPmin_sep)) mod rPmin_sep;
+rnum_other:=(rnum*InverseMod(rPmin_sep, rPmin_other)) mod rPmin_other;
+rnum_sep/rPmin_sep + rnum_other/rPmin_other - rnum/Prev;
+SL_sep:=rnum_sep*InverseMod(rPmin_sep,T^D_sep) mod T^D_sep;
+
+function ell_sep(f)
+    f_mod:=f mod Pmin_sep;
+    return &+[Coefficient(SL_sep,i)*Coefficient(f_mod, i) : i in [0..D_sep-1]];
+end function;
+
+// replace x by s=x+random*y
+c:=Random(k);
+s:=x+c*y;
+para_s:=para_x+c*para_y;
+
+seq_other:=[ell(s^i)-ell_sep(para_s^i) : i in [0..2*mult]];
+seq_otherx:=[ell(x*s^i)-ell_sep(para_x*para_s^i) : i in [0..2*mult]];
+rQmin:=BerlekampMassey(seq_other);
+rQminx:=BerlekampMassey(seq_otherx);
+Qmin:=U!Reverse(rQmin);
+Qminx:=U!Reverse(rQminx);
+Qnum:=numer(seq_other, Qmin);
+Qnumx:=numer(seq_otherx, Qmin);
+Qsq:=&*[x[1] : x in SquareFreeFactorization(Qmin)];
+Qparax:=Qnumx*InverseMod(Qnum,Qsq) mod Qsq;
+[[Evaluate((T-Qparax)/c, r[1]),Evaluate(Qparax, r[1])] : r in Roots(Qsq)];
+
+m:=func<f | ell(Evaluate(Pmin_sep,x)*f)>;
+seq_other2:=[m(s^i) : i in [0..2*mult]];
+seq_otherx2:=[m(x*s^i) : i in [0..2*mult]];
+rQmin2:=BerlekampMassey(seq_other2);
+rQminx2:=BerlekampMassey(seq_otherx2);
+Qmin2:=U!Reverse(rQmin2);
+Qminx2:=U!Reverse(rQminx2);
+Qnum2:=numer(seq_other2, Qmin2);
+Qnumx2:=numer(seq_otherx2, Qmin2);
+Qsq2:=&*[x[1] : x in SquareFreeFactorization(Qmin2)];
+Qparax2:=Qnumx2*InverseMod(Qnum2,Qsq2) mod Qsq2;
+[[Evaluate((T-Qparax2)/c, r[1]),Evaluate(Qparax2, r[1])] : r in Roots(Qsq2)];
