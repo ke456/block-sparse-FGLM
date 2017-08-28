@@ -198,7 +198,7 @@ void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat,
 int row, int col, int deg){
 	for (int i = 0; i < row; i++)
 	  for (int j = 0; j < col; j++)
-		  for (int d = 0; i < deg; i++){
+		  for (int d = 0; d < deg+1; d++){
 				auto element = mat.get(i,j,d+deg);
 				result.ref(i,j,d) = element;
 			}
@@ -281,7 +281,77 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	tm.stop();
 	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
-MatrixDomain<GF> MD(field);
+
+  // finding u_tilde
+
+	// Making a matrix with just minpoly as the entry
+  PolMatDom::MatrixP P_mat(PMD.field(),1,1,this->getLength()+1);
+  for (int i = 0; i < this->getLength()+1;i++){
+ 	  auto element = smith[0][i];
+	  P_mat.ref(0,0,i) = element;
+  }
+
+	PolynomialMatrixMulDomain<GF> PMMD(field);
+	PolMatDom::MatrixP rfac_row(PMD.field(),1,M,M*this->getLength()+1);
+	PolMatDom::MatrixP result(PMD.field(),1,M,M*this->getLength()+1);
+
+// extracting the first row of rfac
+	for (int i = 0; i < M; i++)
+	for (int j = 0; j < M*this->getLength()+1; j++){
+		auto element = rfac.get(0,i,j);
+		rfac_row.ref(0,i,j) = element;
+	}	
+	PMMD.mul(result,P_mat,rfac_row);
+	
+	vector<PolMatDom::Polynomial> rfac_polys(M);
+	vector<PolMatDom::Polynomial> div(M);
+	for (int i = 0; i < M; i++){
+		for (int j = 0; j < M*this->getLength()+1; j++){
+			rfac_polys[i].emplace_back(result.get(0,i,j));
+		}
+		cout << "Pol: " << rfac_polys[i] << endl;
+		PMD.divide(rfac_polys[i],smith[i],div[i]);
+		cout << "div: " <<div[i] <<endl;
+	}
+	PolMatDom::MatrixP w(PMD.field(),1,M,M*this->getLength()+1);
+	for (int i = 0; i < M; i++)
+	for (int j = 0; j < M*this->getLength()+1;j++){
+    w.ref(0,i,j) = div[i][j];
+	}
+  cout << "w: " << w << endl;
+  
+	PolMatDom::MatrixP u_tilde(PMD.field(),1,M,M*this->getLength()+1);
+	PMMD.mul(u_tilde, w, lfac);
+	cout << "u_tilde: " << u_tilde << endl;
+	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());
+	PMMD.mul(blah,u_tilde,mat_gen);
+	cout << "blah: " << blah << endl;
+
+	// constructing the numerator for the seqeunce
+  
+	PolMatDom::PMatrix Z (PMD.field(), M, 1, this->getGenDeg());
+	int index = 0;
+	for (int j = this->getGenDeg()-1; j>=0; j--){
+    for (int q = 0; q < M; q++){
+			auto element = mat_seq[j].refEntry(q,0);
+			Z.ref(q,0,index) = element;
+		}
+		index++;
+	}
+	cout << "Z:"<<endl<<Z<<endl;
+  PolMatDom::PMatrix N1(PMD.field(),M,1,this->getLength()+1);
+  PolMatDom::PMatrix N1_shift(PMD.field(),M,1,this->getGenDeg()+1);
+	PMMD.mul(N1,mat_gen,Z);
+	shift(N1_shift,N1,M,1,getGenDeg());
+  cout << "getGenDeg: " << getGenDeg() << endl;
+	cout << "N1: " << N1 << endl;
+	cout << "N1 shift: " << N1_shift << endl;
+	PolMatDom::MatrixP n_mat(PMD.field(),1,1,this->getLength());
+  PMMD.mul(n_mat, u_tilde, N1_shift);
+  cout << "n_mat: " << n_mat << endl;
+
+
+	MatrixDomain<GF> MD(field);
 #ifdef NAIVE_ON
 	tm.clear(); tm.start();
 	DenseMatrix<GF> U(field,M,D);
@@ -306,8 +376,7 @@ MatrixDomain<GF> MD(field);
 		V_col.refEntry(i,0) = el;
 	}
 	V_col.write(cout<<"V_col:"<<endl,Tag::FileFormat::Maple)<<endl;
-  PolynomialMatrixMulDomain<GF> PMMD(field);
-  // LOOP FOR OTHER VARIABLES
+    // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
@@ -328,10 +397,11 @@ MatrixDomain<GF> MD(field);
 		}
 		cout << "Poly: " << endl << polys << endl;
 		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
+		PolMatDom::PMatrix N_shift(PMD.field(),M,1,this->getLength());
 		PMMD.mul(N,mat_gen,polys);
 		cout << "N:" << endl << N << endl;
-		shift(N,N,M,1,getGenDeg());
-		cout << "Shifted N: " << endl<< N << endl;
+		shift(N_shift,N,M,1,getGenDeg());
+		cout << "Shifted N: " << endl<< N_shift << endl;
 	}
 }
 
