@@ -281,6 +281,17 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	tm.stop();
 	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
+
+// finding u_tilde
+
+PolMatDom::MatrixP w(PMD.field(),1,M,M*this->getLength()+1);
+for (int i = 0; i < M; i++)
+for (int j = 0; j < M*this->getLength()+1; j++){
+	auto element = rfac.get(M-1,i,j);
+	w.ref(0,i,j) = element;
+}
+cout << "W: " << w << endl;
+
 MatrixDomain<GF> MD(field);
 #ifdef NAIVE_ON
 	tm.clear(); tm.start();
