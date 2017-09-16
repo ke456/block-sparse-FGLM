@@ -1,12 +1,13 @@
 #define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
-#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
+//#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
+//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
 #define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_POL  // testing xgcd and division via pmbasis
+#define OUTPUT_FUNC // outputs the computed functions
 #include "block-sparse-fglm.h"
 #include <algorithm>
 #include <string>
@@ -20,6 +21,152 @@
 
 using namespace LinBox;
 using namespace std;
+
+int prime;
+GF FIELD;
+
+void poly_add (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a,
+const PolMatDom::Polynomial b){
+	m.resize(0);
+	GF::Element e;
+	for (int i = 0; i < max(a.size(),b.size()); i++){
+		if (i >= a.size()){
+			m.emplace_back(b[i]);
+		}else if (i >= b.size()){
+			m.emplace_back(a[i]);
+		}else
+			m.emplace_back(FIELD.add(e,a[i],b[i]));
+	}
+}
+
+// scalar multiplication
+void poly_mul (PolMatDom::Polynomial &r, const GF::Element &c, const PolMatDom::Polynomial p){
+	r.resize(0);
+	GF::Element e;
+	for (int i = 0; i < p.size(); i++){
+	  r.emplace_back(FIELD.mul(e,c,p[i]));
+	}
+}
+
+void poly_subtract (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a,
+const PolMatDom::Polynomial b){
+	m.resize(0);
+	GF::Element e;
+	for (int i = 0; i < max(a.size(),b.size()); i++){
+		if (i >= a.size()){
+			m.emplace_back(b[i]);
+		}else if (i >= b.size()){
+			m.emplace_back(a[i]);
+		}else
+			m.emplace_back(FIELD.sub(e,a[i],b[i]));
+	}
+}
+
+void poly_shift (PolMatDom::Polynomial &r, const int shift, const PolMatDom::Polynomial p){
+  r.resize(0);
+	for (int i = 0; i < shift; i++)
+	  r.emplace_back(GF::Element(0));
+	for (int i = 0; i < p.size(); i++)
+		r.emplace_back(p[i]);
+}
+
+int poly_deg(const PolMatDom::Polynomial &p){
+	for (int i = p.size()-1; i >= 0; i--){
+		if (!FIELD.isZero(p[i])) return i;
+	}
+	return 0;
+}
+
+bool is_zero (const PolMatDom::Polynomial &p){
+	for (auto &i : p)
+		if (!FIELD.isZero(i)) return false;
+	return true;
+}
+
+void poly_resize(PolMatDom::Polynomial &p){
+	int deg = poly_deg(p);
+	p.resize(deg+1);
+}
+
+void poly_div (PolMatDom::Polynomial &q, PolMatDom::Polynomial a,
+PolMatDom::Polynomial b){
+	poly_resize(a);
+	poly_resize(b);
+	//cout << "a: " << a << endl;
+	//cout << "b: " << b << endl;
+	if (is_zero(a)){
+		q.resize(1);
+		q[0] = 0;
+		return;
+	}
+	auto r = a;
+	GF::Element u;
+	FIELD.div(u,GF::Element(1),b[b.size()-1]);
+	int n = a.size();
+	int m = b.size();
+	q.resize(n-m+1);
+	for (int i = n-m; i >= 0; i--){
+		if (r.size() == m+i){
+		  //cout << "r: " << r << endl;
+			auto q_i = r[r.size()-1] * u;
+			//cout << "q_i: " << q_i << endl;
+			PolMatDom::Polynomial p;
+			poly_shift(p,i,b);
+			poly_mul(p,q_i,p);
+			poly_subtract(r,r,p);	
+			q[i] = q_i;
+		}else
+			q[i] = 0;
+		r.resize(r.size()-1);
+	}
+		
+}
+
+// stores a%b in r
+void poly_mod (PolMatDom::Polynomial &r, PolMatDom::Polynomial a,
+PolMatDom::Polynomial b){
+  poly_resize(a);
+	poly_resize(b);
+	r = a;
+	GF::Element u;
+	FIELD.div(u,GF::Element(1),b[b.size()-1]);
+	int n = a.size();
+	int m = b.size();
+	for (int i = n-m; i >= 0; i--){
+		if (r.size() == m+i){
+			auto q_i = r[r.size()-1] * u;
+			PolMatDom::Polynomial p;
+			poly_shift(p,i,b);
+			poly_mul(p,q_i,p);
+			poly_subtract(r,r,p);	
+		}
+		r.resize(r.size()-1);
+	}
+}
+
+void mat_to_poly (PolMatDom::Polynomial &p, PolMatDom::MatrixP &mat, int size){
+	int actual_size = 0;
+	GF::Element zero{0};
+	for (int i  = size; i >= 0; i--){
+		if (mat.ref(0,0,i) != zero) {
+			actual_size = i;
+			break;
+		}
+	}
+	p.resize(actual_size+1);
+	for (int i = 0; i <= actual_size; i++)
+		p[i] = mat.ref(0,0,i);
+}
+
+// resize mat to x^(size-1)
+void mat_resize (GF &field, PolMatDom::MatrixP &mat, int size){
+	PolMatDom::MatrixP temp(field,1,1,size);
+	for (int i = 0; i < size; i++){
+		temp.ref(0,0,i) = mat.ref(0,0,i);
+	}
+	mat = temp;
+}
+
 
 // reads matrices from s
 Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, string& s):
@@ -37,7 +184,7 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, st
 	getline(file, line);
 	getline(file, line);
 	getline(file, line);
-
+	srand(time(NULL));
 	create_random_matrix(V);
 
 	vector<double> sparsity_count;
@@ -85,10 +232,11 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n):
 	V(field,D,M),
 	mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) 
 {
+	srand(time(NULL));
 	for ( size_t k=0; k<n; ++k )
 		create_random_matrix(mul_mats[k]);
 	create_random_matrix(V);
-	srand(time(NULL));
+	
 }
 
 template<typename Matrix>
@@ -282,15 +430,18 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
 
+#ifdef TIMINGS_ON
+	tm.clear();tm.start();
+#endif
   // finding u_tilde
 
 	// Making a matrix with just minpoly as the entry
-  PolMatDom::MatrixP P_mat(PMD.field(),1,1,this->getLength()+1);
-  for (int i = 0; i < this->getLength()+1;i++){
+  PolMatDom::MatrixP P_mat(PMD.field(),1,1,D+1);
+  for (int i = 0; i < D+1;i++){
  	  auto element = smith[0][i];
 	  P_mat.ref(0,0,i) = element;
   }
-
+	//cout << "P_mat: " << P_mat << endl;
 	PolynomialMatrixMulDomain<GF> PMMD(field);
 	PolMatDom::MatrixP rfac_row(PMD.field(),1,M,M*this->getLength()+1);
 	PolMatDom::MatrixP result(PMD.field(),1,M,M*this->getLength()+1);
@@ -300,17 +451,24 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	for (int j = 0; j < M*this->getLength()+1; j++){
 		auto element = rfac.get(0,i,j);
 		rfac_row.ref(0,i,j) = element;
-	}	
+	}
+	//cout << "rfac row: " << rfac_row << endl;
 	PMMD.mul(result,P_mat,rfac_row);
-	
+	//cout << "result: " << result << endl;
+
 	vector<PolMatDom::Polynomial> rfac_polys(M);
 	vector<PolMatDom::Polynomial> div(M);
 	for (int i = 0; i < M; i++){
 		for (int j = 0; j < M*this->getLength()+1; j++){
 			rfac_polys[i].emplace_back(result.get(0,i,j));
+			
 		}
-		PMD.divide(rfac_polys[i],smith[i],div[i]);
+		//cout << "r_fac at i: " << rfac_polys[i] << endl;
+		//PMD.divide(rfac_polys[i],smith[M-i-1],div[i]);
+		poly_div(div[i],rfac_polys[i],smith[i]);
+		div[i].resize(M*this->getLength()+1,0);
 	}
+	//cout << "div: " << div << endl;
 	PolMatDom::MatrixP w(PMD.field(),1,M,M*this->getLength()+1);
 	for (int i = 0; i < M; i++)
 	for (int j = 0; j < M*this->getLength()+1;j++){
@@ -334,28 +492,31 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	}
 	
 	//sanity check
-	PMMD.mul(blah, u_tilde, mat_gen);
-	cout << "blah: " << blah << endl;
+	//PMMD.mul(blah, u_tilde, mat_gen);
+	//cout << "blah: " << blah << endl;
 
-  cout << "u_tilde: " << u_tilde <<endl;
+  //cout << "u_tilde: " << u_tilde <<endl;
   PolMatDom::PMatrix N1(PMD.field(),M,1,this->getLength());
   PolMatDom::PMatrix N1_shift(PMD.field(),M,1,this->getGenDeg());
 	PMMD.mul(N1,mat_gen,Z);
-	cout << "S*Z: " << N1 << endl;
+	//cout << "S*Z: " << N1 << endl;
 	shift(N1_shift,N1,M,1,getGenDeg());
-	cout << "N1 shift: " << N1_shift << endl;
+	//cout << "N1 shift: " << N1_shift << endl;
 	PolMatDom::MatrixP n1_mat(PMD.field(),1,1,this->getLength());
   PMMD.mul(n1_mat, u_tilde, N1_shift);
+	//cout << "n1 mat: " << n1_mat << endl;
 	PolMatDom::Polynomial n1;
-	for (int i  = 0; i < getLength(); i++)
+	for (int i  = 0; i < D; i++)
 	  n1.emplace_back(n1_mat.get(0,0,i));
+	//cout << "n1: " << n1 << endl;
 	PolMatDom::Polynomial n1_inv,g,u,v;
 	PMD.xgcd(n1,smith[0],g,n1_inv,v);
-	cout << "n1: " << n1_mat << endl;
-	for (int i = 0; i < getLength(); i++){
+	//cout << "n1: " << n1_mat << endl;
+	n1_mat = PolMatDom::MatrixP(PMD.field(),1,1,D);
+	for (int i = 0; i < D; i++){
 	  n1_mat.ref(0,0,i) = n1_inv[i];
 	}
-  cout << "n1 inv mat: " <<  n1_mat << endl;
+  //cout << "n1 inv mat: " <<  n1_mat << endl;
 
 
 	MatrixDomain<GF> MD(field);
@@ -384,7 +545,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	}
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
-		cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
+		//cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
 		MD.mul(right_mat, Ti, V_col);
@@ -400,20 +561,53 @@ void Block_Sparse_FGLM::find_lex_basis(){
 			}
 			index++;
 		}
-		cout << "Poly: " << endl << polys << endl;
+		//cout << "Poly: " << endl << polys << endl;
 		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
 		PolMatDom::PMatrix N_shift(PMD.field(),M,1,this->getLength());
 		PMMD.mul(N,mat_gen,polys);
-		cout << "N:" << endl << N << endl;
+		//cout << "N:" << endl << N << endl;
 		shift(N_shift,N,M,1,getGenDeg());
-		cout << "Shifted N: " << endl<< N_shift << endl;
-		PolMatDom::MatrixP n_mat(PMD.field(),1,1,this->getLength());
+		//cout << "Shifted N: " << endl<< N_shift << endl;
+		PolMatDom::MatrixP n_mat(PMD.field(),1,1,D+1);
  		PMMD.mul(n_mat, u_tilde, N_shift);
- 		cout << "n_mat: " << n_mat << endl;
+		mat_resize(field, n_mat, D);
+ 		//cout << "n_mat: " << n_mat << endl;
 		PolMatDom::MatrixP func_mat(PMD.field(),1,1,this->getLength());
 		PMMD.mul(func_mat,n_mat,n1_mat);
-		cout << "func_mat: " << func_mat << endl;
+		//cout << "func_mat: " << func_mat << endl;
+		PolMatDom::Polynomial func;
+		mat_to_poly(func,func_mat,2*D);
+		//cout << "func: " << func << endl;
+		//for (int i = 0; i < func.size(); i++){
+		//	cout << func[i] << "*x^" << i << " ";
+		//	if (i != func.size()-1) cout << "+";
+		//}
+		//cout << "P: " << smith[0] << endl;
+		poly_mod(func,func,smith[0]);
+		//cout << "func mod P: " << func << endl;
+#ifdef OUTPUT_FUNC
+		cout << "FUNC" << i << ": " << endl;
+		cout << "[";
+		for (int i = 0; i < func.size(); i++){
+			cout << func[i] << "*x1^" << i << " ";
+			if (i != func.size()-1) cout << "+";
+		}
+		cout << "]"<< endl;
+#endif
 	}
+#ifdef OUTPUT_FUNC
+	cout << "P: " << endl;
+	cout << "[";
+	for (int i = 0; i < smith[0].size(); i++){
+		cout << smith[0][i] << "*x1^" << i;
+		if (i != smith[0].size()-1)	cout << "+";
+	}
+	cout << "]"<< endl;
+#endif
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### R_j computations: " << tm.usertime() << endl; 
+#endif
 }
 
 template<typename PolMat>
@@ -1276,6 +1470,8 @@ int main( int argc, char **argv ){
 	cout << "s=" << s<< endl;
 	if (s == ""){
 	  GF field(p);
+		prime = p;
+		FIELD = field;
 #ifdef TEST_FGLM
 	  Block_Sparse_FGLM l(field, D, M, n);
 	  l.find_lex_basis();
@@ -1296,6 +1492,8 @@ int main( int argc, char **argv ){
 		cout << "blocking dimension:" << " M=" << M << endl;
 		file.close();
 		GF field(p);
+		prime = p;
+		FIELD = field;
 #ifdef TEST_FGLM
 		Block_Sparse_FGLM l(field, D, M, n, s);
 		l.find_lex_basis();
@@ -1479,7 +1677,50 @@ int main( int argc, char **argv ){
     cout << "###OUTPUT### divide output: " << endl;
     cout << q << endl;
 #endif
-  }
+	  }
+	{
+  	PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+    PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+    PolMatDom::Polynomial q;
+		poly_add(q,a,b);
+    cout << "###OUTPUT### add input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+		cout << "###OUTPUT### add output: " << endl;
+		cout << q << endl;
+	}
+	{
+  	PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+    PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+    PolMatDom::Polynomial q;
+		poly_subtract(q,a,b);
+    cout << "###OUTPUT### subtract input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+		cout << "###OUTPUT### subtract output: " << endl;
+		cout << q << endl;
+	}
+	{
+  	PolMatDom::Polynomial a = {59,62,10,3,0,56};
+    PolMatDom::Polynomial b = {1,1,-1};
+    PolMatDom::Polynomial q;
+		poly_mod(q,a,b);
+    cout << "###OUTPUT### mod input: " << endl;
+    cout << a << endl;
+    cout << b << endl;
+		cout << "###OUTPUT### mod output: " << endl;
+		cout << q << endl;
+	}
+	{
+		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+		GF::Element e{10};
+    PolMatDom::Polynomial q;
+		poly_mul(q,e,a);
+		cout << "###OUTPUT### add input: " << endl;
+    cout << a << endl;
+		cout << "###OUTPUT### add output: " << endl;
+		cout << q << endl;
+	}
 #endif
 	return 0;
 }
