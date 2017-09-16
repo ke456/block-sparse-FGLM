@@ -1,0 +1,873 @@
+\documentclass[12pt]{article}
+\usepackage{bbm,fullpage,amsthm}
+\usepackage{alltt}
+\usepackage{bm}
+\usepackage{amsmath,amssymb,epsfig,color,xspace,mathrsfs}
+\usepackage{hyperref}
+\pagestyle{empty}
+
+\def\C {\ensuremath{\mathbb{C}}}
+\def\Q {\ensuremath{\mathbb{Q}}}
+\def\N {\ensuremath{\mathbb{N}}}
+\def\R {\ensuremath{\mathbb{R}}}
+\def\Z {\ensuremath{\mathbb{Z}}}
+\def\F {\ensuremath{\mathbb{F}}}
+\def\H {\ensuremath{\mathbb{H}}}
+\def\K {\ensuremath{\mathbb{K}}}
+\def\Kbar {{\ensuremath{\overline{\mathbb{K}}}}}
+\def\A {\ensuremath{\mathbb{A}}}
+\def\D {\ensuremath{D}}
+\def\m {\ensuremath{\mathfrak{m}}}
+\def\todo#1{(\textbf{todo:} #1)}
+
+\def\scrM {\ensuremath{\mathscr{M}}}
+\def\calL {\ensuremath{\mathcal{L}}}
+\def\scrP {\ensuremath{\mathscr{P}}}
+\def\scrS {\ensuremath{\mathscr{S}}}
+\def\ann {\ensuremath{\mathrm{ann}}}
+\def\rk {\ensuremath{\mathrm{rk}}}
+
+\DeclareBoldMathCommand{\bell}{\ell}
+\DeclareBoldMathCommand{\bu}{u}
+\DeclareBoldMathCommand{\bv}{v}
+\DeclareBoldMathCommand{\bX}{X}
+\DeclareBoldMathCommand{\bx}{x}
+\DeclareBoldMathCommand{\balpha}{\alpha}
+\DeclareBoldMathCommand{\bbeta}{\beta}
+
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{remark}[definition]{Remark}
+
+\def\K{\mathbb{K}}
+\def\Deg{D}
+\def\scrY{\mathscr{Y}}
+\def\mA{\mathbf{A}}
+\def\mB{\mathbf{B}}
+\def\mF{\mathbf{F}}
+\def\mNs{\mathbf{N^*}}
+\def\mS{\mathbf{S}}
+\def\mT{\mathbf{T}}
+\def\mU{\mathbf{U}}
+\def\mV{\mathbf{V}}
+\def\mW{\mathbf{W}}
+\def\mX{\mathbf{X}}
+\def\mY{\mathbf{Y}}
+\def\mZ{\mathbf{Z}}
+
+\title{Block Sparse-FGLM Algorithm}
+
+\thispagestyle{empty}
+
+\begin{document}
+
+\tableofcontents
+\pagebreak
+
+\section{Introduction}
+Computing the Gr\"obner basis of an ideal with respect to a term
+ordering is an essential step in solving systems of polynomials. 
+Certain term orderings, such as the degree reverse lexicographical 
+ordering (\textit{degrevlex}), the computation of the Gr\"obner basis
+faster, while other orderings, such as the lexicographical ordering
+(\textit{lex}), make it easier to find the coordinates of the solutions.
+In particular, for a radical ideal with a finite set of points in its variety
+and in generic position, its lex Gr\"obner basis has the form
+$$ \{  x_1 - R_1(x_n), x_2-R_2(x_n),\dots, x_{n-1}-R_{n-1}(x_n), R_n(x_n)  \}$$
+where $R_i$ is a polynomial in only $x_n$. The points in the variety are
+$$\{ ( R_1(\alpha), R_2(\alpha), \dots, R_n(\alpha)  ) |\forall \alpha: R_n(\alpha)=0  \}$$
+Thus, one typically first computes a Gr\"obner basis for the degrevlex ordering,
+and then converts it to a lex Gr\"obner basis, or a related representation, such as 
+Roillier's Rational Univariate Representation \cite{Rouillier99}
+
+\subsection{Basic Operations}
+Over an field $\mathbb{K}$,
+recall that we can compute multiplication,
+division with remainder, extended GCD, and square free part
+of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
+field operations ($O^{\tilde{~}}$ omits polylogarithm factors)
+\cite{GaGe13}. 
+
+
+
+
+
+\newpage
+\section{Previous Algorithms}
+
+\subsection{Wiedemann algorithm}
+The Wiedemann algorithm of \cite{Wiedemann86} solves a system
+$Ay = b$, where $A$ is an invertible square matrix. The most
+important aspect of this algorithm is that the minimal polynomial
+$P(x) = \sum_{i = 0}^{D} c_i x^i$ of $A$ can be computed
+through a scalar sequence
+$$ s = (u^{tr}A^ib)_{i \ge 0}$$
+for a random vector $u$. Once we have sufficient number of terms
+of $s$, we apply the Berlekamp-Massey algorithm, which efficiently
+computes $P(x)$ from $s$.
+In the simplest case, where $c_0 \neq 0$, we have that
+\begin{align*}
+P(A) = 0 &= c_0 I + c_1A + \dots + c_D A^D \\
+\implies -c_0 I &= \sum_{i=1}^{D}c_iA^i \\
+\implies I &= A(-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})\\
+\implies b &= A(-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})b
+\end{align*}
+Therefore, $x = (-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})b$.
+
+\subsection{Sparse-FGLM Algorithm}
+The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
+Gr\"obner basis of an ideal with runtime cubic in the dimension
+of the monomial basis. More precisely, given
+
+\begin{center}
+\begin{tabular}{c c}
+	$I \subset \mathbb{K}$:& zero dimensional radical ideal
+	in shape position\\
+	$\mathbb{B} \subset \mathbb{K}[x_1,\dots,x_n]/I$:&
+	monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
+	$D$: & dimension of $\mathbb{B}$\\
+	$T_1,\dots,T_n$:& multiplication matrices of
+	$x_1,\dots,x_n$ respectively	
+\end{tabular}
+\end{center}
+it produces the lex Gr\"obner basis of $I$ of the form
+$\{ R_1(x_1), x_2-R_2(x_1),\dots, x_n - R_n(x_1)  \}$.
+The key idea is that $R(x_1)$ is the minimal polynomial
+of the multiplication matrix $T_1$, which we can
+find using the Wiedemann algorithm. We generate
+$$ s = (u^{tr} T^i_1 e)_{(0 \le i < 2D)}$$
+where $u$ is a random vector and $e$ is the coordinate
+vector for $1$ in $\mathbb{B}$. Then, we find the minimum
+generating polynomial $P(t)$ by
+applying the Berlekamp-Massey algorithm on $s$.
+If we rewrite $P(t)$ in $x_1$, we get $R_1(x_1)$
+We compute the numerator $n$ of the generating series
+$Z = \sum_{i=0}^{D} s^{(i)}/t^{i+1}$ by a product
+$N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we
+generate $s_j = (u^{tr} T_1^i T_j e)_{(0 \le i < D)}$
+along with the numerator $N_j$ of the generating series
+$Z_j = \sum_{i=0}^{D} s_j^{(i)} / t^{i+1}$ by a product
+$N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
+Also, other versions of this algorithm exist to handle
+non-radical ideals using the Berlekamp-Massey-Sakata algorithm.
+
+\newpage
+\section{Blocking}
+In Sparse-FGLM algorithm, generating the matrix sequence 
+$L = (u^{tr} T_1^i)_{(0 \le i < 2D)}$ is the bottleneck of this
+algorithm. The most efficient way to compute $L^{(i)}$ is
+to compute $L^{(i-1)}T_1$; however, this requires the terms
+of $L$ to be computed sequentially. Therefore, it is natural to
+consider using blocking methods; that is, using
+sequences of small matrices instead of scalar
+sequences. Computing each
+term of such sequences will take longer, but this is easily
+parallelizable. Therefore, if blocking reduces the number of terms
+needed, we can expect an overall speed up.
+
+The idea of extending the Wiedemann algorithm to using
+blocking methods is due to Coppersmith \cite{Coppersmith93}.
+The formal analysis of Coppersmith's algorithm was done by
+Kaltofen, Villard, and others \cite{KaVi04}\cite{Villard97}.
+As with the Wiedemann algorithm, we are mainly interested in
+computing the minimal polynomial of a matrix from a sequence.
+In this section, we will review basic terminology and definitions
+as well as present a proof that choosing the blocking matrices 
+generically will produce the correct output, 
+which had previously been proven by Kaltofen and Villard.
+
+\subsection{Linearly recurrent sequences}
+We first review basic facts on linearly recurrent sequences.
+Consider a sequence $(\ell_i)_{i \ge 0} \in \K^\N$
+and the associated generating series $S=\sum_{i \ge 0} \ell_i T^i \in
+\K[[T]]$. The sequence $(\ell_i)$ is {\rm linearly recurrent} if and
+only if its generating series is {\em rational}- that is, if there
+exist polynomials $N,D$ in $\K[T]$ such that $S=N/D$; these
+polynomials are unique if we assume $\gcd(N,D)=1$ and $D(0)=1$. When
+this is the case, given a degree bound $\delta$ on such $N$ and $D$,
+we can recover them by means of a rational reconstruction
+algorithm~\cite{GaGe13}. In the same vein, we say that a degree $m$
+polynomial $P\in\K[T]$ {\em cancels} a sequence $\ell$ if $p_0 \ell_i
++ \cdots + p_m \ell_{i+d}=0$ for all $i \ge 0$, where $p_0,\dots,p_m$
+are the coefficients of $P$; this is equivalent to ${\rm rev}(P) S$
+being a polynomial, with $S=\sum_{i \ge 0} \ell_i T^i$ and ${\rm
+	rev}(P)=T^m P(1/T)$.
+
+\subsection{Matrix sequences and generators}
+In this section, we will extend the idea of linearly recurrent
+sequences to matrix sequences.
+Similar to the scalar case, for a matrix sequence $S$,
+we can define a generating polynomial.
+
+\begin{definition}
+	A generating polynomial matrix of $S$ is 
+	a polynomial with matrix coefficients
+	$\mF = \sum^{\nu}_{i=0} \mW_i t^i $ that satisfies,
+	$$ \mW_0 S^{(\alpha)} + \mW_1 S^{(\alpha+1)} + \dots + \mW_\nu S^{(\alpha+\nu)}  = 0, \forall \alpha \ge 0$$ 
+\end{definition}
+We can find the coefficients $\mW_i$ by solving the system
+\begin{align*}
+	0 = \mW_0 S^{(0)} + \mW_1 S^{(1)} &+ \dots + \mW_\nu S^{(\nu)}   \\
+	0 = \mW_0 S^{(1)} + \mW_1 S^{(2)} &+ \dots + \mW_\nu S^{(\nu+1)} \\
+	&\vdots \\
+	0 = \mW_0 S^{(d)} + \mW_1 S^{(d+1)} &+ \dots + \mW_\nu S^{(\nu+d)}
+\end{align*}
+which is equivalent to finding the kernel of the block Hankel
+matrix
+$$ \begin{bmatrix}
+S^{(0)} & \cdots & S^{(\nu)}\\
+\vdots & \ddots & \vdots\\
+S^{(d)} & \cdots & S^{(\nu + d)}
+\end{bmatrix}$$
+Many generating polynomial matrices are possible, but some
+may add additional factors when used in calculations.
+Thus, as with the scalar case, it is necessary to define
+minimality of generators.
+
+\begin{definition}
+	The generating matrix polynomial in Popov form
+	for a matrix sequence is called
+	the minimum generating matrix polynomial (see
+	\cite[definition 2.3]{KaVi04})
+\end{definition}
+
+\begin{definition}
+	A polynomial matrix $\mF$ is in Popov form if
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{definition}
+
+There are several algorithms to compute the minimum generating
+matrix polynomial, but we will use a generalization
+of the Berlekamp-Massey algorithm \cite{Coppersmith93}.
+
+
+\subsection{Computing the Minimal Polynomial}
+Let $\mA$ be in $\mathbb{K}^{D \times D}$ and 
+$\mU,\mV \in \mathbb{K}^{D \times M}$ be two blocking matrices
+for some $M \le D$. Now, define two matrix sequences
+$S_V = (\mA^i \mV)_{(i \ge 0)}$ and 
+$S_{U,V} = (\mU^{tr} \mA^i \mV)_{(i \ge 0)}$ denote their minimum
+generating matrix polynomial as $\mF^{A,V}$ and $\mF^{U,A,V}$
+respectively. As with the Wiedemann algorithm, we may not
+be able to find the minimal polynomial of $\mA$ from 
+$S_{U,V}$ for some unlucky choices of $\mU$ and $\mV$. In this
+section, we will sketch a proof that a generic choice of
+$\mU$ and $\mV$ will produce the correct result.
+
+Let $s_1, \dots, s_r$ be the invariant factors
+of $tI - \mA$, ordered in such a way that 
+$s_r | s_{r-1}| \dots | s_1$, and let $d_i = $ deg$(s_i)$ for
+all $i$; for $i > r$, we let $s_i$ = 1, with $d_i = 0$.
+We define $\nu = d_1 + \cdots + d_M \le D$ and
+$\delta = \lceil \nu / M \rceil \le \lceil D / M \rceil$.
+We also denote by $\sigma_1, \cdots, \sigma_t$ the invariant
+factors of $\mF^{X,A,Y}$, for some $t \le M$. As above,
+for $i > t$, we let $\sigma_i = 1$.
+
+\begin{theorem}
+	\label{randXY}
+	For a generic choice of $X$ and $Y$, we have:
+	\begin{itemize}
+		\item $F_X^{A,Y}$ has degree $\delta$;
+		\item $s_i = \sigma_i$ for $1 \le i \le M$.
+	\end{itemize}
+\end{theorem}
+
+\begin{proof}
+	We denote by $\langle Y \rangle$ the vector
+	space generated by the columns of $Y,AY,A^2Y,\dots$. We also write
+	$N_Y=\dim(\langle Y \rangle)$.
+	
+	First, we prove that for any $Y$ in $\K^{N \times M}$, for a generic
+	$X$ in $\K^{N\times M}$, $F_X^{A,Y}=F^{A,Y}$.  Indeed,
+	by~\cite[Lemma~4.2]{Villard97a}, there exists matrices $P_Y$ in
+	$\K^{N\times N_Y}$ and $A_Y \in \K^{N_Y \times N_Y}$, with $P_Y$ of
+	full rank $N_Y$, and where $A_Y$ is a matrix of the restriction of $A$
+	to $\langle Y \rangle$, such that $F_X^{A,Y}=F^{A,Y}$ if and only if
+	the dimension of the span of $[Z ~ B_Y Z ~B_Y^2 Z ~ \cdots]$ is equal to
+	$N_Y$, with $B_Y=A_Y^\perp$ and $Z=P_Y^\perp X \in \K^{N_Y \times M}$.
+	
+	We prove that this is the case for a generic $X$. By construction, one
+	can find a basis of $\langle Y \rangle$ in which the matrix of $A_Y$
+	is block-companion, with $M' \le M$ blocks (take the $A_Y$-span of the
+	first column of $Y$, then of the second column, working modulo the
+	previous vector space, etc.) Thus, $B_Y$ is similar to a
+	block-companion matrix with $M'$ blocks as well; since $Z$ has $M$
+	columns, $S$ has full dimension $N_Y$ for a generic $Z$ (and for a
+	generic $X$, since $P_Y$ has rank $N_Y$). Thus, for generic choices of
+	$X$ and $Y$, $F_X^{A,Y}=F^{A,Y}$.
+	
+	Let us next introduce a matrix $\scrY$ of indeterminates of size $N
+	\times M$, and let $F^{A,\scrY}$ be the minimal generating polynomial
+	of the ``generic'' sequence $(A^i \scrY)_{i \ge 0}$. The notation
+	$\langle \scrY \rangle$ and $N_\scrY$ are defined as above.  In
+	particular, by~\cite[Proposition 6.1]{Villard97a}, the minimal
+	generating polynomial $F^{A,\scrY}$ has degree $\delta$ and
+	determinantal degree $\nu$.
+	
+	Now, for a generic $Y$ in $\K^{N\times M}$, $N_Y=N_\scrY$. Indeed,
+	$\langle \scrY\rangle$ is the span of $[\scrY ~ A \scrY ~ \cdots ~
+	A^{N-1} \scrY]$, whereas $\langle Y\rangle$ is the span of $[Y ~ A Y
+	~ \cdots ~A^{N-1} Y]$. Take a maximal non-zero minor $\mu$ of
+	$K_\scrY$; as soon as $\mu(Y)\ne 0$, we have equality of the
+	dimensions. On the other hand, by~\cite[Lemma~4.3]{Villard97a}, for
+	any $Y$ (including $\scrY$), the degree of $F^{A,Y}$ is equal to the
+	first index $d$ such that $\dim({\rm span}([Y ~ A Y ~ \cdots ~A^{d-1}
+	Y]))=N_Y$. As a result, for generic $Y$, $F^{A,Y}$ and $F^{A,\scrY}$
+	have the same degree, that is, $\delta$.  The first item is proved.
+	
+	We conclude by proving that for generic $X,Y$, the invariant factors
+	$\sigma_1,\dots,\sigma_M$ of $F_X^{A,Y}$ are $s_1,\dots,s_M$.
+	By~\cite[Theorem~2.12]{KaVi04}, for any $X$ and $Y$ in $\K^{N\times
+		M}$, for $i=1,\dots,M$, the $i^{th}$ invariant factor $\sigma_i$ of
+	$F_X^{A,Y}$ divides $s_i$, so that $\deg(\det(F_X^{A,Y}))\le\nu$, with
+	equality if and only if $\sigma_i=s_i$ for all $i \le M$.
+	
+	For $Y$ as above and any integers $e,d$, we let ${\rm Hk}_{e,d}(Y)$ be
+	the block Hankel matrix
+	$$ {\rm Hk}_{e,d}(Y) =
+	\begin{bmatrix}
+	I \\  A \\  A^2 \\ \vdots  \\  A^{e-1}
+	\end{bmatrix}
+	\begin{bmatrix}
+	Y & AY & A^2Y &\cdots&  A^{d-1}Y
+	\end{bmatrix}
+	$$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}(Y)) =
+	\deg(\det(F^{A,Y}))$ for $d \ge \deg(F^{A,Y})$ and $e \ge N$.  We take
+	$e=N$, so that ${\rm rank}({\rm Hk}_{N,d}(Y)) = \deg(\det(F^{A,Y}))$
+	for $d \ge \deg(F^{A,Y})$. On the other hand, the sequence ${\rm
+		rank}({\rm Hk}_{N,d}(Y))$ is constant for $d \ge N$; as a result,
+	${\rm rank}({\rm Hk}_{N,N}(Y)) = \deg(\det(F^{A,Y}))$. For the same
+	reason, we also have ${\rm rank}({\rm Hk}_{N,N}(\scrY)) =
+	\deg(\det(F^{A,\scrY}))$, so that for a generic $Y$, $F^{A,Y}$ and
+	$F^{A,\scrY}$ have the same determinantal degree, that is, $\nu$.  As
+	a result, for generic $X$ and $Y$, we also have
+	$\deg(\det(F_X^{A,Y}))=\nu$, and the conclusion follows.
+\end{proof}
+
+It is well known that the largest invariant factor of
+$tI - A$ is the minimal polynomial of $A$. Therefore, the above
+theorem shows that if we choose the entries of $X$ and $Y$
+randomly, with high probability, we will have that the
+largest invariant factor of $F^{X,A,Y}$ is the minimal
+polynomial of $A$.
+
+Finally, we prove that the fraction description is strictly proper.
+
+\begin{theorem}
+	Let $Z = \sum_{i=0}^{\infty} (X^{tr} A^i Y)/ t^{i+1}$. If there exists $F^{X,A,Y}$ such that
+	$(F^{X,A,Y})^{-1} N = Z$, then for every column of $N$,
+	its column degree is strictly less than the corresponding 
+	column degree of $F^{X,A,Y}$ 
+\end{theorem}
+
+\begin{proof}
+	Let $H = X^{tr} (tI - A)^{-1} Y$,
+	(TODO: minor / det(tI-A) -> strictly proper) 
+	then $H$ strictly proper
+	and its expansion is equal to $Z$. Suppose we find
+	$F^{X,A,Y}$ such that $(F^{X,A,Y})^{-1} N = Z$, then
+	$N = F^{X,A,Y}Z$. Since $Z = H$ and $H$ has ``negative"
+	degrees, $N = F^{X,A,Y}H$ must have smaller degree
+	than $F^{X,A,Y}$.
+\end{proof}
+
+\noindent This shows that once we have $F^{X,A,Y}$, we can compute
+$N$ with $\lceil D / M \rceil \ge \delta$ terms of $(XA^iY)_{i \ge 0}$.
+
+
+\newpage
+\section{Block Sparse-FGLM algorithm}
+In this section, we will show how to extend the Sparse-FGLM
+to using blocking methods. Steel's method also used the
+Block Wiedemann algorithm to compute the minimal polynomial
+of $T_i$, for which the roots provide the appropriate
+values for $x_i$,
+but uses the ``evaluation" method for the rest
+(another Gr\"obner Basis computation with that variable
+evaluated at each root of the minimal polynomial) \cite{Steel15}.
+Our algorithm computes the rest of the lex
+Gr\"obner basis directly.
+
+Given:
+\begin{center}
+	\begin{tabular}{c c}
+		$I \subset \mathbb{K}$:& zero dimensional ideal
+		in shape position\\
+		$\mathbb{B} \subset \mathbb{K}[x_1,\dots,x_n]/I$:&
+		monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
+		$D$: & dimension of $\mathbb{B}$\\
+		$T_1, \dots,T_n$:& multiplication matrices of
+		$x_1 ,\dots,x_n$ respectively\\
+		$x$:& random linear combination of $x_i$'s\\
+		$T$:& multiplication matrix of $x$
+	\end{tabular}
+\end{center}
+we compute a lex Gr\"obner basis that have the same points
+in its variety as the radical of $I$ 
+(note that we do not assume that $I$ is radical).
+This is because we introduce another variable $x$ which,
+generically, separates the points in the variety.
+We assume that the base field $\K$ has characteristic
+larger than $D$.
+
+As with the scalar case, we need to compute the minimal polynomial
+of $T$. We choose an integer $M$ and two matrices of random
+entries $U,V \in \K^{D\times M}$. Then, we generate a matrix
+sequence $S = (U^{tr}TV)_{0 \le i < 2d}$ with
+$d = \lceil \frac{D}{M} \rceil$ and find the minimum generating
+polynomial matrix $G$ of $S$ by applying the matrix
+Berlekamp-Massey algorithm. We set $P$ to be the largest
+invariant factor of $G$ and $R(x)$ to
+be the square free part of $P$.
+
+To find the matrix numerator, we do a product 
+$N^* = G\sum_{i=0}^{d} \frac{S^{(i)}} {t^{i+1}}$. We can find a
+scalar numerator $N$ by taking the first entry of 
+$[0 \dots 0 P] G^{-1} N^*$. To find $R_j(x_1)$, $1 \le j \le n$,
+we generate $S^{(i)}_j = (U^{tr} T^i T_j V)_{0 \le i d}$,
+compute $N^*_j = G \sum_{i=0}^{d} \frac{S^{(i)}} {t^{i+1}}$,
+and set $N^j$ as the first entry of 
+$[0 \dots 0 P] G^{-1} N^*_j$. Finally, $R_j(x_1) = N_j / N \mod P$
+
+\begin{center}
+	\textbf{Block Sparse-FGLM:}
+	\begin{itemize}
+		\item[]\textcolor{red}{\bf 1.~} {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
+		\item[]\textcolor{red}{\bf 2.~} {\sf $S= (UT^iV^t)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+		\item[]\textcolor{red}{\bf 3.~} {\sf $G = {\sf MatrixBerlekampMassey}(S)$ and $N^* = G\sum_{i\ge 0} \frac{S^{(i)}}{t^{i+1}}$}
+		\item[]\textcolor{red}{\bf 4.~} {\sf $P=$ largest invariant factor of $G$ and $R={\sf SquareFreePart}(P)$}
+		\item[]\textcolor{red}{\bf 5.~} {\sf $a = [0 ~\cdots 0 P] G^{-1}$}
+		\item[]\textcolor{red}{\bf 6.~} {\sf $N=$ first entry of $aN^*$}
+		\item[]\textcolor{red}{\bf 7.~} {\sf for $j = 1 \dots n$:}
+		\begin{itemize}
+			\item[]\textcolor{red}{\bf 7.1.} ~~{\sf $S_j = (UT_1^i T_j V^t)_{0 \le i < d}$ and $N_j^* = G\sum_{i\ge 0} \frac{S_j^{(i)}}{t^{i+1}}$}
+			\item[]\textcolor{red}{\bf 7.2.} ~~{\sf $N_j=$ first entry of $aN_j^*$}
+			\item[]\textcolor{red}{\bf 7.3.} ~~{\sf $R_j=N_j/N$ mod $R$}
+		\end{itemize}
+	\end{itemize}
+\end{center}
+
+We will demonstrate how step 7.3 computes $R_j$ through
+a small example. Let 
+$I = \langle (x_1-1)(x_2-2),(x_1-3)(x_2-4)\rangle \subset
+GF(101)[x_1,x_2]$, then
+clearly $V(I) = \{ (1,4),(3,2) \}$ and $x_1$ separates the
+points of $V$. We choose a linear form 
+$$\ell: f \in I \mapsto \mathbb{N},\;\ell(f) = 17 f(1,4) + 33 f(3,2)$$
+(later, we will prove that for a 
+radical ideal $I$, every linear form looks like 
+$\ell = c_1 f(\alpha_1) + \dots c_n f(\alpha_n) $ for all
+$\alpha \in V(I)$). Then we have,
+\begin{align*}
+\ell(x_1^i) &= 17 \cdot 1^i + 33 \cdot 3^i\\
+\ell(x_2x_1^i) &= 17 \cdot 4 \cdot 1^i + 33 \cdot 2 \cdot 3^i
+\end{align*} 
+We can define a generating series for both sequences,
+\begin{align*}
+S_1 = \sum_{i = 0}^{\infty} \ell(x^i_1) / t^{i+1}
+ &= \frac{17}{t-1} + \frac{33}{t-3}
+ = \frac{17(t-3)+33(t-1)}{(t-1)(t-3)} \\
+S_2 = \sum_{i=0}^{\infty} \ell(x_2x^i_1)/t^{i+1} 
+&= \frac{17\cdot 4}{t-1} + \frac{33 \cdot 2}{t-3}
+= \frac{17\cdot 4 (t-3) + 33\cdot 2(t-1)}{(t-1)(t-3)}
+\end{align*}
+$S_1$ and $S_2$ have a common denominator $P = (t-1)(t-3)$,
+whose roots are the coordinates of $x_1$ in $V(I)$. If we
+apply step 7.3, we get
+\begin{align*}
+R_2 
+&=\frac{S_2}{S_1} \mod P\\
+ &= 
+\frac{17\cdot 4 (t-3) + 33\cdot 2(t-1)}{17(t-3)+33(t-1)} \mod P\\
+&=\frac{4 (t-3) + 2(t-1)}{(t-3)+(t-1)} \mod P
+\end{align*}
+Now, $ R_2(1) = 4$ and $R_2(3) = 2$ as needed.
+
+\subsection{Computing a scalar numerator}
+We first prove that one can recover a scalar numerator
+through a matrix numerator.
+\begin{lemma}\label{gen}
+	Let $Z = \sum_{i=0}^{\infty} S^{(i)}/t^{i+1}$, then each
+	entry of $Z$ is in the form $N_{i,j}/P$, where $P$ is
+	the minimum scalar generator
+\end{lemma} 
+
+\begin{proof}
+	Rewrite $U$ and $V$ as $U = [u_1 u_2 \cdots u_M],
+	V = [v_1 v_2 \cdots v_M]$, then
+	$$S^{(i)} = 
+	\begin{bmatrix}
+	u_1^{tr}T^iv_1 & u_1^{tr}T^iv_2 & \cdots & u_1^{tr}T^iv_M \\
+	u_2^{tr}T^iv_1 & \cdots         & \cdots   & u_2^{tr}T^iv_M \\
+	\vdots           & \ddots           & \ddots   & \vdots \\
+	u_M^{tr}T^iv_1 & \cdots           & \cdots   & u_M^{tr}T^iv_M
+	\end{bmatrix}$$
+	Thus,
+	$$ Z = 
+	\begin{bmatrix}
+	\sum u_1^{tr}T^iv_1/t^{i+1} & \cdots  & \cdots & \sum u_1^{tr}T^iv_M/t^{i+1} \\
+	\vdots                        & \ddots  & \ddots & \vdots \\
+	\sum u_M^{tr}T^iv_1/t^{i+1} & \cdots  & \cdots & \sum u_M^{tr}T^iv_M/t^{i+1}
+	\end{bmatrix}$$
+	Since each entry of $Z$ is a scalar sequence with the same
+	minimum generator, we can rewrite them in their closed form
+	$N_{i,j}/P$.
+\end{proof}
+
+\begin{lemma}\label{utilde}
+	Let $\mathscr{D} = AGB$ be the Smith normal form of $G$ and $s_1, \cdots s_M$ be
+	invariant factors of $G$ such that 
+	$s_M | s_{M-1} | \cdots | s_1$. Then, there exists a vector $\tilde{u}$
+	such that $\tilde{u} G = [0, \cdots, 0, s_1]$\\
+\end{lemma}
+
+\begin{proof}
+	Let $[b_1,\cdots,b_M]$ be the last row of $B$ and 
+	$w = [\frac{s_1b_1}{s_M},\frac{s_1b_2}{s_{M-1}},\cdots,\frac{s_1b_{M-1}}{s_2},b_M]$ (since $s_i | s_1$), then
+	\begin{align*}
+	(w A) A^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_M},\frac{s_1b_2}{s_{M-1}},\cdots,\frac{s_1b_{M-1}}{s_2},b_M]
+	\begin{bmatrix}
+	s_M &        & \\
+	& \ddots & \\
+	&        & s_1
+	\end{bmatrix}\\
+	&= [s_1b_1, s_1b_2, \cdots, s_1b_M]\\
+	&= [0,\cdots,0,s_1] B
+	\end{align*}
+	Therefore, if we choose $\tilde{u} = w A$, we get
+	$ \tilde{u} G = (w A) A^{-1} \mathscr{D} B^{-1} = 
+	[0,\cdots,0,s_1]$ as needed.\\
+\end{proof}
+
+\begin{theorem}
+	 The first entry of the last row of $\tilde{u} N^*$ is  
+	 the numerator of the generating function for 
+	 $(u_{M}^{tr} T^i v_{1})_{i \ge 0}$
+\end{theorem}
+
+\begin{proof}
+	By lemma \ref{gen} , 
+	$$ N^* = G \sum_{i=0}^{\infty} S^{(i)}/t^{i+1} = G 
+	\begin{bmatrix}
+	N_{1,1} / P & \cdots & N_{1,M} / P \\
+	\vdots      & \ddots & \vdots \\
+	N_{M,1} / P & \cdots & N_{M,M} / P
+	\end{bmatrix}
+	$$
+	By theorem \ref{randXY}, the $i^{th}$ invariant factor of
+	$tI - A$ is equal to the $i^{th}$ invariant factor of $G$ for generic choice of
+	$U,V$. Thus, $s_1 = P$ and by lemma \ref{utilde}
+	\begin{align*}
+	\tilde{u} N^* &= \tilde{u} G
+	\begin{bmatrix}
+	N_{1,1} / P & \cdots & N_{1,M} / P \\
+	\vdots            & \ddots & \vdots \\
+	N_{M,1} / P & \cdots & N_{M,M} / P
+	\end{bmatrix} \\
+	&= [0,\cdots,0,P]
+	\begin{bmatrix}
+	N_{1,1} / P & \cdots & N_{1,M} / P \\
+	\vdots            & \ddots & \vdots \\
+	N_{M,1} / P & \cdots & N_{M,M} / P
+	\end{bmatrix}\\
+	&= [N_{M,1} , \cdots , N_{M,M}]
+	\end{align*}
+	Since $P$ is known to be the minimum generator of 
+	the sequences, we have that $N_{M,1}$ is the
+	numerator of generating function for 
+	$(u_{M}^{tr} T^i v_{1})_{i \ge 0}$.
+\end{proof}
+
+By following the same steps, we also have that the first
+entry of $\tilde{u} N^*_j$ is the product of the 
+generating function for $(u^{tr}_M T^i T_j v_1)_{i \ge 0}$ with
+$P$.
+
+\subsection{Structure of the dual}
+\label{dual}
+Let $I$ be an ideal in
+$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
+residue class ring. Suppose that $V=V(I)$ has dimension zero, and
+write it $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s in
+$\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
+$i$.  We also let $\D$ be the dimension of $Q$, so that $d \le \D$,
+and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In this
+section, we recall and generalize results from the appendix
+of~\cite{BoSaSc03}.
+
+For $i$ in $\{1,\dots,d\}$, let $Q_i$ be the local algebra at
+$\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ is the
+$\m_{\balpha_i}$-primary component of $I$. By the Chinese Remainder
+Theorem, $Q\otimes_\K \Kbar=\Kbar[X_1,\dots,X_n]/I$ is isomorphic to
+the direct product $Q_1\times \cdots \times Q_d$.  We let $N_i$ be the
+{\em nil-index} of $Q_i$, that is, the maximal integer $N$ such that
+$\m_{\alpha_i}^N$ is not contained in $I_i$; for instance, $N_i=0$ if
+and only if $Q_i$ is a field, if and only if $\alpha_i$ is a
+non-singular root of $I$. We also let
+$\D_i=\dim_\Kbar(Q_i) \ge N_i$, so that $\D=\D_1 + \cdots + \D_d$.
+Fix $i$ in $1,\dots,d$.  There exists a basis of the dual ${\rm
+	hom}_\Kbar(Q_i,\Kbar)$ consisting of linear forms
+$(\lambda_{i,j})_{1\le j \le \D_i}$ of the form
+$$\lambda_{i,j}: f \mapsto (\Lambda_{i,j}(f))(\balpha_i),$$
+where $\Lambda_{i,j}$ is the operator
+$$f \mapsto \Lambda_{i,j}(f) = \sum_{\mu=(\mu_1,\dots,\mu_n) \in
+	S_{i,j}} c_{i,j,\mu} \frac{ \partial^{\mu_1 + \cdots + \mu_n} f}
+{\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}},$$ for some finite
+subset $S_{i,j}$ of $\N^n$ and constants $c_{i,j,\mu}$ in
+$\Kbar$. 
+For instance, when $\balpha_i$ is non-singular, there is (up to a
+scalar multiple) only one function $\lambda_{i,j}$, say
+$\lambda_{i,1}$, and it takes the form $\lambda_{i,1}(f) =
+f(\balpha_i)$. 
+
+More generally, we will always take $\lambda_{i,1}$ of the form
+$\lambda_{i,1}(f) = f(\balpha_i)$, and for $j>1$, and
+$\mu=(0,\dots,0)$, we set $c_{i,j,\mu}=0$ (so all terms in
+$\Lambda_{i,j}$ have order $1$ or more).  Thus, introducing 
+parameters $\ell_{i,1}$ and $\bell_i=(\ell_{i,m})_{m
+	=2,\dots,D_i}$, we deduce the existence of homogeneous linear forms
+$P_{i,\mu}$ such that any $\lambda$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$
+can be written as 
+$$\lambda:f \mapsto (\Lambda(f))(\balpha_i),\quad\text{with}\quad
+\Lambda(f) = \sum_{\mu=(\mu_1,\dots,\mu_n) \in S_i} c_{\mu}
+\frac{ \partial^{\mu_1 + \cdots + \mu_n} f}
+{\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}},
+$$ where $S_i$ is the union of $S_{i,1},\dots,S_{i,D_i}$, and where
+the coefficients $c_\mu$ can be descibed in parametric manner as
+$c_{(0,\dots,0)}=\ell_{i,1}$ and $c_{\mu} = P_{i,\mu}(\bell_i)$ for all
+$\mu$ in $S_i$, $\mu \ne (0,\dots,0)$.
+
+If $\lambda$ is non-zero, we can then define its {\em order} $\omega$
+and {\em symbol} $\pi$. The former is the maximum of all
+$|\mu|=\mu_1+\cdots+\mu_n$ for $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$ 
+such that $c_\mu$ is non-zero;
+by~\cite[Lemma~3.3]{Mourrain97} we have $\omega \le N_i-1$. Then, we let
+$$\pi =\sum_{\mu \in S_i,\ |\mu|=\omega} c_{\mu} X_1^{\mu_1} \cdots
+X_n^{\mu_n}$$ be the {\em symbol} of $\lambda$; by construction,
+this is a non-zero polynomial.  
+
+Finally, we say a word about global objects.  Fix a linear form $\lambda:
+Q \to \K$. By the Chinese Remainder Theorem, there exist unique
+$\lambda^{(1)},\dots,\lambda^{(d)}$, with $\lambda^{(i)}$ in ${\rm
+	hom}_\Kbar(Q_i,\Kbar)$ for all $i$, such that the extension
+$\lambda_\Kbar: Q\otimes_\K \Kbar \to \Kbar$ decomposes as $\lambda_\Kbar =
+\lambda^{(1)} + \cdots + \lambda^{(d)}$. We call {\em support} of $\lambda$ the
+subset $\mathfrak{S}$ of $\{1,\dots,d\}$ such that $\lambda^{(i)}$ is
+non-zero exactly for $i$ in $\mathfrak{S}$.  As a consequence, for all
+$f$ in $Q$, we have
+\begin{align}\label{eq:fui}
+\lambda(f) &= \lambda^{(1)}(f) + \cdots + \lambda^{(d)}(f)\nonumber\\
+&=  \sum_{i \in \mathfrak{S}} \lambda^{(i)}(f).
+\end{align}
+
+\subsection{Using a generic separating element}
+We now show
+how to compute a parametrization of $V(I)$ through the introduction
+of a generic combination of variables $x=\beta_1 X_1 + \cdots +\beta_n X_n$.
+
+\begin{lemma}\label{lemma:formula}
+	Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, suppose that $\ell$ is supported on
+	some subset 
+	$\mathfrak{S}$ of $\{1,\dots,d\}$ and let $\{\pi_i \mid i \in \mathfrak{S}\}$
+	and  $\{w_i \mid i \in \mathfrak{S}\}$
+	be as above. 
+	
+	Let $x=\beta_1 X_1 + \cdots +\beta_n X_n$, for some $\beta_1,\dots,\beta_n$ in $\K$
+	and let $v$ be in $\K[X_1,\dots,X_n]$. Then, we have the equality
+	\begin{align}\label{eq:sumgenseries}
+	\sum_{\ell \ge 0} \ell(v x^i)t^\ell =
+	\sum_{i \in \mathfrak{S}} \frac{
+		v(\balpha_i)\, w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)
+		t^{w_i} + (1-x(\balpha_i)    t)A_i}
+	{(1-x(\balpha_i) t)^{w_{i}+1}},    
+	\end{align}
+	for some polynomials $A_1,\dots,A_d$ in
+	$\Kbar[t]$, with $A_i$ of degree less than $w_i$ for all $i$
+	in $\mathfrak{S}$.
+\end{lemma}
+
+\begin{proof}
+	Take $v$ and $x$ as above. Consider first
+	an operator of the form $f \mapsto \frac{ \partial^{\mu_1+\cdots+\mu_n}  f}
+	{\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}$. Then, we have
+	the following generating series identities, with coefficients in 
+	$\K(X_1,\dots,X_n)$:
+	\begin{align*}
+	\sum_{\ell \ge 0} 
+	\frac{ \partial^{|\mu|} ( v x^\ell )} {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}
+	t^\ell 
+	&=  \sum_{\ell \ge 0} 
+	\frac{ \partial^{|\mu|} (v x^\ell t^\ell)} {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}\\
+	&=  
+	\frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}
+	\left (\sum_{\ell \ge 0} v x^\ell t^\ell\right ) \\
+	&= \frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}
+	\left (\frac v{1-xt} \right ) \\
+	&= v\, |\mu|!\, \prod_{1 \le k \le n} 
+	\left (\frac{ \partial x} {\partial X_k} \right)^{\mu_k}
+	\frac {t^{|\mu|}}{(1-x t)^{|\mu|+1}} + \frac{P_{|\mu|}(\bX,t)}{(1-x t)^{|\mu|}} + \cdots + \frac{P_{1}(\bX,t)}{(1-x t)}\\
+	&= v\, |\mu|!\, \prod_{1 \le k \le n} 
+	\beta_k^{\mu_k}
+	\frac {t^{|\mu|}}{(1-x t)^{|\mu|+1}} + \frac{P(\bX,t)}{(1-x t)^{|\mu|}},
+	\end{align*}
+	for some polynomials $P_1,\dots,P_{|\mu|},P$ in $\K[\bX,t]$ that
+	depend on the choices of $\mu$, $v$ and $x$, with $\deg(P_i,t) < i$
+	for all $i$ and thus $\deg(P,t) < |\mu|$.
+	
+	Take now a linear combination of such operators, such as 
+	$f \mapsto \sum_{\mu \in R} c_\mu \frac{ \partial^{\mu_1 +\cdots + \mu_n}  f } {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}$. The corresponding generating series
+	becomes
+	\begin{align*}
+	\sum_{\ell \ge 0} 
+	\sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v x^\ell )} {\partial X_1^{\mu_1} \cdots
+		\partial X_n^{\mu_n}}
+	t^\ell 
+	&=
+	v\,\sum_{\mu \in R} c_\mu
+	|\mu|!\, \prod_{1 \le k \le n} 
+	\beta_k^{\mu_k}
+	\frac {t^{|\mu|}}{(1-x t)^{|\mu|+1}} +\sum_{\mu \in R} \frac{P_\mu(\bX,t)}{(1-x t)^{|\mu|}},
+	\end{align*}
+	where each $P_\mu$ has degree less than $|\mu|$ in $t$.
+	Let $w$ be the maximum of all $|\mu|$ for $\mu$ in $R$. We can rewrite 
+	the above as
+	\begin{align*}
+	v\, w! 
+	\sum_{\mu \in R, |\mu|=w} c_\mu
+	\, \prod_{1 \le k \le n} 
+	\beta_k^{\mu_k}
+	\frac {t^{w}}{(1-x t)^{w+1}}
+	+ \frac{A(\bX,t)}{(1-x t)^{w}},
+	\end{align*}
+	for some polynomial $A$ of degre less than $w$ in $t$. If we let 
+	$\pi =\sum_{\mu \in R,\ |\mu|=w} c_{\mu} X_1^{\mu_1} \cdots
+	X_n^{\mu_n}$, this becomes
+	\begin{align*}
+	\sum_{\ell \ge 0} 
+	\sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v x^\ell )} { X_1^{\mu_1} \cdots
+		X_n^{\mu_n}}
+	t^\ell 
+	&=
+	v\, w! \,  \pi(\beta_1,\dots,\beta_n)
+	\frac {t^{w}}{(1-x t)^{w+1}}
+	+ \frac{A(\bX,t)}{(1-x t)^{w}}.
+	\end{align*}
+	Applying this formula to the sum in~\eqref{eq:fui}, we obtain the
+	claim in the lemma.
+\end{proof}
+
+\noindent Let us suppose that
+\begin{itemize}
+	\item for all $i$ in $\mathfrak{S}$,  $ \pi_i(\beta_1,\dots,\beta_n)$ is nonzero;
+	\item $x$ is a separating element for $ \{\balpha_i \mid i \in \mathfrak{S}\}$.
+\end{itemize}
+Take $v=1$ in the previous lemma, and
+let us rewrite the sum in~\eqref{eq:sumgenseries} as $A/B$, with
+\begin{align*}
+A&=\sum_{i \in \mathfrak{S}} \Big(\big[
+w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)
+t^{w_i} + (1-x(\balpha_i)    t)A_i\big]
+\prod_{j \in \mathfrak{S}-\{i\}}(1-x(\balpha_j) t)^{w_{j}+1}\Big)
+\\
+B&=\prod_{i \in \mathfrak{S}}(1-x(\balpha_i) t)^{w_{i}+1}.
+\end{align*}
+We claim that $A$ and $B$ are coprime. Indeed, any root of $B$ is of
+the form $1/x(\balpha_i)$ for $i$ in $\mathfrak{S}$; we claim that all
+values $A(1/x(\balpha_i))$ are nonzero. Indeed, for $i' \ne i$, the
+term $\prod_{j \in \mathfrak{S}-\{i'\}}(1-x(\balpha_j) t)^{w_{j}+1}$
+vanishes at $t=1/x(\balpha_i)$, whereas our two assumptions
+respectively imply that $ w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)
+t^{w_i} + (1-x(\balpha_i) t)A_i$ and $\prod_{j \in
+	\mathfrak{S}-\{i\}}(1-x(\balpha_j) t)^{w_{j}+1}$
+are nonzero at  $t=1/x(\balpha_i)$, so that $A(1/x(\balpha_i))$ is nonzero.
+
+As a result, given $2D$ terms of the sequence $\ell(x^i)$, we can
+reconstruct $A$ and $B$ as above. We claim that we can actually
+recover the polynomial $\tilde B = \prod_{i \in
+	\mathfrak{S}}(t-x(\balpha_i) )^{w_{i}+1}$.  Remark that $\tilde B$
+may not agree with the reversed polynomial ${\rm rev}(B)=t^{\deg(B)}
+B(1/t) = \prod_{i \in \mathfrak{S}, x(\balpha_i)\ne 0}(t-x(\balpha_i)
+)^{w_{i}+1}$; knowing $B$ (and thus ${\rm rev}(B)$), we need to
+determine whether there exists $i_0$ in $\mathfrak{S}$ such that
+$x(\balpha_{i_0})=0$, and if so, the corresponding exponent $w_{i_0}$.
+
+\begin{itemize}
+	\item Suppose first that all values $x(\balpha_i)$ are nonzero.  Then,
+	$B$ has degree $\sum_{i \in \mathfrak{S}} (w_i+1)$, so that we have
+	the inequality $\deg(B) > \deg(A)$.
+	\item Suppose now that $x(\balpha_{i_0})=0$, for some $i_0$ in
+	$\mathfrak{S}$. Then, $B$ has degree $\sum_{i \in
+		\mathfrak{S}-\{i_0\}} (w_i+1)$; let us verify that we have $\deg(A)
+	\ge \deg(B)$ in this case.  For $i$ in $ \mathfrak{S}-\{i_0\}$, the
+	term $\big[ w_i!\, \pi_{i}(\beta_1,\dots,\beta_n) t^{w_i} +
+	(1-x(\balpha_i) t)A_i\big] \prod_{j \in
+		\mathfrak{S}-\{i\}}(1-x(\balpha_j) t)^{w_{j}+1}$ has degree less
+	than $\deg(B)$, whereas that same term for $i=i_0$ has degree
+	$\sum_{i \in \mathfrak{S}} (w_i+1)-1 \ge \deg(B)$.
+	
+	Thus, $A$ itself has degree greater than (or equal to) $\deg(B)$,
+	and the difference $\deg(A)-\deg(B)$ is precisely $w_{i_0}$.
+\end{itemize}
+In particular, in either case, we can determine the integer $\delta=\sum_{i \in \mathfrak{S}} (w_i+1)-1$,
+which is an upper bound on the degree of $A$.
+This allows us to define $\tilde A = t^{\delta}A(1/t)$, that is,
+$$\tilde A = 
+\sum_{i \in \mathfrak{S}} \Big(\big[
+w_i!\, \pi_{i}(\beta_1,\dots,\beta_n) + (t-x(\balpha_i)  )\tilde A_i\big]
+\prod_{j \in \mathfrak{S}-\{i\}}(t-x(\balpha_j) )^{w_{j}+1}\Big),$$
+with $\tilde A_i = t^{w_i-1} A_i(1/t) \in \K[t]$. In particular, 
+the value $\tilde A(x(\balpha_i))$ is 
+$$\tilde A(x(\balpha_i))= w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)\prod_{j \in
+	\mathfrak{S}-\{i\}}(x(\balpha_i)-x(\balpha_j) )^{w_{j}+1},$$ which is
+nonzero. In other words, $\tilde A$ is a unit modulo $C= \prod_{i \in
+	\mathfrak{S}}(t-x(\balpha_i) )$.
+
+Let us finally consider the formula in Lemma~\ref{lemma:formula} 
+for an arbitrary $v$, still under our two assumptions above. 
+The sum in~\eqref{eq:sumgenseries} can now be rewritten as $A_v/B$, with
+\begin{align*}
+A_v&=\sum_{i \in \mathfrak{S}} \Big(\big[
+v(\balpha_i) w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)
+t^{w_i} + (1-x(\balpha_i)    t)A_i\big]
+\prod_{j \in \mathfrak{S}-\{i\}}(1-x(\balpha_j) t)^{w_{j}+1}\Big).
+\end{align*}
+We do not claim that $A_v$ and $B$ are necessarily coprime, but
+since $B$ is known, we can recover $A_v$ using only $D$ 
+terms in the sequence $\ell(v x^i)$. As above, we can deduce
+$\tilde A_v
+= t^{\delta}A_v(1/t)$, that is,
+$$\tilde A_v = 
+\sum_{i \in \mathfrak{S}} \Big(\big[
+v(\balpha_i) w_i!\, \pi_{i}(\beta_1,\dots,\beta_n) + (t-x(\balpha_i)  )\tilde A_i\big]
+\prod_{j \in \mathfrak{S}-\{i\}}(t-x(\balpha_j) )^{w_{j}+1}\Big).$$
+Now, the value of $\tilde A_v$ at $x(\balpha_i)$ is
+\begin{align*}
+\tilde A_v(x(\balpha_i))&=v(\balpha_i) w_i!\, \pi_{i}(\beta_1,\dots,\beta_n)\prod_{j \in
+	\mathfrak{S}-\{i\}}(x(\balpha_i)-x(\balpha_j) )^{w_{j}+1}\\
+&= v(\balpha_i) \tilde A(x(\balpha_i)).
+\end{align*}
+Thus, the polynomial 
+$$P_v = \frac{\tilde A_v}{\tilde A} \bmod C$$
+is well-defined, and $P_v(x(\balpha_i))=v(\balpha_i)$ holds for all $i$ in $\mathfrak{S}$.
+
+\subsection{Computing with $X_1$}
+
+\newpage
+\section{Experimental Results}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{thesis}
+\end{document}
