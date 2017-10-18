@@ -198,8 +198,10 @@ Mu:=U!(T^delta_u*Evaluate(rev_Mu, 1/T));
 Bu:=U!(T^Degree(Mu)*Evaluate(Mu, 1/T));
 Pu:=SquarefreePart(Mu);
 
+seq_val_u_v:=[[(x*(mat_muls[i]*one))[1,1] : x in seq_ell_u] : i in [1..n]];
+
 tA1u:=U!(T^(delta_u-1)*Evaluate((U![(x*one)[1,1] : x in seq_ell_u]*Bu) mod T^delta_u, 1/T));
-tAXu:=[U!(T^(delta_u-1)*Evaluate((U![(x*(mat_muls[i]*one))[1,1] : x in seq_ell_u]*Bu) mod T^delta_u, 1/T)) : i in [1..n]];
+tAXu:=[U!(T^(delta_u-1)*Evaluate((U! seq_val_u_v[i]) *Bu mod T^delta_u, 1/T)) : i in [1..n]];
 inv_denom_u:=InverseMod(tA1u, Pu);
 param_u:=[f*inv_denom_u mod Pu : f in tAXu];
 
@@ -220,9 +222,28 @@ u_mod:=&+[coefs_u[i]*param[i] : i in [1..n]];
 QP:=quo<U | P>;
 Qu_mod:=QP!u_mod;
 pow_umod:=[QP!1];
+pow_umod_v:=[[QP!param[i]] : i in [1..n]];
 for i in [1..2*D+3] do
     Append(~pow_umod, pow_umod[#pow_umod]*Qu_mod);
+    for j in [1..n] do
+	Append(~pow_umod_v[j], pow_umod_v[j][#(pow_umod_v[j])]*Qu_mod);
+    end for;
 end for;
 val_ell1:=[&+[Coefficient(pow_umod[i], j)*seq_ell1[j+1] : j in [0..Degree(P)-1]] : i in [1..2*D+4]];
+val_ell1_v:=[ [&+[Coefficient(pow_umod_v[k][i], j)*seq_ell1[j+1] : j in [0..Degree(P)-1]] : i in [1..2*D+4]] : k in [1..n]];
 
 val_ell2:=[seq_val_u1[i]-val_ell1[i] : i in [1..2*D+4]];
+val_ell2_v:=[ [seq_val_u_v[j][i]-val_ell1_v[j][i] : i in [1..2*D+4]] : j in [1..n]];
+
+
+rev_C, mu:=BerlekampMassey(val_ell2);
+C:=U!(T^mu*Evaluate(rev_C, 1/T));
+Bb:=U!(T^Degree(C)*Evaluate(C, 1/T));
+Pb:=SquarefreePart(C);
+
+tA1b:=U!(T^(mu-1)*Evaluate((U!val_ell2*Bb) mod T^mu, 1/T));
+tAXb:=[U!(T^(mu-1)*Evaluate(U!val_ell2_v[i]*Bb mod T^mu, 1/T)) : i in [1..n]];
+inv_denom_b:=InverseMod(tA1b, Pb);
+param_b:=[f*inv_denom_b mod Pb : f in tAXb];
+
+{[Evaluate(f, x[1]) : f in param] : x in Roots(P)} join {[Evaluate(f, x[1]) : f in param_b] : x in Roots(Pb)} eq SequenceToSet(pts);
