@@ -1,0 +1,228 @@
+
+function block_diagonal_matrix(seq_mat)
+    n:=#seq_mat;
+    k:=BaseRing(seq_mat[1]);
+    nn:=[NumberOfRows(x) : x in seq_mat];
+    mm:=[NumberOfColumns(x) : x in seq_mat];
+    pref_nn:=[&+([0] cat nn[1..i-1]) : i in [1..#nn]];
+    pref_mm:=[&+([0] cat mm[1..i-1]) : i in [1..#mm]];
+    
+    N:=&+nn;
+    M:=&+mm;
+    mat:=ZeroMatrix(k,N,M);
+
+    for i in [1..#seq_mat] do
+	for u in [1..nn[i]] do
+	    for v in [1..mm[i]] do
+		mat[pref_nn[i] + u,pref_mm[i]+v]:=seq_mat[i][u,v];
+	    end for;
+	end for;
+    end for;
+    
+    return mat;
+end function;
+
+function rnd(k)
+    if IsFinite(k) then
+	return Random(k);
+    else
+	return k!Random([-1000..1000]);
+    end if;
+end function;
+
+function random_sparse_polynomial(pol_ring: sparsity:=4)
+    k:=BaseRing(pol_ring);
+    f:=&+[rnd(k)*&*[pol_ring.i^Random([0..3]) : i in [1..Rank(pol_ring)]] : j in [1..sparsity]];
+    return f-Evaluate(f,[0 : i in [1..Rank(pol_ring)]]);
+end function;
+
+function primary_ideal(pol_ring, point, is_1regular: max_degree:=1000)
+    k:=BaseRing(pol_ring);
+    n:=Rank(pol_ring);
+
+    if max_degree eq 1 then
+	eqs:=[pol_ring.i : i in [1..n]];
+    end if;
+    
+    if max_degree eq 2 then
+	if is_1regular then
+	    eqs:=[pol_ring.i + rnd(k)*pol_ring.(n-1) : i in [1..n-2]] cat [(pol_ring.(n-1))^2] cat [pol_ring.n];
+	else
+	    eqs:=[pol_ring.i + rnd(k)*pol_ring.(n) : i in [1..n-1]] cat [(pol_ring.n)^2];
+	end if;
+    end if;
+
+    if max_degree eq 3 then
+	if n le 2 or Random([1..10]) le 5 then
+	    if is_1regular then
+		eqs:=[pol_ring.i + rnd(k)*(pol_ring.(n-1))^2+rnd(k)*pol_ring.(n-1): i in [1..n-2]] cat [(pol_ring.(n-1))^3] cat [pol_ring.n];
+	    else
+		eqs:=[pol_ring.i + rnd(k)*(pol_ring.(n))^2+rnd(k)*pol_ring.(n) : i in [1..n-1]] cat [(pol_ring.n)^3];
+	    end if;
+	else
+	    if is_1regular then
+		eqs:=[pol_ring.i + rnd(k)*pol_ring.(n-1) + rnd(k)*pol_ring.(n-2) : i in [1..n-3]] cat
+		    [(pol_ring.(n-2))^2, (pol_ring.(n-1))*(pol_ring.(n-2)),(pol_ring.(n-1))^2,pol_ring.n];
+	    else
+		eqs:=[pol_ring.i + rnd(k)*pol_ring.(n) + rnd(k)*pol_ring.(n-1) : i in [1..n-2]] cat
+		    [(pol_ring.(n-1))^2, (pol_ring.(n))*(pol_ring.(n-1)),(pol_ring.(n))^2];
+	    end if;
+	end if;
+    end if;
+        
+    if max_degree ge 4 then
+	degs:={* 1+i^^(5 div i) : i in [1..5] *};
+	
+	done:=false;
+	while not done do 
+	    eqs:=[pol_ring.i^Random(degs) : i in [1..n]];
+	    if is_1regular then
+		eqs:=eqs cat [pol_ring.n];
+	    end if;
+	    
+	    nb:=0;
+	    repeat 
+		eqs:=eqs cat [ random_sparse_polynomial(pol_ring:sparsity:=6) ];
+		eqs:=GroebnerBasis(eqs);
+		nb:=nb+1;
+	    until nb eq 10;
+	    
+	    done:=#eqs gt n+1 and Dimension(quo<pol_ring | eqs>) le max_degree;
+	    if not is_1regular then
+		done:=done and Degree(eqs[#eqs]) ne 1;
+	    end if;
+	end while;
+    end if;
+
+    return [Evaluate(f, [pol_ring.i - point[i] : i in [1..n]]) : f in eqs];
+end function;
+
+function get_ideals(pol_ring, m)
+    k:=BaseRing(pol_ring);
+    n:=Rank(pol_ring);
+    
+    // Xn separating, radical
+    pts1:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [1..m[1]]];
+    S1:=[primary_ideal(pol_ring, pt, true: max_degree:=1) : pt in pts1];
+    // Xn separating and regular, non-radical
+    pts2:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [m[1]+1..m[1]+m[2]]];
+    S2:=[primary_ideal(pol_ring, pt, true: max_degree:=Random({*2,2,2,3,3,4*})) : pt in pts2];
+    // Xn separating, non-regular
+    pts3:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [m[1]+m[2]+1..m[1]+m[2]+m[3]]];
+    S3:=[primary_ideal(pol_ring, pt, false: max_degree:=Random({*2,2,2,3,3,4*})) : pt in pts3];
+    // Xn non-separating, radical
+    pts4a:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [m[1]+m[2]+m[3]+1..m[1]+m[2]+m[3]+m[4]]];
+    pts4b:=[[pts4a[i][j]+Random([1..1000]) : j in [1..n-1]] cat [pts4a[i][n]] : i in [1..m[4]]];
+    pts4:=pts4a cat pts4b; 
+    S4:=[primary_ideal(pol_ring, pt, true: max_degree:=1) : pt in pts4];
+    // Xn not separating, all regular, non-radical
+    pts5a:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [m[1]+m[2]+m[3]+m[4]+1..m[1]+m[2]+m[3]+m[4]+m[5]]];
+    pts5b:=[[pts5a[i][j]+Random([1..1000]) : j in [1..n-1]] cat [pts5a[i][n]] : i in [1..m[5]]];
+    pts5:=pts5a cat pts5b;
+    S5:=[primary_ideal(pol_ring, pt, true: max_degree:=Random({*2,2,2,3,3,4*})) : pt in pts5];
+    // Xn not separating, half non-regular
+    pts6a:=[[rnd(k) : j in [1..n-1]] cat [i-1] : i in [m[1]+m[2]+m[3]+m[4]+m[5]+1..m[1]+m[2]+m[3]+m[4]+m[5]+m[6]]];
+    pts6b:=[[pts6a[i][j]+Random([1..1000]) : j in [1..n-1]] cat [pts6a[i][n]] : i in [1..m[6]]];
+    S6a:=[primary_ideal(pol_ring, pt, false: max_degree:=Random({*2,2,2,3,3,4*})) : pt in pts6a];
+    S6b:=[primary_ideal(pol_ring, pt, true: max_degree:=Random({*2,2,2,3,3,4*})) : pt in pts6b];
+    S6:=S6a cat S6b;
+
+    return &cat [S1,S2,S3,S4,S5,S6], &cat[pts1,pts2,pts3,pts4,pts5,pts6a,pts6b];
+end function;
+
+function get_mat_muls(ideals)
+    Q:=[quo<Universe(x) | x> : x in ideals];
+    one:=&cat [ [1] cat [0 : i in [2..Dimension(q)]] : q in Q];
+    N:=#one;
+    return [Transpose(block_diagonal_matrix(<RepresentationMatrix(q.i) : q in Q>)) : i in [1..Rank(Q[1])]],
+	Matrix(BaseRing(Universe(ideals[1])), N, 1, one);
+end function;
+
+function get_ell(k, n)
+    v:=Matrix(k, 1, n, [rnd(k) : i in [1..n]]);
+    return v;
+end function;
+
+k:=GF(65537);
+U<T>:=PolynomialRing(k);
+n:=4;
+pol_ring:=PolynomialRing(k,n);
+
+m:=[10,3,3,2,2,2];
+ideals, pts:=get_ideals(pol_ring, m);
+mat_muls, one:=get_mat_muls(ideals);
+
+D:=NumberOfColumns(mat_muls[1]);
+ell:=get_ell(k, D);
+seq_ell:=[ell];
+for i in [1..2*D+4] do
+    Append(~seq_ell, seq_ell[#seq_ell]*mat_muls[n]);
+end for;
+seq_val1:=[(x*one)[1,1] : x in seq_ell];
+rev_M, delta:=BerlekampMassey(seq_val1);
+M:=U!(T^delta*Evaluate(rev_M, 1/T));
+B:=U!(T^Degree(M)*Evaluate(M, 1/T));
+P:=[x[1] : x in SquarefreeFactorization(M) | x[2] eq 1];
+P:=P[1];
+
+A1:=(U!seq_val1*B) mod T^delta;
+tA1:=U!(T^(delta-1)*Evaluate(A1, 1/T));
+
+coefs:=[rnd(k) : i in [1..n-1]];
+mat_t2:=&+[coefs[i]*mat_muls[i] : i in [1..n-1]];
+seq_val_t:=[(x*(mat_t2*one))[1,1] : x in seq_ell];
+seq_val_t2:=[(x*(mat_t2^2*one))[1,1] : x in seq_ell];
+
+At:=(U!seq_val_t*B) mod T^delta;
+tAt:=U!(T^(delta-1)*Evaluate(At, 1/T));
+At2:=(U!seq_val_t2*B) mod T^delta;
+tAt2:=U!(T^(delta-1)*Evaluate(At2, 1/T));
+P:=GCD(tA1*tAt2-tAt^2, P);
+
+AX:=[U!(T^(delta-1)*Evaluate((U![(x*(mat_muls[i]*one))[1,1] : x in seq_ell]*B) mod T^delta, 1/T)) : i in [1..n-1]];
+inv_denom:=InverseMod(tA1, P);
+param:=[f*inv_denom mod P : f in AX] cat [T];
+
+[[Evaluate(f, x[1]) : f in param] : x in Roots(P)] eq pts[1..m[1]];
+
+coefs_u:=[rnd(k) : i in [1..n]];
+mat_u:=&+[coefs_u[i]*mat_muls[i] : i in [1..n]];
+
+seq_ell_u:=[ell];
+for i in [1..2*D+4] do
+    Append(~seq_ell_u, seq_ell_u[#seq_ell_u]*mat_u);
+end for;
+seq_val_u1:=[(x*one)[1,1] : x in seq_ell_u];
+rev_Mu, delta_u:=BerlekampMassey(seq_val_u1);
+Mu:=U!(T^delta_u*Evaluate(rev_Mu, 1/T));
+Bu:=U!(T^Degree(Mu)*Evaluate(Mu, 1/T));
+Pu:=SquarefreePart(Mu);
+
+tA1u:=U!(T^(delta_u-1)*Evaluate((U![(x*one)[1,1] : x in seq_ell_u]*Bu) mod T^delta_u, 1/T));
+tAXu:=[U!(T^(delta_u-1)*Evaluate((U![(x*(mat_muls[i]*one))[1,1] : x in seq_ell_u]*Bu) mod T^delta_u, 1/T)) : i in [1..n]];
+inv_denom_u:=InverseMod(tA1u, Pu);
+param_u:=[f*inv_denom_u mod Pu : f in tAXu];
+
+{[Evaluate(f, x[1]) : f in param_u] : x in Roots(Pu)} eq SequenceToSet(pts) ;
+
+// find the generating series of l|P.
+revP:=U!(T^Degree(P)*Evaluate(P,1/T));
+rest:=B div revP;
+num1:=A1*InverseMod(rest, revP) mod revP;
+num2:=A1*InverseMod(revP, rest) mod rest;
+num3:=(A1-num1*rest-num2*revP) div B;
+num:=num1+revP*num3; // should be the numerator
+
+series_ell1:=num*InverseMod(revP,T^(2*D+4)) mod T^(2*D+4);
+seq_ell1:=[Coefficient(series_ell1, i) : i in [0..Degree(P)-1]];
+u_mod:=&+[coefs_u[i]*param[i] : i in [1..n]];
+
+QP:=quo<U | P>;
+Qu_mod:=QP!u_mod;
+pow_umod:=[QP!1];
+for i in [1..2*D+3] do
+    Append(~pow_umod, pow_umod[#pow_umod]*Qu_mod);
+end for;
+val_ell1:=[&+[Coefficient(pow_umod[i], j)*seq_ell1[j+1] : j in [0..Degree(P)-1]] : i in [1..2*D+4]];
+
+val_ell2:=[seq_val_u1[i]-val_ell1[i] : i in [1..2*D+4]];
