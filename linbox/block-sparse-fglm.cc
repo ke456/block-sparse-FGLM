@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cmath>
 #include <omp.h>
@@ -24,6 +25,7 @@ using namespace std;
 
 int prime;
 GF FIELD;
+ofstream ofs{"func.sage"};
 
 void poly_add (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a,
 const PolMatDom::Polynomial b){
@@ -543,6 +545,11 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		auto el = V.refEntry(i,0);
 		V_col.refEntry(i,0) = el;
 	}
+
+#ifdef OUTPUT_FUNC
+	ofs << "R = []" << endl;
+#endif
+
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
 		//cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
@@ -586,23 +593,21 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		poly_mod(func,func,smith[0]);
 		//cout << "func mod P: " << func << endl;
 #ifdef OUTPUT_FUNC
-		cout << "FUNC" << i << ": " << endl;
-		cout << "[";
+		ofs << "R.append(";
 		for (int i = 0; i < func.size(); i++){
-			cout << func[i] << "*x1^" << i << " ";
-			if (i != func.size()-1) cout << "+";
+			ofs << func[i] << "*x1^" << i << " ";
+			if (i != func.size()-1) ofs << "+";
 		}
-		cout << "]"<< endl;
+		ofs <<")"<< endl;
 #endif
 	}
 #ifdef OUTPUT_FUNC
-	cout << "P: " << endl;
-	cout << "[";
+	ofs << "P = ";
 	for (int i = 0; i < smith[0].size(); i++){
-		cout << smith[0][i] << "*x1^" << i;
-		if (i != smith[0].size()-1)	cout << "+";
+		ofs << smith[0][i] << "*x1^" << i;
+		if (i != smith[0].size()-1)	ofs << "+";
 	}
-	cout << "]"<< endl;
+	ofs << endl;
 #endif
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -1722,5 +1727,35 @@ int main( int argc, char **argv ){
 		cout << q << endl;
 	}
 #endif
+#ifdef OUTPUT_FUNC
+	for (int i  = 0; i < n; i++){
+		ofs << "func = fs["<<i<<"]"<<endl;
+		for(int j = 0; j < n-1; j++){
+			ofs << "func = func(";
+			for (int z = 0; z < n; z++){
+				if (z == j+1)
+					ofs<<"R[" << j << "]";
+				else
+				  ofs<<"x"<<z+1;
+				if (z != n-1)
+					ofs << ",";
+			}
+			ofs<<")%P"<<endl;
+		}
+		ofs << "print(func)" << endl;
+	}
+#endif
+
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
