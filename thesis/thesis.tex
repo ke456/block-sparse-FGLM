@@ -48,8 +48,11 @@
 \def\scrY{\mathscr{Y}}
 \def\mA{\mathbf{A}}
 \def\mB{\mathbf{B}}
+\def\mD{\mathbf{D}}
 \def\mF{\mathbf{F}}
+\def\mI{\mathbf{I}}
 \def\mNs{\mathbf{N^*}}
+\def\mN{\mathbf{N}}
 \def\mS{\mathbf{S}}
 \def\mT{\mathbf{T}}
 \def\mU{\mathbf{U}}
@@ -93,30 +96,27 @@ field operations ($O^{\tilde{~}}$ omits polylogarithm factors)
 \cite{GaGe13}. 
 
 
-
-
-
 \newpage
 \section{Previous Algorithms}
 
 \subsection{Wiedemann algorithm}
 The Wiedemann algorithm of \cite{Wiedemann86} solves a system
-$Ay = b$, where $A$ is an invertible square matrix. The most
+$\mA y = b$, where $\mA$ is an invertible square matrix. The most
 important aspect of this algorithm is that the minimal polynomial
-$P(x) = \sum_{i = 0}^{D} c_i x^i$ of $A$ can be computed
+$P(x) = \sum_{i = 0}^{D} c_i x^i$ of $\mA$ can be computed
 through a scalar sequence
-$$ s = (u^{tr}A^ib)_{i \ge 0}$$
+$$ S = (u^{tr}\mA^ib)_{i \ge 0}$$
 for a random vector $u$. Once we have sufficient number of terms
 of $s$, we apply the Berlekamp-Massey algorithm, which efficiently
 computes $P(x)$ from $s$.
 In the simplest case, where $c_0 \neq 0$, we have that
 \begin{align*}
-P(A) = 0 &= c_0 I + c_1A + \dots + c_D A^D \\
-\implies -c_0 I &= \sum_{i=1}^{D}c_iA^i \\
-\implies I &= A(-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})\\
-\implies b &= A(-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})b
+P(\mA) = 0 &= c_0 \mI + c_1\mA + \dots + c_D \mA^D \\
+\implies -c_0 \mI &= \sum_{i=1}^{D}c_i\mA^i \\
+\implies \mI &= \mA(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})\\
+\implies b &= \mA(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})b
 \end{align*}
-Therefore, $x = (-c_0^{-1} \sum_{i=1}^{D}c_iA^{i-1})b$.
+Therefore, $x = (-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})b$.
 
 \subsection{Sparse-FGLM Algorithm}
 The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
@@ -130,25 +130,25 @@ of the monomial basis. More precisely, given
 	$\mathbb{B} \subset \mathbb{K}[x_1,\dots,x_n]/I$:&
 	monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
 	$D$: & dimension of $\mathbb{B}$\\
-	$T_1,\dots,T_n$:& multiplication matrices of
+	$\mT_1,\dots,\mT_n$:& multiplication matrices of
 	$x_1,\dots,x_n$ respectively	
 \end{tabular}
 \end{center}
 it produces the lex Gr\"obner basis of $I$ of the form
 $\{ R_1(x_1), x_2-R_2(x_1),\dots, x_n - R_n(x_1)  \}$.
 The key idea is that $R(x_1)$ is the minimal polynomial
-of the multiplication matrix $T_1$, which we can
+of the multiplication matrix $\mT_1$, which we can
 find using the Wiedemann algorithm. We generate
-$$ s = (u^{tr} T^i_1 e)_{(0 \le i < 2D)}$$
+$$ S = (u^{tr} \mT^i_1 e)_{(0 \le i < 2D)}$$
 where $u$ is a random vector and $e$ is the coordinate
 vector for $1$ in $\mathbb{B}$. Then, we find the minimum
 generating polynomial $P(t)$ by
-applying the Berlekamp-Massey algorithm on $s$.
+applying the Berlekamp-Massey algorithm on $S$.
 If we rewrite $P(t)$ in $x_1$, we get $R_1(x_1)$
 We compute the numerator $n$ of the generating series
 $Z = \sum_{i=0}^{D} s^{(i)}/t^{i+1}$ by a product
 $N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we
-generate $s_j = (u^{tr} T_1^i T_j e)_{(0 \le i < D)}$
+generate $s_j = (u^{tr} \mT_1^i \mT_j e)_{(0 \le i < D)}$
 along with the numerator $N_j$ of the generating series
 $Z_j = \sum_{i=0}^{D} s_j^{(i)} / t^{i+1}$ by a product
 $N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
@@ -158,9 +158,9 @@ non-radical ideals using the Berlekamp-Massey-Sakata algorithm.
 \newpage
 \section{Blocking}
 In Sparse-FGLM algorithm, generating the matrix sequence 
-$L = (u^{tr} T_1^i)_{(0 \le i < 2D)}$ is the bottleneck of this
+$L = (u^{tr} \mT_1^i)_{(0 \le i < 2D)}$ is the bottleneck of this
 algorithm. The most efficient way to compute $L^{(i)}$ is
-to compute $L^{(i-1)}T_1$; however, this requires the terms
+to compute $L^{(i-1)}\mT_1$; however, this requires the terms
 of $L$ to be computed sequentially. Therefore, it is natural to
 consider using blocking methods; that is, using
 sequences of small matrices instead of scalar
@@ -183,25 +183,40 @@ which had previously been proven by Kaltofen and Villard.
 \subsection{Linearly recurrent sequences}
 We first review basic facts on linearly recurrent sequences.
 Consider a sequence $(\ell_i)_{i \ge 0} \in \K^\N$
-and the associated generating series $S=\sum_{i \ge 0} \ell_i T^i \in
-\K[[T]]$. The sequence $(\ell_i)$ is {\rm linearly recurrent} if and
+and the associated generating series $S=\sum_{i \ge 0} \ell_i t^i \in
+\K[[t]]$. The sequence $(\ell_i)$ is {\rm linearly recurrent} if and
 only if its generating series is {\em rational}- that is, if there
-exist polynomials $N,D$ in $\K[T]$ such that $S=N/D$; these
+exist polynomials $N,D$ in $\K[t]$ such that $S=N/D$; these
 polynomials are unique if we assume $\gcd(N,D)=1$ and $D(0)=1$. When
 this is the case, given a degree bound $\delta$ on such $N$ and $D$,
 we can recover them by means of a rational reconstruction
 algorithm~\cite{GaGe13}. In the same vein, we say that a degree $m$
-polynomial $P\in\K[T]$ {\em cancels} a sequence $\ell$ if $p_0 \ell_i
+polynomial $P\in\K[t]$ {\em cancels} a sequence $\ell$ if $p_0 \ell_i
 + \cdots + p_m \ell_{i+d}=0$ for all $i \ge 0$, where $p_0,\dots,p_m$
 are the coefficients of $P$; this is equivalent to ${\rm rev}(P) S$
-being a polynomial, with $S=\sum_{i \ge 0} \ell_i T^i$ and ${\rm
-	rev}(P)=T^m P(1/T)$.
+being a polynomial, with $S=\sum_{i \ge 0} \ell_i t^i$ and ${\rm
+	rev}(P)=t^m P(1/t)$.
+
+Lastly, suppose we are given a generating series in $q$,
+$\sum_{i\ge 0} c^i q^i$ and we want to rewrite it in terms
+of $t = \frac{1}{q}$. We have that
+\begin{align*}
+	\sum_{i\ge0} c^i q^i &= \frac{1}{1-c q}\\
+	\implies
+	\sum_{i\ge0} c^i/ t^i &= \frac{1}{1-c (1/t)}\\
+	&= \frac{t}{t-c}\\
+	\implies
+	\sum_{i\ge0} c^i/ t^{i+1} &= \frac{1}{t-c}
+\end{align*}
 
 \subsection{Matrix sequences and generators}
 In this section, we will extend the idea of linearly recurrent
 sequences to matrix sequences.
-Similar to the scalar case, for a matrix sequence $S$,
-we can define a generating polynomial.
+Let $S$ be a matrix sequence, then it is linearly recurrent
+if and only if there exits polynomial matrices $\mD$ and $\mN$ such 
+that $\sum_{i \ge 0} S^{(i)}t^i = \mD^{-1} \mN$.
+Similarly, we can also define a generating polynomial which
+\textit{cancels} the sequence $S$.
 
 \begin{definition}
 	A generating polynomial matrix of $S$ is 
@@ -245,6 +260,8 @@ minimality of generators.
 There are several algorithms to compute the minimum generating
 matrix polynomial, but we will use a generalization
 of the Berlekamp-Massey algorithm \cite{Coppersmith93}.
+\textcolor{red}{TODO: add specification of pm-basis}
+
 
 
 \subsection{Computing the Minimal Polynomial}
@@ -352,34 +369,26 @@ for $i > t$, we let $\sigma_i = 1$.
 \end{proof}
 
 It is well known that the largest invariant factor of
-$tI - A$ is the minimal polynomial of $A$. Therefore, the above
-theorem shows that if we choose the entries of $X$ and $Y$
+$tI - \mA$ is the minimal polynomial of $\mA$. Therefore, the above
+theorem shows that if we choose the entries of $\mX$ and $\mY$
 randomly, with high probability, we will have that the
-largest invariant factor of $F^{X,A,Y}$ is the minimal
-polynomial of $A$.
+largest invariant factor of $\mF^{X,A,Y}$ is the minimal
+polynomial of $\mA$.
 
-Finally, we prove that the fraction description is strictly proper.
-
-\begin{theorem}
-	Let $Z = \sum_{i=0}^{\infty} (X^{tr} A^i Y)/ t^{i+1}$. If there exists $F^{X,A,Y}$ such that
-	$(F^{X,A,Y})^{-1} N = Z$, then for every column of $N$,
-	its column degree is strictly less than the corresponding 
-	column degree of $F^{X,A,Y}$ 
-\end{theorem}
-
-\begin{proof}
-	Let $H = X^{tr} (tI - A)^{-1} Y$,
-	(TODO: minor / det(tI-A) -> strictly proper) 
-	then $H$ strictly proper
-	and its expansion is equal to $Z$. Suppose we find
-	$F^{X,A,Y}$ such that $(F^{X,A,Y})^{-1} N = Z$, then
-	$N = F^{X,A,Y}Z$. Since $Z = H$ and $H$ has ``negative"
-	degrees, $N = F^{X,A,Y}H$ must have smaller degree
-	than $F^{X,A,Y}$.
-\end{proof}
-
-\noindent This shows that once we have $F^{X,A,Y}$, we can compute
-$N$ with $\lceil D / M \rceil \ge \delta$ terms of $(XA^iY)_{i \ge 0}$.
+Finally, we show that if $\mZ = 
+\sum_{i=0}^{\infty} (\mX^{tr} \mA^i \mY)/ t^{i+1}$ and
+$\mZ = (\mF^{X,A,Y})^{-1}\mN$,
+then for every row of $\mN$, its row degree is strictly
+less than the corresponding row degree of $\mF^{X,A,Y}$.
+Since the highest power of the entries in $\mZ$ is $t^{-1}$, the 
+entries of the product $\mF^{X,A,Y}\mZ$ must have degree of at 
+most $\delta -1$. Furthermore, since the sequence $(\mA^i)_{i \ge 
+0}$ is linearly recurrent, both $\mN$ and $\mF^{X,A,Y}$ are 
+polynomial matrices;
+therefore, any terms of $\mZ$ with degree less than $t^{-\delta}$
+will vanish in the product.
+This shows that once we have $\mF^{X,A,Y}$, we can compute
+$\mN$ with $\lceil D / M \rceil \ge \delta$ terms of $(\mX\mA^i\mY)_{i \ge 0}$.
 
 
 \newpage
@@ -463,7 +472,7 @@ points of $V$. We choose a linear form
 $$\ell: f \in I \mapsto \mathbb{N},\;\ell(f) = 17 f(1,4) + 33 f(3,2)$$
 (later, we will prove that for a 
 radical ideal $I$, every linear form looks like 
-$\ell = c_1 f(\alpha_1) + \dots c_n f(\alpha_n) $ for all
+$\ell = c_1 f(\alpha_1) + \cdots + c_n f(\alpha_n) $ for all
 $\alpha \in V(I)$). Then we have,
 \begin{align*}
 \ell(x_1^i) &= 17 \cdot 1^i + 33 \cdot 3^i\\
