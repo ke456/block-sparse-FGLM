@@ -1174,7 +1174,8 @@ $\mN^*_j = \mG \sum_{i=0}^{d} (\mU^t \mT^i \mT_j e) / {t^{i+1}}$
 and set $N^j =
 [0 \dots 0 P] \mG^{-1} \mN^*_j$. Finally, $R_j(x_1) = N_j / N \mod P$.
 
-\begin{algorithm}
+\begin{algorithm}[H]
+	\label{algo:block-sparse-fglm}
 	\caption{Block Sparse-FGLM($\mT,\mT_1,\dots,\mT_n,m$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
@@ -1182,26 +1183,22 @@ and set $N^j =
 		\item dimension of the blocks $m \in \mathbb{N}$
 	\end{itemize}
 	{\bf Output:} polynomials $(P,R_1,\dots,R_n)$
-\end{algorithm}
-
-\begin{center}
-	\textbf{Block Sparse-FGLM:}
 	\begin{itemize}
 		\item[]\textcolor{red}{\bf 1.~} {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
 		\item[]\textcolor{red}{\bf 2.~} {\sf $S= (U^tT^iV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
 		\item[]\textcolor{red}{\bf 3.~} {\sf $G = {\sf MatrixBerlekampMassey}(S)$ and 
-			$N^* = G\sum_{i\ge 0} {(U^tT^ie)}/{t^{i+1}}$}
+			$N^* = G\sum_{i=0}^{d-1} {(U^tT^ie)}/{t^{i+1}}$}
 		\item[]\textcolor{red}{\bf 4.~} {\sf $P=$ largest invariant factor of $G$ and $R={\sf SquareFreePart}(P)$}
 		\item[]\textcolor{red}{\bf 5.~} {\sf $a = [0 ~\cdots 0 P] G^{-1}$}
 		\item[]\textcolor{red}{\bf 6.~} {\sf $N=aN^*$}
 		\item[]\textcolor{red}{\bf 7.~} {\sf for $j = 1 \dots n$:}
 		\begin{itemize}
-			\item[]\textcolor{red}{\bf 7.1.} ~~{\sf	$N_j^* = G\sum_{i\ge 0} {(U^tT_1^i T_j e)}/{t^{i+1}}$}
+			\item[]\textcolor{red}{\bf 7.1.} ~~{\sf	$N_j^* = G\sum_{i= 0}^{d-1} {(U^tT_1^i T_j e)}/{t^{i+1}}$}
 			\item[]\textcolor{red}{\bf 7.2.} ~~{\sf $N_j=aN_j^*$}
 			\item[]\textcolor{red}{\bf 7.3.} ~~{\sf $R_j=N_j/N$ mod $R$}
 		\end{itemize}
 	\end{itemize}
-\end{center}
+\end{algorithm}
 
 We will demonstrate how step 7.3 computes $R_j$ through
 a small example. Let 
@@ -1351,30 +1348,32 @@ randomly, we will have that the
 largest invariant factor of $\mF^{U,A,V}$ is the minimal
 polynomial of $\mA$  with high probability.
 
-Finally, we show that if $\mZ = 
-\sum_{i=0}^{\infty} (\mU^{tr} \mA^i \mV)/ t^{i+1}$ and
-$\mZ = (\mF^{U,A,V})^{-1}\mN^*$ for some matrix $\mN^*$,
-then for every row of $\mN^*$, 
-its row degree is strictly
-less than the corresponding row degree of $\mF^{U,A,V}$.
-Since the highest power of the entries in $\mZ$ is $t^{-1}$, the 
-entries of the product $\mF^{X,A,Y}\mZ$ must have degree of at 
-most $\delta -1$. Furthermore, since the sequence $(\mA^i)_{i \ge 
-	0}$ is linearly recurrent, both $\mN^*$ and $\mF^{U,A,V}$ are 
-polynomial matrices;
-therefore, any terms of $\mZ$ with degree less than $t^{-\delta}$
-will vanish in the product.
-This shows that once we have $\mF^{U,A,V}$, we can compute
-$\mN^*$ with $\lceil D / m \rceil \ge \delta$ terms of $(\mU\mA^i\mV)_{i \ge 0}$.
-
-
 Next, we prove that one can recover a scalar numerator
 through a matrix numerator.
 
-\begin{lemma}\label{utilde}
-	Let $\textbf{a}$ be defined as line 5 of the Block-Sparse-FGLM algorithm, 
+\begin{Lemma}\label{num_deg}
+	If $\mZ = 
+	\sum_{i=0}^{\infty} (\mU^{tr} \mA^i \mV)/ t^{i+1}$ and
+	$\mZ = (\mF^{U,A,V})^{-1}\mN^*$ for some matrix $\mN^*$,
+	then for every row of $\mN^*$, 
+	its row degree is strictly
+	less than the corresponding row degree of $\mF^{U,A,V}$
+\end{Lemma}
+
+\begin{proof}
+	Since the highest power of the entries in $\mZ$ is $t^{-1}$, the 
+	entries of the product $\mF^{X,A,Y}\mZ$ must have degree of at 
+	most $\delta -1$. Furthermore, since the sequence $(\mA^i)_{i \ge 
+		0}$ is linearly recurrent, both $\mN^*$ and $\mF^{U,A,V}$ are 
+	polynomial matrices;
+	therefore, any terms of $\mZ$ with degree less than $t^{-\delta}$
+	will vanish in the product.
+\end{proof}
+
+\begin{Lemma}\label{utilde}
+	Let $\textbf{a}$ be defined as line 5 of algorithm \ref{algo:block-sparse-fglm}, 
 	then $\textbf{a}$ has polynomial entries.
-\end{lemma}
+\end{Lemma}
 
 \begin{proof}
 	Let $\mathscr{D} = \mA\mG\mB$ be the Smith normal form of $\mG$ and $s_1, \cdots s_M$ be
@@ -1399,24 +1398,32 @@ through a matrix numerator.
 \end{proof}
 
 \begin{theorem}
-	 The last entry of the last row of $a N^*$ is  
+	 Let $N$ be defined as line 6 of algorithm \ref{algo:block-sparse-fglm}, then $N$ is
 	 the numerator of the generating function for 
 	 $(u_{M}^{tr} T^i e)_{i \ge 0}$ with respect
 	 to the minimal polynomial $P$
 \end{theorem}
 
 \begin{proof}
-	Rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_M]$, then
-	$$ Z = \sum_{i\ge0} U^t T^i e / t^{i+1} =
+	Let $S_e = (U^tT^ie)_{i\ge0}$.
+	By lemma \ref{num_deg}, we know that $\mN^*$ has degree no more than
+	$d = \lceil D/m \rceil $; therefore, $\mN^*$ can be computed using $d$
+	terms of $S_e$,
+	$$
+	\mN^* = G \sum_{i=0}^{d-1} S_e^{(i)}/t^{i+1}
+	= G \sum_{i=0}^{\infty} S_e^{(i)}/t^{i+1}
+	$$
+	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_M]$, then
+	$$
+	\mN^* = G
+	\sum_{i=0}^{\infty} U^t T^i e / t^{i+1} =
 	\begin{bmatrix}
 	\sum u_1^{tr}T^ie/t^{i+1}\\
 	\vdots                   \\
 	\sum u_M^{tr}T^ie/t^{i+1}
 	\end{bmatrix}$$
-	Since each entry of $Z$ is a scalar sequence with the same
-	minimum generator, we can rewrite them in their closed form
-	$N_{i,j}/P$. Therefore,
-	$$ \mN^* = G \sum_{i=0}^{\infty} S^{(i)}/t^{i+1} = G 
+	By rewriting each $\sum_{i\ge0} u_j T^i e$ in its closed form, we get
+	$$ \mN^* = G 
 	\begin{bmatrix}
 	N_{1,1} / P \\
 	\vdots      \\
@@ -1447,13 +1454,22 @@ through a matrix numerator.
 	$(u_{M}^{tr} T^i e)_{i \ge 0}$ with
 	respect to $P$.
 \end{proof}
-
-Now consider the generating series 
-$Z_v = \sum_{i\ge0}(u_{M} T^i v) / t^{i+1}$
-for any $v$. By lemma \ref{lemma:anyv}, we have
-that $Z_v P$ is a polynomial of degree less than
-$D$. Therefore, 
-$N_j = (\sum_{i\ge0} (u_m T^i T_j e)/ t^{i+1} )P$
+Finally, by applying similar steps as above, we prove that
+$R_j$ satisfies ... \textcolor{red}{(TODO: define $R_j$)}.
+\begin{corollary}
+	$R_j$ as defined in line $7.3$ of algorithm \ref{algo:block-sparse-fglm} is equal to ... \textcolor{red}{TODO}
+\end{corollary}
+\begin{proof}
+	Let $$\mN_j^* = \mG \sum_{i=0}^{d-1} (U^tT^iT_je)/t^{i+1}$$ 
+	Then
+	by lemma \ref{num_deg}, 
+	$$\mN_j^* = \mG \sum_{i=0}^{\infty}
+	(U^tT^iT_je)/t^{i+1}$$
+	Therefore, $N_j=a\mN_j^*$ must be the scalar numerator of the
+	generating function for $(u^t_mT^ie)_{i\ge0}$ with respect to
+	$P$. Therefore $R_j = N_j/N \mod P = \dots$ (\textcolor{red}{TODO})
+	as needed.
+\end{proof}
 
 \newpage
 \subsection{Example}
