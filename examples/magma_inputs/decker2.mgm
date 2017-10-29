@@ -1,0 +1,12 @@
+
+function get_equations()
+    M:=PolynomialRing(Integers(),2);
+    x:=[M.i : i in [1..Rank(M)]];
+    sys:=[
+	x[1] + x[2]^3,
+	x[1]^2*x[2] - x[2]^4
+	];
+    return sys, "decker2";
+end function;
+
+
