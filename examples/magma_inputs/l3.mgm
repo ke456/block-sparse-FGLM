@@ -1,0 +1,5 @@
+function get_equations()
+  K<t, x, y, z>:=PolynomialRing(Integers(),4);
+  eqs:=[x^3+t+y+z-1, y^3+t+x+z-1, z^3+t+x+y-1, t^3+x+y+z-1];
+  return eqs,"l3";
+end function;

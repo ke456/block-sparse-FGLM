@@ -1,0 +1,5 @@
+function get_equations()
+  K<B, D, F, b, d, f>:=PolynomialRing(Integers(),6);
+  eqs:=[3*B*b-3*B*d-3*D*b+3*D*d+B+D-6*F+4, 3*B*b-3*B*d+3*D*b-3*D*d-6*F*b+6*F*d+5*B-5*D, 3*b^2-6*b*d+3*d^2-6*b-6*d+4*f+3, B^2*b^3-1, D^2*d^3-1, F^2*f^3-1];
+  return eqs,"nbody4";
+end function;

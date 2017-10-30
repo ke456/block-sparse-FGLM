@@ -1,0 +1,12 @@
+
+function get_equations()
+    K<x,y,z>:=PolynomialRing(Integers(),3);
+
+    eqs := [ 
+	x^3 + y*x^2 + x + z,
+	x^2*y +3*x +2,
+	x^2-y*x+z
+	];
+
+    return eqs, "gonzalez_gonzalez";
+end function;

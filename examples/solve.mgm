@@ -1,0 +1,13 @@
+
+k:=GF(9001);
+equations, name:=get_equations();
+N:=PolynomialRing(k, Rank(Universe(equations)), "grevlex");
+equations_mod:=[ N!f : f in equations ];
+d:=Dimension(Ideal(equations_mod));
+if d eq 0 then
+    name, d, Dimension(quo<N|equations_mod>);
+else
+    name, d, 0;
+end if;
+
+quit;

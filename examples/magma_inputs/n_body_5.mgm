@@ -1,0 +1,7 @@
+function get_equations()
+  K<p, phi, s>:=PolynomialRing(Integers(),3);
+  eqs:=[-3*phi^3*s^5+15*p*phi^3*s^3+4*p^3*phi^3-12*p^2*phi^3*s+phi^3*s^3-3*p*phi^3*s-6*p^3, 3*phi^3*s^4-9*p*phi^3*s^2-5*phi^3*s^2-6*p^3*s+5*p*phi^3, 3*s^4-12*p*s^2
++4*phi^2-6*s^2+12*p+3]
+;
+  return eqs,"nbody5";
+end function;

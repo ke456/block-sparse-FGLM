@@ -1,0 +1,15 @@
+
+function get_equations()
+    M<x5, x4, x3, x2, x1>:=PolynomialRing(Integers(),5);
+	   
+    eqs := [
+	(x1 + x1*x2 + x2*x3 + x3*x4)*x5 - 1,
+	(x2 + x1*x3 + x2*x4)*x5 - 2,
+	(x3 + x1*x4)*x5 - 3,
+	x4*x5 - 4,
+	x1 + x2 + x3 + x4 + 1
+	];
+	   
+    return eqs, "eco5";
+
+end function;

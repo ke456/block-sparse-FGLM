@@ -1,0 +1,14 @@
+
+function get_equations()
+    M:=PolynomialRing(Integers(),5);
+    x:=[M.i : i in [1..Rank(M)]];
+
+    sys:=[
+	x[1]^2-2*x[1] + x[1]+x[2]+x[3]+x[4]+x[5]-4,
+	x[2]^2-2*x[2] + x[1]+x[2]+x[3]+x[4]+x[5]-4,
+	x[3]^2-2*x[3] + x[1]+x[2]+x[3]+x[4]+x[5]-4,
+	x[4]^2-2*x[4] + x[1]+x[2]+x[3]+x[4]+x[5]-4,
+	x[5]^2-2*x[5] + x[1]+x[2]+x[3]+x[4]+x[5]-4
+	];
+    return sys, "KSS.mgm";
+end function;
