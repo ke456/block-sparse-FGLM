@@ -1,7 +1,7 @@
 
 function get_equations()
     K<x,y,z,t>:=PolynomialRing(Integers(),4);
-
+    Y:=1;
     eqs := [
 	-2*y^3*z + 6*x^2*z*t - 6*x*y*z*t + 3*y^2*z*t - y*z*t^2 - 6*x^2*t + 6*x*y*t - 2*y^2*t,
 	18*x^2*y*z^2 - 18*x*y^2*z^2 + 18*y^3*z^2 - 63*x^2*z^2*t + 63*x*y*z^2*t - 27*y^2*z^2*t + 9*Y*z^2*t^2 - 18*x^2*y*z + 18*z*y^2*z - 9*y^3*z + 78*x^2*z*t - 78*x*y*z*t + 24*y^2*z*t - 15*x^2*t +15*x*y*t - 5*y^2*t,

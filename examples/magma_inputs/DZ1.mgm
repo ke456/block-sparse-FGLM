@@ -1,6 +1,6 @@
 
 function get_equations()
-    M:=PolynomialRing(Integers(),3);
+    M:=PolynomialRing(Integers(),4);
     x:=[M.i : i in [1..Rank(M)]];
 
     sys:=[
