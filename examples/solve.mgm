@@ -1,0 +1,6 @@
+
+k:=GF(9001);
+equations:=get_equations();
+N:=PolynomialRing(k, Rank(Universe(equations)));
+equations_mod:=[ N!f : f in equations ];
+Dimension(Ideal(equations_mod));
