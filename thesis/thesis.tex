@@ -67,6 +67,7 @@
 \def\mF{\mathbf{F}}
 \def\mG{\mathbf{G}}
 \def\mI{\mathbf{I}}
+\def\mM{\mathbf{M}}
 \def\mNs{\mathbf{N^*}}
 \def\mN{\mathbf{N}}
 \def\mS{\mathbf{S}}
@@ -148,32 +149,30 @@ of the monomial basis. More precisely, given
 \begin{tabular}{c c}
 	$I \subset \mathbb{K}$:& zero dimensional radical ideal
 	in shape position\\
-	$\mathbb{B} \subset \mathbb{K}[x_1,\dots,x_n]/I$:&
-	monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
+	$\mathbb{B} \subset \mathbb{K}[X_1,\dots,X_n]/I$:&
+	monomial basis of $\mathbb{K}[X_1,\dots,X_n]/I$\\
 	$D$: & dimension of $\mathbb{B}$\\
-	$\mT_1,\dots,\mT_n$:& multiplication matrices of
-	$x_1,\dots,x_n$ respectively	
+	$\mM_1,\dots,\mM_n$:& multiplication matrices of
+	$X_1,\dots,X_n$ respectively	
 \end{tabular}
 \end{center}
 it produces the lex Gr\"obner basis of $I$ of the form
-$\{ R_1(x_1), x_2-R_2(x_1),\dots, x_n - R_n(x_1)  \}$.
-The key idea is that $R(x_1)$ is the minimal polynomial
-of the multiplication matrix $\mT_1$, which we can
+$\{ P(X_1), X_2-R_2(X_1),\dots, X_n - R_n(X_1)  \}$.
+The key idea is that $R(X_1)$ is the minimal polynomial
+of the multiplication matrix $\mM_1$, which we can
 find using the Wiedemann algorithm. We generate
-$$ S = (u^{tr} \mT^i_1 e)_{(0 \le i < 2D)}$$
+$$ S = (u^{tr} \mM^i_1 e)_{(0 \le i < 2D)}$$
 where $u$ is a random vector and $e$ is the coordinate
 vector for $1$ in $\mathbb{B}$. Then, we find the minimum
-generating polynomial $P(t)$ by
+generating polynomial $P$ by
 applying the Berlekamp-Massey algorithm on $S$.
-If we rewrite $P(t)$ in $x_1$, we get $R_1(x_1)$
 We compute the numerator $n$ of the generating series
-$Z = \sum_{i=0}^{D} s^{(i)}/t^{i+1}$ by a product
-$N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we
-generate $s_j = (u^{tr} \mT_1^i \mT_j e)_{(0 \le i < D)}$
-along with the numerator $N_j$ of the generating series
-$Z_j = \sum_{i=0}^{D} s_j^{(i)} / t^{i+1}$ by a product
+$Z = \sum_{i=0}^{D-1} u^{tr} \mM^i_1 e/T^{i+1}$ by a product
+$N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we first
+compute the numerator $N_j$ of the generating series
+$Z_j = \sum_{i=0}^{D} u^{tr} \mM_1^i \mM_j e / T^{i+1}$ by a product
 $N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
-Also, other versions of this algorithm exist to handle
+Other versions of this algorithm exist to handle
 non-radical ideals using the Berlekamp-Massey-Sakata algorithm.
 
 \newpage
@@ -237,69 +236,69 @@ variable instead), and performing the union of the two components $V'$
 and $V''$.
 
 \subsubsection{Basic facts on linearly recurrent sequences.} Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
-and the associated generating series $S=\sum_{s \ge 0} \ell_s t^s \in
-\K[[t]]$. The sequence $(\ell_s)_{s \ge 0}$ is {\rm linearly recurrent} if and
+and the associated generating series $Z=\sum_{s \ge 0} \ell_s T^s \in
+\K[[T]]$. The sequence $(\ell_s)_{s \ge 0}$ is {\rm linearly recurrent} if and
 only if its generating series is {\em rational} that is, if there
-exist polynomials $A,B$ in $\K[t]$ such that $S=A/B$; these
+exist polynomials $A,B$ in $\K[T]$ such that $Z=A/B$; these
 polynomials are unique if we assume $\gcd(A,B)=1$ and $B(0)=1$. 
 
-We say that a degree $m$ polynomial $P\in\K[t]$ {\em cancels} a
+We say that a degree $m$ polynomial $P\in\K[T]$ {\em cancels} a
 sequence $(\ell_s)_{s \ge 0}$ if $p_0 \ell_s + \cdots + p_m
 \ell_{s+m}=0$ for all $s \ge 0$, where $p_0,\dots,p_m$ are the
 coefficients of $P$; this is equivalent to ${\rm rev}(P) S$ being
-polynomial of degree less than $m$, with $S=\sum_{s \ge 0} \ell_s t^s$
-and ${\rm rev}(P)=t^m P(1/t)$. The {\em minimal polynomial} of
+polynomial of degree less than $m$, with $Z=\sum_{s \ge 0} \ell_s T^s$
+and ${\rm rev}(P)=T^m P(1/T)$. The {\em minimal polynomial} of
 sequence $(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest degree
 that cancels this sequence. 
 
-Given the closed form $S =  A/B$ as above, we define $\tilde B =
-t^{\max(\deg(A)+1,\deg(B))}B(1/t)$.  By construction, $\tilde B$ lies
-in $\K[t]$, and one can check that it is the minimal polynomial of
+Given the closed form $Z =  A/B$ as above, we define $\tilde B =
+T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.  By construction, $\tilde B$ lies
+in $\K[T]$, and one can check that it is the minimal polynomial of
 sequence $(\ell_s)_{s \ge 0}$. However, it is often easier to work with a 
 closed form that has the minimal polynomial as the denominator rather than
-its reverse. Let $S' = \sum_{s\ge0} \ell_s / t^{i+1}$, then the sequence 
-$(\ell_s)_{s\ge0}$ is linearly recurrent if and only if $S'P$ is a polynomial
-of degree less than $P$. Therefore, if $A' = S'P$ and $B' = P$, then we
-can write $S' = A'/B'$
+its reverse. Let $Z' = \sum_{s\ge0} \ell_s / T^{i+1}$, then the sequence 
+$(\ell_s)_{s\ge0}$ is linearly recurrent if and only if $Z'P$ is a polynomial
+of degree less than $P$. Therefore, if $A' = Z'P$ and $B' = P$, then we
+can write $Z' = A'/B'$
 
 In both cases, if we are given the series and the denominator, then our 
 choice for the numerator is unique. The next definition captures this idea:
 \begin{definition}
 	\label{def:omega}
-	$\Omega(S,P)$ is the numerator for the closed form of $S$ with respect
+	$\Omega(Z,P)$ is the numerator for the closed form of $Z$ with respect
 	to $P$ if:
 	\begin{itemize}
-		\item $\Omega(S,P)$ is a polynomial of degree less than $P$
-		\item $S = \Omega(S,P)/P$
+		\item $\Omega(Z,P)$ is a polynomial of degree less than $P$
+		\item $S = \Omega(Z,P)/P$
 	\end{itemize}
 \end{definition}
 \noindent Let $A$ and $A'$ be defined as above, then 
-$\Omega(S,{\rm rev}(P)) = A$ and $\Omega(S',P) = A'$. Finally, 
-if $S$ and $S'$ defined over the same sequence with 
+$\Omega(Z,{\rm rev}(P)) = A$ and $\Omega(Z',P) = A'$. Finally, 
+if $Z$ and $Z'$ defined over the same sequence with 
 minimal polynomial $P$, then
-$$\Omega(S',P) = t^{deg(P) - 1} \Omega(S,{\rm rev}(P) )(1/t)$$
+$$\Omega(Z',P) = T^{deg(P) - 1} \Omega(Z,{\rm rev}(P) )(1/T)$$
 \noindent This makes it possible to avoid computations using a series
-over $1/t$. We give an example of this using
+over $1/T$. We give an example of this using
 the Fibonacci sequence, which is well known to be linearly recurrent. Since 
 the Fibonacci sequence $F = (1,1,2,3,5,8,\dots)$ is defined
 recursively as $F^{(i+2)} = F^{(i)} + F^{(i+1)}$, $F^{(0)} = 1$, it is
-easy to verify that the minimal polynomial of $F$ is $P = 1-t-t^2$.
-Define $S = \sum_{i\ge 0} F^{(i)} t^s$ and ${\rm rev}(P) = t^2-t-1$, then
-$\Omega(S,{\rm rev}(P)) = 1$; therefore,
-$$S = \frac{1}{t^2-t-1}$$
-\noindent Now, define $S' = \sum_{i\ge0} F^{(i)}/t^{i+1}$, then we have that
+easy to verify that the minimal polynomial of $F$ is $P = 1-T-T^2$.
+Define $Z = \sum_{i\ge 0} F^{(i)} T^s$ and ${\rm rev}(P) = T^2-T-1$, then
+$\Omega(Z,{\rm rev}(P)) = 1$; therefore,
+$$Z = \frac{1}{T^2-T-1}$$
+\noindent Now, define $Z' = \sum_{i\ge0} F^{(i)}/T^{i+1}$, then we have that
 \begin{align*}
-\Omega(S',P)& = t^{deg(P)-1}\Omega(S,{\rm rev}(P))(1/t) = t\\
-\implies S' &= \frac{t}{1-t-t^2}
+\Omega(Z',P)& = T^{deg(P)-1}\Omega(Z,{\rm rev}(P))(1/T) = T\\
+\implies Z' &= \frac{T}{1-T-T^2}
 \end{align*}
 
 The sequences we consider below are of the form $(\ell(t^s))_{s \ge
 	0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $t$ in $Q$. For such
 sequences, the following standard result will be useful.
 \begin{Lemma}\label{lemma:minpoly}
-	Let $t$ be in $Q$ and let $M \in \K[T]$ be its minimal
+	Let $t$ be in $Q$ and let $P \in \K[T]$ be its minimal
 	polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(Q,\K)$,
-	$M$ is the minimal polynomial of the sequence $(\ell(t^s))_{s \ge
+	$P$ is the minimal polynomial of the sequence $(\ell(t^s))_{s \ge
 		0}$.
 \end{Lemma}
 
@@ -762,24 +761,24 @@ zero-dimensional parametrization of $V_{\mathfrak{S}}$.
 \end{proof}
 
 We demonstrate how this algorithm works through a small example. Let 
-$I = \langle (x_1-1)(x_2-2),(x_1-3)(x_2-4)\rangle \subset
-GF(101)[x_1,x_2]$, then
-clearly $V(I) = \{ (1,4),(3,2) \}$ and $x_1$ separates the
+$I = \langle (X_1-1)(X_2-2),(X_1-3)(X_2-4)\rangle \subset
+GF(101)[X_1,X_2]$, then
+clearly $V(I) = \{ (1,4),(3,2) \}$ and $X_1$ separates the
 points of $V$. We choose a random linear form 
 $$\ell: f \in I \mapsto \mathbb{N},\;\ell(f) = 17 f(1,4) + 33 f(3,2)$$
 Then we have
 \begin{align*}
-\ell(x_1^i) &= 17 \cdot 1^i + 33 \cdot 3^i\\
-\ell(x_2x_1^i) &= 17 \cdot 4 \cdot 1^i + 33 \cdot 2 \cdot 3^i
+\ell(X_1^i) &= 17 \cdot 1^i + 33 \cdot 3^i\\
+\ell(X_2X_1^i) &= 17 \cdot 4 \cdot 1^i + 33 \cdot 2 \cdot 3^i
 \end{align*} 
 We define an infinite series for both sequences
 \begin{align*}
-S_1 = \sum_{i = 0}^{\infty} \ell(x^i_1) / t^{i+1}
-&= \frac{17}{t-1} + \frac{33}{t-3}
-= \frac{17(t-3)+33(t-1)}{(t-1)(t-3)} \\
-S_2 = \sum_{i=0}^{\infty} \ell(x_2x^i_1)/t^{i+1} 
-&= \frac{17\cdot 4}{t-1} + \frac{33 \cdot 2}{t-3}
-= \frac{17\cdot 4 (t-3) + 33\cdot 2(t-1)}{(t-1)(t-3)}
+Z_1 = \sum_{i = 0}^{\infty} \ell(X^i_1) / T^{i+1}
+&= \frac{17}{T-1} + \frac{33}{T-3}
+= \frac{17(T-3)+33(T-1)}{(T-1)(T-3)} \\
+Z_2 = \sum_{i=0}^{\infty} \ell(X_2X^i_1)/T^{i+1} 
+&= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{t-3}
+= \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}
 \end{align*}
 $S_1$ and $S_2$ have a common denominator $P = (t-1)(t-3)$,
 whose roots are the coordinates of $x_1$ in $V(I)$. Now, let
@@ -787,8 +786,8 @@ whose roots are the coordinates of $x_1$ in $V(I)$. Now, let
 R_2 
 &=\frac{\Omega(S_2,P)}{\Omega(S_1,P)} \mod P\\
 &= 
-\frac{17\cdot 4 (t-3) + 33\cdot 2(t-1)}{17(t-3)+33(t-1)} \mod P\\
-&=\frac{4 (t-3) + 2(t-1)}{(t-3)+(t-1)} \mod P
+\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod P\\
+&=\frac{4 (T-3) + 2(T-1)}{(T-3)+(T-1)} \mod P
 \end{align*}
 Now, $ R_2(1) = 4$ and $R_2(3) = 2$ as needed.
 
@@ -1190,10 +1189,10 @@ of $S$.
 \newpage
 \section{Block Sparse-FGLM algorithm}
 In this section, we will show how to extend the Sparse-FGLM
-to using blocking methods. Steel's method also used the
+to using blocking methods. Steel's method also uses the
 Block Wiedemann algorithm to compute the minimal polynomial
-of $\mT_i$, for which the roots provide the appropriate
-values for $x_i$,
+of $\mM_i$, for which the roots provide the appropriate
+values for $X_i$,
 but uses the ``evaluation" method for the rest
 (another Gr\"obner Basis computation with that variable
 evaluated at each root of the minimal polynomial) \cite{Steel15}.
@@ -1205,67 +1204,67 @@ Given:
 	\begin{tabular}{c c}
 		$I \subset \mathbb{K}$:& zero dimensional ideal
 		in shape position\\
-		$\mathbb{B} \subset \mathbb{K}[x_1,\dots,x_n]/I$:&
-		monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
+		$\mathbb{B} \subset \mathbb{K}[X_1,\dots,X_n]/I$:&
+		monomial basis of $\mathbb{K}[X_1,\dots,X_n]/I$\\
 		$D$: & dimension of $\mathbb{B}$\\
-		$\mT_1, \dots,\mT_n$:& multiplication matrices of
-		$x_1 ,\dots,x_n$ respectively\\
-		$x$:& random linear combination of $x_i$'s\\
-		$\mT$:& multiplication matrix of $x$
+		$\mM_1, \dots,\mM_n$:& multiplication matrices of
+		$X_1 ,\dots,X_n$ respectively\\
+		$t$:& random linear combination of $X_i$'s\\
+		$\mM$:& multiplication matrix of $t$
 	\end{tabular}
 \end{center}
 we compute a lex Gr\"obner basis that have the same points
 in its variety as the radical of $I$ 
 (note that we do not assume that $I$ is radical).
-This is because we introduce another variable $x$ which,
+This is because we introduce another variable $t$ which,
 generically, separates the points in the variety.
-We assume that the base field $\K$ has characteristic
+We also assume that the base field $\K$ has characteristic
 larger than $D$. More precisely, we want to find polynomials
-$(P,R_1,\dots,R_n)$ such that for all $\alpha$ that is a factor of
-$P$, $\{ (R_1(\alpha),\dots,R_n(\alpha)) \} = V(I)$
+$(R,R_1,\dots,R_n)$ such that for all $\alpha$ that is a factor of
+$R$, $\{ (R_1(\alpha),\dots,R_n(\alpha)) \} = V(I)$
 
 As with the scalar case, we need to compute the minimal polynomial
-of $\mT$. We choose an integer $m$ and two matrices of random
+of $\mM$. We choose an integer $m$ and two matrices of random
 entries $\mU,\mV \in \K^{D\times m}$. Then, we generate a matrix
-sequence $S = (\mU^{t}\mT^i\mV)_{0 \le i < 2d}$ with
+sequence $S = (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$ with
 $d = \lceil \frac{D}{m} \rceil$ and find the minimum generating
-polynomial matrix $\mG$ of $S$ by applying the matrix
+polynomial matrix $\mF^{U,M,V}$ of $S$ by applying the matrix
 Berlekamp-Massey algorithm. We set $P$ to be the largest
-invariant factor of $\mG$ and $R(x)$ to
+invariant factor of $\mF^{U,M,V}$ and $R$ to
 be the square free part of $P$.
 
 To find the matrix numerator, we do a product 
-$\mN^* = \mG\sum_{i=0}^{d} (\mU^t \mT^i e)/ t^{i+1}$. We can find a
-scalar numerator by computing $N =  [0 \dots 0 P] \mG^{-1} \mN^*$. To find $R_j(x_1)$, $1 \le j \le n$,
-we compute 
-$\mN^*_j = \mG \sum_{i=0}^{d} (\mU^t \mT^i \mT_j e) / {t^{i+1}}$
+$\mN^* = \mF^{U,M,V}\sum_{i=0}^{d} (\mU^{tr} \mM^i e)/ T^{i+1}$. We can find a
+scalar numerator by computing $N =  [0 \dots 0 P] (\mF^{U,M,V})^{-1} \mN^*$. 
+To find $R_j(X_1)$, $1 \le j \le n$, we compute 
+$\mN^*_j = \mF^{U,M,V} \sum_{i=0}^{d} (\mU^{tr} \mM^i \mM_j e) / {T^{i+1}}$
 and set $N^j =
-[0 \dots 0 P] \mG^{-1} \mN^*_j$. Finally, $R_j(x_1) = N_j / N \mod P$.
+[0 \dots 0 P] (\mF^{U,M,V})^{-1} \mN^*_j$. Finally, $R_j(x_1) = N_j / N \mod P$.
 
 \begin{algorithm}[H]
 	\label{algo:block-sparse-fglm}
-	\caption{Block Sparse-FGLM($\mT,\mT_1,\dots,\mT_n,m$)}
+	\caption{Block Sparse-FGLM($\mM,\mM_1,\dots,\mM_n,m$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
-		\item $\mT,\mT_1,\dots,\mT_n$ defined as above
+		\item $\mM,\mM_1,\dots,\mM_n$ defined as above
 		\item dimension of the blocks $m \in \mathbb{N}$
 	\end{itemize}
-	{\bf Output:} polynomials $(P,R_1,\dots,R_n)$
+	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
 	\begin{itemize}\setlength\itemsep{0em}
 		\item[]{\bf 1.~} {\sf choose $\mU,\mV \in \mathbb{K}^{m \times D}$}
-		\item[]{\bf 2.~} {\sf $S= (\mU^t\mT^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
-		\item[]{\bf 3.~} {\sf $\mF^{U,T,V} = {\sf MatrixBerlekampMassey}(S)$ and 
-		$\mN^* = \mF^{U,T,V}\sum_{i=0}^{d-1} {(\mU^t\mT^ie)}/{t^{i+1}}$}
-		\item[]{\bf 4.~} {\sf $P=$ largest invariant factor of $\mF^{U,T,V}$ 
-		and $R={\sf SquareFreePart}(P)$}
-		\item[]{\bf 5.~} {\sf $a = [0 ~\cdots 0 P] (\mF^{U,T,V})^{-1}$}
-		\item[]{\bf 6.~} {\sf $N=a\mN^*$}
-		\item[]{\bf 7.~} {\sf for $j = 1 \dots n$:}
+		\item[]{\bf 2.~} {\sf $S= (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+		\item[]{\bf 3.~} {\sf $\mF^{U,M,V} = {\sf MatrixBerlekampMassey}(S)$}
+		\item[]{\bf 4.~} {\sf $\mN^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^ie)}/{T^{i+1}}$} 	 
+		\item[]{\bf 5.~} {\sf $P=$ largest invariant factor of $\mF^{U,M,V}$}
+		\item[]{\bf 6.~} {\sf $R={\sf SquareFreePart}(P)$} 
+		\item[]{\bf 7.~} {\sf $a = [0 ~\cdots 0 P] (\mF^{U,M,V})^{-1}$}
+		\item[]{\bf 8.~} {\sf $N=a\mN^*$}
+		\item[]{\bf 9.~} {\sf for $j = 1 \dots n$:}
 		\begin{itemize}
-			\item[]{\bf 7.1.} ~~{\sf	$\mN_j^* = \mF^{U,T,V}
-				\sum_{i= 0}^{d-1} {(U^tT_1^i T_j e)}/{t^{i+1}}$}
-			\item[]{\bf 7.2.} ~~{\sf $N_j=a\mN_j^*$}
-			\item[]{\bf 7.3.} ~~{\sf $R_j=N_j/N$ mod $R$}
+			\item[]{\bf 9.1.} ~~{\sf	$\mN_j^* = \mF^{U,M,V}
+				\sum_{i= 0}^{d-1} {(\mU^{tr}\mM^i \mM_j e)}/{T^{i+1}}$}
+			\item[]{\bf 9.2.} ~~{\sf $N_j=a\mN_j^*$}
+			\item[]{\bf 9.3.} ~~{\sf $R_j=N_j/N$ mod $R$}
 		\end{itemize}
 	\end{itemize}
 \end{algorithm}
@@ -1273,135 +1272,117 @@ and set $N^j =
 \subsection{Proof of Correctness}
 
 First, we present a proof that one can compute
-the minimal polynomial of $\mT$ from the
+the minimal polynomial of $\mM$ from the
 output of Matrix Berlekamp-Massey if we choose
 the blocking matrices $\mU$ and $\mV$ generically.
 This result had been previously been proven by
 Kaltofen and Villard \cite{KaVi04}\cite{Villard97a}.
 
-Let $\mT$ be in $\mathbb{K}^{D \times D}$ and 
+Let $\mM$ be in $\mathbb{K}^{D \times D}$ and 
 $\mU,\mV \in \mathbb{K}^{D \times m}$ be two blocking matrices. Now, define two matrix sequences
-$S_V = (\mT^i \mV)_{(i \ge 0)}$ and 
-$S_{U,V} = (\mU^{tr} \mT^i \mV)_{(i \ge 0)}$ denote their minimum
-generating matrix polynomial as $\mF^{T,V}$ and $\mF^{U,T,V}$ respectively.
+$S_V = (\mM^i \mV)_{(i \ge 0)}$ and 
+$S_{U,V} = (\mU^{tr} \mM^i \mV)_{(i \ge 0)}$ denote their minimum
+generating matrix polynomial as $\mF^{M,V}$ and $\mF^{U,M,V}$ respectively.
 Let $s_1, \dots, s_r$ be the invariant factors
-of $t\mI - \mT$, ordered in such a way that 
+of $T\mI - \mM$, ordered in such a way that 
 $s_r | s_{r-1}| \dots | s_1$, and let $d_i = $ deg$(s_i)$ for
 all $i$; for $i > r$, we let $s_i$ = 1, with $d_i = 0$.
 We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
-We also denote by $\sigma_1, \cdots, \sigma_t$ the invariant
-factors of $\mF^{U,T,V}$, for some $t \le m$. As above,
-for $i > t$, we let $\sigma_i = 1$.
+We also denote by $\sigma_1, \cdots, \sigma_k$ the invariant
+factors of $\mF^{U,M,V}$, for some $k \le m$. As above,
+for $i > k$, we let $\sigma_i = 1$.
 
 \begin{theorem}
 	\label{randXY}
 	For a generic choice of $\mU$ and $\mV$, we have:
 	\begin{itemize}
-		\item $\mF^{U,T,V}$ has degree $\delta$;
-		\item $s_i = \sigma_i$ for $1 \le i \le M$.
+		\item $\mF^{U,M,V}$ has degree $\delta$;
+		\item $s_i = \sigma_i$ for $1 \le i \le m$.
 	\end{itemize}
 \end{theorem}
 
 \begin{proof}
 	We denote by $\langle \mV \rangle$ the vector
-	space generated by the columns of $\mV,\mT\mV,\mT^2\mV,\dots$. We also write
+	space generated by the columns of $\mV,\mM\mV,\mM^2\mV,\dots$. We also write
 	$D_V=\dim(\langle \mV \rangle)$.
 	
 	First, we prove that for any $\mV$ in $\K^{D \times m}$, for a generic
-	$\mU$ in $\K^{D\times m}$, $\mF^{U,T,V}=\mF^{T,V}$.  Indeed,
+	$\mU$ in $\K^{D\times m}$, $\mF^{U,M,V}=\mF^{M,V}$.  Indeed,
 	by~\cite[Lemma~4.2]{Villard97a}, there exists matrices $\mathbf{P}_V$ in
-	$\K^{D\times D_V}$ and $\mT_V \in \K^{D_V \times D_V}$, with $\mathbf{P}_V$ of
-	full rank $D_V$, and where $\mT_V$ is a matrix of the restriction of $\mT$
-	to $\langle \mV \rangle$, such that $\mF^{U,T,V}=\mF^{T,V}$ if and only if
+	$\K^{D\times D_V}$ and $\mM_V \in \K^{D_V \times D_V}$, with $\mathbf{P}_V$ of
+	full rank $D_V$, and where $\mM_V$ is a matrix of the restriction of $\mM$
+	to $\langle \mV \rangle$, such that $\mF^{U,M,V}=\mF^{M,V}$ if and only if
 	the dimension of the span of $[\mZ ~ \mB_V \mZ ~\mB_V^2 \mZ ~ \cdots]$ is equal to
-	$D_V$, with $\mB_V=\mT_V^\perp$ and $\mZ=\mathbf{P}_V^\perp \mU \in \K^{D_V \times m}$.
+	$D_V$, with $\mB_V=\mM_V^\perp$ and $\mZ=\mathbf{P}_V^\perp \mU \in \K^{D_V \times m}$.
 	
 	We prove that this is the case for a generic $\mU$. By construction, one
-	can find a basis of $\langle \mV \rangle$ in which the matrix of $\mT_V$
-	is block-companion, with $m' \le m$ blocks (take the $\mT_V$-span of the
+	can find a basis of $\langle \mV \rangle$ in which the matrix of $\mM_V$
+	is block-companion, with $m' \le m$ blocks (take the $\mM_V$-span of the
 	first column of $\mV$, then of the second column, working modulo the
 	previous vector space, etc.) Thus, $\mB_V$ is similar to a
 	block-companion matrix with $m'$ blocks as well; since $\mZ$ has $m$
 	columns, $S$ has full dimension $N_V$ for a generic $\mZ$ (and for a
 	generic $\mU$, since $P_V$ has rank $N_V$). Thus, for generic choices of
-	$\mU$ and $\mV$, $\mF^{U,T,V}=\mF^{T,V}$.
+	$\mU$ and $\mV$, $\mF^{U,M,V}=\mF^{M,V}$.
 	
 	Let us next introduce a matrix $\scrV$ of indeterminates of size $D
-	\times m$, and let $\mF^{T,\scrV}$ be the minimal generating polynomial
-	of the ``generic'' sequence $(\mT^i \scrV)_{i \ge 0}$. The notation
+	\times m$, and let $\mF^{M,\scrV}$ be the minimal generating polynomial
+	of the ``generic'' sequence $(\mM^i \scrV)_{i \ge 0}$. The notation
 	$\langle \scrV \rangle$ and $D_\scrV$ are defined as above.  In
 	particular, by~\cite[Proposition 6.1]{Villard97a}, the minimal
-	generating polynomial $\mF^{T,\scrV}$ has degree $\delta$ and
+	generating polynomial $\mF^{M,\scrV}$ has degree $\delta$ and
 	determinantal degree $\nu$.
 	
 	Now, for a generic $\mV$ in $\K^{D\times m}$, $D_V=D_\scrV$. Indeed,
-	$\langle \scrV\rangle$ is the span of $K_\scrV=[\scrV ~ \mT \scrV ~ \cdots ~
-	\mT^{N-1} \scrV]$, whereas $\langle \mV \rangle$ is the span of $[\mV ~ \mT \mV
-	~ \cdots ~\mT^{N-1} \mV]$. Take a maximal non-zero minor $\mu$ of
+	$\langle \scrV\rangle$ is the span of $K_\scrV=[\scrV ~ \mM \scrV ~ \cdots ~
+	\mM^{N-1} \scrV]$, whereas $\langle \mV \rangle$ is the span of $[\mV ~ \mM \mV
+	~ \cdots ~\mM^{N-1} \mV]$. Take a maximal non-zero minor $\mu$ of
 	$K_\scrV$; as soon as $\mu(Y)\ne 0$, we have equality of the
 	dimensions. On the other hand, by~\cite[Lemma~4.3]{Villard97a}, for
-	any $\mV$ (including $\scrV$), the degree of $\mF^{T,V}$ is equal to the
-	first index $d$ such that $\dim({\rm span}([\mV ~ \mT \mV ~ \cdots ~\mT^{d-1}
-	\mV]))=D_V$. As a result, for generic $\mV$, $\mF^{T,V}$ and $\mF^{T,\scrV}$
+	any $\mV$ (including $\scrV$), the degree of $\mF^{M,V}$ is equal to the
+	first index $d$ such that $\dim({\rm span}([\mV ~ \mM \mV ~ \cdots ~\mM^{d-1}
+	\mV]))=D_V$. As a result, for generic $\mV$, $\mF^{M,V}$ and $\mF^{M,\scrV}$
 	have the same degree, that is, $\delta$.  The first item is proved.
 	
 	We conclude by proving that for generic $\mU,\mV$, the invariant factors
-	$\sigma_1,\dots,\sigma_m$ of $\mF^{U,T,V}$ are $s_1,\dots,s_m$.
+	$\sigma_1,\dots,\sigma_m$ of $\mF^{U,M,V}$ are $s_1,\dots,s_m$.
 	By~\cite[Theorem~2.12]{KaVi04}, for any $\mU$ and $\mV$ in $\K^{D\times
 		m}$, for $i=1,\dots,m$, the $i^{th}$ invariant factor $\sigma_i$ of
-	$\mF^{U,T,V}$ divides $s_i$, so that $\deg(\det(\mF^{U,T,V}))\le\nu$, with
+	$\mF^{U,M,V}$ divides $s_i$, so that $\deg(\det(\mF^{U,M,V}))\le\nu$, with
 	equality if and only if $\sigma_i=s_i$ for all $i \le m$.
 	
 	For $\mV$ as above and any integers $e,d$, we let ${\rm Hk}_{e,d}(\mV)$ be
 	the block Hankel matrix
 	$$ {\rm Hk}_{e,d}(\mV) =
 	\begin{bmatrix}
-	\mI \\  \mT \\  \mT^2 \\ \vdots  \\  \mT^{e-1}
+	\mI \\  \mM \\  \mM^2 \\ \vdots  \\  \mM^{e-1}
 	\end{bmatrix}
 	\begin{bmatrix}
-	\mV & \mT\mV & \mT^2\mV &\cdots&  \mT^{d-1}\mV
+	\mV & \mM\mV & \mM^2\mV &\cdots&  \mM^{d-1}\mV
 	\end{bmatrix}
 	$$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}(\mV)) =
-	\deg(\det(\mF^{T,V}))$ for $d \ge \deg(\mF^{T,V})$ and $e \ge D$.  We take
-	$e=D$, so that ${\rm rank}({\rm Hk}_{D,d}(\mV)) = \deg(\det(\mF^{T,V}))$
-	for $d \ge \deg(\mF^{T,V})$. On the other hand, the sequence ${\rm
+	\deg(\det(\mF^{M,V}))$ for $d \ge \deg(\mF^{M,V})$ and $e \ge D$.  We take
+	$e=D$, so that ${\rm rank}({\rm Hk}_{D,d}(\mV)) = \deg(\det(\mF^{M,V}))$
+	for $d \ge \deg(\mF^{M,V})$. On the other hand, the sequence ${\rm
 		rank}({\rm Hk}_{N,d}(\mV))$ is constant for $d \ge D$; as a result,
 	${\rm rank}({\rm Hk}_{D,D}(\mV)) = \deg(\det(\mF^{T,V}))$. For the same
 	reason, we also have ${\rm rank}({\rm Hk}_{D,D}(\scrV)) =
-	\deg(\det(F^{T,\scrV}))$, so that for a generic $\mU$, $\mF^{T,V}$ and
-	$\mF^{T,\scrV}$ have the same determinantal degree, that is, $\nu$.  As
+	\deg(\det(F^{M,\scrV}))$, so that for a generic $\mU$, $\mF^{M,V}$ and
+	$\mF^{M,\scrV}$ have the same determinantal degree, that is, $\nu$.  As
 	a result, for generic $\mU$ and $\mV$, we also have
-	$\deg(\det(\mF^{U,T,V}))=\nu$, and the conclusion follows.
+	$\deg(\det(\mF^{U,M,V}))=\nu$, and the conclusion follows.
 \end{proof} 
 
 It is well known that the largest invariant factor of
-$t\mI - \mT$ is the minimal polynomial of $\mT$. Therefore, the above
+$T\mI - \mM$ is the minimal polynomial of $\mM$. Therefore, the above
 theorem shows that if we choose the entries of $\mU$ and $\mV$
 randomly, we will have that the
-largest invariant factor of $\mF^{U,T,V}$ is the minimal
-polynomial of $\mT$  with high probability.
+largest invariant factor of $\mF^{U,M,V}$ is the minimal
+polynomial of $\mM	$  with high probability.
 
 Next, we prove that one can recover a scalar numerator
 through a matrix numerator.
-
-\begin{Lemma}\label{num_deg}
-	If $\mZ = 
-	\sum_{i=0}^{\infty} (\mU^{tr} \mA^i \mV)/ t^{i+1}$ and
-	$\mZ = (\mF^{U,A,V})^{-1}\mN^*$ for some matrix $\mN^*$,
-	then for every row of $\mN^*$, 
-	its row degree is strictly
-	less than the corresponding row degree of $\mF^{U,A,V}$
-\end{Lemma}
-
-\begin{proof}
-	Since the highest power of the entries in $\mZ$ is $t^{-1}$, the 
-	entries of the product $\mF^{U,A,V}\mZ$ must have degree of at 
-	most $\delta -1$. Furthermore, since $\mF^{U,A,V}$ cancels 
-	the sequence $(\mU\mA^i\mV)_{i \ge 0}$ then $\mN^*$ is a
-	polynomial matrix;
-	therefore, $\mN^*$ does not have terms of negative exponents.
-\end{proof}
 
 \begin{Lemma}\label{utilde}
 	Let $\textbf{a}$ be defined as line 5 of algorithm \ref{algo:block-sparse-fglm}, 
@@ -1409,129 +1390,136 @@ through a matrix numerator.
 \end{Lemma}
 
 \begin{proof}
-	Let $\mathscr{D} = \mA\mF^{U,T,V}\mB$ be the Smith normal form of $\mF^{U,T,V}$ and $s_1, \cdots s_M$ be
-	invariant factors of $\mF^{U,T,V}$ such that 
-	$s_M | s_{M-1} | \cdots | s_1$.
-	Let $[b_1,\cdots,b_M]$ be the last row of $\mB$ and 
-	$w = [\frac{s_1b_1}{s_M},\frac{s_1b_2}{s_{M-1}},\cdots,\frac{s_1b_{M-1}}{s_2},b_M]$ (since $s_i | s_1$), then
+	Let $\mathscr{D} = \mA\mF^{U,M,V}\mB$ be the Smith normal form of $\mF^{U,M,V}$ and $s_1, \cdots s_m$ be
+	invariant factors of $\mF^{U,M,V}$ such that 
+	$s_m | s_{m-1} | \cdots | s_1$.
+	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
+	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
 	\begin{align*}
-	(w \mA) \mA^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_M},\frac{s_1b_2}{s_{M-1}},\cdots,\frac{s_1b_{M-1}}{s_2},b_M]
+	(w \mA) \mA^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]
 	\begin{bmatrix}
-	s_M &        & \\
+	s_m &        & \\
 	& \ddots & \\
 	&        & s_1
 	\end{bmatrix}\\
-	&= [s_1b_1, s_1b_2, \cdots, s_1b_M]\\
+	&= [s_1b_1, s_1b_2, \cdots, s_1b_m]\\
 	&= [0,\cdots,0,s_1] \mB
 	\end{align*}
 	Therefore, if $a = w \mA$, we get
-	$ a \mF^{U,T,V} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
+	$ a \mF^{U,M,V} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
 	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
 	entries, $a$ must also have polynomial entries.\\
 \end{proof}
 
 \begin{theorem}
 	 Let $U = [u_1,u_2,\dots,u_m]$be in $\K^{D\times m}$,
-	 $\mF^{U,T,V}$ be the minimum generator of $(\mU^t \mT^i \mV)_{i\ge0}$,
-	 and $P$ be the minimal polynomial of $\mT$. For any 
+	 $\mF^{U,M,V}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
+	 and $P$ be the minimal polynomial of $\mM$. For any 
 	 $v \in \K^{D}$, if\\ 
-	 $\mN^* = \mF^{U,T,V}\sum_{i=0}^{d-1} (\mU^t \mT^i v)/t^{i+1}$ 
+	 $\mN^* = \mF^{U,M,V}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1}$ 
 	 with all terms of negative exponents removed
 	 and $N = a\mN^*$,
-	 then $N = \Omega(\sum_{i\ge0}(u_m^t \mT^i v)/t^{i+1},P)$.
+	 then $N = \Omega(\sum_{i\ge0}(u_m^t \mM^i v)/T^{i+1},P)$.
 	 \label{theorem:anyv}
 \end{theorem}
 
 \begin{proof}
-	Let $\mN^{*'} = \mF^{U,T,V} \sum_{i=0}^{\infty} (\mU^t\mT^iv)/t^{i+1}$.
-	By lemma \ref{num_deg}, we know that $\mN^{*'}$ has degree no more than
-	$d = \lceil D/m \rceil $; therefore, $\mN^{*'}$ can be computed using $d$
-	terms of $(\mU^t\mT^i v)_{(i\ge 0)}$. If $\mN^*$ is
-	defined as above, then 
+	Let $Z = \sum_{i=0}^{\infty} (\mU^t\mM^iv)/T^{i+1}$ and
+	$\mN^{*'} = \mF^{U,M,V} Z$.
+	Since the highest power of the entries in 
+	$Z$ is $T^{-1}$, the 
+	entries of the product $\mN^{*'}$ must have degree less 
+	than $d = deg(\mF^{U,M,V})$. Furthermore, since $\mF^{U,M,V}$ cancels 
+	the sequence $(\mU\mM^i\mV)_{i \ge 0}$, $\mN^{*'}$ is a
+	polynomial matrix and does not have terms of negative exponents.
+	This means any terms in $Z$ with degree less than $d$ must vanish in the
+	product.
+	Therefore,
 	$$ \mN^* = \mN^{*'}$$
 	
-	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_M]$, then
+	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_m]$, then
 	$$
-	\mN^* = \mF^{U,T,V}
-	\sum_{i=0}^{\infty} \mU^t \mT^i v / t^{i+1} =
+	\mN^* = \mF^{U,M,V}
+	\sum_{i=0}^{\infty} \mU^t \mM^i v / T^{i+1} =
 	\begin{bmatrix}
-	\sum u_1^{tr}\mT^iv/t^{i+1}\\
+	\sum u_1^{tr}\mM^iv/T^{i+1}\\
 	\vdots                   \\
-	\sum u_M^{tr}\mT^iv/t^{i+1}
+	\sum u_m^{tr}\mM^iv/T^{i+1}
 	\end{bmatrix}$$
 	Recall $\Omega$ from definition \ref{def:omega}.
-	By rewriting each $\sum_{i\ge0} u_j \mT^i v$ in its closed form, we get
-	$$ \mN^* = \mF^{U,T,V}
+	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
+	$$ \mN^* = \mF^{U,M,V}
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^t \mT^i v/t^{i+1},P) / P \\
+	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^t \mT^i v/t^{i+1},P) / P 
+	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
 	\end{bmatrix}
 	$$
 	By theorem \ref{randXY}, the $i^{th}$ invariant factor of
-	$t\mI - \mT$ is equal to the $i^{th}$ invariant factor of $\mF^{U,T,V}$ 
+	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{U,M,V}$ 
 	for generic choice of
 	$\mU,\mV$. Thus, $s_1 = P$ and by lemma \ref{utilde}
 	\begin{align*}
-	a \mN^* &= a \mF^{U,T,V}
+	a \mN^* &= a \mF^{U,M,V}
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^t \mT^i v/t^{i+1},P) / P \\
+	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^t \mT^i v/t^{i+1},P) / P 
+	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
 	\end{bmatrix}\\
 	&= [0,\cdots,0,P]
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^t \mT^i v/t^{i+1},P) / P \\
+	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^t \mT^i v/t^{i+1},P) / P 
+	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
 	\end{bmatrix}\\
-	&= \Omega(\sum_{i\ge0} u_m^t \mT^i v/t^{i+1},P)
+	&= \Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P)
 	\end{align*}
-	Therefore, $N = \Omega(\sum_{i\ge0} u_m^t \mT^i v/t^{i+1},P)$ as needed.
+	Therefore, $N = \Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P)$ as needed.
 \end{proof}
 
+% l_{u_m} for linear form of u_m
 Finally, we conclude by seeing what happens
 when we pick specific values for $v$ and apply theorem \ref{theorem:anyv}.
 In line 3 of algorithm \ref{algo:block-sparse-fglm}, we compute
-$\mN^* = \sum_{i=0}^{d-1}\mU^t \mT e/t^{i+1}$, 
+$\mN^* = \mF^{U,M,V}\sum_{i=0}^{d-1}\mU^t \mM e/T^{i+1}$, 
 where $e$ is the coordinate vector of $1$ in $\mathbb{B}$. By applying theorem \ref{theorem:anyv},
-$$N = a\mN^* = \Omega(\sum_{i\ge 0} u_m \mT^i e/t^{i+1},P)$$
+$$N = a\mN^* = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1},P)$$
 By construction,
-$\mT^i e$ gives the coordinate vector of $x^i$ in $\mathbb{B}$, so
-$\sum_{i= 0}^{d-1} u_m \mT^i e = \sum_{i\ge0} \ell(x^i)$, for some linear form
-$\ell$. Therefore, 
-$$N = \Omega(\sum_{i\ge 0} u_m \mT^i e/t^{i+1},P) = \Omega(\sum_{i\ge 0} \ell(x^i) /t^{i+1},P)$$.
+$\mM^i e$ gives the coordinate vector of $t^i$ in $\mathbb{B}$, so
+$\sum_{i= 0}^{d-1} u_m^{tr} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$, where
+$\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
+$$N = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1},P) = \Omega(\sum_{i\ge 0} \ell(t^i) /T^{i+1},P)$$.
 
 Similarly, in line 7.1 of algorithm \ref{algo:block-sparse-fglm}, we compute
-$\sum_{i\ge0} \mU^t \mT \mT_j e / t^{i+1}$. By theorem \ref{theorem:anyv},
-$$N_j = a \N^*_j = \Omega(\sum_{i\ge 0} u_m \mT^i \mT_j e/t^{i+1},P) $$
-Again, by construction, $\mT_j e$ is the coordinate vector for $x_j$ in 
-$\mathbb{B}$ and $\mT^i \mT_j e$ is the coordinate vector for $x^i x_j$ in
+$\mN^*_j = \mF^{U,M,V}\sum_{i\ge0} \mU^{tr} \mM \mM_j e / T^{i+1}$. By theorem \ref{theorem:anyv},
+$$N_j = a \mN^*_j = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i \mM_j e/T^{i+1},P) $$
+Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
+$\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
 $\mathbb{B}$. Therefore,
-$$ N_j =  \Omega(\sum_{i\ge 0} u_m \mT^i \mT_j e/t^{i+1},P) =
- \Omega(\sum_{i\ge 0} \ell(x^ix_j)/t^{i+1},P)$$
+$$ N_j =  \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i \mT_j e/T^{i+1},P) =
+ \Omega(\sum_{i\ge 0} \ell_{u_m}(X_jt^i)/T^{i+1},P)$$
 By the correctness of algorithm \ref{algo:para2}, we have the proof
 of correctness for algorithm \ref{algo:block-sparse-fglm}.
 
 \newpage
 \subsection{Example}
 First, we give an example in the radical case. Let
-$$I = \langle -16x_1^2 - 15x_1x_2 - 14x_2^2 - 48x_1 + 26, 35x_1x_2 + 47x_1 - 46x_2 - 47 \rangle \subset GF(101)[x_1,x_2]$$
-We choose $x = 2x_1 + 53 x_2$, with multiplication matrices:
+$$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset GF(101)[X_1,X_2]$$
+We choose $t = 2X_1 + 53 X_2$, with multiplication matrices:
 \begin{align*}
-\mT_1 = \begin{bmatrix}
+\mM_1 = \begin{bmatrix}
  85&   0&  37&   0\\
  69&  85&  15&   0\\
 100&  91&  19&   1\\
   1&  10&  68&   0
 \end{bmatrix}\,
-\mT_2 = \begin{bmatrix}
+\mM_2 = \begin{bmatrix}
 36&  1&  0&  0\\
 42&  0& 85&  1\\
 51&  0& 91&  0\\
 95&  0& 10&  0
 \end{bmatrix}\,
-\mT = \begin{bmatrix}
+\mM = \begin{bmatrix}
 58& 53& 74&  0\\
 41& 69& 91& 53\\
 75& 81& 13&  2\\
@@ -1540,7 +1528,7 @@ We choose $x = 2x_1 + 53 x_2$, with multiplication matrices:
 \end{align*}
 We choose $m = 2$ and choose $U,V \in GF(101)^{D\times m}$ of random
 entries:
-$$ \mU^t = \begin{bmatrix}
+$$ \mU^{tr} = \begin{bmatrix}
 84& 38\\
 29& 58\\
 80& 43\\
@@ -1553,7 +1541,7 @@ $$ \mU^t = \begin{bmatrix}
  59&  89
 \end{bmatrix}
 $$
-We compute the matrix sequence $S = (\mU^t\mT^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
+We compute the matrix sequence $S = (\mU^t\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
 $$ S = (
 \begin{bmatrix}
 92& 75\\  
@@ -1572,33 +1560,33 @@ $$ S = (
 26& 76
 \end{bmatrix}
 )$$
-$$ \mG =
+$$ \mF^{U,M,V} =
 \begin{bmatrix}
-x^2 + 76x + 8&       87x + 31\\
-    100x + 46& x^2 + 87x + 44
+t^2 + 76t + 8&       87t + 31\\
+    100t + 46& t^2 + 87t + 44
 \end{bmatrix}
 $$
-The biggest invariant factor of $\mG$ is 
-$$P = x^4 + 62x^3 + 85x^2 + 69x + 37 = R$$
+The biggest invariant factor of $\mF^{U,M,V}$ is 
+$$P = t^4 + 62t^3 + 85t^2 + 69t + 37 = R$$
 since $P$ is square free. 
 Now, we compute $\mN^*$ and $a$:
 \begin{align*}
-\mN^* &=[84x + 46, 38x + 65]\\
-a &= [x + 55, x^2 + 76x + 8]
+\mN^* &=[84t + 46, 38t + 65]\\
+a &= [t + 55, t^2 + 76t + 8]
 \end{align*}
 Finally, we find the scalar numerator $N = a\mN^*$:
-$$ N = 100x^3 + 26x^2 + 33x + 18$$
-To get $R_1(x)$, we compute $\mN_1^*$ and $N_1=a\mN_1^*$:
+$$ N = 100t^3 + 26t^2 + 33t + 18$$
+To get $R_1(t)$, we compute $\mN_1^*$ and $N_1=a\mN_1^*$:
 \begin{align*}
-\mN_1^* &= [79x + 8, 100x + 23]\\
-N_1 &= 100x^3 + 26x^2 + 33x + 18
+\mN_1^* &= [79t + 8, 100t + 23]\\
+N_1 &= 100t^3 + 26t^2 + 33t + 18
 \end{align*}
 Lastly,
 \begin{align*}
-R_1(x) &= N_1 / N \mod R \\
-       &= 61x^3 + 75x^2 + 85x + 23
+R_1(t) &= N_1 / N \mod R \\
+       &= 61t^3 + 75t^2 + 85t + 23
 \end{align*}
-We compute $R_2(x)= 32x^3 + 41x^2 + 94x + 22$ in the same way. 
+We compute $R_2(t)= 32t^3 + 41t^2 + 94t + 22$ in the same way. 
 As a sanity check,
 we see that $V(I)$ has one point in $GF(101) \times GF(101)$:
 $(54,79)$ and $P$ has one factor in $GF(101)$: $53$. Now,
