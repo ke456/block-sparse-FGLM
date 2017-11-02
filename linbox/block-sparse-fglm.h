@@ -93,6 +93,8 @@ class PolMatDom {
 	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
 	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
 
+	// computing s-owP kernel basis
+	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
