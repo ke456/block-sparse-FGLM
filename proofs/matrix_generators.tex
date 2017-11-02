@@ -20,7 +20,6 @@
 %\declaretheorem[style=algorithm]{problem}
 %\declaretheorem[style=algorithm]{algorithm}
 
-
 \usepackage[capitalize]{cleveref}
 
 \title{Matrix Berlekamp-Massey}
@@ -70,9 +69,19 @@
 \section{Definition of recurrence relations}
 \label{sec:relations}
 
-First issue: which definition to use for matrix generator? There is one in
-\cite{KalYuh13}, and a different one in \cite{Thome02}; both are related as
-follows.
+First thing: what are linearly recurrent sequences, when talking about matrix
+sequences? The definition is essentially the same as in the scalar case. There
+is a similar notion of generator of a sequence (which is a matrix): it is related to the
+denominator in some minimal fraction description of the generating series of
+the sequence. More precisely, this depends on how the generating series is defined:
+\begin{itemize}
+  \item if $\sum_{k \ge 0} \seqelt{k} \var^k$ then the matrix generator is the
+    reversed denominator;
+  \item if $\sum_{k>0} \seqelt{k} \var^{-k}$, it is exactly the denominator.
+\end{itemize}
+
+Let us see two corresponding definitions from \cite{KalYuh13} and from
+\cite{Thome02}.
 
 \begin{definition}[\cite{Thome02}]
   \label{dfn:relation_thome}
@@ -96,11 +105,11 @@ $p_k \in \matSpace[\cdim][1]$, then we have
   \sum_{k=0}^{d} \seqelt{\delta - k} p_{k} = 0 \quad \text{ for all } d \ge
   \deg(\rel) \text{ and } \delta \ge \max(d,\deg(\seqpm \rel)+1).
 \end{equation}
-One may have in mind that $\deg(\seqpm \rel) < \deg(\rel)$ since this typically
-holds for the output of existing algorithms; in general, this does not
-necessary hold. For example, if $\seq$ has only finitely many nonzero terms,
-and thus $\seqpm$ already has polynomial entries, any coordinate vector is a
-relation $\rel$ such that $\seqpm \rel$ has degree larger than $\deg(\rel)$.
+One may have in mind that $\deg(\seqpm \rel) < \deg(\rel)$ since this often
+holds in interesting examples; of course in general this does not necessary
+hold. For example, if $\seq$ has only finitely many nonzero terms, and thus
+$\seqpm$ already has polynomial entries, any coordinate vector is a relation
+$\rel$ such that $\seqpm \rel$ has degree larger than $\deg(\rel)$.
 
 \begin{definition}[\cite{KalYuh13}]
   \label{dfn:relation_ky}
@@ -141,6 +150,11 @@ relation $\rel$ such that $\seqpm \rel$ has degree larger than $\deg(\rel)$.
   Therefore the reverse $\var^{d} \rel(\var^{-1})$ is a relation for
   \cref{dfn:relation_ky}.
 \end{proof}
+
+\section{Matrix Berlekamp-Massey, or computing matrix generators}
+\label{sec:matrix_berlekamp_massey_or_computing_matrix_generators}
+
+
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
