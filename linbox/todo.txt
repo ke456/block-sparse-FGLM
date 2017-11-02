@@ -1,7 +1,7 @@
--- tune pmbasis threshold
--- in Linbox, the mul / midproduct of polynomial matrices does not accept const... this is unfortunate since it is only touching the matrices entries, isn't it?
+Vincent :
+  -- system solving (Newton or divide-and-conquer)
+  -- write summary about MatrixBM (relying on Turner if possible)
+  -- tune pmbasis threshold
+  -- implement dense "multi-Krylov" algorithm
+  -- can we obtain the same output via the dense version?
 
--- implement dense "multi-Krylov" version
--- can we obtain the same output via the dense version?
--- see about the proof of Lemma 3 in formula-proof
--- check the output of Smith form

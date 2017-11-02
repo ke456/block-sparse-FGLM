@@ -1414,7 +1414,7 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 		series.ref(i,j,k) = pmat.get(i,j,k);
 	const vector<int> shift( m, 0 );
 	vector<size_t> mindeg = this->pmbasis( appbas, series, order, shift );
-	kerbas.resize( appbas.size() );
+	kerbas.resize( order-d );
 	size_t row = 0;
 	for ( size_t i=0; i<m; ++i )
 	{
@@ -1502,6 +1502,31 @@ bool test_order( const PolMat &approx, const PolMat &series, const size_t order 
 				{
 					test = false;
 //					std::cout << d << "\t" << i << "\t" << j << std::endl;
+				}
+			}
+		++d;
+	}
+	return test;
+}
+
+template <typename PolMat>
+bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
+{
+	PolynomialMatrixMulDomain<typename PolMat::Field> PMD(kerbas.field());
+	PolMat prod( kerbas.field(), kerbas.rowdim(), pmat.coldim(), kerbas.size()+pmat.size()-1 );
+	PMD.mul( prod, kerbas, pmat );
+
+	bool test = true;
+	size_t d = 0;
+	while ( test && d<kerbas.size()+pmat.size()-1 )
+	{
+		for ( size_t i=0; i<prod.rowdim(); ++i )
+			for ( size_t j=0; j<prod.coldim(); ++j )
+			{
+				if ( prod.ref(i,j,d) != 0 )
+				{
+					test = false;
+					cout << "degree " << d << endl;
 				}
 			}
 		++d;
@@ -1659,7 +1684,7 @@ int main( int argc, char **argv ){
     tm.stop();
     cout << "###OUTPUT### degrees in kernel basis: " << endl;
     PMD.print_degree_matrix( kerbas );
-    cout << "###CORRECTNESS### is kernel: " << "not implemented" << endl;
+    cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
     cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 #endif
 #ifdef TEST_POL
