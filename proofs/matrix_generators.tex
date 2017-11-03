@@ -5,6 +5,8 @@
 \usepackage{enumerate}
 \usepackage{fullpage}
 \usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
+\usepackage{color}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
 
 % for enumerate / itemize: define reasonable margins
 \usepackage[shortlabels]{enumitem}
@@ -65,9 +67,10 @@
 \newcommand{\seq}{\mathcal{S}} % sequence of matrices
 \newcommand{\seqpm}{\mat{S}} % power series matrix from a sequence
 \newcommand{\rel}{\col{p}} % linear relation
-\newcommand{\relbas}{\mat{p}} % linear relation
+\newcommand{\relbas}{\mat{P}} % linear relation
 \newcommand{\relSpace}{\polMatSpace[1][\rdim]} % space for linear relations
 \newcommand{\relbasSpace}{\polMatSpace[\rdim][\rdim]} % space for linear relations
+\newcommand{\num}{\mat{Q}} % linear relation
 \newcommand{\degBd}{\delta} % bound on degree of minimal generator
 
 %% ------------------------------------------------
@@ -175,10 +178,10 @@ found in \cite[Sec.\,3]{KalVil01}, and in \cite[Def.\,4.2]{Turner02}.
 \end{definition}
 
 The set of relations for $\seq$ is a $\polRing$-submodule of $\relSpace$, which
-has rank $\rdim$ if $\seq$ is linearly recurrent. This is showed in
-\cite[Fact\,1]{KalYuh13} for sequences having a \emph{scalar} recurrence
-relation. Let us now link this with the property of being linearly recurrent
-as in the above definition.
+\textbf{has rank $\rdim$ if $\seq$ is linearly recurrent} (\todo{I cannot find
+this result in the literature..!}). This is showed in \cite[Fact\,1]{KalYuh13}
+for sequences having a \emph{scalar} recurrence relation. Let us now link this
+with the property of being linearly recurrent as in the above definition.
 
 \begin{lemma}
   The sequence $\seq$ is linearly recurrent if and only if there exists a
@@ -202,6 +205,17 @@ a generating set for the module of relations; it is said to be
     \cite{MulSto03} with pivots on the diagonal;
   \item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
 \end{itemize}
+
+\begin{lemma}
+  Consider $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ and
+  its generating series $\seqpm = \sum_{k>0} \seqelt{k} \var^{-k} \in
+  \psMatSpace[\rdim][\cdim]$. Let $\relbas \in \relbasSpace$, and consider
+  $\num = \relbas \seqpm$.
+  
+  is a generating matrix for
+  $\seq$ if and only if
+
+\end{lemma}
 
 %alternative definition from \cite{Thome02}.
 %
@@ -260,14 +274,21 @@ We consider the following problem.
   {pbm:mingen}
 
   \dataInfos{Input}{%itemize
-    \item Sequence $\seq = (\seqelt{k})_k \subset \matSpace[\rdim][\cdim]$,
-    \item bound $\degBd \in \NN$.
+    \item sequence $\seq = (\seqelt{k})_k \subset \matSpace[\rdim][\cdim]$,
+    \item degree bound $\degBd \in \NN$.
+  }
+
+  \dataInfos{Assumptions}{%itemize
+    \item the sequence $\seq$ is linearly recurrent,
+    \item the canonical generating matrix of $\seq$ has degree at most $\degBd
+      \in \NN$.
   }
 
   \dataInfo{Output}{
-    a matrix 
+    a minimal generating matrix for $\seq$.
   }
 \end{problembox}
+
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
