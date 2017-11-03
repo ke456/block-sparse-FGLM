@@ -1,0 +1,14 @@
+
+function get_equations()
+    a:=1;
+    M:=PolynomialRing(Integers(),3);
+    z:=[M.i : i in [1..Rank(M)]];
+
+    eqs := [
+	5*z[1]^9 - 6*z[1]^5*z[2] + z[1]*z[2]^4 + 2*z[1]*z[3],
+	-2*z[1]^6*z[2] + 2*z[1]^2*z[2]^3 + 2*z[2]*z[3],
+	z[1]^2 + z[2]^2 - a
+	];
+    return eqs, "bifurcation";
+
+end function;

@@ -1,0 +1,5 @@
+function get_equations()
+  K<x, y, z>:=PolynomialRing(Integers(),3);
+  eqs:=[5*y^4+3*y^2+2*y*z+x+8*y, 20*y^3+6*y+2*z+8, y^2+3*z^2+2];
+  return eqs,"hawes2";
+end function;

@@ -1,0 +1,13 @@
+
+function get_equations()
+    M<x,y,z>:=PolynomialRing(Integers(),3);
+
+    eqs := [
+	-y^2*z^2-y^2+24*y*z-z^2-13,
+	-x^2*z^2-x^2+24*x*z-z^2-13,
+	-x^2*y^2-x^2+24*x*y-y^2-13
+	];
+
+    return eqs, "cyclohexane";
+end function;
+

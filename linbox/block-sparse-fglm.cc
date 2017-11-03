@@ -6,12 +6,14 @@
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
 #define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
+#define TEST_KERNEL // testing / timing kernel basis algo
 //#define TEST_POL  // testing xgcd and division via pmbasis
 #define OUTPUT_FUNC // outputs the computed functions
 #include "block-sparse-fglm.h"
 #include <algorithm>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cmath>
 #include <omp.h>
@@ -24,6 +26,7 @@ using namespace std;
 
 int prime;
 GF FIELD;
+ofstream ofs{"func.sage"};
 
 void poly_add (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a,
 const PolMatDom::Polynomial b){
@@ -543,6 +546,11 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		auto el = V.refEntry(i,0);
 		V_col.refEntry(i,0) = el;
 	}
+
+#ifdef OUTPUT_FUNC
+	ofs << "R = []" << endl;
+#endif
+
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
 		//cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
@@ -586,23 +594,21 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		poly_mod(func,func,smith[0]);
 		//cout << "func mod P: " << func << endl;
 #ifdef OUTPUT_FUNC
-		cout << "FUNC" << i << ": " << endl;
-		cout << "[";
+		ofs << "R.append(";
 		for (int i = 0; i < func.size(); i++){
-			cout << func[i] << "*x1^" << i << " ";
-			if (i != func.size()-1) cout << "+";
+			ofs << func[i] << "*x1^" << i << " ";
+			if (i != func.size()-1) ofs << "+";
 		}
-		cout << "]"<< endl;
+		ofs <<")"<< endl;
 #endif
 	}
 #ifdef OUTPUT_FUNC
-	cout << "P: " << endl;
-	cout << "[";
+	ofs << "P = ";
 	for (int i = 0; i < smith[0].size(); i++){
-		cout << smith[0][i] << "*x1^" << i;
-		if (i != smith[0].size()-1)	cout << "+";
+		ofs << smith[0][i] << "*x1^" << i;
+		if (i != smith[0].size()-1)	ofs << "+";
 	}
-	cout << "]"<< endl;
+	ofs << endl;
 #endif
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -671,7 +677,7 @@ vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::P
 	 **/
 	/** Input:
 	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of size = order+1, series to approximate
+	 *   - series: m x n polynomial matrix of size = order, series to approximate
 	 *   - order: positive integer, order of approximation
 	 *   - shift: m-tuple of degree shifts (acting on columns of approx)
 	 **/
@@ -1044,8 +1050,12 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
 	 **/
 	/** Action:
-	 *   - Compute and store in 'approx' a shifted minimal approximation basis for (series,order,shift)
+	 *   - Compute and store in 'approx' a shifted ordered weak Popov
+	 *   approximation basis for (series,order,shift)
 	 **/
+	/* Return:
+	 * - the shifted minimal degree for (series,order)
+	 */
 	/** Output: shifted row degrees of the computed approx **/
 	/** Complexity: O(m^w M(order) log(order) ) **/
 	/** TODO study the impact of the threshold **/
@@ -1272,7 +1282,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 
 	// extract the left factor lfac which is the bottom left block,
 	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
-  app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
+	app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
 	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
 	for ( size_t i=0; i<M; ++i )
 	for ( size_t j=0; j<M; ++j )
@@ -1367,6 +1377,57 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::Matr
 #endif
 }
 
+/*! \brief Computing s-owP kernel basis of a polynomial matrix
+ *
+ *  Given an m x n polynomial matrix F, and a shift s = (s1,...,sn),
+ *  this function computes a left kernel basis of F in s-ordered
+ *  weak Popov form.
+ *
+ *  Algorithm based on PM-Basis at a high order:
+ *  cost bound O~( ? )
+ *  --> faster algorithms are known in some cases,
+ *  cf. Zhou-Labahn-Storjohann ISSAC 2012 and Vu Thi Xuan's Master 1 report
+ *
+ * \param kerbas: storage for the output kernel basis
+ * \param pmat: input polynomial matrix
+ * \param shift: input shift
+ * \return the shifted minimal degree of the kernel basis (or the shifted pivot degree and index?)
+ */
+/* TODO: <vneiger> only supports uniform shift */
+/* TODO: <vneiger> specific to our case -> in general might return only a part of the kernel basis */
+/* TODO: <vneiger> adjust number of rows in output kernel basis after computation */
+void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
+{
+	size_t m = pmat.rowdim();
+	size_t n = pmat.coldim();
+	size_t d = pmat.size()-1;
+	size_t order = 1 + floor( (m*d) / (double) (m-n));  // specific to uniform shift; large enough to return whole basis?
+	cout << "degre : " << d << endl;
+	cout << "order : " << order << endl;
+	cout << "m : " << m << endl;
+	cout << "n : " << n << endl;
+	PolMatDom::PMatrix appbas(this->field(), m, m, order );
+	PolMatDom::PMatrix series(this->field(), m, n, order );
+	for ( size_t k=0; k<=d; ++k )
+	for ( size_t j=0; j<n; ++j )
+	for ( size_t i=0; i<m; ++i )
+		series.ref(i,j,k) = pmat.get(i,j,k);
+	const vector<int> shift( m, 0 );
+	vector<size_t> mindeg = this->pmbasis( appbas, series, order, shift );
+	kerbas.resize( order-d );
+	size_t row = 0;
+	for ( size_t i=0; i<m; ++i )
+	{
+		if (mindeg[i]+d < order)
+		{
+			for ( size_t j=0; j<m; ++j )
+			for ( size_t k=0; k<kerbas.size(); ++k )
+				kerbas.ref(row,j,k) = appbas.get(i,j,k);
+			++row;
+		}
+	}
+}
+
 template<typename Matrix>
 void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::MatrixP &mat_num, const vector<Matrix> & mat_seq ) {
 	// 0. initialize dimensions, shift, matrices
@@ -1441,6 +1502,31 @@ bool test_order( const PolMat &approx, const PolMat &series, const size_t order 
 				{
 					test = false;
 //					std::cout << d << "\t" << i << "\t" << j << std::endl;
+				}
+			}
+		++d;
+	}
+	return test;
+}
+
+template <typename PolMat>
+bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
+{
+	PolynomialMatrixMulDomain<typename PolMat::Field> PMD(kerbas.field());
+	PolMat prod( kerbas.field(), kerbas.rowdim(), pmat.coldim(), kerbas.size()+pmat.size()-1 );
+	PMD.mul( prod, kerbas, pmat );
+
+	bool test = true;
+	size_t d = 0;
+	while ( test && d<kerbas.size()+pmat.size()-1 )
+	{
+		for ( size_t i=0; i<prod.rowdim(); ++i )
+			for ( size_t j=0; j<prod.coldim(); ++j )
+			{
+				if ( prod.ref(i,j,d) != 0 )
+				{
+					test = false;
+					cout << "degree " << d << endl;
 				}
 			}
 		++d;
@@ -1526,7 +1612,7 @@ int main( int argc, char **argv ){
     PMD.print_degree_matrix( app_bas );
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-    cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+    cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
   {
     cout << "~~~NOW TESTING OLD MBASIS~~~" << endl;
@@ -1539,7 +1625,7 @@ int main( int argc, char **argv ){
     PMD.print_degree_matrix( app_bas );
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-    cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+    cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
   {
     cout << "~~~NOW TESTING NEW MBASIS~~~" << endl;
@@ -1552,7 +1638,7 @@ int main( int argc, char **argv ){
     PMD.print_degree_matrix( app_bas );
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-    cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+    cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
   {
     cout << "~~~NOW TESTING NEW PMBASIS~~~" << endl;
@@ -1565,7 +1651,7 @@ int main( int argc, char **argv ){
     PMD.print_degree_matrix( app_bas );
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-    cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+    cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
   {
     cout << "~~~NOW TESTING POPOV_PMBASIS~~~" << endl;
@@ -1578,8 +1664,28 @@ int main( int argc, char **argv ){
     PMD.print_degree_matrix( app_bas );
 #endif
     cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-    cout << "###TIME### appprox basis: " << tm.usertime() << endl;
+    cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
+#endif
+#ifdef TEST_KERNEL
+    cout << "~~~NOW TESTING KERNEL BASIS~~~" << endl;
+	size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
+	cout << "dimensions of input matrix : " << M << " x " << M-1 << endl;
+	cout << "degree of input matrix : " << degree << endl;
+	PolMatDom::PMatrix pmat( field, M, M-1, degree+1 );
+	for ( size_t d=0; d<=degree; ++d )
+	for ( size_t i=0; i<M; ++i )
+	for ( size_t j=0; j<M-1; ++j )
+		rd.random( pmat.ref( i, j, d ) );
+	Timer tm;
+    PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
+    tm.clear(); tm.start();
+    PMD.kernel_basis( kerbas, pmat );
+    tm.stop();
+    cout << "###OUTPUT### degrees in kernel basis: " << endl;
+    PMD.print_degree_matrix( kerbas );
+    cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
+    cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 #endif
 #ifdef TEST_POL
   Timer tm2;
@@ -1722,5 +1828,24 @@ int main( int argc, char **argv ){
 		cout << q << endl;
 	}
 #endif
+#ifdef OUTPUT_FUNC
+	for (int i  = 0; i < n; i++){
+		ofs << "func = fs["<<i<<"]"<<endl;
+		for(int j = 0; j < n-1; j++){
+			ofs << "func = func(";
+			for (int z = 0; z < n; z++){
+				if (z == j+1)
+					ofs<<"R[" << j << "]";
+				else
+				  ofs<<"x"<<z+1;
+				if (z != n-1)
+					ofs << ",";
+			}
+			ofs<<")%P"<<endl;
+		}
+		ofs << "print(func)" << endl;
+	}
+#endif
+
 	return 0;
 }

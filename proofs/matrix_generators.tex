@@ -5,21 +5,29 @@
 \usepackage{enumerate}
 \usepackage{fullpage}
 \usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage[nottoc, notlof, notlot]{tocbibind}
+\usepackage{color}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 
-\usepackage{amsthm,thmtools}
-\declaretheorem[style=plain]{definition}
+% for enumerate / itemize: define reasonable margins
+\usepackage[shortlabels]{enumitem}
+\setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
+
+% math and theorem names
+\usepackage{amsmath,amsfonts,amssymb,amsthm,thmtools}
+\declaretheorem[style=plain,parent=section]{definition}
 \declaretheorem[sibling=definition]{theorem}
 \declaretheorem[sibling=definition]{corollary}
 \declaretheorem[sibling=definition]{proposition}
 \declaretheorem[sibling=definition]{lemma}
-%\declaretheorem[style=remark,sibling=definition,qed={\Coffeecup}]{remark}
-%\declaretheorem[style=remark,sibling=definition,qed={\WritingHand}]{example}
-%\declaretheoremstyle[headpunct={},notebraces={\textbf{--}~}{}]{algorithm}
-%\declaretheorem[style=algorithm]{problem}
-%\declaretheorem[style=algorithm]{algorithm}
+\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{remark}
+\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{example}
+\declaretheoremstyle[headpunct={},notebraces={\textbf{--}~}{}]{algorithm}
+\declaretheorem[style=algorithm]{problem}
+\declaretheorem[style=algorithm]{algorithm}
 
+% for our algorithms & problems
+\usepackage{mdframed}
 
 \usepackage[capitalize]{cleveref}
 
@@ -41,6 +49,7 @@
 \newcommand{\field}{\mathbb{K}} % base field
 \newcommand{\polRing}{\field[\var]} % polynomial ring
 \newcommand{\Pox}{[\mkern-3mu[ \var ]\mkern-3.2mu]}
+\newcommand{\Poxi}{[\mkern-3mu[ \var^{-1} ]\mkern-3.2mu]}
 \newcommand{\psRing}{\field\Pox}
 \newcommand{\matSpace}[1][\rdim]{\renewcommand\storeArg{#1}\matSpaceAux} % polynomial matrix space, 2 opt args
 \newcommand{\matSpaceAux}[1][\storeArg]{\field^{\storeArg \times #1}} % not to be used in document
@@ -56,91 +65,262 @@
 \newcommand{\cdim}{n} % column dimension
 \newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
 \newcommand{\seqelt}[1]{S_{#1}} % element of sequence of matrices
+\newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
 \newcommand{\seq}{\mathcal{S}} % sequence of matrices
 \newcommand{\seqpm}{\mat{S}} % power series matrix from a sequence
 \newcommand{\rel}{\col{p}} % linear relation
-\newcommand{\relbas}{\mat{p}} % linear relation
-\newcommand{\relSpace}{\polMatSpace[\cdim][1]} % space for linear relations
-\newcommand{\relbasSpace}{\polMatSpace[\cdim][\cdim]} % space for linear relations
+\newcommand{\relbas}{\mat{P}} % linear relation
+\newcommand{\relSpace}{\polMatSpace[1][\rdim]} % space for linear relations
+\newcommand{\relbasSpace}{\polMatSpace[\rdim][\rdim]} % space for linear relations
+\newcommand{\num}{\row{q}} % numerator for relation
+\newcommand{\nummat}{\mat{Q}} % numerator for relation basis
+\newcommand{\degBd}{d} % bound on degree of minimal generator
+\newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
+\newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
+\newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
+\newcommand{\leadingMat}[2][\unishift]{\mathrm{lm}_{#1}(#2)} % leading matrix of polynomial matrix, default shifts = 0 (uniform)
+
+%% ------------------------------------------------
+%% --------- For problems and algorithms ----------
+%% ------------------------------------------------
+\newcommand{\argfig}[1]{\begin{figure}[#1]} % to be able to feed an optional argument to the inside figure
+
+\newenvironment{algobox}[1][htbp]{
+  \newcommand{\algoInfo}[3]{
+    \begin{algorithm}[{name=[\algoname{##2}:~##1]\algoname{##2}}]
+    \label{##3}
+    ~ \hfill
+    {\small\emph{(##1)}}
+    \smallskip
+
+  }
+  \newcommand{\dataInfos}[2]{
+    \algoword{##1:}
+      \begin{itemize}[topsep=0pt]
+          ##2
+      \end{itemize}
+    \smallskip
+  }
+  \newcommand{\dataInfo}[2]{
+    \algoword{##1:} ##2 
+    %\smallskip
+  }
+  \newcommand{\algoSteps}[1]{
+    %\smallskip
+    \addtolength{\leftmargini}{-0.35cm}
+    \begin{enumerate}[{\bf 1.}]
+        ##1
+    \end{enumerate}
+    \smallskip
+  }
+
+  \expandafter\argfig\expandafter{#1}
+    \centering
+    \begin{minipage}{0.99\textwidth}
+    \begin{mdframed}
+      \smallskip
+    }
+    {
+    \end{algorithm}
+    \end{mdframed}
+    \end{minipage}
+  \end{figure}
+}
+
+\newenvironment{problembox}[1][htbp]{
+  \newcommand{\problemInfo}[3]{
+    \begin{problem}[{name=[\emph{##2}\ifx&##1&\else##1\fi]\emph{##2}}]
+    \label{##3}
+    ~\smallskip
+
+  }
+  \newcommand{\dataInfos}[2]{
+    \emph{##1:}
+    \begin{itemize}[topsep=0pt]
+      ##2
+    \end{itemize}
+    \smallskip
+  }
+  \newcommand{\dataInfo}[2]{
+    \emph{##1:}  ##2
+  }
+
+  \expandafter\argfig\expandafter{#1}
+    \centering
+    \begin{minipage}{0.75\textwidth}
+    \begin{mdframed}
+    }
+    {
+    \end{problem}
+    \end{mdframed}
+    \end{minipage}
+  \end{figure}
+}
+
 
 \begin{document}
   \maketitle
 
 
-\section{Definition of recurrence relations}
+\section{Definitions}
 \label{sec:relations}
 
-First issue: which definition to use for matrix generator? There is one in
-\cite{KalYuh13}, and a different one in \cite{Thome02}; both are related as
-follows.
+First thing: what are linearly recurrent sequences and minimal generators, when
+talking about matrix sequences? The definition is essentially the same as in
+the scalar case. There is a similar notion of generator of a sequence (which is
+a matrix): it is related to the denominator in some minimal fraction
+description of the generating series of the sequence.
 
-\begin{definition}[\cite{Thome02}]
-  \label{dfn:relation_thome}
-  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
-  sequence of $\rdim\times\cdim$ matrices over $\field$. We define the power
-  series matrix $\seqpm = \sum_{k\ge 0} \seqelt{k} \var^k \in
-  \psMatSpace[\rdim][\cdim]$. Then, a vector $\rel \in \relSpace$ is said to be
-  a \emph{(linear recurrence) relation for $\seq$} if the product $\seqpm \rel$
-  has polynomial entries, that is, $\seqpm \rel \in \relSpace$.
+We consider the following definition which extends the scalar case. It can be
+found in \cite[Sec.\,3]{KalVil01}, and in \cite[Def.\,4.2]{Turner02}.
+
+\begin{definition}
+  \label{dfn:recurrence_relation}
+  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$. A vector
+  $\rel = \sum_{0\le k\le \degBd} p_k \var^k \in \relSpace$ of degree at most
+  $\degBd$ is said to be a \emph{(linear recurrence) relation for $\seq$} if
+  $\sum_{k=0}^{\degBd} p_{k} \seqelt{\delta + k} = 0$ for all $\delta \ge 0$.
+  Then, $\seq$ is said to be linearly recurrent if there exists a nontrivial
+  relation for $\seq$.
 \end{definition}
 
-For some reason (which is unclear to me), in \cite{Thome02} the word
-``generator'' is used for such relations. Here we will reserve this word for
-sets of vectors that indeed generate the set of all relations.
-
-Assume there exists a nonzero relation for $\seq$, and let $\rel$ be such a
-relation. Writing $\rel = \sum_k p_k \var^k$ for matrices
-$p_k \in \matSpace[\cdim][1]$, then we have
-\begin{equation}
-  \label{eqn:relation_thome}
-  \sum_{k=0}^{d} \seqelt{\delta - k} p_{k} = 0 \quad \text{ for all } d \ge
-  \deg(\rel) \text{ and } \delta \ge \max(d,\deg(\seqpm \rel)+1).
-\end{equation}
-One may have in mind that $\deg(\seqpm \rel) < \deg(\rel)$ since this typically
-holds for the output of existing algorithms; in general, this does not
-necessary hold. For example, if $\seq$ has only finitely many nonzero terms,
-and thus $\seqpm$ already has polynomial entries, any coordinate vector is a
-relation $\rel$ such that $\seqpm \rel$ has degree larger than $\deg(\rel)$.
-
-\begin{definition}[\cite{KalYuh13}]
-  \label{dfn:relation_ky}
-  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
-  sequence of $\rdim\times\cdim$ matrices over $\field$. We define the power
-  series matrix $\seqpm = \sum_{k\ge 0} \seqelt{k} \var^k \in
-  \psMatSpace[\rdim][\cdim]$. Then, a vector $\rel \in \relSpace$ of degree at
-  most $d$ is said to be a \emph{(linear recurrence) relation for $\seq$} if
-  \[
-    \sum_{k=0}^{d} \seqelt{\delta + k} p_{k} = 0
-    \quad\text{ for all } \delta \ge 0.
-  \]
-  where $(p_k)_{k}$ are the matrices in $\matSpace[\cdim][1]$ such that $\rel =
-  \sum_{0\le k\le d} p_k \var^k$.
-\end{definition}
+The set of relations for $\seq$ is a $\polRing$-submodule of $\relSpace$, which
+\fixme{has rank $\rdim$ if $\seq$ is linearly recurrent}. This is showed in
+\cite[Fact\,1]{KalYuh13} but only for sequences having a \emph{scalar}
+recurrence relation. Let us now link this with the property of being linearly
+recurrent as in the above definition.
 
 \begin{lemma}
-  \label{lem:link_defs}
-  For a given sequence $\seq \subset \matSpace[\rdim][\cdim]$, a nonzero vector
-  $\rel \in \relSpace$ is a relation for \cref{dfn:relation_thome} if and only
-  if there exists $d \ge \deg(\rel)$ such that the reverse $\var^{d}
-  \rel(\var^{-1})$ is a relation for \cref{dfn:relation_ky}.
+  The sequence $\seq$ is linearly recurrent if and only if there exists a
+  polynomial $P(\var) = \sum_{0\le k\le \degBd} p_k \var^k \in \polRing$ such
+  that $\sum_{k=0}^{\degBd} p_{k} \seqelt{\delta + k} = 0$ for all $\delta \ge
+  0$.
 \end{lemma}
 \begin{proof}
-  First, we assume that $\var^{d} \rel(\var^{-1}) = \sum_{k=0}^{d} p_{d-k}
-  \var^k$ is a relation for \cref{dfn:relation_ky}, for some integer $d \ge
-  \deg(\rel)$. This means that, for all $\delta \ge 0$, we have $0 =
-  \sum_{k=0}^{d} \seqelt{\delta + k} p_{d-k} = \sum_{k=0}^{d} \seqelt{\delta+d
-  - k} p_{k}$. This implies that $\seqpm\rel$ has polynomial entries (and
-  $\deg(\seqpm\rel) \le d$).
-
-  Now, we assume that $\rel$ is a relation for \cref{dfn:relation_thome}.
-  Taking $d = \max(\deg(\rel),\deg(\seqpm \rel)+1)$ in
-  \cref{eqn:relation_thome}, we obtain $\sum_{k=0}^{d} \seqelt{\delta - k}
-  p_{k} = 0$ for all $\delta \ge d$. This implies $\sum_{k=0}^{d}
-  \seqelt{\delta-d + k} p_{d-k} = 0$ for all $\delta\ge d$, or equivalently,
-  $\sum_{k=0}^{d} \seqelt{\delta+k} p_{d-k} = 0$ for all $\delta\ge 0$.
-  Therefore the reverse $\var^{d} \rel(\var^{-1})$ is a relation for
-  \cref{dfn:relation_ky}.
+  \todo{I cannot find this result in the literature..!} (but we don't care since
+  in our case the sequence is obviously cancelled by a polynomial)
 \end{proof}
+
+Then, the fact that the relation module has rank $\rdim$ is straightforward: since
+the sequence is linearly recurrent, it has a scalar recurrence polynomial
+$P(\var)$, hence for each $i$ the vector $[0 \; \cdots \; 0 \; P(\var) \; 0 \;
+\cdots \; 0]$ with $P(\var)$ at position $i$ is a relation for $\seq$.
+
+A \emph{generating matrix}, or \emph{generator}, for the sequence is a matrix
+whose rows form a generating set for the module of relations; it is said to be
+\begin{itemize}
+  \item \emph{minimal} if the matrix is reduced \cite{Wolovich74,Kailath80};
+  \item \emph{ordered weak Popov} if the matrix is in weak Popov form
+    \cite{MulSto03} with pivots on the diagonal;
+  \item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
+\end{itemize}
+In this context, an important quantity related to the sequence is the
+determinantal degree $\deg(\det(\relbas))$, invariant for all generators
+$\relbas \in \relbasSpace$. Hereafter, we denote it by $\degDet$.
+
+\begin{lemma}
+  Consider $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ and
+  its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} / \var^{k+1} \in
+  \field\Poxi^{\rdim \times \cdim}$.
+  \begin{itemize}
+    \item A vector $\rel \in \relSpace$ is a relation for $\seq$ if and only if
+      the entries of $\num = \rel \seqpm$ are in $\polRing$. Then, $\deg(\num)
+      < \deg(\rel)$.
+    \item A matrix $\relbas \in \relbasSpace$ is a generator for $\seq$ if and
+      only if $\deg(\det(\relbas)) = \degDet$ and the entries of $\nummat =
+      \relbas \seqpm$ are in $\polRing$. Then, $\rdeg{\nummat} <
+      \rdeg{\relbas}$ componentwise.
+  \end{itemize}
+\end{lemma}
+\begin{proof}
+  Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
+  coefficient of $\num$ of degree $-\delta-1<0$ is $\sum_{0\le k \le \degBd}
+  p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
+  The degree comparison is clear since $\seqpm$ has only terms of (strictly)
+  negative degree.
+
+  Concerning the second item, thanks to the first item applied to each row of
+  $\relbas$, it is enough to assume that all the rows of $\relbas$ are
+  relations for $\seq$, and to prove that $\relbas$ is a generator if and only
+  if $\deg(\det(\relbas)) = \degDet$. Our assumption implies that $\relbas$ is
+  a left multiple $\relbas = \mat{U} \mat{G}$ for some matrix $\mat{U}$ and
+  some generator $\mat{G}$. Obviously if $\relbas$ is a generator then
+  $\deg(\det(\relbas)) = \degDet$. Conversely, if $\deg(\det(\relbas)) =
+  \degDet$ then $\mat{U}$ is unimodular.
+\end{proof}
+
+%alternative definition from \cite{Thome02}.
+%
+%\begin{definition}[\cite{Thome02}]
+%  \label{dfn:relation_thome}
+%  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
+%  sequence of $\rdim\times\cdim$ matrices over $\field$. We define the
+%  generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} \var^k \in
+%  \psMatSpace[\rdim][\cdim]$. Then, a vector $\rel \in \relSpace$ is said to be
+%  a \emph{(linear recurrence) relation for $\seq$} if the product $\rel\seqpm$
+%  has polynomial entries, that is, $\rel \seqpm \in \relSpace$.
+%\end{definition}
+%
+%Assume there is a nontrivial relation $\rel = \sum_k p_k \var^k$ for $\seq$, we
+%have
+%\begin{equation}
+%  \label{eqn:relation_thome}
+%  \sum_{k=0}^{d} p_{k} \seqelt{\delta - k} = 0 \quad \text{ for all } d \ge
+%  \deg(\rel) \text{ and } \delta \ge \max(d,\deg(\seqpm \rel)+1).
+%\end{equation}
+%The alternative definition focuses on this type of relation.
+%\begin{lemma}
+%  \label{lem:link_defs}
+%  For a given sequence $\seq \subset \matSpace[\rdim][\cdim]$, a nonzero vector
+%  $\rel \in \relSpace$ is a relation for \cref{dfn:relation_thome} if and only
+%  if there exists $d \ge \deg(\rel)$ such that the reverse $\var^{d}
+%  \rel(\var^{-1})$ is a relation for \cref{dfn:relation_ky}.
+%\end{lemma}
+%\begin{proof}
+%  First, we assume that $\var^{d} \rel(\var^{-1}) = \sum_{k=0}^{d} p_{d-k}
+%  \var^k$ is a relation for \cref{dfn:relation_ky}, for some integer $d \ge
+%  \deg(\rel)$. This means that, for all $\delta \ge 0$, we have $0 =
+%  \sum_{k=0}^{d} \seqelt{\delta + k} p_{d-k} = \sum_{k=0}^{d} \seqelt{\delta+d
+%  - k} p_{k}$. This implies that $\seqpm\rel$ has polynomial entries (and
+%  $\deg(\seqpm\rel) \le d$).
+%
+%  Now, we assume that $\rel$ is a relation for \cref{dfn:relation_thome}.
+%  Taking $d = \max(\deg(\rel),\deg(\seqpm \rel)+1)$ in
+%  \cref{eqn:relation_thome}, we obtain $\sum_{k=0}^{d} \seqelt{\delta - k}
+%  p_{k} = 0$ for all $\delta \ge d$. This implies $\sum_{k=0}^{d}
+%  \seqelt{\delta-d + k} p_{d-k} = 0$ for all $\delta\ge d$, or equivalently,
+%  $\sum_{k=0}^{d} \seqelt{\delta+k} p_{d-k} = 0$ for all $\delta\ge 0$.
+%  Therefore the reverse $\var^{d} \rel(\var^{-1})$ is a relation for
+%  \cref{dfn:relation_ky}.
+%\end{proof}
+
+\section{Computing a minimal matrix generators}
+\label{sec:computing_matrix_generators}
+
+We consider the following problem.
+
+\begin{problembox}[htbp]
+  \problemInfo
+  {}
+  {Minimal generator}
+  {pbm:mingen}
+
+  \dataInfos{Input}{%itemize
+    \item sequence $\seq = (\seqelt{k})_k \subset \matSpace[\rdim][\cdim]$,
+    \item degree bound $\degBd \in \NN$.
+  }
+
+  \dataInfos{Assumptions}{%itemize
+    \item the sequence $\seq$ is linearly recurrent,
+    \item the canonical generating matrix of $\seq$ has degree at most $\degBd
+      \in \NN$.
+  }
+
+  \dataInfo{Output}{
+    a minimal generating matrix for $\seq$.
+  }
+\end{problembox}
+
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}

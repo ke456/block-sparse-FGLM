@@ -1,0 +1,16 @@
+
+
+function get_equations()
+    M<c,d,p,q>:=PolynomialRing(Integers(),4);
+
+    a:=4;
+    b:=1;
+    eqs := [
+	2*(b-1)^2 + 2*(q-p*q+p^2) + c^2*(q-1)^2 - 2*b*a + 2*c*d*(1-q)*(q-p) + 2 * b * p * q * d * (d-c) + b^2*d^2*(1-2*p) + 2*b*d^2*(p-q) + 2*b*d*c*(p-1) + 2*b*p*q*(c+1) + (b^2 - 2*b)*p^2*d^2 + 2*b^2*p^2 + 4*b*(1-b)*p + d^2*(p-q)^2,
+	d*(2*p+1)*(q-p) + c*(p+2)*(1-q) + b*(b-2)*d + b*(1-2*b)*p*d + b*c*(q+p-p*q-1) + b*(b+1)*p^2*d,
+	-b^2*(p-1)^2 + 2*p*(p-q) - 2*(q-1),
+	b^2 + 4*(p-q^2) + 3*c^2*(q-1)^2 - 3*d^2*(p-q)^2 + 3*b^2*d^2*(p-1)^2 + b^2*p*(p-2) + 6*b*d*c*(p+q+q*p-1)
+	];
+
+    return eqs, "czapor_geddes_2";
+end function;

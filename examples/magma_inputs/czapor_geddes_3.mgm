@@ -1,0 +1,22 @@
+
+function get_equations()
+    M<x,y>:=PolynomialRing(Integers(),2);
+
+    a:=1;
+    b:=2;
+    c:=3;
+    d:=4;
+    e:=5;
+    f:=6;
+    g:=7;
+    h:=8;
+    k:=9;
+
+    eqs := [
+	a*x^2 + b*x*y + c*x + d*y^2 + e*y + f,
+	b*x^2 + 4*d*x*y + 2*e*x + g*y^2 + h*y +k
+	];
+
+    return eqs, "czapor_geddes_3";
+
+end function;

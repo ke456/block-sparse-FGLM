@@ -1,0 +1,12 @@
+
+function get_equations()
+    M<x,y,z>:=PolynomialRing(Integers(),3);
+
+    eqs := [
+	-x^5+y^5-3*y-1,
+	5*y^4-3,
+	-20*x+y-z
+	];
+    return eqs, "barry";
+end function;
+
