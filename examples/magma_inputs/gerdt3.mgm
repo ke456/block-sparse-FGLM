@@ -1,6 +1,6 @@
 
 function get_equations()
-    K<x,y,z,t>:=PolynomialRing(Integers(),8);
+    K<x,y,z,t>:=PolynomialRing(Integers(),4);
 
     eqs := [
 	6*x*y^2*t - x^2*z*t - 6*x*y*z*t + 3*x*z^2*t - 2*z^3*t - 6*x*y^2 + 6*x*y*z - 2*x*z^2,
