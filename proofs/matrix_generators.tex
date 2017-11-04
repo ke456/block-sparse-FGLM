@@ -161,8 +161,7 @@
 \begin{document}
   \maketitle
 
-
-\section{Definitions}
+\section{Linearly recurrent matrix sequences}
 \label{sec:relations}
 
 First thing: what are linearly recurrent sequences and minimal generators, when
@@ -198,7 +197,7 @@ recurrent as in the above definition.
 \end{lemma}
 \begin{proof}
   \todo{I cannot find this result in the literature..!} (but we don't care since
-  in our case the sequence is obviously cancelled by a polynomial)
+  in our case the sequence obviously admits a scalar relation)
 \end{proof}
 
 Then, the fact that the relation module has rank $\rdim$ is straightforward: since
@@ -219,18 +218,17 @@ determinantal degree $\deg(\det(\relbas))$, invariant for all generators
 $\relbas \in \relbasSpace$. Hereafter, we denote it by $\degDet$.
 
 \begin{lemma}
-  Consider $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ and
-  its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} / \var^{k+1} \in
-  \field\Poxi^{\rdim \times \cdim}$.
-  \begin{itemize}
-    \item A vector $\rel \in \relSpace$ is a relation for $\seq$ if and only if
-      the entries of $\num = \rel \seqpm$ are in $\polRing$. Then, $\deg(\num)
-      < \deg(\rel)$.
-    \item A matrix $\relbas \in \relbasSpace$ is a generator for $\seq$ if and
-      only if $\deg(\det(\relbas)) = \degDet$ and the entries of $\nummat =
-      \relbas \seqpm$ are in $\polRing$. Then, $\rdeg{\nummat} <
-      \rdeg{\relbas}$ componentwise.
-  \end{itemize}
+  \label{lem:linearly_recurrent}
+  Consider a matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset
+  \seqeltSpace$ and its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} /
+  \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, a vector $\rel \in
+  \relSpace$ is a relation for $\seq$ if and only if the entries of $\num =
+  \rel \seqpm$ are in $\polRing$; furthermore, in this case, $\deg(\num) <
+  \deg(\rel)$.
+  %A matrix $\relbas \in \relbasSpace$ is a generator for $\seq$ if and only if
+  %$\deg(\det(\relbas)) = \degDet$ and the entries of $\nummat = \relbas
+  %\seqpm$ are in $\polRing$. Then, $\rdeg{\nummat} < \rdeg{\relbas}$
+  %componentwise.
 \end{lemma}
 \begin{proof}
   Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
@@ -238,16 +236,34 @@ $\relbas \in \relbasSpace$. Hereafter, we denote it by $\degDet$.
   p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
   The degree comparison is clear since $\seqpm$ has only terms of (strictly)
   negative degree.
-
-  Concerning the second item, thanks to the first item applied to each row of
-  $\relbas$, it is enough to assume that all the rows of $\relbas$ are
-  relations for $\seq$, and to prove that $\relbas$ is a generator if and only
-  if $\deg(\det(\relbas)) = \degDet$. Our assumption implies that $\relbas$ is
-  a left multiple $\relbas = \mat{U} \mat{G}$ for some matrix $\mat{U}$ and
-  some generator $\mat{G}$. Obviously if $\relbas$ is a generator then
-  $\deg(\det(\relbas)) = \degDet$. Conversely, if $\deg(\det(\relbas)) =
-  \degDet$ then $\mat{U}$ is unimodular.
+  %
+  %  Concerning the second item, thanks to the first item applied to each row
+  %  of $\relbas$, it is enough to assume that all the rows of $\relbas$ are
+  %  relations for $\seq$, and to prove that $\relbas$ is a generator if and
+  %  only if $\deg(\det(\relbas)) = \degDet$. Our assumption implies that
+  %  $\relbas$ is a left multiple $\relbas = \mat{U} \mat{G}$ for some matrix
+  %  $\mat{U}$ and some generator $\mat{G}$. Obviously if $\relbas$ is a
+  %  generator then $\deg(\det(\relbas)) = \degDet$; conversely, if
+  %  $\deg(\det(\relbas)) = \degDet$ then $\mat{U}$ is unimodular.
 \end{proof}
+
+\begin{corollary}
+  A matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ is
+  linearly recurrent if and only if its generating series $\seqpm = \sum_{k\ge
+  0} \seqelt{k} / \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
+  written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
+  \in \relbasSpace$ is nonsingular and $\nummat \in
+  \polMatSpace[\rdim][\cdim]$. In this case,
+  \begin{itemize}
+    \item we have $\rdeg{\nummat} < \rdeg{\relbas}$ and $\deg(\det(\relbas))
+      \ge \degDet$,
+    \item $\relbas$ is a matrix generator of $\seq$ if and only if the fraction
+      is irreducible (i.e. $\mat{U} \relbas + \mat{V} \nummat = \mat{I}$ for
+      some $\mat{U}$, $\mat{V}$),
+    \item $\relbas$ is a matrix generator of $\seq$ if and only if
+      $\deg(\det(\relbas)) = \degDet$.
+  \end{itemize}
+\end{corollary}
 
 %alternative definition from \cite{Thome02}.
 %
@@ -294,10 +310,20 @@ $\relbas \in \relbasSpace$. Hereafter, we denote it by $\degDet$.
 %  \cref{dfn:relation_ky}.
 %\end{proof}
 
-\section{Computing a minimal matrix generators}
+\section{Computing minimal matrix generators}
 \label{sec:computing_matrix_generators}
 
-We consider the following problem.
+Now, we focus on the following algorithmic problem: we are given a linearly
+recurrent sequence and we want to find a matrix generator. If we want our
+algorithm to run efficiently (or simply, in finite time), we cannot access
+infinitely many terms of the sequence. We therefore ask for an additional
+input, which one often has when considering a sequence coming from some
+application: a (finite) bound on the degree of a minimal generating matrix.
+Note that a bound on the determinantal degree $\degDet$ is sufficient since any
+minimal generating matrix will have degree less than this; yet better bounds
+can be available and will imply better efficiency.
+
+In short, we consider the following problem.
 
 \begin{problembox}[htbp]
   \problemInfo
@@ -312,15 +338,17 @@ We consider the following problem.
 
   \dataInfos{Assumptions}{%itemize
     \item the sequence $\seq$ is linearly recurrent,
-    \item the canonical generating matrix of $\seq$ has degree at most $\degBd
-      \in \NN$.
+    \item any minimal matrix generator of $\seq$ has degree at most $\degBd$.
   }
 
   \dataInfo{Output}{
-    a minimal generating matrix for $\seq$.
+    a minimal matrix generator for $\seq$.
   }
 \end{problembox}
 
+We now show how the additional information of $\degBd$ allows us to find a
+matrix generator by considering only a small chunk of the sequence, rather than
+all its terms.
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
