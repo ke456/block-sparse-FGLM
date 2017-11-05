@@ -81,7 +81,6 @@
 \newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
 \newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
-\newcommand{\leadingMat}[2][\unishift]{\mathrm{lm}_{#1}(#2)} % leading matrix of polynomial matrix, default shifts = 0 (uniform)
 \newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
 
 %% ------------------------------------------------
@@ -216,7 +215,7 @@ $P(\var)$, hence for each $i$ the vector $[0 \; \cdots \; 0 \; P(\var) \; 0 \;
 A \emph{matrix generator} for the sequence is a matrix whose rows form a
 generating set for the module of relations; it is said to be
 \begin{itemize}
-  \item \emph{minimal} if the matrix is reduced \cite{Wolovich74,Kailath80};
+  \item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
   \item \emph{ordered weak Popov} if the matrix is in weak Popov form
     \cite{MulSto03} with pivots on the diagonal;
   \item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
@@ -386,19 +385,18 @@ do not consider here).
   \label{thm:mingen_via_appbas}
   Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
   sequence, let $\degBd \in \NN$, and let
-  \[
+  \begin{equation}
+    \label{eqn:series_to_approximate}
     \sys =
     \begin{bmatrix}
       \sum_{0\le k\le 2\degBd} \seqelt{k} \var^{2\degBd-k} \\
       - \mat{I}_{\cdim}
     \end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
-  \]
+  \end{equation}
   Let further $\rel \in \relSpace$ with $\deg(\rel)\le\degBd$. Then, $\rel$ is
   a relation for $\seq$ if and only if there exists a vector $\rem \in
   \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem]$ is an
   approximant for $\sys$ at order $2\degBd+1$.
-
-  As a corollary, 
 \end{theorem}
 \begin{proof}
   From \cref{lem:linearly_recurrent}, if $\rel$ is a relation then $\num = \rel
@@ -411,15 +409,44 @@ do not consider here).
   $\deg(\rem)<\deg(\rel)$ and $[\rel \;\; \rem] \sys = 0 \bmod
   \var^{2\degBd+1}$.
   
-  hence $\rel$ has polynomial entries as well and
-  $[\rel \;\; \rem] \sys = 0 \bmod \var^{2\degBd+1}$.  Since $\rel \seqpm$ has
-  polynomial entries, $\rem$ has polynomial entries; and since all terms of
-  $\sum_{k > 2 \degBd} \seqelt{k} \var^{2\degBd-k}$ have negative degree, we
-  have $\deg(\rem) < \deg(\rel)$.
-
-
+  \todo{finish this}
 \end{proof}
 
+\begin{corollary}
+  \label{cor:mingen_via_appbas}
+  Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent, let
+  $\degBd \in \NN$ be an upper bound on the degree of any minimal matrix
+  generator for $\seq$, and let $\sys \in \polMatSpace[(\rdim+\cdim)][\cdim]$
+  be as in \cref{eqn:series_to_approximate}. Let further $\mat{B} \in
+  \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$ be an approximant basis at
+  order $2\degBd+1$ for $\sys$. Then,
+  \begin{itemize}
+    \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
+      principal submatrix is a Popov matrix generator for $\seq$;
+    \item if $\mat{B}$ is in ordered weak Popov form then its
+      $\rdim\times\rdim$ leading principal submatrix is an ordered weak Popov
+      matrix generator for $\seq$;
+    \item more generally, if $\mat{B}$ is row reduced then it has exactly
+      $\rdim$ rows of the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$,
+      $\rem \in \remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBd$; writing
+      $[\relbas \;\; \remmat]$ for the submatrix formed by these rows, then
+      $\relbas$ is a minimal matrix generator for $\seq$.
+  \end{itemize}
+\end{corollary}
+
+\begin{corollary}
+  Assuming $\rdim = \Theta(\cdim)$, any of these matrix generators (minimal,
+  Popov, \ldots) can be computed in $O(\rdim^\omega \mathsf{M}(d) \log(d))$
+  operations in $\field$.
+\end{corollary}
+
+We would prefer to say that we compute the canonical form, rather than a
+minimal one. In theory, exactly the same asymptotic cost bound (but not yet in
+the literature, so this needs some short explanation; except if we do not care
+about logarithmic factors then this is in the literature).
+
+With our implementation, asking for the canonical form should induce a slowdown
+factor of at most $2$.
 
 \bibliographystyle{plain}
 \bibliography{biblio.bib}
