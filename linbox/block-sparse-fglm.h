@@ -51,7 +51,8 @@ class Block_Sparse_FGLM{
 	Block_Sparse_FGLM(const GF &, int, int, size_t);
 	Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, std::string& s);
 
-	void find_lex_basis();
+	vector<PolMatDom::Polynomial> find_lex_basis();
+	vector<PolMatDom::Polynomial> find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &);
 };
 
 class PolMatDom {

@@ -355,7 +355,7 @@ int row, int col, int deg){
 			}
 }
 
-void Block_Sparse_FGLM::find_lex_basis(){
+vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats){
 #ifdef TIMINGS_ON
 	Timer tm;
 	tm.clear(); tm.start();
@@ -550,7 +550,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 #ifdef OUTPUT_FUNC
 	ofs << "R = []" << endl;
 #endif
-
+	vector<PolMatDom::Polynomial> result_pols;
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
 		//cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
@@ -593,6 +593,7 @@ void Block_Sparse_FGLM::find_lex_basis(){
 		//cout << "P: " << smith[0] << endl;
 		poly_mod(func,func,smith[0]);
 		//cout << "func mod P: " << func << endl;
+		result_pols.emplace_back(func);
 #ifdef OUTPUT_FUNC
 		ofs << "R.append(";
 		for (int i = 0; i < func.size(); i++){
@@ -614,6 +615,11 @@ void Block_Sparse_FGLM::find_lex_basis(){
 	tm.stop();
 	cout << "###TIME### R_j computations: " << tm.usertime() << endl; 
 #endif
+	return result_pols;
+}
+
+vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(){
+	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>());
 }
 
 template<typename PolMat>
