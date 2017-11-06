@@ -12,48 +12,6 @@
 
 
 typedef Givaro::Modular<double> GF;
-class Block_Sparse_FGLM{
-	// the current field
-	GF field;
-
-	int D; // vector space dimension / dimension of multiplication matrices
-	int M; // number of blocks (set to number of CPUs?)
-	size_t n; // number of variables and size of vector mul_mats
-
-	// length of the sequence:
-	size_t getLength() const { return 2*ceil(D/(double)M); };
-	// generic degree in matrix generator:
-	size_t getGenDeg() const { return ceil(D/(double)M); };
-	
-	// stores the multiplication matrices T_i
-	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
-
-	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
-	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
-
-	/* Helpers                                           */
-	template<typename Matrix>
-	void create_random_matrix(Matrix &m);
-	
-	// Computes sequence (U T1^i)
-	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
-	
-	// Computes sequence (UT1^i)V
-	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
-	                         std::vector<LinBox::DenseMatrix<GF>> &,
-	                         LinBox::DenseMatrix<GF> &,
-													 int,
-	                         size_t);
-
-
-	public:
-	/* CTOR                                              */
-	Block_Sparse_FGLM(const GF &, int, int, size_t);
-	Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, std::string& s);
-
-	vector<PolMatDom::Polynomial> find_lex_basis();
-	vector<PolMatDom::Polynomial> find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &);
-};
 
 class PolMatDom {
 
@@ -102,5 +60,50 @@ class PolMatDom {
 	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq );
 
 };
+
+class Block_Sparse_FGLM{
+	// the current field
+	GF field;
+
+	int D; // vector space dimension / dimension of multiplication matrices
+	int M; // number of blocks (set to number of CPUs?)
+	size_t n; // number of variables and size of vector mul_mats
+
+	// length of the sequence:
+	size_t getLength() const { return 2*ceil(D/(double)M); };
+	// generic degree in matrix generator:
+	size_t getGenDeg() const { return ceil(D/(double)M); };
+	
+	// stores the multiplication matrices T_i
+	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+
+	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
+	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
+
+	/* Helpers                                           */
+	template<typename Matrix>
+	void create_random_matrix(Matrix &m);
+	
+	// Computes sequence (U T1^i)
+	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
+	
+	// Computes sequence (UT1^i)V
+	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
+	                         std::vector<LinBox::DenseMatrix<GF>> &,
+	                         LinBox::DenseMatrix<GF> &,
+													 int,
+	                         size_t);
+
+
+	public:
+	/* CTOR                                              */
+	Block_Sparse_FGLM(const GF &, int, int, size_t);
+	Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, std::string& s);
+
+	std::vector<PolMatDom::Polynomial> find_lex_basis();
+	std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &);
+};
+
+
 
 #endif
