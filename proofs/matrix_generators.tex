@@ -30,6 +30,8 @@
 \usepackage{mdframed}
 
 \usepackage[capitalize]{cleveref}
+\crefname{problem}{Problem}{Problems}
+\Crefname{problem}{Problem}{Problems}
 
 \title{Matrix Berlekamp-Massey}
 
@@ -82,6 +84,7 @@
 \newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
 \newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
+\newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
 
 %% ------------------------------------------------
 %% --------- For problems and algorithms ----------
@@ -167,34 +170,36 @@
 \section{Linearly recurrent matrix sequences}
 \label{sec:relations}
 
-First thing: what are linearly recurrent sequences and minimal generators, when
-talking about matrix sequences? The definition is essentially the same as in
-the scalar case. There is a similar notion of minimal generator of a sequence
-(which is a matrix): it is related to the denominator in some irreducible
-fraction description of the generating series of the sequence.
+When considering sequences of matrices over a field $\field$, \emph{linearly
+recurrent sequences} and \emph{minimal generators} are defined similarly as for
+scalar sequences.
 
-We consider the following definition which extends the scalar case. It can be
-found in \cite[Sec.\,3]{KalVil01}, and in \cite[Def.\,4.2]{Turner02}.
-
-\begin{definition}
+\begin{definition}[{\cite[Sec.\,3]{KalVil01}}]
+  %% also \cite[Def.\,4.2]{Turner02}.. any earlier ref?
   \label{dfn:recurrence_relation}
-  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$. A vector
-  $\rel = \sum_{0\le k\le \degBd} p_k \var^k \in \relSpace$ of degree at most
-  $\degBd$ is said to be a \emph{(linear recurrence) relation for $\seq$} if
-  $\sum_{k=0}^{\degBd} p_{k} \seqelt{\delta + k} = 0$ for all $\delta \ge 0$.
-  Then, $\seq$ is said to be linearly recurrent if there exists a nontrivial
-  relation for $\seq$.
+  Let $\seq = (\seqelt{k})_{k\in\NN} \subset \matSpace[\rdim][\cdim]$ be a
+  matrix sequence and let $\rel = \sum_{0\le k\le \degBd} p_k \var^k \in
+  \relSpace$ be a polynomial vector.  Then,
+  \begin{itemize}
+    \item $\rel$ is said to be a \emph{(vector) relation for $\seq$} if
+      $\sum_{k=0}^{\degBd} p_{k} \seqelt{\delta + k} = 0$ for all $\delta \ge
+      0$;
+    \item $\seq$ is said to be \emph{linearly recurrent} if there exists a
+      nontrivial relation for $\seq$.
+  \end{itemize}
 \end{definition}
 
-\fixme{Note: hereafter we never use the word \emph{generator} to refer to
-relations like those in this definition. This word \emph{generator} will be
-reserved to matrices which generate modules of relations.}
+Hereafter, the word generator \emph{never} refers to these relations.  This
+word will be reserved to generating sets for the set of all relations.
 
-The set of relations for $\seq$ is a $\polRing$-submodule of $\relSpace$, which
-\fixme{has rank $\rdim$ if $\seq$ is linearly recurrent}. This is showed in
-\cite[Fact\,1]{KalYuh13} but only for sequences having a \emph{scalar}
-recurrence relation. Let us now link this with the property of being linearly
-recurrent as in the above definition.
+We will now see that, as in the scalar case, one can define the minimal
+generator of a sequence as the denominator in some irreducible fraction
+description of the generating series of the sequence. The set of relations for
+$\seq$ is a $\polRing$-submodule of $\relSpace$, which \todo{has rank $\rdim$
+if $\seq$ is linearly recurrent}. This is showed in \cite[Fact\,1]{KalYuh13} or
+in \cite{Turner02} for sequences having a \emph{scalar} recurrence relation.
+Let us now link this with the property of being linearly recurrent as in the
+above definition.
 
 \begin{lemma}
   The sequence $\seq$ is linearly recurrent if and only if there exists a
@@ -203,8 +208,9 @@ recurrent as in the above definition.
   0$.
 \end{lemma}
 \begin{proof}
-  \todo{I cannot find this result in the literature..!} (but we don't care since
-  in our case the sequence obviously admits a scalar relation)
+  \todo{I cannot find this result in the literature..!} \fixme{actually, is it
+  even true?} (but we don't care since in our case the sequence obviously
+  admits a scalar relation)
 \end{proof}
 
 Then, the fact that the relation module has rank $\rdim$ is straightforward: since
@@ -278,7 +284,7 @@ For more details:
   \begin{itemize}
     \item \cite[Sec.\,1]{Villard97} when the sequence is of the form $\seq =
       (\mat{U} \mat{A}^k \mat{V})_k$. Note that in this case the generating
-      series can be written $\seqpm = \mat{U} (\var \mat{I} - \mat{A})
+      series can be written $\seqpm = \mat{U} (\var \mat{I} - \mat{A})^{-1}
       \mat{V}$. Link with so-called realizations from control theory
       \cite{Kailath80}\ldots
     \item \cite[Chap.\,4]{Turner02} has things related to Hankel matrices (but
@@ -340,12 +346,10 @@ recurrent sequence and we want to find a matrix generator. If we want our
 algorithm to run efficiently (or simply, in finite time), we cannot access
 infinitely many terms of the sequence. We therefore ask for an additional
 input, which one often has when considering a sequence coming from some
-application: a (finite) bound on the degree of a minimal matrix generator.
-Note that a bound on the determinantal degree $\degDet$ is sufficient since any
-minimal matrix generator will have degree less than this; yet better bounds can
-be available and will imply better efficiency.
-
-In short, we consider the following problem.
+application: a bound on the degree of a minimal matrix generator.  If
+available, a bound on the determinantal degree $\degDet$ is sufficient; yet
+better bounds can be available and will yield better efficiency.  We now focus
+on \cref{pbm:mingen}.
 
 \begin{problembox}[htbp]
   \problemInfo
@@ -381,6 +385,13 @@ this section 4.2 of \cite{Turner02} provides many more details related to the
 mechanisms and output properties in the approximant basis algorithm, which we
 do not consider here).
 
+We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
+\polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
+\emph{approximants for $\sys$ at order $d$} is defined as
+\[
+  \appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
+\]
+
 \begin{theorem}
   \label{thm:mingen_via_appbas}
   Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
@@ -395,34 +406,16 @@ do not consider here).
   \end{equation}
   Let further $\rel \in \relSpace$ with $\deg(\rel)\le\degBd$. Then, $\rel$ is
   a relation for $\seq$ if and only if there exists a vector $\rem \in
-  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem]$ is an
-  approximant for $\sys$ at order $2\degBd+1$.
-\end{theorem}
-\begin{proof}
-  From \cref{lem:linearly_recurrent}, if $\rel$ is a relation then $\num = \rel
-  \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0} \seqelt{k}
-  \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k > 2 \degBd} \seqelt{k}
-  \var^{2\degBd-k})$ has polynomial entries, has degree less than $\deg(\rel)$,
-  and satisfies $[\rel \;\; \rem] \sys = \num \var^{2\degBd+1}$.
+  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
+  \appMod{\sys}{2\degBd+1}$.
 
-  Conversely, assume that there exists some $\rem\in\remSpace$ such that
-  $\deg(\rem)<\deg(\rel)$ and $[\rel \;\; \rem] \sys = 0 \bmod
-  \var^{2\degBd+1}$.
-  
-  \todo{finish this}
-\end{proof}
-
-\begin{corollary}
-  \label{cor:mingen_via_appbas}
-  Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent, let
-  $\degBd \in \NN$ be an upper bound on the degree of any minimal matrix
-  generator for $\seq$, and let $\sys \in \polMatSpace[(\rdim+\cdim)][\cdim]$
-  be as in \cref{eqn:series_to_approximate}. Let further $\mat{B} \in
-  \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$ be an approximant basis at
-  order $2\degBd+1$ for $\sys$. Then,
+  As a corollary, if $\degBd \in \NN$ is an upper bound on the degree of any
+  minimal matrix generator for $\seq$ and $\mat{B} \in
+  \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$ is a basis of
+  $\appMod{\sys}{2\degBd+1}$, then
   \begin{itemize}
     \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
-      principal submatrix is a Popov matrix generator for $\seq$;
+      principal submatrix is the canonical matrix generator for $\seq$;
     \item if $\mat{B}$ is in ordered weak Popov form then its
       $\rdim\times\rdim$ leading principal submatrix is an ordered weak Popov
       matrix generator for $\seq$;
@@ -432,7 +425,20 @@ do not consider here).
       $[\relbas \;\; \remmat]$ for the submatrix formed by these rows, then
       $\relbas$ is a minimal matrix generator for $\seq$.
   \end{itemize}
-\end{corollary}
+\end{theorem}
+\begin{proof}
+  From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
+  $\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
+  \seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k > 2 \degBd}
+  \seqelt{k} \var^{2\degBd-k})$ has polynomial entries, has degree less than
+  $\deg(\rel)$, and satisfies $[\rel \;\; \rem] \sys = \num \var^{2\degBd+1}$.
+
+  Conversely, assume that there exists some $\rem\in\remSpace$ such that
+  $\deg(\rem)<\deg(\rel)$ and $[\rel \;\; \rem] \sys = 0 \bmod
+  \var^{2\degBd+1}$.
+  
+  \todo{finish this}
+\end{proof}
 
 \begin{corollary}
   Assuming $\rdim = \Theta(\cdim)$, any of these matrix generators (minimal,
