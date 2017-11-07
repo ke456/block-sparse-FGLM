@@ -42,9 +42,6 @@
 %misc
 \newcommand{\storeArg}{} % aux, not to be used in document!!
 \newcounter{notationCounter}
-%integers
-\renewcommand{\ge}{\geqslant} % greater or equal
-\renewcommand{\le}{\leqslant} % lesser or equal
 %spaces
 \newcommand{\NN}{\mathbb{Z}_{\ge 0}} % nonnegative integers
 \newcommand{\var}{X} % variable for univariate polynomials
@@ -80,6 +77,8 @@
 \newcommand{\remmat}{\mat{R}} % remnant for linear recurrence relation basis
 \newcommand{\remSpace}{\polMatSpace[1][\cdim]} % space for linear relations
 \newcommand{\degBd}{d} % bound on degree of minimal generator
+\newcommand{\degBdr}{d_{r}} % bound on degree of a right minimal generator
+\newcommand{\degBdl}{d_{\ell}} % bound on degree of a left minimal generator
 \newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
 \newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
@@ -346,8 +345,9 @@ recurrent sequence and we want to find a matrix generator. If we want our
 algorithm to run efficiently (or simply, in finite time), we cannot access
 infinitely many terms of the sequence. We therefore ask for an additional
 input, which one often has when considering a sequence coming from some
-application: a bound on the degree of a minimal matrix generator.  If
-available, a bound on the determinantal degree $\degDet$ is sufficient; yet
+application: a bound on the degree of any minimal matrix generator.  Note that
+all minimal generators have the same degree: that of the canonical generator.
+If available, a bound on the determinantal degree $\degDet$ is sufficient; yet
 better bounds can be available and will yield better efficiency.  We now focus
 on \cref{pbm:mingen}.
 
@@ -359,12 +359,13 @@ on \cref{pbm:mingen}.
 
   \dataInfos{Input}{%itemize
     \item sequence $\seq = (\seqelt{k})_k \subset \seqeltSpace$,
-    \item degree bound $\degBd \in \NN$.
+    \item degree bounds $(\degBdl,\degBdr) \in \NN^2$.
   }
 
   \dataInfos{Assumptions}{%itemize
     \item the sequence $\seq$ is linearly recurrent,
-    \item any minimal matrix generator of $\seq$ has degree at most $\degBd$.
+    \item the left (resp.~right) canonical matrix generator of $\seq$ has
+      degree at most $\degBdl$ (resp.~$\degBdr$).
   }
 
   \dataInfo{Output}{
@@ -392,58 +393,67 @@ We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
   \appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
 \]
 
+Then, the following lemma shows that relations for $\seq$ can be retrieved as
+subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
+involving the first $\degBdl+\degBdr$ entries of the sequence $\seq$. Note that
+these bounds $\degBdl,\degBdr$ are the same as Turner's $\gamma_1,\gamma_2$
+\cite[Def.\,4.6~and\,4.7]{Turner02}.
+
+
 \begin{theorem}
   \label{thm:mingen_via_appbas}
   Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
-  sequence, let $\degBd \in \NN$, and let
+  sequence. For $\degBd>0$, define
   \begin{equation}
     \label{eqn:series_to_approximate}
     \sys =
     \begin{bmatrix}
-      \sum_{0\le k\le 2\degBd} \seqelt{k} \var^{2\degBd-k} \\
-      - \mat{I}_{\cdim}
+      \sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
     \end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
   \end{equation}
-  Let further $\rel \in \relSpace$ with $\deg(\rel)\le\degBd$. Then, $\rel$ is
-  a relation for $\seq$ if and only if there exists a vector $\rem \in
-  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
-  \appMod{\sys}{2\degBd+1}$.
+  Then, for any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem
+  \in \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
+  \appMod{\sys}{\degBd}$.
 
-  As a corollary, if $\degBd \in \NN$ is an upper bound on the degree of any
-  minimal matrix generator for $\seq$ and $\mat{B} \in
-  \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$ is a basis of
-  $\appMod{\sys}{2\degBd+1}$, then
+  Now, consider $(\degBdl,\degBdr) \in \NN^2$ such that the left (resp.~right)
+  canonical matrix generator of $\seq$ has degree at most $\degBdl$
+  (resp.~$\degBdr$), and define $\sys$ for $\degBd = \degBdl+\degBdr+1$.  For
+  any vectors $\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\;
+  \rem] \in\appMod{\sys}{\degBdl+\degBdr+1}$ and $\deg([\rel \;\;
+  \rem])\le\degBdl$, then $\rel$ is a relation for $\seq$ and
+  $\deg(\rem)<\deg(\rel)$.
+  
+  As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
+  is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
   \begin{itemize}
-    \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
-      principal submatrix is the canonical matrix generator for $\seq$;
-    \item if $\mat{B}$ is in ordered weak Popov form then its
-      $\rdim\times\rdim$ leading principal submatrix is an ordered weak Popov
-      matrix generator for $\seq$;
-    \item more generally, if $\mat{B}$ is row reduced then it has exactly
-      $\rdim$ rows of the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$,
-      $\rem \in \remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBd$; writing
-      $[\relbas \;\; \remmat]$ for the submatrix formed by these rows, then
-      $\relbas$ is a minimal matrix generator for $\seq$.
+    \item if $\mat{B}$ is in Popov (resp. ordered weak Popov) form then its
+      $\rdim\times\rdim$ leading principal submatrix is the canonical (resp.
+      ordered weak Popov) matrix generator for $\seq$;
+    \item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
+      degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
+      \remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
+      matrix generator for $\seq$.
+      %the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$, $\rem \in
+      %\remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBdl$
   \end{itemize}
 \end{theorem}
 \begin{proof}
   From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
   $\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
-  \seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k > 2 \degBd}
-  \seqelt{k} \var^{2\degBd-k})$ has polynomial entries, has degree less than
-  $\deg(\rel)$, and satisfies $[\rel \;\; \rem] \sys = \num \var^{2\degBd+1}$.
+  \seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k \ge \degBd}
+  \seqelt{k} \var^{\degBd-k-1})$ has polynomial entries, has degree less than
+  $\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
+  hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
 
-  Conversely, assume that there exists some $\rem\in\remSpace$ such that
-  $\deg(\rem)<\deg(\rel)$ and $[\rel \;\; \rem] \sys = 0 \bmod
-  \var^{2\degBd+1}$.
+
   
-  \todo{finish this}
+  Then, the three items are straightforward consequences.
 \end{proof}
 
 \begin{corollary}
   Assuming $\rdim = \Theta(\cdim)$, any of these matrix generators (minimal,
-  Popov, \ldots) can be computed in $O(\rdim^\omega \mathsf{M}(d) \log(d))$
-  operations in $\field$.
+  Popov, \ldots) can be computed in $O(\rdim^\omega \mathsf{M}(\degBd)
+  \log(\degBd))$ operations in $\field$, where $d =\max(\degBdl,\degBdr)$.
 \end{corollary}
 
 We would prefer to say that we compute the canonical form, rather than a
