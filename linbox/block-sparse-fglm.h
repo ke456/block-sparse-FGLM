@@ -40,7 +40,7 @@ class PolMatDom {
 	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat );
+	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat, const size_t threshold=16 );
 
 	// mbasis algorithm to compute approximant bases
 	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
@@ -53,11 +53,11 @@ class PolMatDom {
 	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
 
 	// computing s-owP kernel basis
-	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
+	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size_t threshold=16 );
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq );
+	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
 
 };
 
@@ -68,11 +68,7 @@ class Block_Sparse_FGLM{
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
 	size_t n; // number of variables and size of vector mul_mats
-
-	// length of the sequence:
-	size_t getLength() const { return 2*ceil(D/(double)M); };
-	// generic degree in matrix generator:
-	size_t getGenDeg() const { return ceil(D/(double)M); };
+	size_t threshold; // FIXME temporary: threshold MBasis/PMBasis
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
@@ -96,12 +92,18 @@ class Block_Sparse_FGLM{
 
 
 	public:
-	/* CTOR                                              */
-	Block_Sparse_FGLM(const GF &, int, int, size_t);
-	Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, std::string& s);
+		// length of the sequence:
+		size_t getLength() const { return 2*ceil(D/(double)M); };
+		// generic degree in matrix generator:
+		size_t getGenDeg() const { return ceil(D/(double)M); };
+		size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
 
-	std::vector<PolMatDom::Polynomial> find_lex_basis();
-	std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &);
+		/* CTOR                                              */
+		Block_Sparse_FGLM(const GF &, int, int, size_t, size_t);
+		Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, size_t threshold, std::string& s);
+
+		std::vector<PolMatDom::Polynomial> find_lex_basis();
+		std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &);
 };
 
 
