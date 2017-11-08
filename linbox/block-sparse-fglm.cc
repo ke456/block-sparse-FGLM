@@ -1621,7 +1621,7 @@ int main( int argc, char **argv ){
     cout << "###TIME### approx basis: " << tm.usertime() << endl;
   }
   {
-    cout << "~~~NOW TESTING OLD MBASIS~~~" << endl;
+    cout << "~~~NOW TESTING OLD PMBASIS~~~" << endl;
     PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
     tm.clear(); tm.start();
     vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift );
