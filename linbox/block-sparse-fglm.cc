@@ -4,8 +4,8 @@
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
-//#define TEST_FGLM // testing / timing approximant basis algos
-#define TEST_APPROX // testing / timing approximant basis algos
+#define TEST_FGLM // testing / timing approximant basis algos
+//#define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_KERNEL // testing / timing kernel basis algo
 //#define TEST_POL  // testing xgcd and division via pmbasis
 #define OUTPUT_FUNC // outputs the computed functions
@@ -1585,6 +1585,7 @@ int main( int argc, char **argv ){
 		D = stoi(line);
 		cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
 		cout << "blocking dimension:" << " M=" << M << endl;
+		cout << "threshold mbasis/pmbasis (advice: take 128 if p==9001): " << t << endl;
 		file.close();
 		GF field(p);
 		prime = p;
