@@ -621,6 +621,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 
 vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(){
 	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>());
+	return first; // for now
 }
 
 template<typename PolMat>
