@@ -1547,7 +1547,7 @@ int main( int argc, char **argv ){
 	size_t M = 4;   // row dimension for the blocks
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices
 	size_t n = 2;  // number of variables / of multiplication matrices
-	size_t t = 16;  // threshold MBasis / PMBasis
+	size_t threshold = 16;  // threshold MBasis / PMBasis
 	string s = "";
 
 	static Argument args[] = {
@@ -1555,7 +1555,7 @@ int main( int argc, char **argv ){
 		{ 'n', "-n n", "Set number of variables to n.", TYPE_INT, &n },
 		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
 		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
-		{ 't', "-t t", "Set threshold mbasis / pmbasis to t.", TYPE_INT,  &t },
+		{ 't', "-t threshold", "Set threshold mbasis / pmbasis to t.", TYPE_INT,  &threshold },
 		{ 'F', "-F F", "Read input from file F", TYPE_STR,  &s },
 		END_OF_ARGUMENTS
 	};	
@@ -1568,7 +1568,7 @@ int main( int argc, char **argv ){
 		prime = p;
 		FIELD = field;
 #ifdef TEST_FGLM
-	  Block_Sparse_FGLM l(field, D, M, n, t);
+	  Block_Sparse_FGLM l(field, D, M, n, threshold);
 	  l.find_lex_basis();
 #endif
 	}
@@ -1585,13 +1585,13 @@ int main( int argc, char **argv ){
 		D = stoi(line);
 		cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
 		cout << "blocking dimension:" << " M=" << M << endl;
-		cout << "threshold mbasis/pmbasis (advice: take 128 if p==9001): " << t << endl;
+		cout << "threshold mbasis/pmbasis (advice: take 128 if p==9001): " << threshold << endl;
 		file.close();
 		GF field(p);
 		prime = p;
 		FIELD = field;
 #ifdef TEST_FGLM
-		Block_Sparse_FGLM l(field, D, M, n, t, s);
+		Block_Sparse_FGLM l(field, D, M, n, threshold, s);
 		l.find_lex_basis();
 #endif
 	}
@@ -1628,7 +1628,7 @@ int main( int argc, char **argv ){
     cout << "~~~NOW TESTING OLD PMBASIS~~~" << endl;
     PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
     tm.clear(); tm.start();
-    vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift, t );
+    vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift, threshold );
     tm.stop();
 #ifdef VERBOSE_ON
     cout << "###OUTPUT### degrees in approx basis:" << endl;
@@ -1654,7 +1654,7 @@ int main( int argc, char **argv ){
     cout << "~~~NOW TESTING NEW PMBASIS~~~" << endl;
     PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
     tm.clear(); tm.start();
-    vector<size_t> mindeg4 = PMD.pmbasis( app_bas, series, order, shift, t );
+    vector<size_t> mindeg4 = PMD.pmbasis( app_bas, series, order, shift, threshold );
     tm.stop();
 #ifdef VERBOSE_ON
     cout << "###OUTPUT### degrees in approx basis:" << endl;
@@ -1667,7 +1667,7 @@ int main( int argc, char **argv ){
     cout << "~~~NOW TESTING POPOV_PMBASIS~~~" << endl;
     PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
     tm.clear(); tm.start();
-    vector<size_t> mindeg5 = PMD.popov_pmbasis( app_bas, series, order, shift, t );
+    vector<size_t> mindeg5 = PMD.popov_pmbasis( app_bas, series, order, shift, threshold );
     tm.stop();
 #ifdef VERBOSE_ON
     cout << "###OUTPUT### degrees in approx basis: " << endl;
@@ -1690,7 +1690,7 @@ int main( int argc, char **argv ){
 	Timer tm;
     PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
     tm.clear(); tm.start();
-    PMD.kernel_basis( kerbas, pmat );
+    PMD.kernel_basis( kerbas, pmat, threshold );
     tm.stop();
     cout << "###OUTPUT### degrees in kernel basis: " << endl;
     PMD.print_degree_matrix( kerbas );
