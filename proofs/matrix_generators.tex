@@ -33,7 +33,7 @@
 \crefname{problem}{Problem}{Problems}
 \Crefname{problem}{Problem}{Problems}
 
-\title{Matrix Berlekamp-Massey}
+\title{Computing generators for linearly recurrent matrix sequences}
 
 \author{}
 \date{\today}
@@ -283,13 +283,15 @@ also admits a right canonical generator.
 
 Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
 find a minimal matrix generator.  We assume the availability of bounds
-$(\degBdl,\degBdr)$ on the degree of the left and right canonical generators,
-which allows us to control the number of terms of the sequence we will access
+$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
+which allow us to control the number of terms of the sequence we will access
 during the algorithm.  Since taking the Popov form of a reduced matrix does not
 change the degree, any left minimal matrix generator $\relbas$ has the same
 degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
 a bound on the degree of any left minimal generator. The same remark holds for
-$\degBdr$ and right minimal generators.
+$\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
+the same as $\gamma_1,\gamma_2$ in \cite[Def.\,4.6~and\,4.7]{Turner02}; see
+also $\delta_l,\delta_r$ in \cite[Sec.\,4.2]{Villard97a}.)
 
 \begin{lemma}
   \label{lem:finitely_many_terms}
@@ -329,18 +331,14 @@ $\degBdr$ and right minimal generators.
   and the proof is complete.
 \end{proof}
 
-We now show how the additional information of $\degBd$ allows us to find a
-matrix generator by considering only a small chunk of the sequence, rather than
-all its terms.
+(A similar result is in \cite[Thm.\,4.5]{Turner02}.)
 
 The fast computation of matrix generators is usually handled via algorithms for
 computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
 next result gives the main idea behind this approach. This result is similar to
-\cite[Thm.\,4.7,\,4.8,\,4.9,\,4.10]{Turner02}, but in some sense the reversal
-is on the input sequence rather than on the output matrix generator (and also
-this section 4.2 of \cite{Turner02} provides many more details related to the
-mechanisms and output properties in the approximant basis algorithm, which we
-do not consider here).
+\cite[Thm.\,4.6]{Turner02} (see also
+\cite[Thm.\,4.7,\,4.8,\,4.9,\,4.10]{Turner02}), but in some sense the reversal
+is on the input sequence rather than on the output matrix generator.
 
 We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
 \polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
@@ -349,17 +347,18 @@ We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
   \appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
 \]
 
-Then, the following lemma shows that relations for $\seq$ can be retrieved as
+Then, the next theorem shows that relations for $\seq$ can be retrieved as
 subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
-involving the first $\degBdl+\degBdr$ entries of the sequence $\seq$. Note that
-these bounds $\degBdl,\degBdr$ are the same as $\gamma_1,\gamma_2$ in
-\cite[Def.\,4.6~and\,4.7]{Turner02}; see also $\delta_l,\delta_r$ in
-\cite[Sec.\,4.2]{Villard97a}.
+involving the first $\degBdl+\degBdr$ entries of $\seq$. 
 
 \begin{theorem}
   \label{thm:mingen_via_appbas}
   Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
-  sequence. For $\degBd>0$, define
+  sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
+  (resp.~right) canonical matrix generator of $\seq$ has degree
+  $\le\degBdl$ (resp.~$\le \degBdr$).
+  
+  For $\degBd>0$, define
   \begin{equation}
     \label{eqn:series_to_approximate}
     \sys =
@@ -367,24 +366,18 @@ these bounds $\degBdl,\degBdr$ are the same as $\gamma_1,\gamma_2$ in
       \sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
     \end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
   \end{equation}
-  Then, for any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem
-  \in \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
-  \appMod{\sys}{\degBd}$.
-
-  Now, consider $(\degBdl,\degBdr) \in \NN^2$ such that the left (resp.~right)
-  canonical matrix generator of $\seq$ has degree at most $\degBdl$
-  (resp.~$\degBdr$), and define $\sys$ for $\degBd = \degBdl+\degBdr+1$.  For
-  any vectors $\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\;
-  \rem] \in\appMod{\sys}{\degBdl+\degBdr+1}$ and $\deg([\rel \;\;
-  \rem])\le\degBdl$, then $\rel$ is a relation for $\seq$ and
-  $\deg(\rem)<\deg(\rel)$.
+  For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
+  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
+  \appMod{\sys}{\degBd}$.  Assuming $\degBd \ge \degBdr+1$, for any vectors
+  $\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\; \rem]
+  \in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
+  then $\rel$ is a relation for $\seq$. %% and $\deg(\rem)<\deg(\rel)$.
   
   As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
   is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
   \begin{itemize}
-    \item if $\mat{B}$ is in Popov (resp. ordered weak Popov) form then its
-      $\rdim\times\rdim$ leading principal submatrix is the canonical (resp.
-      ordered weak Popov) matrix generator for $\seq$;
+    \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
+      principal submatrix is the canonical matrix generator for $\seq$;
     \item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
       degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
       \remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
@@ -401,24 +394,52 @@ these bounds $\degBdl,\degBdr$ are the same as $\gamma_1,\gamma_2$ in
   $\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
   hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
 
+  Conversely, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ we have $\rel
+  (\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1}) = \rem \bmod
+  \var^\degBd$. Since $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
+  \rem])\le\degBd-\degBdr-1$, this implies that the coefficients of degree
+  $\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le k < \degBd} \seqelt{k}
+  \var^{\degBd-k-1})$ are zero. Then, \cref{lem:finitely_many_terms} shows that
+  $\rel$ is a relation for $\seq$.
 
-  
-  Then, the three items are straightforward consequences.
+  Finally, the two items are straightforward consequences.
 \end{proof}
 
+Then, using fast approximant basis algorithms, we obtain the next result.
+
 \begin{corollary}
-  Assuming $\rdim = \Theta(\cdim)$, any of these matrix generators (minimal,
-  Popov, \ldots) can be computed in $O(\rdim^\omega \mathsf{M}(\degBd)
-  \log(\degBd))$ operations in $\field$, where $d =\max(\degBdl,\degBdr)$.
+  Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and let
+  $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in \NN^2$ are such
+  that the left (resp.~right) canonical matrix generator of $\seq$ has degree
+  $\le\degBdl$ (resp.~$\le \degBdr$).  Then,
+  \begin{itemize}
+    \item using the algorithm of \cite{GiJeVi03}: if $\cdim \in \Omega(\rdim)$,
+      a left minimal matrix generator for $\seq$ can be computed in $O(\cdim^\omega
+      \mathsf{M}(\degBd) \log(\degBd))$ operations in $\field$;
+    \item using the algorithm of \cite{ZhoLab12}: if $\cdim \in O(\rdim)$, a
+      left minimal matrix generator for $\seq$ can be computed in $O(\rdim^\omega
+      \mathsf{M}(\cdim\degBd/\rdim) \log(\cdim\degBd))$ operations in $\field$;
+    \item using the algorithm of \cite{JeNeScVi16}: the left canonical matrix
+      generator for $\seq$ can be computed in $O((\rdim+\cdim)^{\omega-1}
+      \mathsf{M}(\cdim\degBd) \log(\cdim\degBd)^3)$ operations in $\field$.
+  \end{itemize}
 \end{corollary}
 
-We would prefer to say that we compute the canonical form, rather than a
-minimal one. In theory, exactly the same asymptotic cost bound (but not yet in
-the literature, so this needs some short explanation; except if we do not care
-about logarithmic factors then this is in the literature).
+\emph{Note:} The last cost bound comes from \cite[Thm.\,1.4]{JeNeScVi16}. But
+actually in the present case with the uniform shift and uniform order we may as
+well use a slight modification of \cite{GiJeVi03,ZhoLab12} (plus a call to
+SarSto11 to find the degrees); this is what I did in the implementation. Then,
+same cost as in the first item, but finds the canonical generator.
+Unfortunately this is not yet in the literature so this would need some
+details, which we want to avoid especially if we don't really care about log
+factors.
 
-With our implementation, asking for the canonical form should induce a slowdown
-factor of at most $2$.
+\bibliographystyle{plain}
+\bibliography{biblio.bib}
+
+\appendix
+\section{Attic}
+\label{sec:attic}
 
 \begin{problembox}[htbp]
   \problemInfo
@@ -441,14 +462,6 @@ factor of at most $2$.
     a minimal matrix generator for $\seq$.
   }
 \end{problembox}
-
-
-\bibliographystyle{plain}
-\bibliography{biblio.bib}
-
-\appendix
-\section{Attic}
-\label{sec:attic}
 
 For more details:
 \begin{itemize}
