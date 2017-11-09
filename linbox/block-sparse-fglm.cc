@@ -457,7 +457,9 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		rfac_row.ref(0,i,j) = element;
 	}
 	PMMD.mul(result,P_mat,rfac_row);
-
+	
+	Timer tm3;
+	tm3.start();
 	vector<PolMatDom::Polynomial> rfac_polys(M);
 	vector<PolMatDom::Polynomial> div(M);
 	for (int i = 0; i < M; i++){
@@ -476,7 +478,10 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
   
 	PolMatDom::MatrixP u_tilde(PMD.field(),1,M,M*this->getLength()+1);
 	PMMD.mul(u_tilde, w, lfac);
-	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());
+	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());	
+	tm3.stop();
+	cout << "Computing u_tilde: " << tm3.usertime();
+
 
 	// constructing the numerator for the seqeunce
   
