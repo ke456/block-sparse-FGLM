@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	size_t p = 23068673;  // size of the base field
 	size_t m = 4;   // row dimension for the blocks
 	size_t d = 512; // vector space dimension / dimension of multiplication matrices
-	size_t nb = 10; // number of products for timing
+	size_t nb = 1; // number of products for timing
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field.", TYPE_INT, &p },
