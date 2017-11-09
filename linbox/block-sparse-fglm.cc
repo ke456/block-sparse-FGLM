@@ -534,18 +534,35 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 			}
 			index++;
 		}
+		Timer tm2;
+		tm2.clear();
 		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
 		PolMatDom::PMatrix N_shift(PMD.field(),M,1,this->getLength());
+		tm2.start();
 		PMMD.mul(N,mat_gen,polys);
 		shift(N_shift,N,M,1,getGenDeg());
+		
+		tm2.stop();
+		cout << "Computing N: " << tm2.usertime() << endl;
+		tm2.clear();
+		
+		tm2.start();
 		PolMatDom::MatrixP n_mat(PMD.field(),1,1,D+1);
  		PMMD.mul(n_mat, u_tilde, N_shift);
 		mat_resize(field, n_mat, D);
+		tm2.stop();
+		cout << "Computing n: " << tm2.usertime() << endl;
+		tm2.clear();
+		
+		tm2.start();
 		PolMatDom::MatrixP func_mat(PMD.field(),1,1,this->getLength());
 		PMMD.mul(func_mat,n_mat,n1_mat);
 		PolMatDom::Polynomial func;
 		mat_to_poly(func,func_mat,2*D);
 		poly_mod(func,func,smith[0]);
+		tm2.stop();
+		cout << "Computing func: " << tm2.usertime() << endl;
+		tm2.clear();
 		result_pols.emplace_back(func);
 #ifdef OUTPUT_FUNC
 		ofs << "R.append(";
