@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	size_t p = 23068673;  // size of the base field
 	size_t m = 4;   // row dimension for the blocks
 	size_t d = 512; // vector space dimension / dimension of multiplication matrices
-	size_t nb = 1; // number of products for timing
+	size_t nb = 10; // number of products for timing
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field.", TYPE_INT, &p },
@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
 	//cout << "base field / number of iterations: " << p << " , " << nb << endl;
 	//cout << "dimensions / degrees of matrices : " << m << " x " << m << " x " << m << " , " << d << " x " << d << endl;
 	{
+		bool correct=true;
 		Timer time_init_in, time_init_out, time_product;
 		for (size_t i = 0; i < nb; ++i) {
 			Timer tm;
@@ -70,10 +71,12 @@ int main(int argc, char *argv[])
 			tm.clear(); tm.start();
 			PMMD.mul( prod, mat1, mat2 );
 			tm.stop(); time_product += tm;
+			//correct = correct && check_mul(prod, mat1, mat2, mat1.size()+mat2.size()-1);
 		}
 		//cout << "#timing# Initialize matrices: --> " << time_init_in.usertime()/nb << endl;
 		//cout << "#timing# Initialize product:  --> " << time_init_out.usertime()/nb << endl;
 		//cout << "#timing# Perform product:     --> " << time_product.usertime()/nb << endl;
+		//cout << "#output# All products correct --> " << correct << endl;
 		cout << d << ", " << time_product.usertime()/nb  << endl;
 	}
 	//cout << "~~~~~~~~~~~END TIMINGS SQUARE MULT~~~~~~~~~~~~~" << endl;
