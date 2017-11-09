@@ -445,7 +445,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
  	  auto element = smith[0][i];
 	  P_mat.ref(0,0,i) = element;
   }
-	//cout << "P_mat: " << P_mat << endl;
+
 	PolynomialMatrixMulDomain<GF> PMMD(field);
 	PolMatDom::MatrixP rfac_row(PMD.field(),1,M,M*this->getLength()+1);
 	PolMatDom::MatrixP result(PMD.field(),1,M,M*this->getLength()+1);
@@ -456,9 +456,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		auto element = rfac.get(0,i,j);
 		rfac_row.ref(0,i,j) = element;
 	}
-	//cout << "rfac row: " << rfac_row << endl;
 	PMMD.mul(result,P_mat,rfac_row);
-	//cout << "result: " << result << endl;
 
 	vector<PolMatDom::Polynomial> rfac_polys(M);
 	vector<PolMatDom::Polynomial> div(M);
@@ -467,12 +465,9 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 			rfac_polys[i].emplace_back(result.get(0,i,j));
 			
 		}
-		//cout << "r_fac at i: " << rfac_polys[i] << endl;
-		//PMD.divide(rfac_polys[i],smith[M-i-1],div[i]);
 		poly_div(div[i],rfac_polys[i],smith[i]);
 		div[i].resize(M*this->getLength()+1,0);
 	}
-	//cout << "div: " << div << endl;
 	PolMatDom::MatrixP w(PMD.field(),1,M,M*this->getLength()+1);
 	for (int i = 0; i < M; i++)
 	for (int j = 0; j < M*this->getLength()+1;j++){
@@ -494,54 +489,24 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		}
 		index++;
 	}
-	
-	//sanity check
-	//PMMD.mul(blah, u_tilde, mat_gen);
-	//cout << "blah: " << blah << endl;
 
-  //cout << "u_tilde: " << u_tilde <<endl;
   PolMatDom::PMatrix N1(PMD.field(),M,1,this->getLength());
   PolMatDom::PMatrix N1_shift(PMD.field(),M,1,this->getGenDeg());
 	PMMD.mul(N1,mat_gen,Z);
-	//cout << "S*Z: " << N1 << endl;
 	shift(N1_shift,N1,M,1,getGenDeg());
-	//cout << "N1 shift: " << N1_shift << endl;
 	PolMatDom::MatrixP n1_mat(PMD.field(),1,1,this->getLength());
   PMMD.mul(n1_mat, u_tilde, N1_shift);
-	//cout << "n1 mat: " << n1_mat << endl;
 	PolMatDom::Polynomial n1;
 	for (int i  = 0; i < D; i++)
 	  n1.emplace_back(n1_mat.get(0,0,i));
-	//cout << "n1: " << n1 << endl;
 	PolMatDom::Polynomial n1_inv,g,u,v;
 	PMD.xgcd(n1,smith[0],g,n1_inv,v);
-	//cout << "n1: " << n1_mat << endl;
 	n1_mat = PolMatDom::MatrixP(PMD.field(),1,1,D);
 	for (int i = 0; i < D; i++){
 	  n1_mat.ref(0,0,i) = n1_inv[i];
 	}
-  //cout << "n1 inv mat: " <<  n1_mat << endl;
-
 
 	MatrixDomain<GF> MD(field);
-#ifdef NAIVE_ON
-	tm.clear(); tm.start();
-	DenseMatrix<GF> U(field,M,D);
-	
-	vector<DenseMatrix<GF>> lst(this->getLength(), DenseMatrix<GF>(field,M,D));
-	auto &T1 = mul_mats[0];
-	create_random_matrix(U);
-	lst[0] = U;
-	for ( size_t i=1; i<this->getLength(); i++){
-		MD.mul(lst[i],lst[i-1],T1);
-	}
-#ifdef EXTRA_VERBOSE_ON
-	for (auto &i : lst)
-		i.write(cout<<"U: ", Tag::FileFormat::Maple)<<endl;
-#endif
-	tm.stop();
-	cout << "###TIME### sequence (UT1^i) naive: " << tm.usertime() << endl;
-#endif
 	DenseMatrix<GF> V_col(field,D,1); // a single column of V
 	for (int i = 0; i < D; i++){
 		auto el = V.refEntry(i,0);
@@ -554,7 +519,6 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	vector<PolMatDom::Polynomial> result_pols;
   // LOOP FOR OTHER VARIABLES
   for (int i  = 1; i < mul_mats.size(); i++){
-		//cout <<"\n\n\n\n"<<"STARTING VAR: " << i << endl;
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
 		MD.mul(right_mat, Ti, V_col);
@@ -570,30 +534,18 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 			}
 			index++;
 		}
-		//cout << "Poly: " << endl << polys << endl;
 		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
 		PolMatDom::PMatrix N_shift(PMD.field(),M,1,this->getLength());
 		PMMD.mul(N,mat_gen,polys);
-		//cout << "N:" << endl << N << endl;
 		shift(N_shift,N,M,1,getGenDeg());
-		//cout << "Shifted N: " << endl<< N_shift << endl;
 		PolMatDom::MatrixP n_mat(PMD.field(),1,1,D+1);
  		PMMD.mul(n_mat, u_tilde, N_shift);
 		mat_resize(field, n_mat, D);
- 		//cout << "n_mat: " << n_mat << endl;
 		PolMatDom::MatrixP func_mat(PMD.field(),1,1,this->getLength());
 		PMMD.mul(func_mat,n_mat,n1_mat);
-		//cout << "func_mat: " << func_mat << endl;
 		PolMatDom::Polynomial func;
 		mat_to_poly(func,func_mat,2*D);
-		//cout << "func: " << func << endl;
-		//for (int i = 0; i < func.size(); i++){
-		//	cout << func[i] << "*x^" << i << " ";
-		//	if (i != func.size()-1) cout << "+";
-		//}
-		//cout << "P: " << smith[0] << endl;
 		poly_mod(func,func,smith[0]);
-		//cout << "func mod P: " << func << endl;
 		result_pols.emplace_back(func);
 #ifdef OUTPUT_FUNC
 		ofs << "R.append(";
