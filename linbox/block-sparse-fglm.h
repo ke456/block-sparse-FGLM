@@ -84,7 +84,7 @@ class Block_Sparse_FGLM{
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
-	Linbox::SparseMatrix<GF> mul_mat_t;
+	LinBox::SparseMatrix<GF> mul_mat_t;
 
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
@@ -94,7 +94,7 @@ class Block_Sparse_FGLM{
 	void create_random_matrix(Matrix &m);
 	
 	// Computes sequence (U T1^i)
-	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>> &);
+	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>>&, bool);
 	
 	// Computes sequence (UT1^i)V
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
@@ -115,7 +115,7 @@ class Block_Sparse_FGLM{
 		Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, size_t threshold, std::string& s);
 
 		std::vector<PolMatDom::Polynomial> find_lex_basis();
-		std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &);
+		std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
 };
 
 

@@ -179,8 +179,8 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 	M(M), 
 	n(n), 
 	threshold(threshold),
-	mul_mat_t(field,D,D),
 	mul_mats(n, SparseMatrix<GF>(field,D,D)), 
+	mul_mat_t(field,D,D),
 	V(field,D,M), 
 	mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field,M,D)) 
 {
@@ -198,6 +198,7 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 		field.init(a,rand());
 		rand_comb.emplace_back(a);
 	}
+	cout << endl;
 
 	vector<double> sparsity_count;
 	long max_entries = D*D;
@@ -219,11 +220,14 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 	  count++;
 	  GF::Element a(a_int);
 	  mul_mats[index].refEntry(i,j) = a;
-	  mul_mat_t.refEntry(i,j) = field.add(a,mul_mat_t[i,j]);
+	  GF::Element e;
+		field.mul(e,rand_comb[index],a);
+		field.add(e,e,mul_mat_t.refEntry(i,j));
+		mul_mat_t.refEntry(i,j) = e;
 	}
 	}
 	file.close();
-	  
+	
 #ifdef SPARSITY_COUNT
 	cout << "sparsity: ";
 	for (auto i: sparsity_count)
@@ -247,7 +251,7 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 		}
 }
 
-void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
+void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v, bool use_t){
 	MatrixDomain<GF> MD{field};
 
 	// initialize the left block (random MxD)
@@ -265,10 +269,14 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 		i = vector<DenseMatrix<GF>>(this->getLength(),DenseMatrix<GF>(field,1,D));
 	}
 
-	// initialize the first multiplication matrix (random DxD)
-	auto &T1 = mul_mats[0];
+	// initialize the first multiplication matrix
+	SparseMatrix<GF> *T1;
+	if (use_t)
+		T1 = &mul_mat_t;
+	else
+		T1 = &mul_mats[0];
 #ifdef EXTRA_VERBOSE_ON
-	T1.write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
+	T1->write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
 #endif
 
 	// compute sequence in a parallel fashion
@@ -278,7 +286,7 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v){
 		vector<DenseMatrix<GF>> temp_mat_seq(this->getLength(), DenseMatrix<GF>(field,1,D)); 
 		temp_mat_seq[0] = U_rows[i];
 		for (size_t j  = 1; j < this->getLength(); j++){
-			MD2.mul(temp_mat_seq[j],temp_mat_seq[j-1],T1);
+			MD2.mul(temp_mat_seq[j],temp_mat_seq[j-1],*T1);
 		}
 		mat_seq[i] = temp_mat_seq;
 	}
@@ -350,13 +358,14 @@ int row, int col, int deg){
 			}
 }
 
-vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats){
+// use_t = true means we are using a random combination
+vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, bool use_t){
 #ifdef TIMINGS_ON
 	Timer tm;
 	tm.clear(); tm.start();
 #endif
 	// 1. compute the "left" matrix sequence (U T1^i)
-	get_matrix_sequence_left(mat_seq_left);
+	get_matrix_sequence_left(mat_seq_left,use_t);
 	
 #ifdef VERBOSE_ON	
 	cout << "###OUTPUT### Matrix sequence (U T1^i)_i :" << endl;
@@ -527,8 +536,10 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	ofs << "R = []" << endl;
 #endif
 	vector<PolMatDom::Polynomial> result_pols;
+	int start = 0;
+	if (!use_t) start = 1;
   // LOOP FOR OTHER VARIABLES
-  for (int i  = 1; i < mul_mats.size(); i++){
+  for (int i = start; i < mul_mats.size(); i++){
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
 		MD.mul(right_mat, Ti, V_col);
@@ -609,7 +620,8 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 }
 
 vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(){
-	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>());
+	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),false); // uses X1
+	auto second =  find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),true); // uses t
 	return first; // for now
 }
 
@@ -1563,8 +1575,8 @@ int main( int argc, char **argv ){
 		prime = p;
 		FIELD = field;
 #ifdef TEST_FGLM
-	  Block_Sparse_FGLM l(field, D, M, n, threshold);
-	  l.find_lex_basis();
+	  //Block_Sparse_FGLM l(field, D, M, n, threshold);
+	  //l.find_lex_basis();
 #endif
 	}
 	else{
