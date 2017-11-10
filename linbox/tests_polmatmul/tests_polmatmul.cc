@@ -44,11 +44,12 @@ int main(int argc, char *argv[])
 	long seed = time(NULL);
 	typename GF::RandIter rd(field,0,seed);
 	PolynomialMatrixMulDomain<GF> PMMD( field );
+	BlasMatrixDomain<GF> BMD( field );
 
 	//cout << "~~~~~~~~~~~STARTING TIMINGS SQUARE MULT~~~~~~~~~~~~~" << endl;
 	//cout << "base field / number of iterations: " << p << " , " << nb << endl;
 	//cout << "dimensions / degrees of matrices : " << m << " x " << m << " x " << m << " , " << d << " x " << d << endl;
-	{
+	{ // square polynomial matrix product
 		bool correct=true;
 		Timer time_init_in, time_init_out, time_product;
 		for (size_t i = 0; i < nb; ++i) {
@@ -79,6 +80,41 @@ int main(int argc, char *argv[])
 		//cout << "#output# All products correct --> " << correct << endl;
 		cout << d << ", " << time_product.usertime()/nb  << endl;
 	}
+	{  // some test about constant matrix product
+		Timer time_init_in, time_init_out, time_product;
+		for (size_t i = 0; i < nb; ++i) {
+			Timer tm;
+			tm.start();
+			BlasMatrix<GF> mat1( field, m*d, m );
+			BlasMatrix<GF> mat2( field, m, m*d );
+			for ( size_t i=0; i<mat1.rowdim(); ++i )
+			for ( size_t j=0; j<mat1.coldim(); ++j )
+			{
+				rd.random( mat1.refEntry( i, j ) );
+			}
+			for ( size_t i=0; i<mat2.rowdim(); ++i )
+			for ( size_t j=0; j<mat2.coldim(); ++j )
+			{
+				rd.random( mat2.refEntry( i, j ) );
+			}
+			tm.stop();
+			time_init_in += tm;
+			tm.clear(); tm.start();
+			BlasMatrix<GF> prod( field, m*d, m*d );
+			tm.stop(); time_init_out += tm;
+			tm.clear(); tm.start();
+			BMD.mul( prod, mat1, mat2 );
+			tm.stop(); time_product += tm;
+			//correct = correct && check_mul(prod, mat1, mat2, mat1.size()+mat2.size()-1);
+		}
+		//cout << "#timing# Initialize matrices: --> " << time_init_in.usertime()/nb << endl;
+		//cout << "#timing# Initialize product:  --> " << time_init_out.usertime()/nb << endl;
+		//cout << "#timing# Perform product:     --> " << time_product.usertime()/nb << endl;
+		//cout << "#output# All products correct --> " << correct << endl;
+		cout << "constant :" << endl;
+		cout << d << ", " << time_product.usertime()/nb  << endl;
+	}
+
 	//cout << "~~~~~~~~~~~END TIMINGS SQUARE MULT~~~~~~~~~~~~~" << endl;
 
 	//cout << "~~~~~~~~~~~STARTING TIMINGS MIDPRODUCT~~~~~~~~~~~~~" << endl;
