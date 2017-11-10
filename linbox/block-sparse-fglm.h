@@ -84,6 +84,7 @@ class Block_Sparse_FGLM{
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+	Linbox::SparseMatrix<GF> mul_mat_t;
 
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
@@ -111,7 +112,6 @@ class Block_Sparse_FGLM{
 		size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
 
 		/* CTOR                                              */
-		Block_Sparse_FGLM(const GF &, int, int, size_t, size_t);
 		Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, size_t threshold, std::string& s);
 
 		std::vector<PolMatDom::Polynomial> find_lex_basis();

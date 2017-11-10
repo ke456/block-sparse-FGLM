@@ -179,6 +179,7 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 	M(M), 
 	n(n), 
 	threshold(threshold),
+	mul_mat_t(field,D,D),
 	mul_mats(n, SparseMatrix<GF>(field,D,D)), 
 	V(field,D,M), 
 	mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field,M,D)) 
@@ -191,6 +192,12 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 	getline(file, line);
 	srand(time(NULL));
 	create_random_matrix(V);
+	vector<GF::Element> rand_comb;
+	for (int i = 0; i < n; i++){
+		GF::Element a;
+		field.init(a,rand());
+		rand_comb.emplace_back(a);
+	}
 
 	vector<double> sparsity_count;
 	long max_entries = D*D;
@@ -212,6 +219,7 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 	  count++;
 	  GF::Element a(a_int);
 	  mul_mats[index].refEntry(i,j) = a;
+	  mul_mat_t.refEntry(i,j) = field.add(a,mul_mat_t[i,j]);
 	}
 	}
 	file.close();
@@ -228,21 +236,6 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, si
 #endif
 }
 
-Block_Sparse_FGLM::Block_Sparse_FGLM(const GF &field, int D, int M, size_t threshold, size_t n): 
-	field(field), 
-	D(D), 
-	M(M), 
-	n(n), 
-	mul_mats(n, SparseMatrix<GF>(field,D,D)), 
-	V(field,D,M),
-	mat_seq_left(2*ceil(D/(double)M),DenseMatrix<GF>(field,M,D)) 
-{
-	srand(time(NULL));
-	for ( size_t k=0; k<n; ++k )
-		create_random_matrix(mul_mats[k]);
-	create_random_matrix(V);
-	
-}
 
 template<typename Matrix>
 void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
