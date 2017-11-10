@@ -1,3 +1,127 @@
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fri 10 Nov 15:00 (using Givaro's xgcd for R_j computations --> slower !!?!! )
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./main -t 128 -F test256.dat ; ./main -t 128 -F test625.dat ; ./main -t 128 -F test1000.dat ; ./main -t 128 -F test1296.dat ; ./main -t 128 -F test3375.dat
+
+s=test256.dat
+read file test256.dat with p=9001 n=4 D=256
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 0.888758 (user time)
+###TIME### left sequence (UT1^i): 0.264107 (real time)
+###TIME### sequence (UT1^i)V: : 0.000882
+###TIME### Matrix Berlekamp Massey: 0.017371
+###TIME### Smith form and transformations: 0.309861
+###TIME### R_j computations: 0.069166
+
+s=test625.dat
+read file test625.dat with p=9001 n=4 D=625
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 9.89228 (user time)
+###TIME### left sequence (UT1^i): 2.8989 (real time)
+###TIME### sequence (UT1^i)V: : 0.023425
+###TIME### Matrix Berlekamp Massey: 0.050232
+###TIME### Smith form and transformations: 0.538435
+###TIME### R_j computations: 0.259845
+
+s=test1000.dat
+read file test1000.dat with p=9001 n=3 D=1000
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 21.5654 (user time)
+###TIME### left sequence (UT1^i): 6.03145 (real time)
+###TIME### sequence (UT1^i)V: : 0.047307
+###TIME### Matrix Berlekamp Massey: 0.074236
+###TIME### Smith form and transformations: 0.94801
+###TIME### R_j computations: 0.516625
+
+s=test1296.dat
+read file test1296.dat with p=9001 n=4 D=1296
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 73.5118 (user time)
+###TIME### left sequence (UT1^i): 23.0147 (real time)
+###TIME### sequence (UT1^i)V: : 0.049775
+###TIME### Matrix Berlekamp Massey: 0.099282
+###TIME### Smith form and transformations: 1.69868
+###TIME### R_j computations: 0.982437
+
+s=test3375.dat
+read file test3375.dat with p=9001 n=3 D=3375
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 610.803 (user time)
+###TIME### left sequence (UT1^i): 169.734 (real time)
+###TIME### sequence (UT1^i)V: : 0.13693
+###TIME### Matrix Berlekamp Massey: 0.227672
+###TIME### Smith form and transformations: 3.17248
+###TIME### R_j computations: 4.93412
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fri 10 Nov 11:00 (after improvement of XGCD)
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./main -t 128 -F test256.dat ; ./main -t 128 -F test625.dat ; ./main -t 128 -F test1000.dat ; ./main -t 128 -F test1296.dat ; ./main -t 128 -F test3375.dat
+
+s=test256.dat
+read file test256.dat with p=9001 n=4 D=256
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 0.835611 (user time)
+###TIME### left sequence (UT1^i): 0.214898 (real time)
+###TIME### sequence (UT1^i)V: : 0.000752
+###TIME### Matrix Berlekamp Massey: 0.022547
+###TIME### Smith form and transformations: 0.176737
+###TIME### R_j computations: 0.090862
+
+s=test625.dat
+read file test625.dat with p=9001 n=4 D=625
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 9.81301 (user time)
+###TIME### left sequence (UT1^i): 2.5198 (real time)
+###TIME### sequence (UT1^i)V: : 0.02416
+###TIME### Matrix Berlekamp Massey: 0.045508
+###TIME### Smith form and transformations: 0.50851
+###TIME### R_j computations: 0.208243
+
+s=test1000.dat
+read file test1000.dat with p=9001 n=3 D=1000
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 21.2417 (user time)
+###TIME### left sequence (UT1^i): 5.46424 (real time)
+###TIME### sequence (UT1^i)V: : 0.047466
+###TIME### Matrix Berlekamp Massey: 0.044981
+###TIME### Smith form and transformations: 0.817228
+###TIME### R_j computations: 0.358768
+
+s=test1296.dat
+read file test1296.dat with p=9001 n=4 D=1296
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+###TIME### left sequence (UT1^i): : 70.8491 (user time)
+###TIME### left sequence (UT1^i): 18.2395 (real time)
+###TIME### sequence (UT1^i)V: : 0.052728
+###TIME### Matrix Berlekamp Massey: 0.069567
+###TIME### Smith form and transformations: 1.18957
+###TIME### R_j computations: 0.653726
+
+s=test3375.dat
+read file test3375.dat with p=9001 n=3 D=3375
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+^[[1;5D###TIME### left sequence (UT1^i): : 606.492 (user time)
+###TIME### left sequence (UT1^i): 155.672 (real time)
+###TIME### sequence (UT1^i)V: : 0.128304
+###TIME### Matrix Berlekamp Massey: 0.203891
+###TIME### Smith form and transformations: 3.37454
+###TIME### R_j computations: 2.21255
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Thur 9 Nov 16:15
 vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./main -t 128 -F test256.dat ; ./main -t 128 -F test625.dat ; ./main -t 128 -F test1000.dat ; ./main -t 128 -F test1296.dat ; ./main -t 128 -F test3375.dat
 

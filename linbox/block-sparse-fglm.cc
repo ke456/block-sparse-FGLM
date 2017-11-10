@@ -1,4 +1,5 @@
 #define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
+//#define EXTRA_TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
 //#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
@@ -458,8 +459,10 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	}
 	PMMD.mul(result,P_mat,rfac_row);
 	
+#ifdef EXTRA_TIMINGS_ON
 	Timer tm3;
 	tm3.start();
+#endif
 	vector<PolMatDom::Polynomial> rfac_polys(M);
 	vector<PolMatDom::Polynomial> div(M);
 	for (int i = 0; i < M; i++){
@@ -479,9 +482,11 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	PolMatDom::MatrixP u_tilde(PMD.field(),1,M,M*this->getLength()+1);
 	PMMD.mul(u_tilde, w, lfac);
 	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());	
+#ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
 	cout << "Computing u_tilde: " << tm3.usertime() << endl;;
 	tm3.clear();
+#endif
 
 	// constructing the numerator for the seqeunce
   
@@ -505,10 +510,14 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	for (int i  = 0; i < D; i++)
 	  n1.emplace_back(n1_mat.get(0,0,i));
 	PolMatDom::Polynomial n1_inv,g,u,v;
+#ifdef EXTRA_TIMINGS_ON
 	tm3.start();
+#endif
 	PMD.xgcd(n1,smith[0],g,n1_inv,v);
+#ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
 	cout << "XGCD: " << tm3.usertime() << endl;
+#endif
 	n1_mat = PolMatDom::MatrixP(PMD.field(),1,1,D);
 	for (int i = 0; i < D; i++){
 	  n1_mat.ref(0,0,i) = n1_inv[i];
@@ -542,35 +551,45 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 			}
 			index++;
 		}
+#ifdef EXTRA_TIMINGS_ON
 		Timer tm2;
 		tm2.clear();
+#endif
 		PolMatDom::PMatrix N(PMD.field(),M,1,this->getLength());
 		PolMatDom::PMatrix N_shift(PMD.field(),M,1,this->getLength());
+#ifdef EXTRA_TIMINGS_ON
 		tm2.start();
+#endif
 		PMMD.mul(N,mat_gen,polys);
 		shift(N_shift,N,M,1,getGenDeg());
 		
+#ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
 		cout << "Computing N: " << tm2.usertime() << endl;
 		tm2.clear();
 		
 		tm2.start();
+#endif
 		PolMatDom::MatrixP n_mat(PMD.field(),1,1,D+1);
  		PMMD.mul(n_mat, u_tilde, N_shift);
 		mat_resize(field, n_mat, D);
+#ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
 		cout << "Computing n: " << tm2.usertime() << endl;
 		tm2.clear();
 		
 		tm2.start();
+#endif
 		PolMatDom::MatrixP func_mat(PMD.field(),1,1,this->getLength());
 		PMMD.mul(func_mat,n_mat,n1_mat);
 		PolMatDom::Polynomial func;
 		mat_to_poly(func,func_mat,2*D);
 		poly_mod(func,func,smith[0]);
+#ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
 		cout << "Computing func: " << tm2.usertime() << endl;
 		tm2.clear();
+#endif
 		result_pols.emplace_back(func);
 #ifdef OUTPUT_FUNC
 		ofs << "R.append(";
@@ -617,22 +636,27 @@ void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
 
 void PolMatDom::xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v )
 {
-  const size_t deg = max(a.size(),b.size());
-  const size_t order = 1 + 2*deg;
-  vector<int> shift = { 0, 0, (int)deg };
-	PolMatDom::PMatrix series( this->field(), 3, 1, order );
-  for ( size_t d=0; d<a.size(); ++d )
-    series.ref(0,0,d) = a[d];
-  for ( size_t d=0; d<b.size(); ++d )
-    series.ref(1,0,d) = b[d];
-  series.ref(2,0,0) = this->field().mOne;
+	 // 1. XGCD via PM-Basis
+	const size_t deg = max(a.size(),b.size());
+	const size_t order = 1 + 2*deg;
+	vector<int> shift = { 0, 0, (int)deg };
+	  PolMatDom::PMatrix series( this->field(), 3, 1, order );
+	for ( size_t d=0; d<a.size(); ++d )
+	  series.ref(0,0,d) = a[d];
+	for ( size_t d=0; d<b.size(); ++d )
+	  series.ref(1,0,d) = b[d];
+	series.ref(2,0,0) = this->field().mOne;
 
-  PolMatDom::PMatrix approx( this->field(), 3, 3, order-1 );
-  pmbasis( approx, series, order, shift );
+	PolMatDom::PMatrix approx( this->field(), 3, 3, order-1 );
+	pmbasis( approx, series, order, shift, 128 );
 
-  g = approx(2,2);
-  u = approx(2,0);
-  v = approx(2,1);
+	g = approx(2,2);
+	u = approx(2,0);
+	v = approx(2,1);
+
+	//// 2. using Givaro's XGCD
+	//// --> actually slower, except for small degrees
+	//this->_PD.gcd(g,u,v,a,b);
 }
 
 void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial & q )
@@ -647,7 +671,7 @@ void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial &
     series.ref(1,0,d) = a[d];
 
   PolMatDom::PMatrix approx( this->field(), 2, 2, order-1 );
-  pmbasis( approx, series, order, shift );
+  pmbasis( approx, series, order, shift, 128 );
 
   this->print_degree_matrix( approx );
 
@@ -1730,26 +1754,22 @@ int main( int argc, char **argv ){
 #endif
   }
   {
-    cout << "xgcd with random polynomials of degree: " << D-1 << endl;
-    PolMatDom::Polynomial a( D );
-    PolMatDom::Polynomial b( D );
-    for ( size_t d=0; d<D; ++d )
-    {
-      rd.random( a[d] );
-      rd.random( b[d] );
-    }
-    PolMatDom::Polynomial g,u,v;
-    // same polynomials multiplied by 3*X + 59
-    // a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
-    // b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
-    // xgcd(a,b) = (X + 15379135,
-    //              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
-    //              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
-    // when over Z/pZ with p = 23068673 
-    tm2.clear(); tm2.start();
-    PMD.xgcd(a,b,g,u,v);
-    tm2.stop();
-    cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+    cout << "###TIME### xgcd, random input (degree, time)" << endl;
+	for ( size_t deg = 5; deg<30000; deg=floor(1.6*deg) )
+	{
+		PolMatDom::Polynomial a( deg );
+		PolMatDom::Polynomial b( deg );
+		for ( size_t d=0; d<deg; ++d )
+		{
+		  rd.random( a[d] );
+		  rd.random( b[d] );
+		}
+		PolMatDom::Polynomial g,u,v;
+		tm2.clear(); tm2.start();
+		PMD.xgcd(a,b,g,u,v);
+		tm2.stop();
+		cout << deg-1 << ", " << tm2.usertime() << endl;
+	}
   }
   {
     cout << "division with quotient of degree 1" << endl;

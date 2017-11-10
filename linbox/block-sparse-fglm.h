@@ -10,6 +10,10 @@
 #include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
 #include "fflas-ffpack/fflas-ffpack.h"
 
+// Givaro Polynomial
+#include <givaro/givpoly1.h>
+#include "linbox/ring/givaro-poly.h"
+
 
 typedef Givaro::Modular<double> GF;
 
@@ -20,16 +24,18 @@ class PolMatDom {
 	typedef std::vector<typename GF::Element> Polynomial;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::polfirst,LinBox::PMStorage::plain,GF> MatrixP;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
+	typedef Givaro::Poly1Dom<GF>::Element GivPoly;
 
 	private:
 
 	const GF* _field;
-	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
+	Givaro::Poly1Dom<GF> _PD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
+	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
 
 	public:
 
-	PolMatDom(const GF &f) : _field(&f), _PMMD(f), _BMD(f) {	}
+	PolMatDom(const GF &f) : _field(&f), _PD(f), _BMD(f), _PMMD(f) { }
 
 	inline const GF& field() const {return *_field;}
 
