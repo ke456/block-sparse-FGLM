@@ -404,8 +404,8 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	// note: * generator is in Popov form
 	//       * degree of row i of numerator < degree of row i of generator
 	PolMatDom PMD( field );
-	PolMatDom::MatrixP mat_gen(PMD.field(),M,M,this->getLength());
-	PolMatDom::MatrixP mat_num(PMD.field(),M,M,this->getLength());
+	PolMatDom::PMatrix mat_gen(PMD.field(),M,M,this->getLength());
+	PolMatDom::PMatrix mat_num(PMD.field(),M,M,this->getLength());
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq, this->getThreshold() );
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -427,8 +427,8 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	tm.clear(); tm.start();
 #endif
 	vector<PolMatDom::Polynomial> smith( M );
-	PolMatDom::MatrixP lfac(PMD.field(),M,M,M*this->getLength()+1);
-	PolMatDom::MatrixP rfac(PMD.field(),M,M,M*this->getLength()+1);
+	PolMatDom::PMatrix lfac(PMD.field(),M,M,M*this->getLength()+1);
+	PolMatDom::PMatrix rfac(PMD.field(),M,M,M*this->getLength()+1);
 	PMD.SmithForm( smith, lfac, rfac, mat_gen, this->getThreshold() );
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -1231,7 +1231,7 @@ vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom:
 
 }
 
-void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::MatrixP &lfac, MatrixP &rfac, const PolMatDom::MatrixP &pmat, size_t threshold ) {
+void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat, size_t threshold ) {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
 	//    - compute left Hermite form hmat1 = umat pmat
@@ -1438,7 +1438,7 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 }
 
 template<typename Matrix>
-void PolMatDom::MatrixBerlekampMassey( PolMatDom::MatrixP &mat_gen, PolMatDom::MatrixP &mat_num, const vector<Matrix> & mat_seq, const size_t threshold ) {
+void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq, const size_t threshold ) {
 	// 0. initialize dimensions, shift, matrices
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();

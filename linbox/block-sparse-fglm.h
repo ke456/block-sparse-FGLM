@@ -49,8 +49,10 @@ class PolMatDom {
 	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
 	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
 
+	//void slow_mul( const MatrixP & 
+
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, MatrixP &lfac, MatrixP &rfac, const MatrixP &pmat, const size_t threshold=16 );
+	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat, const size_t threshold=16 );
 
 	// mbasis algorithm to compute approximant bases
 	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
@@ -67,7 +69,7 @@ class PolMatDom {
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	void MatrixBerlekampMassey( MatrixP &mat_gen, MatrixP &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
+	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
 
 };
 
