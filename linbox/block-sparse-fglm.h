@@ -29,13 +29,17 @@ class PolMatDom {
 	private:
 
 	const GF* _field;
-	Givaro::Poly1Dom<GF> _PD;
+	//Givaro::Poly1Dom<GF> _PD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
 
 	public:
 
-	PolMatDom(const GF &f) : _field(&f), _PD(f), _BMD(f), _PMMD(f) { }
+	PolMatDom(const GF &f) :
+		_field(&f),
+		//_PD(f),
+		_BMD(f),
+		_PMMD(f) { }
 
 	inline const GF& field() const {return *_field;}
 
