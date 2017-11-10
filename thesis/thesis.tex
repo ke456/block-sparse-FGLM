@@ -99,22 +99,22 @@ In particular, for a radical ideal with a finite set of points in its variety
 and in generic position, its lex Gr\"obner basis has the form
 $$ \{  x_1 - R_1(x_n), x_2-R_2(x_n),\dots, x_{n-1}-R_{n-1}(x_n), R_n(x_n)  \}$$
 where $R_i$ is a polynomial in only $x_n$. The points in the variety are
-$$\{ ( R_1(\alpha), R_2(\alpha), \dots, R_n(\alpha)  ) |\forall \alpha: R_n(\alpha)=0  \}$$
+$$\{ ( R_1(\alpha), R_2(\alpha), \dots, R_n(\alpha)  ) \mid \forall \alpha: R_n(\alpha)=0  \}$$
 Thus, one typically first computes a Gr\"obner basis for the degrevlex ordering,
 and then converts it to a lex Gr\"obner basis, or a related representation, such as 
-Roillier's Rational Univariate Representation \cite{Rouillier99}. One such algorithm is
+Rouillier's Rational Univariate Representation \cite{Rouillier99}. One such algorithm is
 the Sparse-FGLM, which can be seen as an application
-of the Wiedemann algorithm. In this paper, we will
+of the Wiedemann algorithm. In this document, we will
 introduce a new algorithm inspired by Sparse-FGLM
 and block Wiedemann algorithm that is easily
 parallelizable.
 
 \subsection{Basic Operations}
-Over an field $\mathbb{K}$,
+Over a field $\mathbb{K}$,
 recall that we can compute multiplication,
 division with remainder, extended GCD, and square free part
 of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
-field operations ($O^{\tilde{~}}$ omits polylogarithm factors)
+field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
 \cite{GaGe13}. 
 
 
@@ -122,23 +122,24 @@ field operations ($O^{\tilde{~}}$ omits polylogarithm factors)
 \section{Previous Algorithms}
 
 \subsection{Wiedemann algorithm}
-The Wiedemann algorithm of \cite{Wiedemann86} solves a system
-$\mA y = b$, where $\mA$ is an invertible square matrix. The most
+The Wiedemann algorithm of \cite{Wiedemann86} solves a linear system
+$\mA y = b$, where $\mA$ is an invertible square matrix and $y,b$ are vectors
+over a field. The most
 important aspect of this algorithm is that the minimal polynomial
 $P(x) = \sum_{i = 0}^{D} c_i x^i$ of $\mA$ can be computed
 through a scalar sequence
 $$ S = (u^{tr}\mA^ib)_{i \ge 0}$$
 for a random vector $u$. Once we have sufficient number of terms
-of $s$, we apply the Berlekamp-Massey algorithm, which efficiently
-computes $P(x)$ from $s$.
+of $S$, we apply the Berlekamp-Massey algorithm, which efficiently
+computes $P(x)$ from $S$.
 In the simplest case, where $c_0 \neq 0$, we have that
 \begin{align*}
 P(\mA) = 0 &= c_0 \mI + c_1\mA + \dots + c_D \mA^D \\
 \implies -c_0 \mI &= \sum_{i=1}^{D}c_i\mA^i \\
-\implies \mI &= \mA(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})\\
+\implies \mI &= \mA\left(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1}\right)\\
 \implies b &= \mA(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})b
 \end{align*}
-Therefore, $x = (-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})b$.
+Therefore, $x = \left(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1}\right)b$.
 
 \subsection{Sparse-FGLM Algorithm}
 The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
@@ -158,7 +159,7 @@ of the monomial basis. More precisely, given
 \end{center}
 it produces the lex Gr\"obner basis of $I$ of the form
 $\{ P(X_1), X_2-R_2(X_1),\dots, X_n - R_n(X_1)  \}$.
-The key idea is that $R(X_1)$ is the minimal polynomial
+The key idea is that $P(X_1)$ is the minimal polynomial
 of the multiplication matrix $\mM_1$, which we can
 find using the Wiedemann algorithm. We generate
 $$ S = (u^{tr} \mM^i_1 e)_{(0 \le i < 2D)}$$
@@ -172,8 +173,8 @@ $N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we first
 compute the numerator $N_j$ of the generating series
 $Z_j = \sum_{i=0}^{D} u^{tr} \mM_1^i \mM_j e / T^{i+1}$ by a product
 $N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
-Other versions of this algorithm exist to handle
-non-radical ideals using the Berlekamp-Massey-Sakata algorithm.
+More general versions of the Sparse-FGLM algorithm exist to handle
+non-radical ideals using the Berlekamp-Massey-Sakata algorithm \cite{FaMo17}.
 
 \newpage
 \section{Previously Results on Generating Series}
@@ -204,7 +205,7 @@ next paragraphs.
 
 \begin{algorithm}[H]
 	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
-		Intput:} \vspace{-0.5em}
+		Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
 		\item a linear form $\ell$ over $Q$
 		\item $t=t_1 X_1 + \cdots + t_n X_n$
@@ -245,7 +246,7 @@ polynomials are unique if we assume $\gcd(A,B)=1$ and $B(0)=1$.
 We say that a degree $m$ polynomial $P\in\K[T]$ {\em cancels} a
 sequence $(\ell_s)_{s \ge 0}$ if $p_0 \ell_s + \cdots + p_m
 \ell_{s+m}=0$ for all $s \ge 0$, where $p_0,\dots,p_m$ are the
-coefficients of $P$; this is equivalent to ${\rm rev}(P) S$ being
+coefficients of $P$; this is equivalent to ${\rm rev}(P) Z$ being a
 polynomial of degree less than $m$, with $Z=\sum_{s \ge 0} \ell_s T^s$
 and ${\rm rev}(P)=T^m P(1/T)$. The {\em minimal polynomial} of
 sequence $(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest degree
@@ -258,8 +259,8 @@ sequence $(\ell_s)_{s \ge 0}$. However, it is often easier to work with a
 closed form that has the minimal polynomial as the denominator rather than
 its reverse. Let $Z' = \sum_{s\ge0} \ell_s / T^{i+1}$, then the sequence 
 $(\ell_s)_{s\ge0}$ is linearly recurrent if and only if $Z'P$ is a polynomial
-of degree less than $P$. Therefore, if $A' = Z'P$ and $B' = P$, then we
-can write $Z' = A'/B'$
+of degree less than $deg(P)$. Therefore, if $A' = Z'P$ and $B' = \tilde B = P$, then we
+can write $Z' = A'/B'$.
 
 In both cases, if we are given the series and the denominator, then our 
 choice for the numerator is unique. The next definition captures this idea:
@@ -268,25 +269,25 @@ choice for the numerator is unique. The next definition captures this idea:
 	$\Omega(Z,P)$ is the numerator for the closed form of $Z$ with respect
 	to $P$ if:
 	\begin{itemize}
-		\item $\Omega(Z,P)$ is a polynomial of degree less than $P$
-		\item $S = \Omega(Z,P)/P$
+		\item $\Omega(Z,P)$ is a polynomial of degree less than $deg(P)$
+		\item $Z = \Omega(Z,P)/P$
 	\end{itemize}
 \end{definition}
 \noindent Let $A$ and $A'$ be defined as above, then 
 $\Omega(Z,{\rm rev}(P)) = A$ and $\Omega(Z',P) = A'$. Finally, 
-if $Z$ and $Z'$ defined over the same sequence with 
+if $Z$ and $Z'$ are defined for the same sequence with 
 minimal polynomial $P$, then
 $$\Omega(Z',P) = T^{deg(P) - 1} \Omega(Z,{\rm rev}(P) )(1/T)$$
 \noindent This makes it possible to avoid computations using a series
 over $1/T$. We give an example of this using
 the Fibonacci sequence, which is well known to be linearly recurrent. Since 
 the Fibonacci sequence $F = (1,1,2,3,5,8,\dots)$ is defined
-recursively as $F^{(i+2)} = F^{(i)} + F^{(i+1)}$, $F^{(0)} = 1$, it is
+recursively as $F_{s+2} = F_{s} + F_{s+1}$, $F_{0}=F_{1} = 1$, it is
 easy to verify that the minimal polynomial of $F$ is $P = 1-T-T^2$.
-Define $Z = \sum_{i\ge 0} F^{(i)} T^s$ and ${\rm rev}(P) = T^2-T-1$, then
+Define $Z = \sum_{s\ge 0} F_{s} T^s$ and ${\rm rev}(P) = T^2-T-1$, then
 $\Omega(Z,{\rm rev}(P)) = 1$; therefore,
 $$Z = \frac{1}{T^2-T-1}$$
-\noindent Now, define $Z' = \sum_{i\ge0} F^{(i)}/T^{i+1}$, then we have that
+\noindent Now, define $Z' = \sum_{s\ge0} F_{s}/T^{s+1}$, then we have that
 \begin{align*}
 \Omega(Z',P)& = T^{deg(P)-1}\Omega(Z,{\rm rev}(P))(1/T) = T\\
 \implies Z' &= \frac{T}{1-T-T^2}
