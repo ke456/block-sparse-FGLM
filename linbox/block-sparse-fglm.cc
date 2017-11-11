@@ -5,7 +5,7 @@
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
-#define TEST_FGLM // testing / timing approximant basis algos
+//#define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_KERNEL // testing / timing kernel basis algo
 //#define TEST_POL  // testing xgcd and division via pmbasis
@@ -735,12 +735,22 @@ void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix
 void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
 {
 	// chooses the fastest (up to some minor difference)
-	// assumes matrices are not far from square
+	// the choices below assumes matrices are not far from square, and have similar degree
 	// well, at least on Vincent's machine... might differ on others
-	size_t threshold_deg=100;
-	size_t threshold_dim=8;
-	if ( mat1.rowdim() > threshold_dim )
 
+	// FIXME all below is for p==9001
+	// dim 8 == when we switch from naive1 to naive2
+	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
+	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
+		this->_PMMD.mul( prod, mat1, mat2 );
+	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
+		this->naive_mult2( prod, mat1, mat2 );
+	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
+			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
+			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
+		this->_PMMD.mul( prod, mat1, mat2 );
+	else // --> my_naive1
+		this->naive_mult1( prod, mat1, mat2 );
 }
 
 vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
