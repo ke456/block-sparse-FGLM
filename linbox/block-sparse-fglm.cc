@@ -683,6 +683,66 @@ void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial &
   q = approx(1,0);
 }
 
+void PolMatDom::naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+{
+	const size_t l = mat1.rowdim();
+	const size_t m = mat1.coldim();
+	const size_t n = mat2.coldim();
+	const size_t d1 = mat1.size()-1;
+	const size_t d2 = mat2.size()-1;
+	const size_t d = d1+d2;
+
+	PolMatDom::PMatrix::Matrix linmat1( this->field(), l*(d1+1), m );
+	PolMatDom::PMatrix::Matrix linmat2( this->field(), m, n*(d2+1) );
+
+	for ( size_t k = 0; k<=d1; ++k )
+	for ( size_t j = 0; j<m; ++j )
+	for ( size_t i = 0; i<l; ++i )
+		linmat1.setEntry( i+l*k, j, mat1.get( i, j, k ) );
+
+	for ( size_t k = 0; k<=d2; ++k )
+	for ( size_t j = 0; j<n; ++j )
+	for ( size_t i = 0; i<m; ++i )
+		linmat2.setEntry( i, j+n*k, mat2.get( i, j, k ) );
+
+	PolMatDom::PMatrix::Matrix linprod( this->field(), l*(d1+1), n*(d2+1) );
+
+	this->_BMD.mul( linprod, linmat1, linmat2 );
+
+	// The following apparently is the bottleneck (quite slower than linprod); is this expected?
+	for ( int k=0; k<=(int)d; ++k )
+	for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk)
+	for (size_t j = 0; j < n; ++j)
+	for (size_t i = 0; i < l; ++i)
+		this->field().addin( prod.ref( i, j, k ), linprod.getEntry(kk*l+i, (k-kk)*n+j) );
+}
+
+void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+{
+	// assumes prod is correctly initialized (dimension, size)
+	// assumes all entries of prod are zero
+	const size_t d1 = mat1.size()-1;
+	const size_t d2 = mat2.size()-1;
+	const size_t d = d1+d2;
+
+	for ( int k=0; k<=(int)d; ++k ) {
+		for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk) {
+			this->_BMD.axpyin( prod[k], mat1[kk], mat2[k-kk] );
+		}
+	}
+}
+
+void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+{
+	// chooses the fastest (up to some minor difference)
+	// assumes matrices are not far from square
+	// well, at least on Vincent's machine... might differ on others
+	size_t threshold_deg=100;
+	size_t threshold_dim=8;
+	if ( mat1.rowdim() > threshold_dim )
+
+}
+
 vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
 {
 	/** Algorithm M-Basis-One as detailed in Section 3 of
