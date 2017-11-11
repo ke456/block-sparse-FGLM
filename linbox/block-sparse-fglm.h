@@ -24,7 +24,7 @@ class PolMatDom {
 	typedef std::vector<typename GF::Element> Polynomial;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::polfirst,LinBox::PMStorage::plain,GF> MatrixP;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
-	typedef Givaro::Poly1Dom<GF>::Element GivPoly;
+	//typedef Givaro::Poly1Dom<GF>::Element GivPoly;
 
 	private:
 
@@ -32,8 +32,8 @@ class PolMatDom {
 	//Givaro::Poly1Dom<GF> _PD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
-	void naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
-	void naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
+	//void naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
+	//void naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
 	//void naive_mult2( MatrixP & prod, const MatrixP & mat1, const MatrixP & mat2 );
 
 	public:
@@ -51,8 +51,8 @@ class PolMatDom {
 
 	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v, const size_t threshold=16 );
 	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
-	void polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
-	void midproduct( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end );
+	//void polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
+	//void midproduct( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end );
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat, const size_t threshold=16 );

@@ -96,8 +96,6 @@ void poly_div (PolMatDom::Polynomial &q, PolMatDom::Polynomial a,
 PolMatDom::Polynomial b){
 	poly_resize(a);
 	poly_resize(b);
-	//cout << "a: " << a << endl;
-	//cout << "b: " << b << endl;
 	if (is_zero(a)){
 		q.resize(1);
 		q[0] = 0;
@@ -111,9 +109,7 @@ PolMatDom::Polynomial b){
 	q.resize(n-m+1);
 	for (int i = n-m; i >= 0; i--){
 		if (r.size() == m+i){
-		  //cout << "r: " << r << endl;
 			auto q_i = r[r.size()-1] * u;
-			//cout << "q_i: " << q_i << endl;
 			PolMatDom::Polynomial p;
 			poly_shift(p,i,b);
 			poly_mul(p,q_i,p);
@@ -449,7 +445,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	  P_mat.ref(0,0,i) = element;
   }
 
-	//PolynomialMatrixMulDomain<GF> PMMD(field);
+	PolynomialMatrixMulDomain<GF> PMMD(field);
 	PolMatDom::PMatrix rfac_row(PMD.field(),1,M,M*this->getLength()+1);
 	PolMatDom::PMatrix result(PMD.field(),1,M,M*this->getLength()+1);
 
@@ -459,7 +455,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		auto element = rfac.get(0,i,j);
 		rfac_row.ref(0,i,j) = element;
 	}
-	PMD.polmatmul(result,P_mat,rfac_row);
+	PMMD.mul(result,P_mat,rfac_row);
 	
 #ifdef EXTRA_TIMINGS_ON
 	Timer tm3;
@@ -482,7 +478,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	}
   
 	PolMatDom::PMatrix u_tilde(PMD.field(),1,M,M*this->getLength()+1);
-	PMD.polmatmul(u_tilde, w, lfac);
+	PMMD.mul(u_tilde, w, lfac);
 	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());	
 #ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
@@ -504,10 +500,10 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 
   PolMatDom::PMatrix N1(PMD.field(),M,1,this->getLength());
   PolMatDom::PMatrix N1_shift(PMD.field(),M,1,this->getGenDeg());
-	PMD.polmatmul(N1,mat_gen,Z);
+	PMMD.mul(N1,mat_gen,Z);
 	shift(N1_shift,N1,M,1,getGenDeg());
 	PolMatDom::PMatrix n1_mat(PMD.field(),1,1,this->getLength());
-  PMD.polmatmul(n1_mat, u_tilde, N1_shift);
+  PMMD.mul(n1_mat, u_tilde, N1_shift);
 	PolMatDom::Polynomial n1;
 	for (int i  = 0; i < D; i++)
 	  n1.emplace_back(n1_mat.get(0,0,i));
@@ -564,7 +560,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 #ifdef EXTRA_TIMINGS_ON
 		tm2.start();
 #endif
-		PMD.polmatmul(N,mat_gen,polys);
+		PMMD.mul(N,mat_gen,polys);
 		shift(N_shift,N,M,1,getGenDeg());
 		
 #ifdef EXTRA_TIMINGS_ON
@@ -575,7 +571,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		tm2.start();
 #endif
 		PolMatDom::PMatrix n_mat(PMD.field(),1,1,D+1);
- 		PMD.polmatmul(n_mat, u_tilde, N_shift);
+ 		PMMD.mul(n_mat, u_tilde, N_shift);
 		mat_resize(field, n_mat, D);
 #ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
@@ -585,7 +581,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		tm2.start();
 #endif
 		PolMatDom::PMatrix func_mat(PMD.field(),1,1,this->getLength());
-		PMD.polmatmul(func_mat,n_mat,n1_mat);
+		PMMD.mul(func_mat,n_mat,n1_mat);
 		PolMatDom::Polynomial func;
 		mat_to_poly(func,func_mat,2*D);
 		poly_mod(func,func,smith[0]);
@@ -683,108 +679,110 @@ void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial &
   q = approx(1,0);
 }
 
-void PolMatDom::naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
-{
-	// assumes prod is correctly initialized (dimension, size)
-	// size does not have to be related to the sum of mat1.size() or mat2.size()
-	//  (useful if a better bound is known)
-	// assumes all entries of prod are zero
-	const size_t l = mat1.rowdim();
-	const size_t m = mat1.coldim();
-	const size_t n = mat2.coldim();
-	const size_t d1 = mat1.size()-1;
-	const size_t d2 = mat2.size()-1;
-	const size_t d = prod.size()-1;
-
-	PolMatDom::PMatrix::Matrix linmat1( this->field(), l*(d1+1), m );
-	PolMatDom::PMatrix::Matrix linmat2( this->field(), m, n*(d2+1) );
-
-	for ( size_t k = 0; k<=d1; ++k )
-	for ( size_t j = 0; j<m; ++j )
-	for ( size_t i = 0; i<l; ++i )
-		linmat1.setEntry( i+l*k, j, mat1.get( i, j, k ) );
-
-	for ( size_t k = 0; k<=d2; ++k )
-	for ( size_t j = 0; j<n; ++j )
-	for ( size_t i = 0; i<m; ++i )
-		linmat2.setEntry( i, j+n*k, mat2.get( i, j, k ) );
-
-	PolMatDom::PMatrix::Matrix linprod( this->field(), l*(d1+1), n*(d2+1) );
-
-	this->_BMD.mul( linprod, linmat1, linmat2 );
-
-	// The following apparently is the bottleneck (quite slower than linprod); is this expected?
-	for ( int k=0; k<=(int)d; ++k )
-	for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk)
-	for (size_t j = 0; j < n; ++j)
-	for (size_t i = 0; i < l; ++i)
-		this->field().addin( prod.ref( i, j, k ), linprod.getEntry(kk*l+i, (k-kk)*n+j) );
-}
-
-void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
-{
-	// assumes prod is correctly initialized (dimension, size)
-	// size does not have to be related to the sum of mat1.size() or mat2.size()
-	//  (useful if a better bound is known)
-	// assumes all entries of prod are zero
-	const size_t d1 = mat1.size()-1;
-	const size_t d2 = mat2.size()-1;
-	const size_t d = prod.size()-1;
-
-	for ( int k=0; k<=(int)d; ++k ) {
-		for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk) {
-			this->_BMD.axpyin( prod[k], mat1[kk], mat2[k-kk] );
-		}
-	}
-}
-
-void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
-{
-	// chooses the fastest (up to some minor difference)
-	// the choices below assumes matrices are not far from square, and have similar degree
-	// well, at least on Vincent's machine... might differ on others
-
-	// FIXME all below is for p==9001
-	// dim 8 == when we switch from naive1 to naive2
-	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
-	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
-		this->_PMMD.mul( prod, mat1, mat2 );
-	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
-		this->naive_mult2( prod, mat1, mat2 );
-	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
-			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
-			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
-		this->_PMMD.mul( prod, mat1, mat2 );
-	else // --> my_naive1
-	{
-		this->naive_mult1( prod, mat1, mat2 );
-	}
-}
-
-void PolMatDom::midproduct( PMatrix & mprod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end )
-{
-	// FIXME all below is for p==9001
-	// dim 8 == when we switch from naive1 to naive2
-	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
-	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
-		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
-	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
-	{
-		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), mat1.size()+mat2.size()-1 );
-		this->naive_mult2( prod, mat1, mat2 );
-		mprod.copy( prod, beg, end );
-	}
-	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
-			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
-			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
-		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
-	else // --> my_naive1
-	{
-		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), mat1.size()+mat2.size()-1 );
-		this->naive_mult1( prod, mat1, mat2 );
-		mprod.copy( prod, beg, end );
-	}
-}
+//void PolMatDom::naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+//{
+//	// assumes prod is correctly initialized (dimension, size)
+//	// size does not have to be related to the sum of mat1.size() or mat2.size()
+//	//  (useful if a better bound is known)
+//	// assumes all entries of prod are zero
+//	const size_t l = mat1.rowdim();
+//	const size_t m = mat1.coldim();
+//	const size_t n = mat2.coldim();
+//	const size_t d1 = mat1.size()-1;
+//	const size_t d2 = mat2.size()-1;
+//	const size_t d = prod.size()-1;
+//
+//	PolMatDom::PMatrix::Matrix linmat1( this->field(), l*(d1+1), m );
+//	PolMatDom::PMatrix::Matrix linmat2( this->field(), m, n*(d2+1) );
+//
+//	for ( size_t k = 0; k<=d1; ++k )
+//	for ( size_t j = 0; j<m; ++j )
+//	for ( size_t i = 0; i<l; ++i )
+//		linmat1.setEntry( i+l*k, j, mat1.get( i, j, k ) );
+//
+//	for ( size_t k = 0; k<=d2; ++k )
+//	for ( size_t j = 0; j<n; ++j )
+//	for ( size_t i = 0; i<m; ++i )
+//		linmat2.setEntry( i, j+n*k, mat2.get( i, j, k ) );
+//
+//	PolMatDom::PMatrix::Matrix linprod( this->field(), l*(d1+1), n*(d2+1) );
+//
+//	this->_BMD.mul( linprod, linmat1, linmat2 );
+//
+//	// The following apparently is the bottleneck (quite slower than linprod); is this expected?
+//	for ( int k=0; k<=(int)d; ++k )
+//	for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk)
+//	for (size_t j = 0; j < n; ++j)
+//	for (size_t i = 0; i < l; ++i)
+//		this->field().addin( prod.ref( i, j, k ), linprod.getEntry(kk*l+i, (k-kk)*n+j) );
+//}
+//
+//void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+//{
+//	// assumes prod is correctly initialized (dimension, size)
+//	// size does not have to be related to the sum of mat1.size() or mat2.size()
+//	//  (useful if a better bound is known)
+//	// assumes all entries of prod are zero
+//	const size_t d1 = mat1.size()-1;
+//	const size_t d2 = mat2.size()-1;
+//	const size_t d = prod.size()-1;
+//
+//	for ( int k=0; k<=(int)d; ++k ) {
+//		for (int kk = max(k-(int)d2,0); kk<=min((int)d1,k); ++kk) {
+//			this->_BMD.axpyin( prod[k], mat1[kk], mat2[k-kk] );
+//		}
+//	}
+//}
+//
+//void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
+//{
+//	// chooses the fastest (up to some minor difference)
+//	// the choices below assumes matrices are not far from square, and have similar degree
+//	// well, at least on Vincent's machine... might differ on others
+//
+//	// FIXME all below is for p==9001
+//	// dim 8 == when we switch from naive1 to naive2
+//	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
+//	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
+//		this->_PMMD.mul( prod, mat1, mat2 );
+//	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
+//		this->naive_mult2( prod, mat1, mat2 );
+//	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
+//			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
+//			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
+//		this->_PMMD.mul( prod, mat1, mat2 );
+//	else // --> my_naive1
+//	{
+//		this->naive_mult1( prod, mat1, mat2 );
+//	}
+//}
+//
+//void PolMatDom::midproduct( PMatrix & mprod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end )
+//{
+//	// FIXME all below is for p==9001
+//	// dim 8 == when we switch from naive1 to naive2
+//	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
+//	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
+//		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
+//	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
+//	{
+//		const size_t sz = min(mat1.size()+mat2.size()-1,end+1);
+//		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), sz );
+//		this->naive_mult2( prod, mat1, mat2 );
+//		mprod.copy( prod, beg, end );
+//	}
+//	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
+//			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
+//			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
+//		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
+//	else // --> my_naive1
+//	{
+//		const size_t sz = min(mat1.size()+mat2.size()-1,end+1);
+//		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), sz );
+//		this->naive_mult1( prod, mat1, mat2 );
+//		mprod.copy( prod, beg, end );
+//	}
+//}
 
 vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
 {
@@ -1204,8 +1202,8 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 			for ( size_t i=0; i<m; ++i )
 				rdeg[i] += mindeg[i];
 			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
-			//this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
-			this->midproduct( res2, approx1, series, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			//this->midproduct( res2, approx1, series, order1, order1+order2-1 ); // res2 = (approx1*series / X^order1) mod X^order2
 			vector<size_t> mindeg2( m );
 			mindeg2 = pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
 			for ( size_t i=0; i<m; ++i )
@@ -1216,7 +1214,8 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 		//approx.resize( approx1.size()+approx2.size()-1 );
 		// in fact, deg(approx) = max(mindeg)  (which is indeed the sum of the mindegs for approx1 and approx2)
 		approx.resize( 1 + *max_element( mindeg.begin(), mindeg.end() ) );
-		this->polmatmul( approx, approx2, approx1 );
+		//this->polmatmul( approx, approx2, approx1 );
+		_PMMD.mul(approx,approx2,approx1);
 		return mindeg;
 	}
 
@@ -1696,7 +1695,7 @@ int main( int argc, char **argv ){
 		D = stoi(line);
 		cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
 		cout << "blocking dimension:" << " M=" << M << endl;
-		cout << "threshold mbasis/pmbasis (advice: 32 if p==9001): " << threshold << endl;
+		cout << "threshold mbasis/pmbasis (advice: 128 if p==9001): " << threshold << endl;
 		file.close();
 		GF field(p);
 		prime = p;
