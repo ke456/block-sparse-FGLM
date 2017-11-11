@@ -8,7 +8,7 @@
 //#define TEST_FGLM // testing / timing approximant basis algos
 #define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_KERNEL // testing / timing kernel basis algo
-#define TEST_POL  // testing xgcd and division via pmbasis
+//#define TEST_POL  // testing xgcd and division via pmbasis
 #define OUTPUT_FUNC // outputs the computed functions
 #include "block-sparse-fglm.h"
 #include <algorithm>
@@ -685,12 +685,16 @@ void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial &
 
 void PolMatDom::naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
 {
+	// assumes prod is correctly initialized (dimension, size)
+	// size does not have to be related to the sum of mat1.size() or mat2.size()
+	//  (useful if a better bound is known)
+	// assumes all entries of prod are zero
 	const size_t l = mat1.rowdim();
 	const size_t m = mat1.coldim();
 	const size_t n = mat2.coldim();
 	const size_t d1 = mat1.size()-1;
 	const size_t d2 = mat2.size()-1;
-	const size_t d = d1+d2;
+	const size_t d = prod.size()-1;
 
 	PolMatDom::PMatrix::Matrix linmat1( this->field(), l*(d1+1), m );
 	PolMatDom::PMatrix::Matrix linmat2( this->field(), m, n*(d2+1) );
@@ -720,6 +724,8 @@ void PolMatDom::naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix
 void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
 {
 	// assumes prod is correctly initialized (dimension, size)
+	// size does not have to be related to the sum of mat1.size() or mat2.size()
+	//  (useful if a better bound is known)
 	// assumes all entries of prod are zero
 	const size_t d1 = mat1.size()-1;
 	const size_t d2 = mat2.size()-1;
@@ -763,7 +769,9 @@ void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix &
 			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
 		this->_PMMD.mul( prod, mat1, mat2 );
 	else // --> my_naive1
+	{
 		this->naive_mult1( prod, mat1, mat2 );
+	}
 }
 
 vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
