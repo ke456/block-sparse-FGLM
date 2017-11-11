@@ -52,6 +52,7 @@ class PolMatDom {
 	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v, const size_t threshold=16 );
 	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
 	void polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
+	void midproduct( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end );
 
 	// Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat, const size_t threshold=16 );

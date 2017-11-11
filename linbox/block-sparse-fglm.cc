@@ -5,8 +5,8 @@
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
-//#define TEST_FGLM // testing / timing approximant basis algos
-#define TEST_APPROX // testing / timing approximant basis algos
+#define TEST_FGLM // testing / timing approximant basis algos
+//#define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_KERNEL // testing / timing kernel basis algo
 //#define TEST_POL  // testing xgcd and division via pmbasis
 #define OUTPUT_FUNC // outputs the computed functions
@@ -738,19 +738,6 @@ void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix
 	}
 }
 
-//void PolMatDom::naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
-//{
-//	// assumes prod is correctly initialized (dimension, size)
-//	// assumes all entries of prod are zero
-//	PMatrix pmat_prod( this->field(), prod.rowdim(), prod.coldim(), prod.size() );
-//	PMatrix pmat_mat1( this->field(), mat1.rowdim(), mat1.coldim(), mat1.size() );
-//	pmat_mat1.copy( mat1, 0, mat1.size()-1 );
-//	PMatrix pmat_mat2( this->field(), mat2.rowdim(), mat2.coldim(), mat2.size() );
-//	pmat_mat2.copy( mat2, 0, mat2.size()-1 );
-//	this->naive_mult1( pmat_prod, pmat_mat1, pmat_mat2 );
-//	prod.copy( pmat_prod, 0, pmat_prod.size()-1 );
-//}
-
 void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
 {
 	// chooses the fastest (up to some minor difference)
@@ -771,6 +758,31 @@ void PolMatDom::polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix &
 	else // --> my_naive1
 	{
 		this->naive_mult1( prod, mat1, mat2 );
+	}
+}
+
+void PolMatDom::midproduct( PMatrix & mprod, const PMatrix & mat1, const PMatrix & mat2, const size_t beg, const size_t end )
+{
+	// FIXME all below is for p==9001
+	// dim 8 == when we switch from naive1 to naive2
+	// deg=100 was best for dim = 8; even finer values would be ~110 for dim=16, ~90 for dim=32
+	if ( mat1.rowdim() >= 8 && mat1.size() > 100 ) // --> Linbox's FFT
+		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
+	else if ( mat1.rowdim() >= 8 ) // --> my_naive2
+	{
+		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), mat1.size()+mat2.size()-1 );
+		this->naive_mult2( prod, mat1, mat2 );
+		mprod.copy( prod, beg, end );
+	}
+	else if ( (mat1.rowdim() >= 4 && mat1.size() >= 128)
+			|| (mat1.rowdim() >= 2 && mat1.size() >= 256)
+			|| (mat1.rowdim() ==1 && mat1.size() >= 600) ) // --> Linbox's FFT
+		this->_PMMD.midproductgen( mprod, mat1, mat2, true, beg, end );
+	else // --> my_naive1
+	{
+		PolMatDom::PMatrix prod( this->field(), mprod.rowdim(), mprod.coldim(), mat1.size()+mat2.size()-1 );
+		this->naive_mult1( prod, mat1, mat2 );
+		mprod.copy( prod, beg, end );
 	}
 }
 
@@ -1192,7 +1204,8 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 			for ( size_t i=0; i<m; ++i )
 				rdeg[i] += mindeg[i];
 			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
-			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			//this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			this->midproduct( res2, approx1, series, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
 			vector<size_t> mindeg2( m );
 			mindeg2 = pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
 			for ( size_t i=0; i<m; ++i )
@@ -1645,7 +1658,7 @@ int main( int argc, char **argv ){
 	size_t M = 4;   // row dimension for the blocks
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices
 	size_t n = 2;  // number of variables / of multiplication matrices
-	size_t threshold = 16;  // threshold MBasis / PMBasis
+	size_t threshold = 32;  // threshold MBasis / PMBasis
 	string s = "";
 
 	static Argument args[] = {
@@ -1683,7 +1696,7 @@ int main( int argc, char **argv ){
 		D = stoi(line);
 		cout << "read file " << s << " with p=" << p << " n=" << n << " D=" << D << endl;
 		cout << "blocking dimension:" << " M=" << M << endl;
-		cout << "threshold mbasis/pmbasis (advice: take 128 if p==9001): " << threshold << endl;
+		cout << "threshold mbasis/pmbasis (advice: 32 if p==9001): " << threshold << endl;
 		file.close();
 		GF field(p);
 		prime = p;
