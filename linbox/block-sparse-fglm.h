@@ -34,6 +34,7 @@ class PolMatDom {
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
 	void naive_mult1( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
 	void naive_mult2( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
+	//void naive_mult2( MatrixP & prod, const MatrixP & mat1, const MatrixP & mat2 );
 
 	public:
 
@@ -48,7 +49,7 @@ class PolMatDom {
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
 
-	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
+	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v, const size_t threshold=16 );
 	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
 	void polmatmul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 );
 
