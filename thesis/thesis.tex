@@ -12,6 +12,161 @@
 \usepackage{bm}
 \pagestyle{empty}
 
+\usepackage{enumerate}
+\usepackage{fullpage}
+\usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
+\usepackage{color}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
+
+% for enumerate / itemize: define reasonable margins
+\usepackage[shortlabels]{enumitem}
+\setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
+
+% math and theorem names
+\usepackage{amsmath,amsfonts,amssymb,amsthm,thmtools}
+\declaretheorem[style=plain,parent=section]{definition}
+\declaretheorem[sibling=definition]{theorem}
+\declaretheorem[sibling=definition]{corollary}
+\declaretheorem[sibling=definition]{proposition}
+\declaretheorem[sibling=definition]{lemma}
+\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{remark}
+\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{example}
+\declaretheoremstyle[headpunct={},notebraces={\textbf{--}~}{}]{algorithm}
+\declaretheorem[style=algorithm]{problem}
+
+% for our algorithms & problems
+\usepackage{mdframed}
+
+\usepackage[capitalize]{cleveref}
+\crefname{problem}{Problem}{Problems}
+\Crefname{problem}{Problem}{Problems}
+
+%%%notation
+%misc
+\newcommand{\storeArg}{} % aux, not to be used in document!!
+\newcounter{notationCounter}
+%spaces
+\newcommand{\NN}{\mathbb{N}} % nonnegative integers
+\newcommand{\var}{X} % variable for univariate polynomials
+\newcommand{\field}{\mathbb{K}} % base field
+\newcommand{\polRing}{\field[\var]} % polynomial ring
+\newcommand{\Pox}{[\mkern-3mu[ \var ]\mkern-3.2mu]}
+\newcommand{\Poxi}{[\mkern-3mu[ \var^{-1} ]\mkern-3.2mu]}
+\newcommand{\psRing}{\field\Pox}
+\newcommand{\matSpace}[1][\rdim]{\renewcommand\storeArg{#1}\matSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\matSpaceAux}[1][\storeArg]{\field^{\storeArg \times #1}} % not to be used in document
+\newcommand{\polMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\polMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\polMatSpaceAux}[1][\storeArg]{\polRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\psMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\psMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\psMatSpaceAux}[1][\storeArg]{\psRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\mat}[1]{\mathbf{\MakeUppercase{#1}}} % for a matrix
+\newcommand{\row}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\col}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\matCoeff}[1]{\MakeLowercase{#1}} % for a coefficient in a matrix
+\newcommand{\rdim}{m} % row dimension
+\newcommand{\cdim}{n'} % column dimension
+\newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
+\newcommand{\seqelt}[1]{S_{#1}} % element of sequence of matrices
+\newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
+\newcommand{\seq}{\mathcal{S}} % sequence of matrices
+\newcommand{\seqpm}{\mat{Z}} % power series matrix from a sequence
+\newcommand{\rel}{\col{p}} % linear relation
+\newcommand{\relbas}{\mat{P}} % linear relation
+\newcommand{\relSpace}{\polMatSpace[1][\rdim]} % space for linear relations
+\newcommand{\relbasSpace}{\polMatSpace[\rdim][\rdim]} % space for linear relations
+\newcommand{\num}{\row{q}} % numerator for linear recurrence relation
+\newcommand{\nummat}{\mat{Q}} % numerator for linear recurrence relation basis
+\newcommand{\rem}{\row{r}} % remnant for linear recurrence relation
+\newcommand{\remmat}{\mat{R}} % remnant for linear recurrence relation basis
+\newcommand{\remSpace}{\polMatSpace[1][\cdim]} % space for linear relations
+\newcommand{\degBd}{d} % bound on degree of minimal generator
+\newcommand{\degBdr}{d_{r}} % bound on degree of a right minimal generator
+\newcommand{\degBdl}{d_{\ell}} % bound on degree of a left minimal generator
+\newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
+\newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
+\newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
+\newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
+\newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
+
+%% ------------------------------------------------
+%% --------- For problems and algorithms ----------
+%% ------------------------------------------------
+\newcommand{\argfig}[1]{\begin{figure}[#1]} % to be able to feed an optional argument to the inside figure
+	
+	\newenvironment{algobox}[1][htbp]{
+		\newcommand{\algoInfo}[3]{
+			\begin{algorithm}[{name=[\algoname{##2}:~##1]\algoname{##2}}]
+				\label{##3}
+				~ \hfill
+				{\small\emph{(##1)}}
+				\smallskip
+				
+			}
+			\newcommand{\dataInfos}[2]{
+				\algoword{##1:}
+				\begin{itemize}[topsep=0pt]
+					##2
+				\end{itemize}
+				\smallskip
+			}
+			\newcommand{\dataInfo}[2]{
+				\algoword{##1:} ##2 
+				%\smallskip
+			}
+			\newcommand{\algoSteps}[1]{
+				%\smallskip
+				\addtolength{\leftmargini}{-0.35cm}
+				\begin{enumerate}[{\bf 1.}]
+					##1
+				\end{enumerate}
+				\smallskip
+			}
+			
+			\expandafter\argfig\expandafter{#1}
+			\centering
+			\begin{minipage}{0.99\textwidth}
+				\begin{mdframed}
+					\smallskip
+				}
+				{
+				\end{algorithm}
+			\end{mdframed}
+		\end{minipage}
+	\end{figure}
+}
+
+\newenvironment{problembox}[1][htbp]{
+	\newcommand{\problemInfo}[3]{
+		\begin{problem}[{name=[\emph{##2}\ifx&##1&\else##1\fi]\emph{##2}}]
+			\label{##3}
+			~\smallskip
+			
+		}
+		\newcommand{\dataInfos}[2]{
+			\emph{##1:}
+			\begin{itemize}[topsep=0pt]
+				##2
+			\end{itemize}
+			\smallskip
+		}
+		\newcommand{\dataInfo}[2]{
+			\emph{##1:}  ##2
+		}
+		
+		\expandafter\argfig\expandafter{#1}
+		\centering
+		\begin{minipage}{0.75\textwidth}
+			\begin{mdframed}
+			}
+			{
+			\end{problem}
+		\end{mdframed}
+	\end{minipage}
+\end{figure}
+}
+
+
 \newtheorem*{Example}{Example}
 \newtheorem{Coro}{Corollary}
 \newtheorem{Def}{Definition}
@@ -49,14 +204,6 @@
 \DeclareBoldMathCommand{\bx}{x}
 \DeclareBoldMathCommand{\balpha}{\alpha}
 \DeclareBoldMathCommand{\bbeta}{\beta}
-
-
-\newtheorem{definition}{Definition}
-\newtheorem{theorem}[definition]{Theorem}
-\newtheorem{corollary}[definition]{Corollary}
-\newtheorem{proposition}[definition]{Proposition}
-\newtheorem{lemma}[definition]{Lemma}
-\newtheorem{remark}[definition]{Remark}
 
 \def\K{\mathbb{K}}
 \def\Deg{D}
@@ -257,27 +404,26 @@ T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.  By construction, $\tilde B$ lies
 in $\K[T]$, and one can check that it is the minimal polynomial of
 sequence $(\ell_s)_{s \ge 0}$. However, it is often easier to work with a 
 closed form that has the minimal polynomial as the denominator rather than
-its reverse. Let $Z' = \sum_{s\ge0} \ell_s / T^{i+1}$, then the sequence 
+its reverse. Let $Z' = \sum_{s\ge0} \ell_s / T^{i+1}$ and $P$ be a polynomial
+that cancels $(\ell_s)_{s\ge0}$, then the sequence 
 $(\ell_s)_{s\ge0}$ is linearly recurrent if and only if $Z'P$ is a polynomial
-of degree less than $deg(P)$. Therefore, if $A' = Z'P$ and $B' = \tilde B = P$, then we
-can write $Z' = A'/B'$.
+of degree less than $deg(P)$. Therefore, if $A' = Z'P$ and $B' = P$, then we
+can write the closed form $Z' = A'/B'$.
 
 In both cases, if we are given the series and the denominator, then our 
 choice for the numerator is unique. The next definition captures this idea:
 \begin{definition}
 	\label{def:omega}
-	$\Omega(Z,P)$ is the numerator for the closed form of $Z$ with respect
-	to $P$ if:
+	Let $S=(S_k)_{k \ge 0}$ be a sequence and $P$ be a polynomial that cancels
+	$S$, then $\Omega(S,P)$ is the numerator for the closed form of $S$ with 
+	respect to $P$ if:
 	\begin{itemize}
-		\item $\Omega(Z,P)$ is a polynomial of degree less than $deg(P)$
-		\item $Z = \Omega(Z,P)/P$
+		\item $\Omega(S,P)$ is a polynomial of degree less than $deg(P)$
+		\item $\sum_{k\ge0} S_k / t^{k+1} = \Omega(S,P)/P$
 	\end{itemize}
 \end{definition}
-\noindent Let $A$ and $A'$ be defined as above, then 
-$\Omega(Z,{\rm rev}(P)) = A$ and $\Omega(Z',P) = A'$. Finally, 
-if $Z$ and $Z'$ are defined for the same sequence with 
-minimal polynomial $P$, then
-$$\Omega(Z',P) = T^{deg(P) - 1} \Omega(Z,{\rm rev}(P) )(1/T)$$
+\noindent Let $A$ and $A'$ be defined as above, then
+$$A' = \Omega(S,P) = T^{deg(P) - 1} A (1/T)$$ 
 \noindent This makes it possible to avoid computations using a series
 over $1/T$. We give an example of this using
 the Fibonacci sequence, which is well known to be linearly recurrent. Since 
@@ -285,11 +431,11 @@ the Fibonacci sequence $F = (1,1,2,3,5,8,\dots)$ is defined
 recursively as $F_{s+2} = F_{s} + F_{s+1}$, $F_{0}=F_{1} = 1$, it is
 easy to verify that the minimal polynomial of $F$ is $P = 1-T-T^2$.
 Define $Z = \sum_{s\ge 0} F_{s} T^s$ and ${\rm rev}(P) = T^2-T-1$, then
-$\Omega(Z,{\rm rev}(P)) = 1$; therefore,
-$$Z = \frac{1}{T^2-T-1}$$
+we can write $Z$ in its closed form:
+$$Z = \frac{A}{B} = \frac{1}{T^2-T-1}$$
 \noindent Now, define $Z' = \sum_{s\ge0} F_{s}/T^{s+1}$, then we have that
 \begin{align*}
-\Omega(Z',P)& = T^{deg(P)-1}\Omega(Z,{\rm rev}(P))(1/T) = T\\
+\Omega(S,P)& = T^{deg(P)-1}A(1/T) = T\\
 \implies Z' &= \frac{T}{1-T-T^2}
 \end{align*}
 
@@ -781,11 +927,11 @@ Z_2 = \sum_{i=0}^{\infty} \ell(X_2X^i_1)/T^{i+1}
 &= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{t-3}
 = \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}
 \end{align*}
-$S_1$ and $S_2$ have a common denominator $P = (t-1)(t-3)$,
-whose roots are the coordinates of $x_1$ in $V(I)$. Now, let
+$Z_1$ and $Z_2$ have a common denominator $P = (t-1)(t-3)$,
+whose roots are the coordinates of $X_1$ in $V(I)$. Now, let
 \begin{align*}
 R_2 
-&=\frac{\Omega(S_2,P)}{\Omega(S_1,P)} \mod P\\
+&=\frac{\Omega((\ell(X_2X^i_1))_{i\ge 0},P)}{\Omega((\ell(X^i_1))_{i\ge 0},P)} \mod P\\
 &= 
 \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod P\\
 &=\frac{4 (T-3) + 2(T-1)}{(T-3)+(T-1)} \mod P
@@ -945,7 +1091,7 @@ Correspondingly, we define $\mathfrak{a}$ as the set of all indices
 $j$ in $\{1,\dots,c\}$ such that $\sigma_j$ is in $\mathfrak{A}$. In
 other words, $j$ is in $\mathfrak{a}$ if and only if $T_j$ has
 cardinality $1$ and $Q_{\sigma_j}$ is reduced.  The algorithm in this
-paragraph will compute a zero-dimenstional parametrization of
+paragraph will compute a zero-dimensional parametrization of
 $V_{\mathfrak{A}}$; we use the following lemma to perform this
 decomposition of $V$.
 
@@ -1111,7 +1257,7 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 \end{proof}
 
 
-\subsection{Generating series with matrix coefficients}
+\subsection{Computing the canonical generator of a linearly recurrent matrix sequence}
 In Sparse-FGLM algorithm, generating the matrix sequence 
 $L = (u^{tr} \mT_1^i)_{(0 \le i < 2D)}$ is the bottleneck of this
 algorithm. The most efficient way to compute $L^{(i)}$ is
@@ -1131,60 +1277,263 @@ Kaltofen, Villard, and others \cite{KaVi04}\cite{Villard97}.
 As with the Wiedemann algorithm, we are mainly interested in
 computing the minimal polynomial of a matrix from a sequence.
 
-Let $S$ be a matrix sequence, then it is linearly recurrent
-if and only if there exits polynomial matrices $\mD$ and $\mN$ such 
-that $\sum_{i \ge 0} S^{(i)}t^i = \mD^{-1} \mN$.
-Similarly, we can also define a generating polynomial which
-\textit{cancels} the sequence $S$.
-
-\begin{definition}
-	A generating polynomial matrix of $S$ is 
-	a polynomial with matrix coefficients
-	$\mF = \sum^{\nu}_{i=0} \mW_i t^i $ that satisfies,
-	$$ \mW_0 S^{(\alpha)} + \mW_1 S^{(\alpha+1)} + \dots + \mW_\nu S^{(\alpha+\nu)}  = 0, \forall \alpha \ge 0$$ 
-\end{definition}
-We can find the coefficients $\mW_i$ by solving the system
-\begin{align*}
-	0 = \mW_0 S^{(0)} + \mW_1 S^{(1)} &+ \dots + \mW_\nu S^{(\nu)}   \\
-	0 = \mW_0 S^{(1)} + \mW_1 S^{(2)} &+ \dots + \mW_\nu S^{(\nu+1)} \\
-	&\vdots \\
-	0 = \mW_0 S^{(d)} + \mW_1 S^{(d+1)} &+ \dots + \mW_\nu S^{(\nu+d)}
-\end{align*}
-which is equivalent to finding the kernel of the block Hankel
-matrix
-$$ \begin{bmatrix}
-S^{(0)} & \cdots & S^{(\nu)}\\
-\vdots & \ddots & \vdots\\
-S^{(d)} & \cdots & S^{(\nu + d)}
-\end{bmatrix}$$
-Many generating polynomial matrices are possible, but some
-may add additional factors when used in calculations.
-Thus, as with the scalar case, it is necessary to define
-minimality of generators.
-
-\begin{definition}
-	The generating matrix polynomial in Popov form
-	for a matrix sequence is called
-	the minimum generating matrix polynomial (see
-	\cite[definition 2.3]{KaVi04})
-\end{definition}
-
-\begin{definition}
-	A polynomial matrix $\mF$ is in Popov form if
+We first present the notion of linear recurrence for sequences of matrices over
+a field $\field$, which extends the well-known notion for sequences in
+$\field^\NN$.
+\begin{definition}[{\cite[Sec.\,3]{KalVil01}}]
+	%% also \cite[Def.\,4.2]{Turner02}.. any earlier ref?
+	\label{dfn:recurrence_relation}
+	Let $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ be a
+	matrix sequence.  Then,
 	\begin{itemize}
-		\item 
+		\item a polynomial $p = \sum_{0\le k\le \degBd} p_k \var^k \in \polRing$ is
+		said to be a \emph{scalar relation for $\seq$} if $\sum_{0\le k \le
+			\degBd} p_{k} \seqelt{\delta + k} = 0$ holds for all $\delta \ge 0$;
+		\item a polynomial vector $\rel = \sum_{0\le k\le \degBd} p_k \var^k \in
+		\relSpace$ is said to be a \emph{(left, vector) relation for $\seq$} if
+		$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for all
+		$\delta \ge 0$;
+		\item $\seq$ is said to be \emph{linearly recurrent} if there exists a
+		nontrivial scalar relation for $\seq$.
+	\end{itemize}
+\end{definition}
+For designing efficient algorithms it will be useful to rely on operations on
+polynomials or truncated series, hence the following characterization of vector
+relations.
+
+\begin{lemma}
+	\label{lem:linearly_recurrent}
+	Consider a matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset
+	\seqeltSpace$ and its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} /
+	\var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, $\rel \in \relSpace$
+	is a vector relation for $\seq$ if and only if the entries of $\num = \rel
+	\seqpm$ are in $\polRing$; furthermore, in this case, $\deg(\num) <
+	\deg(\rel)$.
+\end{lemma}
+\begin{proof}
+	Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
+	coefficient of $\num$ of degree $-\delta-1<0$ is $\sum_{0\le k \le \degBd}
+	p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
+	The degree comparison is clear since $\seqpm$ has only terms of (strictly)
+	negative degree.
+\end{proof}
+
+Concerning the algebraic structure of the set of vector relations, we have the
+following basic result, which can be found for example in
+\cite{Villard97,KalVil01,Turner02}.
+
+\begin{lemma}
+	\label{lem:module_rank}
+	The sequence $\seq$ is linearly recurrent if and only if the set of left
+	vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
+	$\rdim$.
+\end{lemma}
+\begin{proof}
+	The set of vector relations for $\seq$ is a $\polRing$-submodule of
+	$\relSpace$, and hence is free of rank at most $\rdim$
+	\cite[Chap.\,12]{DumFoo04}.
+	
+	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
+	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
+	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
+	hence $\seq$ has rank $\rdim$.  Conversely, if $\seq$ has rank $\rdim$, then
+	it has a basis with $\rdim$ vectors, which form a matrix in $\relbasSpace$;
+	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
+\end{proof}
+
+Note however that a matrix sequence may admit nontrivial vector relations and
+have no scalar relation (and therefore not be linearly recurrent with the
+present definition); in this case the module of vector relations has rank less
+than $\rdim$.
+
+\begin{definition}
+	\label{dfn:matrix_generator}
+	Let $\seq \subset \seqeltSpace$ be linearly recurrent.  A \emph{(left) matrix
+		generator} for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
+	of the module of left vector relations for $\seq$. This basis is said to be
+	\begin{itemize}
+		\item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
+		%\item \emph{ordered weak Popov} if the matrix is in weak Popov form
+		%  \cite{MulSto03} with pivots on the diagonal;
+		\item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
 	\end{itemize}
 \end{definition}
 
-There are several algorithms to compute the minimum generating
-matrix polynomial, but we will use a generalization
-of the Berlekamp-Massey algorithm \cite{Coppersmith93}.
-\textcolor{red}{TODO: add specification of pm-basis}
+Note that the canonical generator is also a minimal generator; furthermore, all
+matrix generators $\relbas \in \relbasSpace$ for $\seq$ have the same
+determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  We
+now show that minimal matrix generators are denominators in some irreducible
+fraction description of the generating series of the sequence.  This is a
+direct consequence of \cref{lem:linearly_recurrent,lem:module_rank} and of
+basic properties of polynomial matrices.
 
-Lastly, by theorem 2.7 of \cite{KaYu06}, the largest 
-invariant factor of the minimum generating
-matrix polynomial is the minimum scalar generator
-of $S$.
+\begin{corollary}
+	A matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ is
+	linearly recurrent if and only if its generating series $\seqpm = \sum_{k\ge
+		0} \seqelt{k} / \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
+	written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
+	\in \relbasSpace$ is nonsingular and $\nummat \in
+	\polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
+	\rdeg{\relbas}$ and $\deg(\det(\relbas)) \ge \degDet$, and $\relbas$ is a
+	matrix generator of $\seq$ if and only if $\deg(\det(\relbas)) = \degDet$ or,
+	equivalently, the fraction $\relbas^{-1} \nummat$ is irreducible (that is,
+	$\mat{U} \relbas + \mat{V} \nummat = \mat{I}$ for some polynomial matrices
+	$\mat{U}$ and $\mat{V}$).
+\end{corollary}
+
+We remark that we may also consider vector relations operating on the right: in
+particular, \cref{lem:linearly_recurrent} shows that if the sequence is
+linearly recurrent then these right relations form a submodule of
+$\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent sequence
+also admits a right canonical generator.
+
+Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
+find a minimal matrix generator.  We assume the availability of bounds
+$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
+which allow us to control the number of terms of the sequence we will access
+during the algorithm.  Since taking the Popov form of a reduced matrix does not
+change the degree, any left minimal matrix generator $\relbas$ has the same
+degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
+a bound on the degree of any left minimal generator. The same remark holds for
+$\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
+the same as $\gamma_1,\gamma_2$ in \cite[Def.\,4.6~and\,4.7]{Turner02}; see
+also $\delta_l,\delta_r$ in \cite[Sec.\,4.2]{Villard97a}.)
+
+\begin{lemma}
+	\label{lem:finitely_many_terms}
+	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent and
+	let $\degBdr \in \NN$ be such that the right canonical matrix generator of
+	$\seq$ has degree at most $\degBdr$.  Then, $\rel = \sum_{0\le k\le \degBd}
+	p_k \var^k \in \relSpace$ is a left relation for $\seq$ if and only if
+	$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for $\delta
+	\in \{0,\ldots,\degBdr-1\}$.
+\end{lemma}
+\begin{proof}
+	Since the right canonical generator $\relbas \in \polMatSpace[\cdim]$ is in
+	column Popov form, we have $\relbas =
+	\mat{L}\diag{\var^{t_1},\ldots,\var^{t_\cdim}} - \mat{Q}$ where
+	$\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_\cdim)$ componentwise and
+	$\mat{L} \in \matSpace[\cdim]$ is unit upper triangular. We define the matrix
+	$\mat{U} = \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_\cdim}}
+	\mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
+	\deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple $\relbas
+	\mat{U} = \var^{\degBdr} \mat{I}_\cdim - \mat{Q} \mat{U}$ are right relations
+	for $\seq$, and we have $\deg(\mat{Q} \mat{U}) < \degBdr$. As a consequence,
+	writing $\mat{Q} \mat{U} = \sum_{0 \le k < \degBdr} Q_k \var^k$, we have
+	$\seqelt{\degBdr+\delta} = \sum_{0 \le k < \degBdr} \seqelt{k+\delta} Q_k$
+	for all $\delta \ge 0$.
+	
+	Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds
+	for all $\delta \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
+	holds for all $\delta\in\NN$. Let $\delta \ge \degBdr-1$ and assume that this
+	identity holds for all integers up to $\delta$. Then, the identity concluding
+	the previous paragraph implies that
+	\begin{align*}
+	\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1 + k} & =
+	\sum_{0 \le k \le \degBd} p_{k} \left(\sum_{0\le j<\degBdr} \seqelt{\delta+1+k-\degBdr+j} Q_j\right) \\
+	& = \sum_{0\le j<\degBdr} 
+	\underbrace{\left(\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1-\degBdr+j+k}\right)}_{=\, 0 \text{ since } \delta+1-\degBdr+j \le \delta} Q_j = 0,
+	\end{align*}
+	and the proof is complete.
+\end{proof}
+
+(A similar result is in \cite[Thm.\,4.5]{Turner02}.)
+
+The fast computation of matrix generators is usually handled via algorithms for
+computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
+next result gives the main idea behind this approach. This result is similar to
+\cite[Thm.\,4.6]{Turner02} (see also
+\cite[Thm.\,4.7,\,4.8,\,4.9,\,4.10]{Turner02}), but in some sense the reversal
+is on the input sequence rather than on the output matrix generator.
+
+We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
+\polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
+\emph{approximants for $\sys$ at order $d$} is defined as
+\[
+\appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
+\]
+
+Then, the next theorem shows that relations for $\seq$ can be retrieved as
+subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
+involving the first $\degBdl+\degBdr$ entries of $\seq$. 
+
+\begin{theorem}
+	\label{thm:mingen_via_appbas}
+	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
+	sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
+	(resp.~right) canonical matrix generator of $\seq$ has degree
+	$\le\degBdl$ (resp.~$\le \degBdr$).
+	
+	For $\degBd>0$, define
+	\begin{equation}
+	\label{eqn:series_to_approximate}
+	\sys =
+	\begin{bmatrix}
+	\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
+	\end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
+	\end{equation}
+	For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
+	\remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
+	\appMod{\sys}{\degBd}$.  Assuming $\degBd \ge \degBdr+1$, for any vectors
+	$\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\; \rem]
+	\in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
+	then $\rel$ is a relation for $\seq$. %% and $\deg(\rem)<\deg(\rel)$.
+	
+	As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
+	is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
+	\begin{itemize}
+		\item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
+		principal submatrix is the canonical matrix generator for $\seq$;
+		\item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
+		degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
+		\remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
+		matrix generator for $\seq$.
+		%the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$, $\rem \in
+		%\remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBdl$
+	\end{itemize}
+\end{theorem}
+\begin{proof}
+	From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
+	$\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
+	\seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k \ge \degBd}
+	\seqelt{k} \var^{\degBd-k-1})$ has polynomial entries, has degree less than
+	$\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
+	hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
+	
+	Conversely, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ we have $\rel
+	(\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1}) = \rem \bmod
+	\var^\degBd$. Since $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
+	\rem])\le\degBd-\degBdr-1$, this implies that the coefficients of degree
+	$\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le k < \degBd} \seqelt{k}
+	\var^{\degBd-k-1})$ are zero. Then, \cref{lem:finitely_many_terms} shows that
+	$\rel$ is a relation for $\seq$.
+	
+	Finally, the two items are straightforward consequences.
+\end{proof}
+
+Then, using fast approximant basis algorithms, we obtain the next result.
+
+\begin{corollary}
+	Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and let
+	$\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in \NN^2$ are such
+	that the left (resp.~right) canonical matrix generator of $\seq$ has degree
+	$\le\degBdl$ (resp.~$\le \degBdr$).  Then,
+	\begin{itemize}
+		\item using the algorithm of \cite{GiJeVi03}: if $\cdim \in \Omega(\rdim)$,
+		a left minimal matrix generator for $\seq$ can be computed in $O(\cdim^\omega
+		\mathsf{M}(\degBd) \log(\degBd))$ operations in $\field$;
+		\item using the algorithm of \cite{ZhoLab12}: if $\cdim \in O(\rdim)$, a
+		left minimal matrix generator for $\seq$ can be computed in $O(\rdim^\omega
+		\mathsf{M}(\cdim\degBd/\rdim) \log(\cdim\degBd))$ operations in $\field$;
+		\item using the algorithm of \cite{JeNeScVi16}: the left canonical matrix
+		generator for $\seq$ can be computed in $O((\rdim+\cdim)^{\omega-1}
+		\mathsf{M}(\cdim\degBd) \log(\cdim\degBd)^3)$ operations in $\field$.
+	\end{itemize}
+\end{corollary}
+
+In our algorithm, we will always use $\cdim = \rdim$; therefore we can find the
+left canonical matrix generator in $O(\rdim^\omega \mathsf{M}(\degBd) \log(\degBd))$
+operations in $\field$.
 
 
 \newpage
@@ -1433,7 +1782,7 @@ through a matrix numerator.
 	than $d = deg(\mF^{U,M,V})$. Furthermore, since $\mF^{U,M,V}$ cancels 
 	the sequence $(\mU\mM^i\mV)_{i \ge 0}$, $\mN^{*'}$ is a
 	polynomial matrix and does not have terms of negative exponents.
-	This means any terms in $Z$ with degree less than $d$ must vanish in the
+	This means any terms in $Z$ with degree less than $-d$ must vanish in the
 	product.
 	Therefore,
 	$$ \mN^* = \mN^{*'}$$
@@ -1441,19 +1790,19 @@ through a matrix numerator.
 	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_m]$, then
 	$$
 	\mN^* = \mF^{U,M,V}
-	\sum_{i=0}^{\infty} \mU^t \mM^i v / T^{i+1} =
+	\sum_{i=0}^{\infty} \mU^{tr} \mM^i v / T^{i+1} =
 	\begin{bmatrix}
-	\sum u_1^{tr}\mM^iv/T^{i+1}\\
+	\sum_{i\ge 0} u_1^{tr}\mM^iv/T^{i+1}\\
 	\vdots                   \\
-	\sum u_m^{tr}\mM^iv/T^{i+1}
+	\sum_{i\ge 0} u_m^{tr}\mM^iv/T^{i+1}
 	\end{bmatrix}$$
 	Recall $\Omega$ from definition \ref{def:omega}.
 	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
 	$$ \mN^* = \mF^{U,M,V}
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
+	\Omega( (u_1^{tr} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
+	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}
 	$$
 	By theorem \ref{randXY}, the $i^{th}$ invariant factor of
@@ -1463,19 +1812,19 @@ through a matrix numerator.
 	\begin{align*}
 	a \mN^* &= a \mF^{U,M,V}
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
+	\Omega((u_1^{tr} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
+	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}\\
 	&= [0,\cdots,0,P]
 	\begin{bmatrix}
-	\Omega(\sum_{i\ge0} u_1^{tr} \mM^i v/T^{i+1},P) / P \\
+	\Omega((u_1^{tr} \mM^i v)_{i \ge 0},P) / P \\
 	\vdots      \\
-	\Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P) / P 
+	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}\\
-	&= \Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P)
+	&= \Omega((u_m^{tr} \mM^i v)_{i\ge 0},P)
 	\end{align*}
-	Therefore, $N = \Omega(\sum_{i\ge0} u_m^{tr} \mM^i v/T^{i+1},P)$ as needed.
+	Therefore, $N = \Omega(( u_m^{tr} \mM^i v)_{i\ge 0},P)$ as needed.
 \end{proof}
 
 % l_{u_m} for linear form of u_m
@@ -1484,21 +1833,21 @@ when we pick specific values for $v$ and apply theorem \ref{theorem:anyv}.
 In line 3 of algorithm \ref{algo:block-sparse-fglm}, we compute
 $\mN^* = \mF^{U,M,V}\sum_{i=0}^{d-1}\mU^t \mM e/T^{i+1}$, 
 where $e$ is the coordinate vector of $1$ in $\mathbb{B}$. By applying theorem \ref{theorem:anyv},
-$$N = a\mN^* = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1},P)$$
+$$N = a\mN^* = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P)$$
 By construction,
 $\mM^i e$ gives the coordinate vector of $t^i$ in $\mathbb{B}$, so
-$\sum_{i= 0}^{d-1} u_m^{tr} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$, where
-$\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
-$$N = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1},P) = \Omega(\sum_{i\ge 0} \ell(t^i) /T^{i+1},P)$$.
+$$\sum_{i= 0}^{d-1} u_m^{tr} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$$ 
+where $\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
+$$N = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
 
 Similarly, in line 7.1 of algorithm \ref{algo:block-sparse-fglm}, we compute
 $\mN^*_j = \mF^{U,M,V}\sum_{i\ge0} \mU^{tr} \mM \mM_j e / T^{i+1}$. By theorem \ref{theorem:anyv},
-$$N_j = a \mN^*_j = \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i \mM_j e/T^{i+1},P) $$
+$$N_j = a \mN^*_j = \Omega((u_m^{tr} \mM^i \mM_j e)_{i\ge 0},P) $$
 Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
 $\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
 $\mathbb{B}$. Therefore,
-$$ N_j =  \Omega(\sum_{i\ge 0} u_m^{tr} \mM^i \mT_j e/T^{i+1},P) =
- \Omega(\sum_{i\ge 0} \ell_{u_m}(X_jt^i)/T^{i+1},P)$$
+$$ N_j =  \Omega((u_m^{tr} \mM^i \mT_j e)_{i\ge 0},P) =
+ \Omega( (\ell_{u_m}(X_jt^i))_{i\ge 0},P)$$
 By the correctness of algorithm \ref{algo:para2}, we have the proof
 of correctness for algorithm \ref{algo:block-sparse-fglm}.
 
@@ -1542,7 +1891,7 @@ $$ \mU^{tr} = \begin{bmatrix}
  59&  89
 \end{bmatrix}
 $$
-We compute the matrix sequence $S = (\mU^t\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
+We compute the matrix sequence $S = (\mU^{tr}\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
 $$ S = (
 \begin{bmatrix}
 92& 75\\  
@@ -1563,33 +1912,33 @@ $$ S = (
 )$$
 $$ \mF^{U,M,V} =
 \begin{bmatrix}
-t^2 + 76t + 8&       87t + 31\\
-    100t + 46& t^2 + 87t + 44
+T^2 + 76T + 8&       87T + 31\\
+    100T + 46& T^2 + 87T + 44
 \end{bmatrix}
 $$
 The biggest invariant factor of $\mF^{U,M,V}$ is 
-$$P = t^4 + 62t^3 + 85t^2 + 69t + 37 = R$$
+$$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = R$$
 since $P$ is square free. 
 Now, we compute $\mN^*$ and $a$:
 \begin{align*}
-\mN^* &=[84t + 46, 38t + 65]\\
-a &= [t + 55, t^2 + 76t + 8]
+\mN^* &=[84T + 46, 38T + 65]\\
+a &= [T + 55, T^2 + 76T + 8]
 \end{align*}
 Finally, we find the scalar numerator $N = a\mN^*$:
-$$ N = 100t^3 + 26t^2 + 33t + 18$$
-To get $R_1(t)$, we compute $\mN_1^*$ and $N_1=a\mN_1^*$:
+$$ N = 100T^3 + 26T^2 + 33T + 18$$
+To get $R_1(T)$, we compute $\mN_1^*$ and $N_1=a\mN_1^*$:
 \begin{align*}
-\mN_1^* &= [79t + 8, 100t + 23]\\
-N_1 &= 100t^3 + 26t^2 + 33t + 18
+\mN_1^* &= [79T + 8, 100T + 23]\\
+N_1 &= 100T^3 + 26T^2 + 33T + 18
 \end{align*}
 Lastly,
 \begin{align*}
-R_1(t) &= N_1 / N \mod R \\
-       &= 61t^3 + 75t^2 + 85t + 23
+R_1(T) &= N_1 / N \mod R \\
+       &= 61T^3 + 75T^2 + 85T + 23
 \end{align*}
-We compute $R_2(t)= 32t^3 + 41t^2 + 94t + 22$ in the same way. 
+We compute $R_2(t)= 32T^3 + 41T^2 + 94T + 22$ in the same way. 
 As a sanity check,
-we see that $V(I)$ has one point in $GF(101) \times GF(101)$:
+we see that $V(I)$ has one point in $GF(101)^2$:
 $(54,79)$ and $P$ has one factor in $GF(101)$: $53$. Now,
 $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 \newpage
