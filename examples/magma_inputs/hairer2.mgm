@@ -1,0 +1,10 @@
+function get_equations()
+  K<a, b, c, d, e, f, g, h, i, j, k, l, m>:=PolynomialRing(Integers(),13);
+  eqs:=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..2]] cat [d+e+f+g-1, 2*a*f+2*b*e+2*c*d-1,
+      3*a^2*f+3*b^2*e+3*c^2*d-1,
+      6*a*d*l+6*a*e*i+6*b*d*m-1,
+      4*a^3*f+4*b^3*e+4*c^3*d-1,
+      8*a*b*e*i+8*a*c*d*l+8*b*c*d*m-1,
+      2*a^2*d*l+2*a^2*e*i+2*b^2*d*m-1, 24*a*d*i*m-1, a-h, b-i-j, c-k-l-m];
+  return eqs,"hairer2";
+end function;

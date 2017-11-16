@@ -1,0 +1,7 @@
+
+function get_equations()
+    K<t, u, x, y, z>:=PolynomialRing(Integers(),5);
+    eqs:=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..3]] cat 
+	[-t^5+5*t*u*x*y*z-u^5-x^5-y^5-z^5, t^3*u*z+t*u^3*x+t*y*z^3+u*x^3*y+x*y^3*z, t^2*u*x^2+t^2*y^2*z+t*u^2*z^2+u^2*x*y^2+x^2*y*z^2, t^2*u^3*y*z+t^2*u*x*z^3-t*u^2*x^4-2*t*u*x^2*y^2*z-t*y^4*z^2+u^5*x*y+x*y*z^5, t^4*u^2*x+2*t^2*u*x*y*z^2-t*u^5*z-t*u*x^2*y^3-t*y^5*z-u^3*x^2*y*z+x*y^2*z^4, -t^6*u-t^4*y*z^2+3*t^2*u^2*x*y*z-t*u^6-t*u*y^5+t*x^3*y^2*z-u^4*x^2*y+u*x*y^2*z^3, -t^5*u*x-t^3*x*y*z^2+t^2*u^4*z+2*t*u^2*x^2*y*z-t*u*y^3*z^2-u*x*y^5+x^4*y^2*z, -t^3*u^2*x*y+t^2*u*z^4-t*u^2*x^3*z-3*t*u*x*y^2*z^2+u^5*y*z+u*x^2*y^4+y^6*z+y*z^6];
+  return eqs,"hunecke";
+end function;
