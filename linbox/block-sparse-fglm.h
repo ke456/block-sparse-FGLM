@@ -1,7 +1,10 @@
+/* -*- mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 #ifndef BLOCK_SPARSE_FGLM_H
 #define BLOCK_SPARSE_FGLM_H
 
-#include <linbox/integer.h>
+#include <string>
+
+// #include <linbox/integer.h>
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
 #include <linbox/matrix/matrix-domain.h>
@@ -10,31 +13,33 @@
 #include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
 #include "fflas-ffpack/fflas-ffpack.h"
 
-// Givaro Polynomial
+// Givaro polynomials
 #include <givaro/givpoly1.h>
 #include "linbox/ring/givaro-poly.h"
 
-
 typedef Givaro::Modular<double> GF;
 
+//-----------------------------------------------//
+//-----------------------------------------------//
+//        Polynomial matrix stuff                //
+//-----------------------------------------------//
+//-----------------------------------------------//
 class PolMatDom {
 
-	public:
-
+    public:
 	typedef std::vector<typename GF::Element> Polynomial;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::polfirst,LinBox::PMStorage::plain,GF> MatrixP;
 	typedef LinBox::PolynomialMatrix<LinBox::PMType::matfirst,LinBox::PMStorage::plain,GF> PMatrix;
 	typedef Givaro::Poly1Dom<GF>::Element GivPoly;
-
-	private:
-
+	
+    private:
 	const GF* _field;
 	//Givaro::Poly1Dom<GF> _PD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
-
-	public:
-
+	
+    public:
+	
 	PolMatDom(const GF &f) :
 		_field(&f),
 		//_PD(f),
@@ -56,13 +61,18 @@ class PolMatDom {
 
 	// mbasis algorithm to compute approximant bases
 	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
-	std::vector<int> old_mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>() );
-	std::vector<size_t> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), bool resUpdate=false );
+	std::vector<int> old_mbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
+				     const std::vector<int> &shift=std::vector<int>() );
+	std::vector<size_t> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
+				    const std::vector<int> &shift=std::vector<int>(), bool resUpdate=false );
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
-	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
-	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
-	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
+				      const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
+				     const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
+					   const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
 
 	// computing s-owP kernel basis
 	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size_t threshold=16 );
@@ -70,12 +80,49 @@ class PolMatDom {
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
 	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
+	
+};
+
+
+//-----------------------------------------------//
+//-----------------------------------------------//
+//        Functions for polynomial matrices      //
+//-----------------------------------------------//
+//-----------------------------------------------//
+
+//shifts every entry by d
+void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, int row, int col, int deg);
+void mat_to_poly (PolMatDom::Polynomial &p, PolMatDom::MatrixP &mat, int size);
+void mat_resize (GF &field, PolMatDom::MatrixP &mat, int size);
+
+
+//-----------------------------------------------//
+//-----------------------------------------------//
+//           Container for input data            //
+//-----------------------------------------------//
+//-----------------------------------------------//
+struct InputMatrices{
+public:
+	int n, D, p;
+	std::vector<std::vector<int>> x;
+	std::vector<std::vector<int>> y;
+	std::vector<std::vector<double>> data;
+	std::vector<double> sparsity;
+	std::string name; // name of the system
+	std::string filename;
+	InputMatrices(std::string & filename);
 
 };
 
+//-----------------------------------------------//
+//-----------------------------------------------//
+//        The main class for FGLM                //
+//-----------------------------------------------//
+//-----------------------------------------------//
 class Block_Sparse_FGLM{
 	// the current field
 	GF field;
+	int prime;
 
 	int D; // vector space dimension / dimension of multiplication matrices
 	int M; // number of blocks (set to number of CPUs?)
@@ -84,10 +131,19 @@ class Block_Sparse_FGLM{
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+	// random combination of the matrces
 	LinBox::SparseMatrix<GF> mul_mat_t;
-
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
+	// coeffs in the random combination
+	std::vector<GF::Element> rand_comb;
+	// sparsities
+	std::vector<double> sparsity;
+	std::string name;
+	std::string filename;
+
+
+	std::ofstream ofs;
 
 	/* Helpers                                           */
 	template<typename Matrix>
@@ -100,22 +156,22 @@ class Block_Sparse_FGLM{
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
 	                         std::vector<LinBox::DenseMatrix<GF>> &,
 	                         LinBox::DenseMatrix<GF> &,
-													 int,
+				 int,
 	                         size_t);
 
 
-	public:
-		// length of the sequence:
-		size_t getLength() const { return 2*ceil(D/(double)M); };
-		// generic degree in matrix generator:
-		size_t getGenDeg() const { return ceil(D/(double)M); };
-		size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
+    public:
+	// length of the sequence:
+	size_t getLength() const { return 2*ceil(D/(double)M); };
+	// generic degree in matrix generator:
+	size_t getGenDeg() const { return ceil(D/(double)M); };
+	size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
+	
+	/* CTOR                                              */
+	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
-		/* CTOR                                              */
-		Block_Sparse_FGLM(const GF &field, int D, int M, size_t n, size_t threshold, std::string& s);
-
-		std::vector<PolMatDom::Polynomial> find_lex_basis();
-		std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
+	std::vector<PolMatDom::Polynomial> find_lex_basis();
+	std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
 };
 
 
