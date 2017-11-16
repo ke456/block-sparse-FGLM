@@ -1,6 +1,7 @@
 
 function get_equations()
-    M<a,b,c,d,e>:=PolynomialRing(Integers(),5);
+    a:=22;
+    M<b,c,d,e>:=PolynomialRing(Integers(),4);
     
     eqs := [
 	15*b^4*c*d^2 + 6*b^4*c^3 + 21*b^4*c^2*d - 144*b^2*c - 8*b^2*c^2*e - 28*b^2*c*d*e - 648*b^2*d + 36*b^2*d^2*e + 9*b^4*d^3 - 120,
