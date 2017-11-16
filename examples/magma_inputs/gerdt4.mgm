@@ -1,0 +1,24 @@
+
+function get_equations()
+    K<x,y,z,t,u,v,w,a,b,c>:=PolynomialRing(Integers(),10);
+
+    eqs :=
+	[ &+[Random([-5..5])*K.i : i in [1..10]] : j in [1..6]] cat 
+	[
+	y*t - y*u - u*b + u*c,
+	2*x*y^2*t - x*y^2*u - 2*y^2*t*v + y^2*u*v - x*y*z*a + 12*x*t^2*a - 4*x*u*a - x*u^2*a + y*z*v*a - 2*t*u*v*a + u^2*v*a - x*u*w*a + u*v*w*a - 6*x*z*a*b,
+	x*y^2*z - y^2*z*v + 6*x*z*t*a + x*z*u*a - z*u*v*a - 2*x*y*z*b + 2*y*z*v*b - 2*y*z*v*b - 2*x*u*w*b + 2*u*v*w*b - 12*x*z*b^2 + x*y*z*c - y*z*v*c + x*u*w*c - u*v*w*c + 6*x*z*b*c,
+	x*y*u - y*u*v + 3*x*z*a + 3*x*t*b + x*u*b - u*v*b,
+	5*x^2*y*t - 5*x^2*y*u - 10*x*y*t*v + 19*x*y*u*v + 5*y*t*v^2 - 5*y*u*v^2 - 6*x^2*z*a - 12*x*z*v*a + 4*x^2*t*b - 7*x^2*u*b + 16*x*t*v*b + 8*x*u*v*b - 2*t*v^2*b - u*v^2*b + 8*x^2*t*c + x^2*u*c - 10*x*t*v*c - 2*x*u*v*c + 2*t*v^2*c + u*v^2*c,
+	-9*x^4*t*v*c + 9*x^4*u*v*c - 18*x^3*t*v^2*c - 9*x^3*u*v^2*c + 3*x^4*y*t - 4*x^4*y*u - 9*x^3*y*t*v + 10*x^3*y*u*v + 9*x^2*y*t*v^2 - 6*x^2*y*u*v^2 - 3*x*y*t*v^3 - 2*x*y*u*v^3 + 2*y*u*v^4 - 6*x^4*z*a - 45*x^3*z*v*a - 27*x^2*z*v^2*a - 3*x*z*v^3*a - 6*x^4*t*b - 2*x^4*u*b - 45*x^3*t*v*b + 32*x^3*u*v*b - 27*x^2*t*v^2*b - 30*x^2*u*v^2*b - 3*x*t*v^3*b - 3*x*t*v^3*b - x*u*v^3*b + u*v^4*b,
+	w*b - t*c + u*c - w*c,
+	-6*z*t*v*a + x*z*w*a - z*v*w*a - 2*x^2*b + 2*v*w^2*b + 12*z*v*b^2 + x*y*z*c - y*z*v*c + x*w^2*c - v*w^2*c - 2*x*z*b*c - 4*z*v*b*c + x*z*c^2 - z*v*c^2,
+	-12*t^2*v*a + 6*t*u*v*a + 2*x*t*w*a - x*u*w*a - 2*t*v*w*a - u*v*w*a - x*w^2*a + v*w^2*a + 6*z*v*a*b + 2*x*y*t*c - x*y*u*c - 2*y*t*v*c - x*z*a*c + z*v*a*c,
+	3*z*v*a + 3*t*v*b - x*t*c + t*v*c - x*w*c + v*w*c,
+	-12*x*z*v*a - 6*z*v^2*a - 2*x^2*t*b + 2*x^2*u*b + 12*x*t*v*b - 10*x*u*v*b + 4*t*v^2*b + 8*u*v^2*b + 5*x^2*w*b - 10*x*v*w*b + 5*v^2*w*b - x,
+	-18*x^2*u*v^3*b - 9*x*u*v^4*b - 9*x^2*u*v^3*c + 9*x*u*v^4*c - 3*x^3*z*v*a - 27*x^2*z*v^2*a - 45*x*z*v^3*a - 6*z*v^4*a - 3*x^3*t*v*b - 27*x^2*t*v^2*b - 45*x*t*v^3*b - 6*t*v^4*b - 3*x^3*v*w*b + 9*x^2*v^2*w*b - 9*v^3*w*b + 3*v^4*w*b + x^4*t*c - x^3*t*v*c - 30*x^2*t*v^2*c + 32*x*t*v^3*c - 2*t*v^4*c + 2*x^4*w*c - 2*x^3*v*w*c - 6*x^2*v^2*w*c + 10*x*v^3*w*c - 4*v^4*w*c
+	];
+
+    return eqs, "gerdt4";
+
+end function;

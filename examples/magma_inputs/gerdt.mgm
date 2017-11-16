@@ -1,0 +1,12 @@
+
+function get_equations()
+    K<x,y,z,t,u,v,w>:=PolynomialRing(Integers(),7);
+    c:=1;
+    eqs :=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..1]] cat 
+[2*t*w+2*w*y-w*z, -2*u*w^2+10*v*w^2-20*w^3+7*t*u-35*t*v+70*t*w, 6*t*w^2+2*w^2*y-2*w^2*z-21*t^2-7*t*y+7*t*z, 4*u*v*w-2*v^3+5*v^2*w-13*v*w^2+15*w^3-42*t*w+42*v*y-14*v*z-63*w*y+147*x+42*z, 602*t*w^3-9*u*w^3+45*v*w^3-135*w^4-126*t*u*w-14*t*v^2-28*u*w*z+14*v^2*z-14*v*w*z+28*w^2*z+294*t*y-98*t*z-147*u*x+735*v*x-2205*w*x-294*y*z+98*z^2, 36*t*w^3+6*w^3*y-9*w^3*z-168*t^2*w-28*t*w*y+42*t*w*z+28*u*w*x-14*v^2*x+14*v*w*x-28*w^2*x+588*t*x+392*x*y-245*x*z, 2*u*v*w-u*w^2-6*v^2*w+13*v*w^2-5*w^3-28*t*w+14*w*y, u^2*w-3*u*v*w+5*u*w^2-38*t*w+14*w*y, -2*t*u*w-2*t*v*w+22*t*w^2-2*u*w*z+4*v*w*y+6*v*w*z-16*w^2*y-10*w^2*z+42*w*x, 48*t*u*w-132*t*w^2+28*u*w*y+8*u*w*z-88*v*w*y-24*v*w*z+156*w^2*y+40*w^2*z-252*w*x, -30*c*w*x-20*t^2*w+10*t*w*y+8*t*w*z+12*u*w*x+15*w^2*x-4*w*y*z,4*t^2*w+2*t*w*y-2*t*w*z-6*u*w*x+12*v*w*x-6*w^2*x+w*y*z-4*y^2, 8*t*w*x+8*w*x*y-4*w*x*z];
+
+    eqs:=[K!x : x in eqs];
+
+    return eqs, "gerdt";
+
+end function;
