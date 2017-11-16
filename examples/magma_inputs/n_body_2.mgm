@@ -1,0 +1,6 @@
+function get_equations()
+  K<F, P, S, Theta, f, p, s>:=PolynomialRing(Integers(),7);
+  eqs:=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..1]] cat [-S*s-2*F+2*Theta+2, -2*F*s^2+S*s^2+8*F*p-4*S*p-2*S*s+4*Theta, s^2+f-4*p-2*s+1, -P*p*s-S*Theta*p+Theta^2*s-2, P^2*p^3-1, F^2*f^3-1]
+;
+  return eqs,"nbody2";
+end function;

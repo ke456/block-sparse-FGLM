@@ -1,0 +1,5 @@
+function get_equations()
+  K<B, D, F, b, d, f, m>:=PolynomialRing(Integers(),7);
+  eqs:=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..2]] cat [-m*(B*b*m-B*d*m-B*m^2-D*b*m+D*d*m-D*m^2+B*b-B*d-D*b+D*d-2*F*m+2*m^2+B+D-2*F+2*m), m*(B*b-B*d+B*m+D*b-D*d-D*m-2*F*b+2*F*d+B-D), b^2-2*b*d+d^2-2*b-2*d+f+1, B^2*b^3-1, D^2*d^3-1, F^2*f^3-1];
+  return eqs,"nbody8";
+end function;

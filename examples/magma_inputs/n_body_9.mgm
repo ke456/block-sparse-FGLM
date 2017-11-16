@@ -1,0 +1,5 @@
+function get_equations()
+  K<m, p, phi, s>:=PolynomialRing(Integers(),4);
+  eqs:=[ &+[Random([-5..5])*K.i : i in [1..Rank(K)]] : j in [1..1]] cat [-phi^3*s^5+2*m*p^3*phi^3-m*phi^3*s^3+5*p*phi^3*s^3+3*m*p*phi^3*s-4*p^2*phi^3*s+phi^3*s^3-3*p*phi^3*s-2*p^3, -phi^3*s^4+m*phi^3*s^2+3*p*phi^3*s^2-m*p*phi^3+phi^3*s^2+2*p^3*s-p*phi^3, s^4-4*p*s^2+phi^2-2*s^2+4*p+1];
+  return eqs,"nbody9";
+end function;
