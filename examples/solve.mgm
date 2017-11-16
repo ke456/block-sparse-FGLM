@@ -1,0 +1,75 @@
+
+
+procedure print_matrix_as_sparse(M)
+    for i in [1..NumberOfRows(M)] do
+	for j in [1..NumberOfColumns(M)] do
+	    if M[i][j] ne 0 then
+		print i-1, j-1, M[i][j];
+	    end if;
+	end for;
+    end for;
+end procedure;
+
+procedure print_matrices(sys, name)
+    M:=Universe(sys);
+    n:=Rank(M);
+    
+    Q:=quo<M | sys>;
+
+    SetOutputFile("data/" cat name cat ".dat": Overwrite:=true);
+    k:=BaseRing(M);
+    name;
+    #k;
+    n;
+    Dimension(Q);
+    for i in [1..n] do
+	print_matrix_as_sparse(RepresentationMatrix(Q!M.i));
+	print Dimension(Q), Dimension(Q), Dimension(Q);
+    end for;
+    
+    UnsetOutputFile();
+end procedure;
+
+procedure print_system(sys, name)
+    R:=Universe(sys);
+    K:=BaseRing(R);
+    n:=Rank(R);
+    M:=PolynomialRing(K, n);
+    vars:=["x" cat IntegerToString(i) : i in [1..n]];
+    AssignNames(~M, vars);
+    SetOutputFile("data/" cat name cat ".sage": Overwrite:=true);
+    printf "def eval(";
+    for i in [1..n] do
+	printf "%o", vars[i];
+	if i lt n then
+	    printf ", ";
+	end if;
+    end for;
+    printf "):\n";
+    printf "\treturn [";
+    for i in [1..#sys] do
+	printf "%o", Evaluate(sys[i], [M.i : i in [1..n]]);
+	if i lt #sys then
+	    printf ", ";
+	end if;
+    end for;
+    printf "]\n";
+    printf "\n";
+    UnsetOutputFile();
+end procedure;
+
+p:=65537;
+k:=GF(p);
+equations, name:=get_equations();
+N:=PolynomialRing(k, Rank(Universe(equations)), "grevlex");
+equations_mod:=[ N!f : f in equations ];
+d:=Dimension(Ideal(equations_mod));
+if d eq 0 then
+    name, d, Dimension(quo<N|equations_mod>);
+    print_matrices(equations_mod, name);
+    print_system(equations_mod, name);
+else
+    name, d, 0;
+end if;
+
+quit;
