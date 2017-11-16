@@ -1,7 +1,7 @@
 /* -*- mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 
 #define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
-//#define EXTRA_TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
+#define EXTRA_TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
 //#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
 //#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
@@ -26,9 +26,11 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include <NTL/lzz_pX.h>
 
 using namespace LinBox;
 using namespace std;
+using namespace NTL;
 
 
 
@@ -1284,7 +1286,8 @@ void Block_Sparse_FGLM::get_matrix_sequence
 }
 
 // use_t = true means we are using a random combination
-vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, bool use_t){
+vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, bool use_t){
+	zz_p::init(prime);
 #ifdef TIMINGS_ON
 	Timer tm;
 	tm.clear(); tm.start();
@@ -1435,22 +1438,17 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	shift(N1_shift, N1, M, 1, getGenDeg());
 	PolMatDom::MatrixP n1_mat(PMD.field(),1,1,this->getLength());
 	PMMD.mul(n1_mat, u_tilde, N1_shift);
-	PolMatDom::Polynomial n1;
+	zz_pX n1;
 	for (int i  = 0; i < D; i++)
-		n1.emplace_back(n1_mat.get(0,0,i));
-	PolMatDom::Polynomial n1_inv, g, u, v;
-#ifdef EXTRA_TIMINGS_ON
-	tm3.start();
-#endif
-	PMD.xgcd(n1,smith[0],g,n1_inv,v);
+		SetCoeff(n1,i,n1_mat.get(0,0,i));
+	zz_pX P,n1_inv;
+	for (int i = 0; i < D+1; i++)
+		SetCoeff(P,i,(long)smith[0][i]);
+	InvMod(n1_inv,n1,P);
 #ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
 	cout << "XGCD: " << tm3.usertime() << endl;
 #endif
-	n1_mat = PolMatDom::MatrixP(PMD.field(),1,1,D);
-	for (int i = 0; i < D; i++){
-		n1_mat.ref(0,0,i) = n1_inv[i];
-	}
 
 	MatrixDomain<GF> MD(field);
 	DenseMatrix<GF> V_col(field,D,1); // a single column of V
@@ -1470,7 +1468,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	ofs << "U.<t> = PolynomialRing(k)\n";
 	ofs << "R = []" << endl;
 #endif
-	vector<PolMatDom::Polynomial> result_pols;
+	vector<zz_pX> result_pols;
 	int start = 0;
 //	if (!use_t) start = 1;
 	// LOOP FOR OTHER VARIABLES
@@ -1519,12 +1517,10 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		
 		tm2.start();
 #endif
-		PolMatDom::MatrixP func_mat(PMD.field(),1,1,this->getLength());
-		PMMD.mul(func_mat,n_mat,n1_mat);
-		PolMatDom::Polynomial func;
-		mat_to_poly(func, func_mat, 2*D);
-		
-		poly_mod(func, func, smith[0], field);
+		zz_pX n_j, func;
+		for (int i  = 0; i < D; i++)
+			SetCoeff(n_j,i,(long)n_mat.get(0,0,i));
+		MulMod(func, n_j, n1_inv,P);
 #ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
 		cout << "Computing func: " << tm2.usertime() << endl;
@@ -1533,9 +1529,9 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 		result_pols.emplace_back(func);
 #ifdef OUTPUT_FUNC
 		ofs << "R.append(";
-		for (int i = 0; i < func.size(); i++){
-			ofs << func[i] << "*t^" << i << " ";
-			if (i != func.size()-1) ofs << "+";
+		for (int i = 0; i < deg(func)+1; i++){
+			ofs << coeff(func,i) << "*t^" << i << " ";
+			if (i != deg(func)) ofs << "+";
 		}
 		ofs <<")"<< endl;
 #endif
@@ -1567,7 +1563,7 @@ vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(const vector<Li
 	return result_pols;
 }
 
-vector<PolMatDom::Polynomial>  Block_Sparse_FGLM::find_lex_basis(){
+vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(){
 	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),false); // uses X1
 	// auto second =  find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),true); // uses t
 	return first; // for now

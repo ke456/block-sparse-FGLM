@@ -12,6 +12,7 @@
 #include "linbox/matrix/polynomial-matrix.h"
 #include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
 #include "fflas-ffpack/fflas-ffpack.h"
+#include <NTL/lzz_pX.h>
 
 // Givaro polynomials
 #include <givaro/givpoly1.h>
@@ -170,8 +171,8 @@ class Block_Sparse_FGLM{
 	/* CTOR                                              */
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
-	std::vector<PolMatDom::Polynomial> find_lex_basis();
-	std::vector<PolMatDom::Polynomial> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
+	std::vector<NTL::zz_pX> find_lex_basis();
+	std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
 };
 
 
