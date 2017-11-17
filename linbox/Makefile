@@ -14,7 +14,7 @@ all: $(TGT)
 %.o: %.cc $(HDR)
 	$(CXX) $(CXXFLAGS) -c $< $(DFLAGS)
 
-fglm: $(SRC) $(OBJ)
+fglm: $(SRC) $(TST) $(OBJ)
 	$(CXX) -o fglm test_fglm.cc $(OBJ) $(LDFLAGS) $(DFLAGS)
 
 polmatdom: $(SRC) $(OBJ)
