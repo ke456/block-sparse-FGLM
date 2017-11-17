@@ -156,6 +156,49 @@ using namespace NTL;
 // 	}
 // }
 
+//void PolMatDom::xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v )
+//{
+//	// 1. XGCD via PM-Basis
+//	const size_t deg = max(a.size(),b.size());
+//	const size_t order = 1 + 2*deg;
+//	vector<int> shift = { 0, 0, (int)deg };
+//	PolMatDom::PMatrix series( this->field(), 3, 1, order );
+//	for ( size_t d=0; d<a.size(); ++d )
+//		series.ref(0,0,d) = a[d];
+//	for ( size_t d=0; d<b.size(); ++d )
+//		series.ref(1,0,d) = b[d];
+//	series.ref(2,0,0) = this->field().mOne;
+//
+//	PolMatDom::PMatrix approx( this->field(), 3, 3, order-1 );
+//	pmbasis( approx, series, order, shift, 128 );
+//
+//	g = approx(2,2);
+//	u = approx(2,0);
+//	v = approx(2,1);
+//
+//	//// 2. using Givaro's XGCD
+//	//// --> actually slower, except for small degrees
+//	//this->_PD.gcd(g,u,v,a,b);
+//}
+
+//void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial & q )
+//{
+//	const size_t deg = max(a.size(),b.size());
+//	const size_t order = 1+deg;
+//	vector<int> shift = { 0, (int)deg };
+//	PolMatDom::PMatrix series( this->field(), 2, 1, order );
+//	for ( size_t d=0; d<b.size(); ++d )
+//		series.ref(0,0,d) = -b[d];
+//	for ( size_t d=0; d<a.size(); ++d )
+//		series.ref(1,0,d) = a[d];
+//
+//	PolMatDom::PMatrix approx( this->field(), 2, 2, order-1 );
+//	pmbasis( approx, series, order, shift, 128 );
+//
+//	this->print_degree_matrix( approx );
+//
+//	q = approx(1,0);
+//}
 
 
 //-----------------------------------------------//
@@ -210,51 +253,6 @@ void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
 		cout << endl;
 	}
 }
-
-void PolMatDom::xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v )
-{
-	// 1. XGCD via PM-Basis
-	const size_t deg = max(a.size(),b.size());
-	const size_t order = 1 + 2*deg;
-	vector<int> shift = { 0, 0, (int)deg };
-	PolMatDom::PMatrix series( this->field(), 3, 1, order );
-	for ( size_t d=0; d<a.size(); ++d )
-		series.ref(0,0,d) = a[d];
-	for ( size_t d=0; d<b.size(); ++d )
-		series.ref(1,0,d) = b[d];
-	series.ref(2,0,0) = this->field().mOne;
-
-	PolMatDom::PMatrix approx( this->field(), 3, 3, order-1 );
-	pmbasis( approx, series, order, shift, 128 );
-
-	g = approx(2,2);
-	u = approx(2,0);
-	v = approx(2,1);
-
-	//// 2. using Givaro's XGCD
-	//// --> actually slower, except for small degrees
-	//this->_PD.gcd(g,u,v,a,b);
-}
-
-void PolMatDom::divide( const Polynomial & a, const Polynomial & b, Polynomial & q )
-{
-	const size_t deg = max(a.size(),b.size());
-	const size_t order = 1+deg;
-	vector<int> shift = { 0, (int)deg };
-	PolMatDom::PMatrix series( this->field(), 2, 1, order );
-	for ( size_t d=0; d<b.size(); ++d )
-		series.ref(0,0,d) = -b[d];
-	for ( size_t d=0; d<a.size(); ++d )
-		series.ref(1,0,d) = a[d];
-
-	PolMatDom::PMatrix approx( this->field(), 2, 2, order-1 );
-	pmbasis( approx, series, order, shift, 128 );
-
-	this->print_degree_matrix( approx );
-
-	q = approx(1,0);
-}
-
 
 template<typename Matrix>
 void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq, const size_t threshold ) {
@@ -1605,7 +1603,6 @@ bool test_order( const PolMat &approx, const PolMat &series, const size_t order 
 	return test;
 }
 
-
 template <typename PolMat>
 bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
 {
@@ -1894,8 +1891,6 @@ int main_polmatdom( int argc, char **argv ){
 	return 0;
 }
 
-
-
 int main_fglm( int argc, char **argv ){
 	// default arguments
 	size_t M = 4;   // row dimension for the blocks
@@ -1923,5 +1918,3 @@ int main_fglm( int argc, char **argv ){
 
 	return 0;
 }
-
-
