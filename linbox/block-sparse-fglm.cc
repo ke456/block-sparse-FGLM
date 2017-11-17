@@ -1631,7 +1631,7 @@ bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
 	return test;
 }
 
-int main_PolMatDom( int argc, char **argv ){
+int main_polmatdom( int argc, char **argv ){
 	// default arguments
 	size_t p = 23068673;  // size of the base field
 	size_t M = 4;   // row dimension for the blocks
