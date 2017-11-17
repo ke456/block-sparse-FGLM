@@ -1124,11 +1124,6 @@ InputMatrices::InputMatrices(string & filename):
 		}
 	}
 	file.close();
-
-	// cout << "MAT\n";
-	// cout << x[1] << endl;
-	// cout << y[1] << endl;
-	// cout << data[1] << endl;
 }
 
 //reads matrices from s
@@ -1139,8 +1134,7 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
         M(M),
 	n(mat.n),
         threshold(threshold),
-	mul_mats(n, SparseMatrix<GF>(field, D, D)),
-	mul_mat_t(field, D, D),
+	mul_mats(n+1, SparseMatrix<GF>(field, D, D)),
 	V(field, D, M),
 	mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field, M, D)),
 	sparsity(mat.sparsity),
@@ -1166,8 +1160,8 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 
 			GF::Element e;
 			field.mul(e, rand_comb[i], a);
-			field.add(e, e, mul_mat_t.refEntry(xx, yy));
-			mul_mat_t.refEntry(xx, yy) = e;
+			field.add(e, e, mul_mats[n].refEntry(xx, yy));
+			mul_mats[n].refEntry(xx, yy) = e;
 		}
 
 	
@@ -1194,42 +1188,39 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 		}
 }
 
-void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v, bool use_t){
+// numvar = n means we are using a random combination
+void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v, int numvar){
 	MatrixDomain<GF> MD{field};
 
 	// initialize the left block (random MxD)
-	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field,1,D));
+	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field, 1, D));
 	for (auto &i : U_rows){
 		create_random_matrix(i);
 #ifdef EXTRA_VERBOSE_ON
-		i.write(cout << "###OUTPUT### U_row: ",Tag::FileFormat::Maple)<<endl;
+		i.write(cout << "###OUTPUT### U_row: ", Tag::FileFormat::Maple) << endl;
 #endif
 	}
 	
 	// stores U_i*T1^j at mat_seq[i][j]
 	vector<vector<DenseMatrix<GF>>> mat_seq(M);
-	for (auto &i : mat_seq){
-		i = vector<DenseMatrix<GF>>(this->getLength(),DenseMatrix<GF>(field,1,D));
-	}
+	for (auto &i : mat_seq)
+		i = vector<DenseMatrix<GF>>(this->getLength(), DenseMatrix<GF>(field, 1, D));
+
 
 	// initialize the first multiplication matrix
-	SparseMatrix<GF> *T1;
-	if (use_t)
-		T1 = &mul_mat_t;
-	else
-		T1 = &mul_mats[0];
+	SparseMatrix<GF> *T1 = &mul_mats[numvar];
 #ifdef EXTRA_VERBOSE_ON
-	T1->write(cout << "###OUTPUT### Multiplication matrix T1:"<<endl, Tag::FileFormat::Maple)<<endl;
+	T1->write(cout << "###OUTPUT### Multiplication matrix T:" << endl, Tag::FileFormat::Maple) << endl;
 #endif
 
 	// compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
 		MatrixDomain<GF> MD2{field};
-		vector<DenseMatrix<GF>> temp_mat_seq(this->getLength(), DenseMatrix<GF>(field,1,D)); 
+		vector<DenseMatrix<GF>> temp_mat_seq(this->getLength(), DenseMatrix<GF>(field, 1, D)); 
 		temp_mat_seq[0] = U_rows[i];
 		for (size_t j  = 1; j < this->getLength(); j++){
-			MD2.mul(temp_mat_seq[j],temp_mat_seq[j-1],*T1);
+			MD2.mul(temp_mat_seq[j], temp_mat_seq[j-1], *T1);
 		}
 		mat_seq[i] = temp_mat_seq;
 	}
@@ -1239,19 +1230,15 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v, boo
 		for (int row = 0; row < M; row++){
 			for (int col = 0; col < D; col++){
 				GF::Element a;
-				mat_seq[row][i].getEntry(a,0,col);
-				temp.refEntry(row,col) = a;
+				mat_seq[row][i].getEntry(a, 0, col);
+				temp.refEntry(row, col) = a;
 			}
 		}
 	} 
 }
 
-void Block_Sparse_FGLM::get_matrix_sequence
-(vector<DenseMatrix<GF>> &v, 
- vector<DenseMatrix<GF>> &l, 
- DenseMatrix<GF> &V,
- int c,
- size_t to){
+void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, vector<DenseMatrix<GF>> &l, 
+					    DenseMatrix<GF> &V, int c, size_t to){
 	// gather all the matrices of l in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
 	DenseMatrix<GF> mat(field, to*M, D);
@@ -1285,18 +1272,20 @@ void Block_Sparse_FGLM::get_matrix_sequence
 	}
 }
 
-// use_t = true means we are using a random combination
-vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, bool use_t){
+//// use_t = true means we are using a random combination
+// numvar = n means we use a random combination
+vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, int numvar){
 	zz_p::init(prime);
 #ifdef TIMINGS_ON
 	Timer tm;
-	tm.clear(); tm.start();
+	tm.clear(); 
+	tm.start();
 #endif
-	// 1. compute the "left" matrix sequence (U T1^i)
-	get_matrix_sequence_left(mat_seq_left,use_t);
+	// 1. compute the "left" matrix sequence (U T^i)
+	get_matrix_sequence_left(mat_seq_left, numvar);
 	
 #ifdef VERBOSE_ON	
-	cout << "###OUTPUT### Matrix sequence (U T1^i)_i :" << endl;
+	cout << "###OUTPUT### Matrix sequence (U T^i)_i :" << endl;
 	cout << "Length d = " << this->getLength() << endl;
 #ifdef EXTRA_VERBOSE_ON	
 	cout << "Entries:" << endl;
@@ -1564,9 +1553,9 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 }
 
 vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(){
-	auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),false); // uses X1
-	// auto second =  find_lex_basis(vector<LinBox::DenseMatrix<GF>>(),true); // uses t
-	return first; // for now
+	//auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>(), 0); // uses X1
+	auto second =  find_lex_basis(vector<LinBox::DenseMatrix<GF>>(), n); // uses t
+	return second; // for now
 }
 
 

@@ -132,8 +132,6 @@ class Block_Sparse_FGLM{
 	
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
-	// random combination of the matrces
-	LinBox::SparseMatrix<GF> mul_mat_t;
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
 	// coeffs in the random combination
@@ -151,7 +149,7 @@ class Block_Sparse_FGLM{
 	void create_random_matrix(Matrix &m);
 	
 	// Computes sequence (U T1^i)
-	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>>&, bool);
+	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>>&, int numvar);
 	
 	// Computes sequence (UT1^i)V
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
@@ -172,7 +170,7 @@ class Block_Sparse_FGLM{
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
 	std::vector<NTL::zz_pX> find_lex_basis();
-	std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, bool);
+	std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, int numvar);
 };
 
 
