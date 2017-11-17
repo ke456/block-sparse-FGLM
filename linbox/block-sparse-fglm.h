@@ -133,7 +133,6 @@ class Block_Sparse_FGLM{
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
-	std::vector<LinBox::DenseMatrix<GF>> mat_seq_left; // store U*T1^i
 	// coeffs in the random combination
 	std::vector<GF::Element> rand_comb;
 	// sparsities
@@ -153,11 +152,18 @@ class Block_Sparse_FGLM{
 	
 	// Computes sequence (UT1^i)V
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
-	                         std::vector<LinBox::DenseMatrix<GF>> &,
+				 const std::vector<LinBox::DenseMatrix<GF>> &,
 	                         LinBox::DenseMatrix<GF> &,
 				 int,
 	                         size_t);
 
+	void find_sequences(const std::vector<LinBox::DenseMatrix<GF>> &carry_over_mats, 
+			    std::vector<LinBox::DenseMatrix<GF>> &mat_seq_left, // U*T^i
+			    std::vector<LinBox::DenseMatrix<GF>> &mat_seq,  
+			    int numvar);
+
+	std::vector<NTL::zz_pX> find_numerators(const std::vector<LinBox::DenseMatrix<GF>> &mat_seq_left,
+				      const std::vector<LinBox::DenseMatrix<GF>> &mat_seq);
 
     public:
 	// length of the sequence:
@@ -170,7 +176,7 @@ class Block_Sparse_FGLM{
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
 	std::vector<NTL::zz_pX> find_lex_basis();
-	std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, int numvar);
+	// std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, int numvar);
 };
 
 

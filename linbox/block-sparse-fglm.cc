@@ -41,120 +41,120 @@ using namespace NTL;
 //-----------------------------------------------//
 //-----------------------------------------------//
 
-void poly_add (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a, const PolMatDom::Polynomial b, const GF &FIELD){
+// void poly_add (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a, const PolMatDom::Polynomial b, const GF &FIELD){
 
-	m.resize(0);
-	GF::Element e;
-	for (int i = 0; i < max(a.size(),b.size()); i++){
-		if (i >= a.size()){
-			m.emplace_back(b[i]);
-		}else if (i >= b.size()){
-			m.emplace_back(a[i]);
-		}else
-			m.emplace_back(FIELD.add(e,a[i],b[i]));
-	}
-}
+// 	m.resize(0);
+// 	GF::Element e;
+// 	for (int i = 0; i < max(a.size(),b.size()); i++){
+// 		if (i >= a.size()){
+// 			m.emplace_back(b[i]);
+// 		}else if (i >= b.size()){
+// 			m.emplace_back(a[i]);
+// 		}else
+// 			m.emplace_back(FIELD.add(e,a[i],b[i]));
+// 	}
+// }
 
-// scalar multiplication
-void poly_mul (PolMatDom::Polynomial &r, const GF::Element &c, const PolMatDom::Polynomial p, const GF& FIELD){
-	r.resize(0);
-	GF::Element e;
-	for (int i = 0; i < p.size(); i++){
-		FIELD.mul(e, c, p[i]);
-		r.emplace_back(e);
-	}
-}
+// // scalar multiplication
+// void poly_mul (PolMatDom::Polynomial &r, const GF::Element &c, const PolMatDom::Polynomial p, const GF& FIELD){
+// 	r.resize(0);
+// 	GF::Element e;
+// 	for (int i = 0; i < p.size(); i++){
+// 		FIELD.mul(e, c, p[i]);
+// 		r.emplace_back(e);
+// 	}
+// }
 
-void poly_subtract (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a, const PolMatDom::Polynomial b, const GF& FIELD){
-	m.resize(0);
-	GF::Element e;
-	for (int i = 0; i < max(a.size(),b.size()); i++){
-		if (i >= a.size()){
-			m.emplace_back(b[i]);
-		}else if (i >= b.size()){
-			m.emplace_back(a[i]);
-		}else
-			m.emplace_back(FIELD.sub(e,a[i],b[i]));
-	}
-}
+// void poly_subtract (PolMatDom::Polynomial &m, const PolMatDom::Polynomial a, const PolMatDom::Polynomial b, const GF& FIELD){
+// 	m.resize(0);
+// 	GF::Element e;
+// 	for (int i = 0; i < max(a.size(),b.size()); i++){
+// 		if (i >= a.size()){
+// 			m.emplace_back(b[i]);
+// 		}else if (i >= b.size()){
+// 			m.emplace_back(a[i]);
+// 		}else
+// 			m.emplace_back(FIELD.sub(e,a[i],b[i]));
+// 	}
+// }
 
-void poly_shift (PolMatDom::Polynomial &r, const int shift, const PolMatDom::Polynomial p, const GF& FIELD){
-	r.resize(0);
-	for (int i = 0; i < shift; i++)
-		r.emplace_back(GF::Element(0));
-	for (int i = 0; i < p.size(); i++)
-		r.emplace_back(p[i]);
-}
+// void poly_shift (PolMatDom::Polynomial &r, const int shift, const PolMatDom::Polynomial p, const GF& FIELD){
+// 	r.resize(0);
+// 	for (int i = 0; i < shift; i++)
+// 		r.emplace_back(GF::Element(0));
+// 	for (int i = 0; i < p.size(); i++)
+// 		r.emplace_back(p[i]);
+// }
 
-int poly_deg(const PolMatDom::Polynomial &p, const GF& FIELD){
-	for (int i = p.size()-1; i >= 0; i--){
-		if (!FIELD.isZero(p[i])) return i;
-	}
-	return 0;
-}
+// int poly_deg(const PolMatDom::Polynomial &p, const GF& FIELD){
+// 	for (int i = p.size()-1; i >= 0; i--){
+// 		if (!FIELD.isZero(p[i])) return i;
+// 	}
+// 	return 0;
+// }
 
-bool is_zero (const PolMatDom::Polynomial &p, const GF& FIELD){
-	for (auto &i : p)
-		if (!FIELD.isZero(i)) return false;
-	return true;
-}
+// bool is_zero (const PolMatDom::Polynomial &p, const GF& FIELD){
+// 	for (auto &i : p)
+// 		if (!FIELD.isZero(i)) return false;
+// 	return true;
+// }
 
-void poly_resize(PolMatDom::Polynomial &p, const GF& FIELD){
-	int deg = poly_deg(p, FIELD);
-	p.resize(deg+1);
-}
+// void poly_resize(PolMatDom::Polynomial &p, const GF& FIELD){
+// 	int deg = poly_deg(p, FIELD);
+// 	p.resize(deg+1);
+// }
 
-void poly_div (PolMatDom::Polynomial &q, PolMatDom::Polynomial &a, PolMatDom::Polynomial &b, const GF& FIELD){
-	poly_resize(a, FIELD);
-	poly_resize(b, FIELD);
-	if (is_zero(a, FIELD)){
-		q.resize(1);
-		q[0] = 0;
-		return;
-	}
-	auto r = a;
-	GF::Element u;
-	FIELD.div(u,GF::Element(1), b[b.size()-1]);
-	int n = a.size();
-	int m = b.size();
-	q.resize(n-m+1);
-	for (int i = n-m; i >= 0; i--){
-		if (r.size() == m+i){
-			auto q_i = r[r.size()-1] * u;
-			PolMatDom::Polynomial p;
-			poly_shift(p, i, b, FIELD);
-			poly_mul(p, q_i, p, FIELD);
-			poly_subtract(r, r, p, FIELD);	
-			q[i] = q_i;
-		}else
-			q[i] = 0;
-		if (r.size() > 0)
-			r.resize(r.size()-1);
-	}
+// void poly_div (PolMatDom::Polynomial &q, PolMatDom::Polynomial &a, PolMatDom::Polynomial &b, const GF& FIELD){
+// 	poly_resize(a, FIELD);
+// 	poly_resize(b, FIELD);
+// 	if (is_zero(a, FIELD)){
+// 		q.resize(1);
+// 		q[0] = 0;
+// 		return;
+// 	}
+// 	auto r = a;
+// 	GF::Element u;
+// 	FIELD.div(u,GF::Element(1), b[b.size()-1]);
+// 	int n = a.size();
+// 	int m = b.size();
+// 	q.resize(n-m+1);
+// 	for (int i = n-m; i >= 0; i--){
+// 		if (r.size() == m+i){
+// 			auto q_i = r[r.size()-1] * u;
+// 			PolMatDom::Polynomial p;
+// 			poly_shift(p, i, b, FIELD);
+// 			poly_mul(p, q_i, p, FIELD);
+// 			poly_subtract(r, r, p, FIELD);	
+// 			q[i] = q_i;
+// 		}else
+// 			q[i] = 0;
+// 		if (r.size() > 0)
+// 			r.resize(r.size()-1);
+// 	}
 		
-}
+// }
 
-// stores a%b in r
-void poly_mod (PolMatDom::Polynomial &r, PolMatDom::Polynomial &a, PolMatDom::Polynomial &b, const GF& FIELD){
-	poly_resize(a, FIELD);
-	poly_resize(b, FIELD);
-	r = a;
-	GF::Element u;
-	FIELD.div(u,GF::Element(1),b[b.size()-1]);
-	int n = a.size();
-	int m = b.size();
-	for (int i = n-m; i >= 0; i--){
-		if (r.size() == m+i){
-			auto q_i = r[r.size()-1] * u;
-			PolMatDom::Polynomial p;
-			poly_shift(p, i, b, FIELD);
-			poly_mul(p, q_i, p, FIELD);
-			poly_subtract(r, r, p, FIELD);	
-		}
-		if (r.size() > 0)
-			r.resize(r.size()-1);
-	}
-}
+// // stores a%b in r
+// void poly_mod (PolMatDom::Polynomial &r, PolMatDom::Polynomial &a, PolMatDom::Polynomial &b, const GF& FIELD){
+// 	poly_resize(a, FIELD);
+// 	poly_resize(b, FIELD);
+// 	r = a;
+// 	GF::Element u;
+// 	FIELD.div(u,GF::Element(1),b[b.size()-1]);
+// 	int n = a.size();
+// 	int m = b.size();
+// 	for (int i = n-m; i >= 0; i--){
+// 		if (r.size() == m+i){
+// 			auto q_i = r[r.size()-1] * u;
+// 			PolMatDom::Polynomial p;
+// 			poly_shift(p, i, b, FIELD);
+// 			poly_mul(p, q_i, p, FIELD);
+// 			poly_subtract(r, r, p, FIELD);	
+// 		}
+// 		if (r.size() > 0)
+// 			r.resize(r.size()-1);
+// 	}
+// }
 
 
 
@@ -1136,7 +1136,6 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
         threshold(threshold),
 	mul_mats(n+1, SparseMatrix<GF>(field, D, D)),
 	V(field, D, M),
-	mat_seq_left(2*ceil(D/(double)M), DenseMatrix<GF>(field, M, D)),
 	sparsity(mat.sparsity),
 	name(mat.name),
 	filename(mat.filename),
@@ -1175,6 +1174,8 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 	for (auto &i : mul_mats)
 		i.write(cout << "mul mat", Tag::FileFormat::Maple)<<endl;
 #endif
+
+	zz_p::init(prime);
 }
 
 
@@ -1237,7 +1238,8 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(vector<DenseMatrix<GF>> &v, int
 	} 
 }
 
-void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, vector<DenseMatrix<GF>> &l, 
+void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, 
+					    const vector<DenseMatrix<GF>> &l, 
 					    DenseMatrix<GF> &V, int c, size_t to){
 	// gather all the matrices of l in a single (seq_length*M) x D matrix
 	MatrixDomain<GF> MD(field);
@@ -1248,25 +1250,25 @@ void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, vector<D
 			int r = i * M + row; // starting point for mat
 			for (int col = 0; col < D; col++){
 				GF::Element a;
-				m.getEntry(a,row,col);
-				mat.refEntry(r,col) = a;
+				m.getEntry(a,row, col);
+				mat.refEntry(r, col) = a;
 			}
 		}
 	}
 
 	// multiplication
-	DenseMatrix<GF> result(field, to*M,c);
+	DenseMatrix<GF> result(field, to*M, c);
 	MD.mul(result,mat,V);
 	
-	v.resize(to, DenseMatrix<GF>(field,M,c));
+	v.resize(to, DenseMatrix<GF>(field, M, c));
 	for (size_t i = 0; i < to; i++){
 		v[i] = DenseMatrix<GF>(field, M, c);
 		for (int row = 0; row < M; row++){
 			int r = i * M + row;
 			for (int col = 0; col < c; col++){
 				GF::Element a;
-				result.getEntry(a,r,col);
-				v[i].refEntry(row,col) = a;
+				result.getEntry(a, r, col);
+				v[i].refEntry(row, col) = a;
 			}
 		}
 	}
@@ -1274,14 +1276,17 @@ void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, vector<D
 
 //// use_t = true means we are using a random combination
 // numvar = n means we use a random combination
-vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatrix<GF>> &carry_over_mats, int numvar){
-	zz_p::init(prime);
+void Block_Sparse_FGLM::find_sequences(const vector<DenseMatrix<GF>> &carry_over_mats, 
+						 vector<DenseMatrix<GF>> &mat_seq_left, // U*T^i
+						 vector<DenseMatrix<GF>> &mat_seq,  
+						 int numvar){
 #ifdef TIMINGS_ON
 	Timer tm;
 	tm.clear(); 
 	tm.start();
 #endif
 	// 1. compute the "left" matrix sequence (U T^i)
+	mat_seq_left = vector<DenseMatrix<GF>>(2*ceil(D/(double)M), DenseMatrix<GF>(field, M, D));
 	get_matrix_sequence_left(mat_seq_left, numvar);
 	
 #ifdef VERBOSE_ON	
@@ -1299,32 +1304,43 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
 	tm.clear(); tm.start();
 #endif
-	vector<DenseMatrix<GF>> mat_seq(getLength(), DenseMatrix<GF>(field,M,M));
-	// 2. compute the total matrix sequence (UT1^i)V
+	// 2. compute the total matrix sequence (UT^i)V
+	mat_seq = vector<DenseMatrix<GF>>(getLength(), DenseMatrix<GF>(field, M, M));
 	get_matrix_sequence(mat_seq, mat_seq_left, V, M, getLength());
 #ifdef TIMINGS_ON
 	tm.stop();
 	cout << "###TIME### sequence (UT1^i)V: " << ": " << tm.usertime() << endl;
-	tm.clear(); tm.start();
+	tm.clear(); 
+	tm.start();
 #endif
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT### Matrix V:" << endl;
-	V.write(cout,Tag::FileFormat::Maple)<<endl;
+	V.write(cout, Tag::FileFormat::Maple) << endl;
 	cout << "###OUTPUT### Matrix sequence (U T1^i V)_i :" << endl;
 	cout << "Length d = " << this->getLength() << endl;
 	cout << "Generic generator degree: deg = " << this->getGenDeg() << endl;
 #ifdef EXTRA_VERBOSE_ON
 	cout << "Entries:" << endl;
-	for (auto &i: mat_seq)
-		i.write(cout, Tag::FileFormat::Maple)<<endl;
+	for (auto &i : mat_seq)
+		i.write(cout, Tag::FileFormat::Maple) << endl;
 #endif
 #endif
+}
+
+//-----------------------------------------------------------------------------
+vector<zz_pX> Block_Sparse_FGLM::find_numerators(const vector<DenseMatrix<GF>> &mat_seq_left,
+						 const vector<DenseMatrix<GF>> &mat_seq){
 	// 3. compute generator and numerator in Matrix Berlekamp Massey: reversed sequence = mat_gen/mat_num
 	// note: * generator is in Popov form
 	//       * degree of row i of numerator < degree of row i of generator
-	PolMatDom PMD( field );
-	PolMatDom::PMatrix mat_gen(PMD.field(),M,M,this->getLength());
-	PolMatDom::PMatrix mat_num(PMD.field(),M,M,this->getLength());
+#ifdef TIMINGS_ON
+	Timer tm;
+	tm.clear(); 
+	tm.start();
+#endif
+	PolMatDom PMD(field);
+	PolMatDom::PMatrix mat_gen(PMD.field(), M, M, this->getLength());
+	PolMatDom::PMatrix mat_num(PMD.field(), M, M, this->getLength());
 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq, this->getThreshold() );
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -1346,63 +1362,68 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 	tm.clear(); tm.start();
 #endif
 	vector<PolMatDom::Polynomial> smith( M );
-	PolMatDom::PMatrix lfac(PMD.field(),M,M,M*this->getLength()+1);
-	PolMatDom::PMatrix rfac(PMD.field(),M,M,M*this->getLength()+1);
+	PolMatDom::PMatrix lfac(PMD.field(), M, M, M*this->getLength()+1);
+	PolMatDom::PMatrix rfac(PMD.field(), M, M, M*this->getLength()+1);
 	PMD.SmithForm( smith, lfac, rfac, mat_gen, this->getThreshold() );
+	vector<zz_pX> zz_pX_smith (M);
+	for (int i = 0; i < M; i++){
+		for (int j = 0; j < smith[i].size(); j++)
+			SetCoeff(zz_pX_smith[i], j, (long)smith[i][j]);
+		zz_pX_smith[i].normalize();
+	}
+
+
+
 #ifdef TIMINGS_ON
 	tm.stop();
 	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
 #endif
 
 #ifdef TIMINGS_ON
-	tm.clear();tm.start();
+	tm.clear();
+	tm.start();
 #endif
 	// finding u_tilde
 
-
 	// Making a matrix with just minpoly as the entry
-	PolMatDom::MatrixP P_mat(PMD.field(),1,1,D+1);
-	for (int i = 0; i < D+1;i++){
+	PolMatDom::MatrixP P_mat(PMD.field(), 1, 1, D+1);
+	for (int i = 0; i < D+1; i++){
 		auto element = smith[0][i];
-		P_mat.ref(0,0,i) = element;
+		P_mat.ref(0, 0, i) = element;
 	}
 
 	PolynomialMatrixMulDomain<GF> PMMD(field);
-	PolMatDom::MatrixP rfac_row(PMD.field(),1,M,M*this->getLength()+1);
-	PolMatDom::MatrixP result(PMD.field(),1,M,M*this->getLength()+1);
-
-// extracting the first row of rfac
+	PolMatDom::MatrixP rfac_row(PMD.field(), 1, M, M*this->getLength()+1);
+	PolMatDom::MatrixP result(PMD.field(), 1, M, M*this->getLength()+1);
+	
+	// extracting the first row of rfac
 	for (int i = 0; i < M; i++)
 		for (int j = 0; j < M*this->getLength()+1; j++){
-			auto element = rfac.get(0,i,j);
-			rfac_row.ref(0,i,j) = element;
+			auto element = rfac.get(0, i, j);
+			rfac_row.ref(0, i, j) = element;
 		}
-	PMMD.mul(result,P_mat,rfac_row);
+	PMMD.mul(result, P_mat, rfac_row);
 
 #ifdef EXTRA_TIMINGS_ON
 	Timer tm3;
 	tm3.start();
 #endif
-	vector<PolMatDom::Polynomial> rfac_polys(M);
-	vector<PolMatDom::Polynomial> div(M);
+	vector<zz_pX> rfac_polys(M);
+	vector<zz_pX> div(M);
 	for (int i = 0; i < M; i++){
-		for (int j = 0; j < M*this->getLength()+1; j++){
-			rfac_polys[i].emplace_back(result.get(0,i,j));
-		}
-		poly_div(div[i], rfac_polys[i], smith[i], field);
-		div[i].resize(M*this->getLength()+1,0);
+		for (int j = 0; j < M*this->getLength()+1; j++)
+			SetCoeff(rfac_polys[i], j, (long)result.get(0, i, j));
+		rfac_polys[i].normalize();
+		div[i] = rfac_polys[i] / zz_pX_smith[i];
 	}
-
-
-	PolMatDom::MatrixP w(PMD.field(),1,M,M*this->getLength()+1);
+	PolMatDom::MatrixP w(PMD.field(), 1, M, M*this->getLength()+1);
 	for (int i = 0; i < M; i++)
-		for (int j = 0; j < M*this->getLength()+1;j++){
-			w.ref(0,i,j) = div[i][j];
-		}
+		for (int j = 0; j < M*this->getLength()+1; j++)
+			w.ref(0, i, j) = coeff(div[i], j)._zz_p__rep;
   
-	PolMatDom::MatrixP u_tilde(PMD.field(),1,M,M*this->getLength()+1);
+	PolMatDom::MatrixP u_tilde(PMD.field(), 1, M, M*this->getLength()+1);
 	PMMD.mul(u_tilde, w, lfac);
-	PolMatDom::PMatrix blah(PMD.field(),1,M,this->getLength());	
+	PolMatDom::PMatrix blah(PMD.field(), 1, M, this->getLength());	
 #ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
 	cout << "Computing u_tilde: " << tm3.usertime() << endl;;
@@ -1410,40 +1431,39 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 #endif
 
 	// constructing the numerator for the sequence
-  
-	PolMatDom::PMatrix Z (PMD.field(), M, 1, this->getGenDeg());
+  	PolMatDom::PMatrix Z (PMD.field(), M, 1, this->getGenDeg());
 	int index = 0;
 	for (int j = this->getGenDeg()-1; j>=0; j--){
 		for (int q = 0; q < M; q++){
-			auto element = mat_seq[j].refEntry(q,0);
-			Z.ref(q,0,index) = element;
+			auto element = mat_seq[j].getEntry(q, 0);
+			Z.ref(q, 0, index) = element;
 		}
 		index++;
 	}
 
-	PolMatDom::PMatrix N1(PMD.field(),M,1,this->getLength());
-	PolMatDom::PMatrix N1_shift(PMD.field(),M,1,this->getGenDeg());
-	PMMD.mul(N1,mat_gen,Z);
+	PolMatDom::PMatrix N1(PMD.field(), M, 1, this->getLength());
+	PolMatDom::PMatrix N1_shift(PMD.field(), M, 1, this->getGenDeg());
+	PMMD.mul(N1, mat_gen, Z);
 	shift(N1_shift, N1, M, 1, getGenDeg());
-	PolMatDom::MatrixP n1_mat(PMD.field(),1,1,this->getLength());
+	PolMatDom::MatrixP n1_mat(PMD.field(), 1, 1, this->getLength());
 	PMMD.mul(n1_mat, u_tilde, N1_shift);
 	zz_pX n1;
 	for (int i  = 0; i < D; i++)
-		SetCoeff(n1,i,n1_mat.get(0,0,i));
+		SetCoeff(n1, i, n1_mat.get(0, 0, i));
 	zz_pX P,n1_inv;
 	for (int i = 0; i < D+1; i++)
-		SetCoeff(P,i,(long)smith[0][i]);
-	InvMod(n1_inv,n1,P);
+		SetCoeff(P, i, (long)smith[0][i]);
+	InvMod(n1_inv, n1, P);
 #ifdef EXTRA_TIMINGS_ON
 	tm3.stop();
 	cout << "XGCD: " << tm3.usertime() << endl;
 #endif
 
 	MatrixDomain<GF> MD(field);
-	DenseMatrix<GF> V_col(field,D,1); // a single column of V
+	DenseMatrix<GF> V_col(field, D, 1); // a single column of V
 	for (int i = 0; i < D; i++){
-		auto el = V.refEntry(i,0);
-		V_col.refEntry(i,0) = el;
+		auto el = V.refEntry(i, 0);
+		V_col.refEntry(i, 0) = el;
 	}
 
 #ifdef OUTPUT_FUNC
@@ -1458,22 +1478,19 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 	ofs << "R = []" << endl;
 #endif
 	vector<zz_pX> result_pols;
-	int start = 0;
-//	if (!use_t) start = 1;
-	// LOOP FOR OTHER VARIABLES
-	for (int i = start; i < mul_mats.size(); i++){
+	for (int i = 0; i < mul_mats.size()-1; i++){
 		DenseMatrix<GF> right_mat(field, D, 1); // Ti * V (only one column)
 		auto &Ti = mul_mats[i];
 		MD.mul(right_mat, Ti, V_col);
-		vector<DenseMatrix<GF>> seq(this->getGenDeg(),DenseMatrix<GF>(field,M,1));
-		get_matrix_sequence(seq,mat_seq_left,right_mat,1,getGenDeg());
-		PolMatDom::PMatrix polys(PMD.field(),M,1,this->getGenDeg());
+		vector<DenseMatrix<GF>> seq(this->getGenDeg(), DenseMatrix<GF>(field, M, 1));
+		get_matrix_sequence(seq, mat_seq_left, right_mat, 1, getGenDeg());
+		PolMatDom::PMatrix polys(PMD.field(), M, 1, this->getGenDeg());
 		// creating the poly matrix from the sequence in reverse order
 		int index = 0;
 		for (int j = seq.size()-1; j >= 0; j--){
 			for (int q = 0; q < M; q++){
-				auto element = seq[j].refEntry(q,0);
-				polys.ref(q,0,index)= element;
+				auto element = seq[j].refEntry(q, 0);
+				polys.ref(q, 0, index) = element;
 			}
 			index++;
 		}
@@ -1496,7 +1513,7 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 		
 		tm2.start();
 #endif
-		PolMatDom::MatrixP n_mat(PMD.field(),1,1,D+1);
+		PolMatDom::MatrixP n_mat(PMD.field(), 1, 1, D+1);
  		PMMD.mul(n_mat, u_tilde, N_shift);
 		mat_resize(field, n_mat, D);
 #ifdef EXTRA_TIMINGS_ON
@@ -1508,8 +1525,8 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 #endif
 		zz_pX n_j, func;
 		for (int i  = 0; i < D; i++)
-			SetCoeff(n_j,i,(long)n_mat.get(0,0,i));
-		MulMod(func, n_j, n1_inv,P);
+			SetCoeff(n_j, i, (long)n_mat.get(0, 0, i));
+		MulMod(func, n_j, n1_inv, P);
 #ifdef EXTRA_TIMINGS_ON
 		tm2.stop();
 		cout << "Computing func: " << tm2.usertime() << endl;
@@ -1554,7 +1571,9 @@ vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(const vector<LinBox::DenseMatri
 
 vector<zz_pX>  Block_Sparse_FGLM::find_lex_basis(){
 	//auto first = find_lex_basis(vector<LinBox::DenseMatrix<GF>>(), 0); // uses X1
-	auto second =  find_lex_basis(vector<LinBox::DenseMatrix<GF>>(), n); // uses t
+	vector<DenseMatrix<GF>> mat_seq_left, mat_seq;
+	find_sequences(vector<DenseMatrix<GF>>(), mat_seq_left, mat_seq, n);
+	vector<zz_pX> second =  find_numerators(mat_seq_left, mat_seq); // uses t
 	return second; // for now
 }
 
@@ -1734,143 +1753,143 @@ int main_PolMatDom( int argc, char **argv ){
 	cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
 	cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 #endif
-#ifdef TEST_POL
-	Timer tm2;
-	cout << "~~~~~~~~~~~STARTING TESTS POLY~~~~~~~~~~~~~" << endl;
-	{
-		cout << "small xgcd with coprime polynomials" << endl;
-		PolMatDom::Polynomial a = {1,1,-1,0,-1,1};
-		PolMatDom::Polynomial b = {-1,0,1,1,0,0,-1};
-		PolMatDom::Polynomial g,u,v;
-		// a = 1+X-X^2-X^4+X^5
-		// b = -1 + X^2 + X^3 -X^6
-		// xgcd(a,b) = (1,
-		//              15379115*X^5 + 15379116*X^2 + 7689558*X + 7689558,
-		//              15379115*X^4 + 7689558*X^3 + 15379116*X + 7689557)
-		// when over Z/pZ with p = 23068673 
-		tm2.clear(); tm2.start();
-		PMD.xgcd(a,b,g,u,v);
-		tm2.stop();
-		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### xgcd input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### xgcd output: " << endl;
-		cout << g << endl;
-		cout << u << endl;
-		cout << v << endl;
-#endif
-	}
-	{
-		cout << "small xgcd with gcd of degree 1" << endl;
-		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
-		PolMatDom::Polynomial b = {23068614,23068670,59,62,3,0,23068614,23068670};
-		PolMatDom::Polynomial g,u,v;
-		// same polynomials multiplied by 3*X + 59
-		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
-		// b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
-		// xgcd(a,b) = (X + 15379135,
-		//              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
-		//              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
-		// when over Z/pZ with p = 23068673 
-		tm2.clear(); tm2.start();
-		PMD.xgcd(a,b,g,u,v);
-		tm2.stop();
-		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### xgcd input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### xgcd output: " << endl;
-		cout << g << endl;
-		cout << u << endl;
-		cout << v << endl;
-#endif
-	}
-	{
-		cout << "###TIME### xgcd, random input (degree, time)" << endl;
-		for ( size_t deg = 5; deg<30000; deg=floor(1.6*deg) )
-		{
-			PolMatDom::Polynomial a( deg );
-			PolMatDom::Polynomial b( deg );
-			for ( size_t d=0; d<deg; ++d )
-			{
-				rd.random( a[d] );
-				rd.random( b[d] );
-			}
-			PolMatDom::Polynomial g,u,v;
-			tm2.clear(); tm2.start();
-			PMD.xgcd(a,b,g,u,v);
-			tm2.stop();
-			cout << deg-1 << ", " << tm2.usertime() << endl;
-		}
-	}
-	{
-		cout << "division with quotient of degree 1" << endl;
-		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
-		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-		PolMatDom::Polynomial q;
-		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
-		// b = 1+X-X^2-X^4+X^5
-		// quotient should be X + 15379135,
-		// when over Z/pZ with p = 23068673 
-		tm2.clear(); tm2.start();
-		PMD.divide(a,b,q);
-		tm2.stop();
-		cout << "###TIME### divide: " << tm2.usertime() << endl;
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### divide input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### divide output: " << endl;
-		cout << q << endl;
-#endif
-	}
-	{
-		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-		PolMatDom::Polynomial q;
-		poly_add(q,a,b);
-		cout << "###OUTPUT### add input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### add output: " << endl;
-		cout << q << endl;
-	}
-	{
-		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-		PolMatDom::Polynomial q;
-		poly_subtract(q,a,b);
-		cout << "###OUTPUT### subtract input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### subtract output: " << endl;
-		cout << q << endl;
-	}
-	{
-		PolMatDom::Polynomial a = {59,62,10,3,0,56};
-		PolMatDom::Polynomial b = {1,1,-1};
-		PolMatDom::Polynomial q;
-		poly_mod(q,a,b);
-		cout << "###OUTPUT### mod input: " << endl;
-		cout << a << endl;
-		cout << b << endl;
-		cout << "###OUTPUT### mod output: " << endl;
-		cout << q << endl;
-	}
-	{
-		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-		GF::Element e{10};
-		PolMatDom::Polynomial q;
-		poly_mul(q,e,a);
-		cout << "###OUTPUT### add input: " << endl;
-		cout << a << endl;
-		cout << "###OUTPUT### add output: " << endl;
-		cout << q << endl;
-	}
-#endif
+// #ifdef TEST_POL
+// 	Timer tm2;
+// 	cout << "~~~~~~~~~~~STARTING TESTS POLY~~~~~~~~~~~~~" << endl;
+// 	{
+// 		cout << "small xgcd with coprime polynomials" << endl;
+// 		PolMatDom::Polynomial a = {1,1,-1,0,-1,1};
+// 		PolMatDom::Polynomial b = {-1,0,1,1,0,0,-1};
+// 		PolMatDom::Polynomial g,u,v;
+// 		// a = 1+X-X^2-X^4+X^5
+// 		// b = -1 + X^2 + X^3 -X^6
+// 		// xgcd(a,b) = (1,
+// 		//              15379115*X^5 + 15379116*X^2 + 7689558*X + 7689558,
+// 		//              15379115*X^4 + 7689558*X^3 + 15379116*X + 7689557)
+// 		// when over Z/pZ with p = 23068673 
+// 		tm2.clear(); tm2.start();
+// 		PMD.xgcd(a,b,g,u,v);
+// 		tm2.stop();
+// 		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+// #ifdef VERBOSE_ON
+// 		cout << "###OUTPUT### xgcd input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### xgcd output: " << endl;
+// 		cout << g << endl;
+// 		cout << u << endl;
+// 		cout << v << endl;
+// #endif
+// 	}
+// 	{
+// 		cout << "small xgcd with gcd of degree 1" << endl;
+// 		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
+// 		PolMatDom::Polynomial b = {23068614,23068670,59,62,3,0,23068614,23068670};
+// 		PolMatDom::Polynomial g,u,v;
+// 		// same polynomials multiplied by 3*X + 59
+// 		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
+// 		// b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
+// 		// xgcd(a,b) = (X + 15379135,
+// 		//              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
+// 		//              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
+// 		// when over Z/pZ with p = 23068673 
+// 		tm2.clear(); tm2.start();
+// 		PMD.xgcd(a,b,g,u,v);
+// 		tm2.stop();
+// 		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
+// #ifdef VERBOSE_ON
+// 		cout << "###OUTPUT### xgcd input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### xgcd output: " << endl;
+// 		cout << g << endl;
+// 		cout << u << endl;
+// 		cout << v << endl;
+// #endif
+// 	}
+// 	{
+// 		cout << "###TIME### xgcd, random input (degree, time)" << endl;
+// 		for ( size_t deg = 5; deg<30000; deg=floor(1.6*deg) )
+// 		{
+// 			PolMatDom::Polynomial a( deg );
+// 			PolMatDom::Polynomial b( deg );
+// 			for ( size_t d=0; d<deg; ++d )
+// 			{
+// 				rd.random( a[d] );
+// 				rd.random( b[d] );
+// 			}
+// 			PolMatDom::Polynomial g,u,v;
+// 			tm2.clear(); tm2.start();
+// 			PMD.xgcd(a,b,g,u,v);
+// 			tm2.stop();
+// 			cout << deg-1 << ", " << tm2.usertime() << endl;
+// 		}
+// 	}
+// 	{
+// 		cout << "division with quotient of degree 1" << endl;
+// 		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
+// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+// 		PolMatDom::Polynomial q;
+// 		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
+// 		// b = 1+X-X^2-X^4+X^5
+// 		// quotient should be X + 15379135,
+// 		// when over Z/pZ with p = 23068673 
+// 		tm2.clear(); tm2.start();
+// 		PMD.divide(a,b,q);
+// 		tm2.stop();
+// 		cout << "###TIME### divide: " << tm2.usertime() << endl;
+// #ifdef VERBOSE_ON
+// 		cout << "###OUTPUT### divide input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### divide output: " << endl;
+// 		cout << q << endl;
+// #endif
+// 	}
+// 	{
+// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+// 		PolMatDom::Polynomial q;
+// 		poly_add(q,a,b);
+// 		cout << "###OUTPUT### add input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### add output: " << endl;
+// 		cout << q << endl;
+// 	}
+// 	{
+// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
+// 		PolMatDom::Polynomial q;
+// 		poly_subtract(q,a,b);
+// 		cout << "###OUTPUT### subtract input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### subtract output: " << endl;
+// 		cout << q << endl;
+// 	}
+// 	{
+// 		PolMatDom::Polynomial a = {59,62,10,3,0,56};
+// 		PolMatDom::Polynomial b = {1,1,-1};
+// 		PolMatDom::Polynomial q;
+// 		poly_mod(q,a,b);
+// 		cout << "###OUTPUT### mod input: " << endl;
+// 		cout << a << endl;
+// 		cout << b << endl;
+// 		cout << "###OUTPUT### mod output: " << endl;
+// 		cout << q << endl;
+// 	}
+// 	{
+// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
+// 		GF::Element e{10};
+// 		PolMatDom::Polynomial q;
+// 		poly_mul(q,e,a);
+// 		cout << "###OUTPUT### add input: " << endl;
+// 		cout << a << endl;
+// 		cout << "###OUTPUT### add output: " << endl;
+// 		cout << q << endl;
+// 	}
+// #endif
 
 	return 0;
 }
