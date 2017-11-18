@@ -1,6 +1,126 @@
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Fri 17 Nov 18:00 (after NTL incorporation --> timings unchanged except "R_j computations")
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./fglm -t 128 -F test256.dat ; ./fglm -t 128 -F test625.dat ; ./fglm -t 128 -F test1000.dat ; ./fglm -t 128 -F test1296.dat ; ./fglm -t 128 -F test3375.dat
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test256.dat
+###TIME### left sequence (UT1^i): : 0.855302 (user time)
+###TIME### left sequence (UT1^i): 0.216667 (real time)
+###TIME### sequence (UT1^i)V: : 0.000936
+###TIME### Matrix Berlekamp Massey: 0.028615
+###TIME### Smith form and transformations: 0.208963
+Computing u_tilde: 0.003357
+XGCD: 0.011784
+Computing N: 0.004119
+Computing n: 0.003236
+Computing func: 0.000108
+Computing N: 0.004107
+Computing n: 0.003456
+Computing func: 0.000123
+Computing N: 0.004389
+Computing n: 0.003335
+Computing func: 0.00011
+Computing N: 0.00409
+Computing n: 0.003234
+Computing func: 0.000107
+###TIME### R_j computations: 0.046114
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test625.dat
+###TIME### left sequence (UT1^i): : 9.90158 (user time)
+###TIME### left sequence (UT1^i): 2.50697 (real time)
+###TIME### sequence (UT1^i)V: : 0.018025
+###TIME### Matrix Berlekamp Massey: 0.053049
+###TIME### Smith form and transformations: 0.540798
+Computing u_tilde: 0.005676
+XGCD: 0.017907
+Computing N: 0.005616
+Computing n: 0.006074
+Computing func: 0.000467
+Computing N: 0.005739
+Computing n: 0.005304
+Computing func: 0.000298
+Computing N: 0.005491
+Computing n: 0.006263
+Computing func: 0.00062
+Computing N: 0.005807
+Computing n: 0.005334
+Computing func: 0.000298
+###TIME### R_j computations: 0.075831
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1000.dat
+###TIME### left sequence (UT1^i): : 21.4081 (user time)
+###TIME### left sequence (UT1^i): 5.43229 (real time)
+###TIME### sequence (UT1^i)V: : 0.036469
+###TIME### Matrix Berlekamp Massey: 0.051494
+###TIME### Smith form and transformations: 0.694915
+Computing u_tilde: 0.005851
+XGCD: 0.024135
+Computing N: 0.004859
+Computing n: 0.010336
+Computing func: 0.00033
+Computing N: 0.004716
+Computing n: 0.012874
+Computing func: 0.000355
+Computing N: 0.004725
+Computing n: 0.010228
+Computing func: 0.000305
+###TIME### R_j computations: 0.090827
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1296.dat
+###TIME### left sequence (UT1^i): : 70.6702 (user time)
+###TIME### left sequence (UT1^i): 18.9941 (real time)
+###TIME### sequence (UT1^i)V: : 0.039949
+###TIME### Matrix Berlekamp Massey: 0.088822
+###TIME### Smith form and transformations: 1.27669
+Computing u_tilde: 0.011298
+XGCD: 0.026819
+Computing N: 0.002281
+Computing n: 0.010286
+Computing func: 0.000637
+Computing N: 0.002277
+Computing n: 0.010475
+Computing func: 0.000627
+Computing N: 0.002262
+Computing n: 0.010203
+Computing func: 0.000625
+Computing N: 0.002349
+Computing n: 0.010291
+Computing func: 0.00066
+###TIME### R_j computations: 0.108022
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test3375.dat
+###TIME### left sequence (UT1^i): : 607.665 (user time)
+###TIME### left sequence (UT1^i): 158.593 (real time)
+###TIME### sequence (UT1^i)V: : 0.129024
+###TIME### Matrix Berlekamp Massey: 0.332194
+###TIME### Smith form and transformations: 3.0557
+Computing u_tilde: 0.024332
+XGCD: 0.059556
+Computing N: 0.004309
+Computing n: 0.020636
+Computing func: 0.001376
+Computing N: 0.004304
+Computing n: 0.02086
+Computing func: 0.001382
+Computing N: 0.004276
+Computing n: 0.020634
+Computing func: 0.001361
+###TIME### R_j computations: 0.248023
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Fri 10 Nov 15:00 (using Givaro's xgcd for R_j computations --> slower !!?!! )
+Fri 10 Nov 15:00 (using Givaro's xgcd for R_j computations --> slower than via pmbasis...)
 
 vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./main -t 128 -F test256.dat ; ./main -t 128 -F test625.dat ; ./main -t 128 -F test1000.dat ; ./main -t 128 -F test1296.dat ; ./main -t 128 -F test3375.dat
 
