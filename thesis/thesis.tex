@@ -264,30 +264,6 @@ of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
 field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
 \cite{GaGe13}. 
 
-
-\newpage
-\section{Previous Algorithms}
-
-\subsection{Wiedemann algorithm}
-The Wiedemann algorithm of \cite{Wiedemann86} solves a linear system
-$\mA y = b$, where $\mA$ is an invertible square matrix and $y,b$ are vectors
-over a field. The most
-important aspect of this algorithm is that the minimal polynomial
-$P(x) = \sum_{i = 0}^{D} c_i x^i$ of $\mA$ can be computed
-through a scalar sequence
-$$ S = (u^{tr}\mA^ib)_{i \ge 0}$$
-for a random vector $u$. Once we have sufficient number of terms
-of $S$, we apply the Berlekamp-Massey algorithm, which efficiently
-computes $P(x)$ from $S$.
-In the simplest case, where $c_0 \neq 0$, we have that
-\begin{align*}
-P(\mA) = 0 &= c_0 \mI + c_1\mA + \dots + c_D \mA^D \\
-\implies -c_0 \mI &= \sum_{i=1}^{D}c_i\mA^i \\
-\implies \mI &= \mA\left(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1}\right)\\
-\implies b &= \mA(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1})b
-\end{align*}
-Therefore, $x = \left(-c_0^{-1} \sum_{i=1}^{D}c_i\mA^{i-1}\right)b$.
-
 \subsection{Sparse-FGLM Algorithm}
 The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
 Gr\"obner basis of an ideal with runtime cubic in the dimension
