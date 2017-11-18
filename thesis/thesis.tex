@@ -873,7 +873,9 @@ zero-dimensional parametrization of $V_{\mathfrak{S}}$.
 	Thus, the polynomial $M$ we compute at step 1 is indeed the minimal
 	polynomial of $t$, and we can apply the previous lemma, and for 
 	any root $r_j$ of $P$, and $i=1,\dots,n$, we have
-	$$\frac{ C_{X_i}(r_j)}{ C_1(r_j)}  = \frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$
+	$$\frac{ C_{X_i}(r_j)}{ C_1(r_j)}  = 
+	\frac{\Omega((\ell(X_i t^s))_{s\ge0}, M)(r_j)}{\Omega((\ell(t^s))_{s\ge0} ,M)(r_j)}=
+	\frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$
 	so that $ C_{X_i}/ C_1 \bmod P$ is the $i$th polynomial in
 	the zero-dimensional parametrization of $V$ corresponding to $t$.
 \end{proof}
@@ -939,30 +941,26 @@ only, namely those $j$ for which $m_j=1$.
 
 \begin{Lemma}\label{lemma:valuelambda}
 	Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, let $M$ be the minimal
-	polynomial of $X_1$ in $Q$, let $\delta$ be its degree and 
-	let $B=T^{\delta}M(1/T)$. Then, the following holds:
-	\begin{itemize}
-		\item the power series $A = \Big(\sum_{s \ge 0}
-		\ell(X_1^s)T^s\Big)B$ is actually a polynomial of degree less than~$\delta$;
-		\item the polynomial $\tilde A = T^{\delta-1} A(1/T)$ satisfies
-		$$\tilde A(r_j) = \lambda_j(1) M'(r_j) \quad \text{for all $j$ such that $m_j=1$.}$$
-	\end{itemize}
+	polynomial of $X_1$ in $Q$ and let $\delta$ be its degree. Then, 
+	the polynomial $\Omega((\ell(X_1^s))_{s\ge0},M)$ satisfies
+	$$\Omega((\ell(X_1^s))_{s\ge0},M)(r_j) = \lambda_j(1) M'(r_j) \quad \text{for all $j$ such that $m_j=1$.}$$
+
 \end{Lemma}
 \begin{proof}
 	Let $\mathfrak{e}$ be the set of all indices $j$ in $\{1,\dots,c\}$
 	such that $m_j=1$, and let $\mathfrak{f}=\{1,\dots,c\}-\mathfrak{e}$;
 	this definition allows us to split the sum as
 	\begin{align*}
-	\sum_{s \ge 0} \ell(X_1^s) T^s  
+	\sum_{s \ge 0} \ell(X_1^s)/T^{s+1}  
 	&= \sum_{j \in \{1,\dots,c\}}\sum_{i\in T_j} 
-	\sum_{s \ge 0}\ell_i(X_1^s)T^s  \\
-	&=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)T^s +
-	\sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)T^s.
+	\sum_{s \ge 0}\ell_i(X_1^s)/T^{s+1}  \\
+	&=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1} +
+	\sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1}.
 	\end{align*}
-	Using Lemma~\ref{lemma:formula} with $t=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \lambda_j(X_1^s)T^s$ 
+	Using Lemma~\ref{lemma:formula} with $t=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \lambda_j(X_1^s)/T^{s+1}$ 
 	in the second summand
 	can be rewritten as 
-	$$\frac{C_j}{(1-r_j T)^{v_j}},$$
+	$$\frac{C_j}{(T-r_j)^{v_j}},$$
 	for some integer $v_j$, and for some polynomial $C_j$ of degree less than
 	$v_j$. Next, take $j$ in $\mathfrak{e}$. Since $m_j=1$, $\nu_i=1$ for all $i$ in $T_j$,
 	so that
@@ -974,20 +972,20 @@ only, namely those $j$ for which $m_j=1$.
 	$X_1^s$ for $s\ge 0$. Thus, $\ell_i(X_1^s)$ can be rewritten 
 	as $\ell_{i,1} \alpha_{i,1}^s$, for some constant $\ell_{i,1}$,
 	and the generating series of these terms is 
-	$$\frac {\ell_{i,1}}{1-\alpha_{i,1}T}=\frac {\ell_{i,1}}{1-r_j T}.$$
+	$$\frac {\ell_{i,1}}{T-\alpha_{i,1}}=\frac {\ell_{i,1}}{T-r_j}.$$
 	Remarking  that we can write $\ell_{i,1}=\ell_i(1)$,
 	altogether, the sum in question can be written
 	\begin{align*}
-	\sum_{s \ge 0} \ell(X_1^s) T^s  
+	\sum_{s \ge 0} \ell(X_1^s)/ T^{s+1}  
 	&=\sum_{j \in \mathfrak{e}} 
-	\frac{ \sum_{i\in T_j}  \ell_{i}(1) }{1-r_j T}
-	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(1-r_j T)^{x_j}}\\
+	\frac{ \sum_{i\in T_j}  \ell_{i}(1) }{T-r_j }
+	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}\\
 	&= \sum_{j \in \mathfrak{e}} 
-	\frac{ \lambda_j(1) }{1-r_j T}
-	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(1-r_j T)^{x_j}}
+	\frac{ \lambda_j(1) }{T-r_j }
+	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}
 	\end{align*}
 	for some integers $\{x_j \mid j \in b\}$ such that $\deg(D_j) < x_j$
-	holds, and with $D_j$ and $1-r_j T$ coprime; if $r_j=0$, we take
+	holds, and with $D_j$ and $T-r_j $ coprime; if $r_j=0$, we take
 	$x_j=\deg(D_j)+1$. In particular, the minimal polynomial of
 	$(\ell(X_1^s))_{s\ge 0}$ is $N=\prod_{j\in \mathfrak{e}}(T-r_j)
 	\prod_{j \in \mathfrak{f}}(T-r_j)^{x_j}$.
@@ -995,39 +993,23 @@ only, namely those $j$ for which $m_j=1$.
 	On the other hand, the minimal polynomial $M$ of $X_1$ can be rewritten as $M=\prod_{j\in
 		\mathfrak{e}}(T-r_j) \prod_{j \in \mathfrak{f}}(T-r_j)^{m_j}$, so
 	that $\delta=\sum_{j \in \mathfrak{e}} 1 + \sum_{j\in \mathfrak{f}}
-	m_j$ and $B=\prod_{j\in \mathfrak{e}}(1-r_j T) \prod_{j \in
-		\mathfrak{f}}(1-r_j T)^{m_j}$. The minimal polynomial
+	m_j$. The minimal polynomial
 	of the sequence $\ell(X_1^s)$ divides $M$, so that $x_j \le m_j$ holds for all $j$ in
 	$\mathfrak{f}$.
-	As a result,  $A =\big ( \sum_{s \ge 0} \ell(X_1^s) T^s \big ) B$ is 
-	indeed a polynomial of degree less than $\delta$, given by
+	As a result, $\Omega((\ell(X_1^s))_{s\ge0},M)$ exists and is given by
 	\begin{align*}
-	A=&
-	\sum_{j \in \mathfrak{e}}
-	\Big(
-	\lambda_j(1) \prod_{\iota \in \mathfrak{e}-\{j\}}(1-r_\iota T)\Big)
-	\Big(\prod_{j \in \mathfrak{f}}(1-r_j T)^{m_j} \Big)\\
-	&+
-	\sum_{j\in \mathfrak{f}}
-	\Big(D_j (1-r_j T)^{m_j-x_j}
-	\prod_{\iota \in \mathfrak{f}-\{j\}}(1-r_j T)^{m_\iota}\Big)
-	\Big(\prod_{j\in \mathfrak{e}} (1-r_jT) \Big).
-	\end{align*}
-	The reciprocal polynomial $\tilde A=T^{\delta-1} A(1/T)$ is then
-	\begin{align*}
-	\tilde  A=&
+	\Omega((\ell(X_1^s))_{s\ge0},M)=&
 	\sum_{j \in \mathfrak{e}}
 	\Big(
 	\lambda_j(1) \prod_{\iota \in \mathfrak{e}-\{j\}}(T-r_\iota)\Big)
 	\Big(\prod_{j \in \mathfrak{f}}(T-r_j)^{m_j} \Big)\\
 	&+
 	\sum_{j\in \mathfrak{f}}
-	\Big(\tilde D_j (T-r_j)^{m_j-x_j}
+	\Big( D_j (T-r_j)^{m_j-x_j}
 	\prod_{\iota \in \mathfrak{f}-\{j\}}(T-r_j)^{m_\iota}\Big)
-	\Big(\prod_{j\in \mathfrak{e}} (T-r_j) \Big),
+	\Big(\prod_{j\in \mathfrak{e}} (T-r_j) \Big).
 	\end{align*}
-	with $\tilde D_j = T^{x_j-1} D_j(1/T)$ for all $j$ in $\mathfrak{f}$.
-	This implies that $$\tilde A(r_k) =\lambda_k(1) 
+	This implies that $$\Omega((\ell(X_1^s))_{s\ge0},M)(r_k) =\lambda_k(1) 
 	\prod_{\iota \in \mathfrak{e}-\{k\}}(r_k-r_\iota)
 	\prod_{j \in \mathfrak{f}}(r_k-r_j)^{m_j} = \lambda_k(1) M'(r_k)$$ 
 	holds for all $k$ in $\mathfrak{e}$.
@@ -1169,20 +1151,17 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	\begin{enumerate}\setlength\itemsep{0em}
 		\item let $M$ be the minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge 0}$ and let $\delta$ be its degree
 		\item let $P = \prod_{r \text{~root of $M$ of multiplicity 1}}(T-r)$
-		\item let $B=T^\delta M(1/T)$
 		\item let $t$ be a random linear form in $X_2,\dots,X_n$
 		\item \textbf{for} $i=0,1,2$ \textbf{do}
 		\begin{enumerate}
-			\item let $A_i = \big (\sum_{s < \delta} \ell(t^i X_1^s)T^s\big )B \mod T^{\delta}$
-			\item let $\tilde A_i = T^{\delta -1}A_i(1/T)$
+			\item let $A_i = \Omega((\ell(t^i X_1^s))_{s\ge0},M)$
 		\end{enumerate}
-		\item\label{step:updateP} let $P = \gcd(P, \tilde A_0 \tilde A_2-\tilde A_1^2)$
+		\item\label{step:updateP} let $P = \gcd(P, A_0  A_2- A_1^2)$
 		\item \textbf{for} $i=2,\dots,n$ \textbf{do}
 		\begin{enumerate}
-			\item let $A_{X_i} = \big (\sum_{s < \delta} \ell(X_2 X_1^s)T^s\big)B \mod T^{\delta}$ 
-			\item let $\tilde A_{X_i} = T^{\delta -1}A_{X_i}(1/T)$
+			\item let $A_{X_i} = \Omega((\ell(X_i X_1^s))_{s\ge0},M)$
 		\end{enumerate}
-		\item \textbf{return} $((P,T,\tilde A_{X_2}/\tilde A_1 \bmod P, \dots,\tilde A_{X_n}/\tilde A_{1} \bmod P),X_1)$
+		\item \textbf{return} $((P,T,A_{X_2}/ A_1 \bmod P, \dots,A_{X_n}/A_{1} \bmod P),X_1)$
 	\end{enumerate}
 	\label{algo:para}
 \end{algorithm}
@@ -1200,11 +1179,11 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	$M$ is the minimal polynomial of $X_1$, so that we indeed have
 	$P=\prod_{j \in \{1,\dots,c\}, m_j=1} (T-r_j)$. Let then $r_j$ be
 	one of these roots; by Lemma~\ref{lemma:valuelambda}, for $i=0,1,2$
-	we have $\tilde A_i(r_j) = M'(r_j) (t^i \cdot \lambda_j)(1)$, where
+	we have $ A_i(r_j) = M'(r_j) (t^i \cdot \lambda_j)(1)$, where
 	$\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
 	components of $\ell$. 
 	
-	As a result, the value of $\tilde A_0 \tilde A_2 - \tilde A_1^2$ at
+	As a result, the value of $ A_0  A_2 -  A_1^2$ at
 	$r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
 	quantity $ac-b^2$ defined in Lemma~\ref{lemma:acb2}, so for a
 	generic choice of $\ell$ and $t$, it vanishes if and only if $j$ is
@@ -1215,13 +1194,15 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	$V_{\mathfrak{A}}$. This is done using again
 	Lemma~\ref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
 	$T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
-	$$\tilde A_1(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad \tilde
+	$$ A_1(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
 	A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
 	is in $\mathfrak{a}$, $Q_{\sigma_j}$ is reduced, so that there
 	exists a constant $\lambda_{j,1}$ such that for all $f$ in
 	$\Kbar[X_1,\dots,X_n]$, $\lambda_j(f)$ takes the form $\lambda_{j,1}
 	f(\balpha_{\sigma_j})$. This shows that, as claimed,
-	$$\frac{\tilde A_{X_j}(r_j)}{\tilde A_1 (r_j)} = \frac
+	$$\frac{ A_{X_j}(r_j)}{ A_1 (r_j)} = 
+	\frac {\Omega((\ell(X_j X_1^s)_{s\ge0},M)(r_j)}{\Omega((\ell(t X_1^s))_{s\ge0},M)(r_j)}=
+	\frac
 	{M'(r_j) \lambda_{j,1} \alpha_{j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{j,i}.$$
 	For $i=1$, since we use $X_1$ as a separating variable for $V_{\mathfrak{A}}$, 
 	we simply add the polynomial $T$ to our list.
