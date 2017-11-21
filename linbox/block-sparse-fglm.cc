@@ -9,7 +9,7 @@
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
 // #define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
-//#define TEST_KERNEL // testing / timing kernel basis algo
+#define TEST_KERNEL // testing / timing kernel basis algo
 //#define TEST_POL  // testing xgcd and division via pmbasis
 // #define OUTPUT_FUNC // outputs the computed functions
 
@@ -171,10 +171,6 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 	size_t n = pmat.coldim();
 	size_t d = pmat.size()-1;
 	size_t order = 1 + floor( (m*d) / (double) (m-n));  // specific to uniform shift; large enough to return whole basis?
-	cout << "degre : " << d << endl;
-	cout << "order : " << order << endl;
-	cout << "m : " << m << endl;
-	cout << "n : " << n << endl;
 	PolMatDom::PMatrix appbas(this->field(), m, m, order );
 	PolMatDom::PMatrix series(this->field(), m, n, order );
 	for ( size_t k=0; k<=d; ++k )
@@ -197,6 +193,30 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 	}
 }
 
+void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat, const size_t threshold )
+{
+	// copy all columns except last one
+	PolMatDom::PMatrix subcols( this->field(), pmat.rowdim(), pmat.coldim()-1, pmat.size() );
+	for (size_t d = 0; d < pmat.size(); ++d)
+	for (size_t i = 0; i < pmat.rowdim(); ++i)
+	for (size_t j = 0; j < pmat.coldim()-1; ++j)
+		subcols.ref(i,j,d) = pmat.get(i,j,d);
+
+	PolMatDom::PMatrix kerbas( this->field(), 1, pmat.rowdim(), 0 );
+	this->kernel_basis( kerbas, subcols, threshold );
+
+	factor = 0;
+	zz_pX pol(pmat.size());
+	for ( size_t i=0; i<pmat.rowdim(); ++i )
+	{
+		for (size_t d=0; d<kerbas.size(); ++d)
+			SetCoeff(left_multiplier[i], d, (long)kerbas.get(0,i,d));
+		for (size_t d=0; d<pmat.size(); ++d)
+			SetCoeff(pol, d, (long)pmat.get(i,pmat.coldim()-1,d));
+
+		factor += left_multiplier[i] * pol;
+	}
+}
 
 void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat, size_t threshold ) {
 	// Heuristic computation of the Smith form and multipliers
@@ -1668,7 +1688,7 @@ int main_polmatdom( int argc, char **argv ){
 		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
 		{ 't', "-t threshold", "Set threshold mbasis / pmbasis to t.", TYPE_INT,  &threshold },
 		END_OF_ARGUMENTS
-	};	
+	};
 
 	parseArguments (argc, argv, args);
 
