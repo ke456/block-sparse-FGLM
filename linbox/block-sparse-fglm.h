@@ -14,10 +14,6 @@
 #include "fflas-ffpack/fflas-ffpack.h"
 #include <NTL/lzz_pX.h>
 
-// Givaro polynomials
-#include <givaro/givpoly1.h>
-#include "linbox/ring/givaro-poly.h"
-
 typedef Givaro::Modular<double> GF;
 
 //-----------------------------------------------//
@@ -35,30 +31,32 @@ class PolMatDom {
 	
     private:
 	const GF* _field;
-	//Givaro::Poly1Dom<GF> _PD;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
+	size_t _pmbasis_threshold;
 	
     public:
 	
 	PolMatDom(const GF &f) :
 		_field(&f),
-		//_PD(f),
 		_BMD(f),
-		_PMMD(f) { }
+		_PMMD(f),
+		_pmbasis_threshold(16)
+	{ }
+
+	PolMatDom(const GF &f, const size_t threshold) :
+		_field(&f),
+		_BMD(f),
+		_PMMD(f),
+		_pmbasis_threshold(threshold)
+	{ }
 
 	inline const GF& field() const {return *_field;}
 
+	inline const size_t getPMBasisThreshold() const { return _pmbasis_threshold; }
+
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
-
-	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
-	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
-
-	//void slow_mul( PMatrix & prod, const PMatrix & mat1, const PMatrix & mat2 )
-
-	// Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat, const size_t threshold=16 );
 
 	// mbasis algorithm to compute approximant bases
 	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
@@ -69,18 +67,27 @@ class PolMatDom {
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
 	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				      const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+				      const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				     const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+				     const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-					   const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+					   const std::vector<int> &shift=std::vector<int>() );
 
 	// computing s-owP kernel basis
-	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size_t threshold=16 );
+	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
+
+	// (Heuristic) computes a vector v(x) and a polynomial f(x) such that
+	// v(x) pmat(x) = [0...0 f(x)], where f(x) is the largest Smith factor
+	// Note: assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
+	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat );
+
+	// (Heuristic) Smith form of a nonsingular matrix; also computes the unimodular factors
+	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat );
+
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
+	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq );
 	
 };
 
@@ -129,10 +136,10 @@ class Block_Sparse_FGLM{
 	int M; // number of blocks (set to number of CPUs?)
 	size_t n; // number of variables and size of vector mul_mats
 	size_t threshold; // FIXME temporary: threshold MBasis/PMBasis
-	
+	int deg_minpoly; // degree of minpoly
+
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
-	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	// coeffs in the random combination
 	std::vector<GF::Element> rand_comb;
 	// sparsities
@@ -147,36 +154,52 @@ class Block_Sparse_FGLM{
 	template<typename Matrix>
 	void create_random_matrix(Matrix &m);
 	
-	// Computes sequence (U T1^i)
-	void get_matrix_sequence_left(std::vector<LinBox::DenseMatrix<GF>>&, int numvar);
+        //-------------------------------------------------------//
+        // puts U*mul_mats[numvar]^i into v, i=0...2D/M          //
+        // v_flat is v flattened into a single matrix            //
+        // numvar = n means we are using a random combination    //
+        //-------------------------------------------------------//
+	void get_matrix_sequence_left(LinBox::DenseMatrix<GF>& v_flat,
+				      int numvar);
 	
-	// Computes sequence (UT1^i)V
-	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> &,
-				 const std::vector<LinBox::DenseMatrix<GF>> &,
-	                         LinBox::DenseMatrix<GF> &,
-				 int,
-	                         size_t);
+        //-------------------------------------------------------//
+	// Computes sequence (UT1^i)V                            //
+        // assumes that v_flat holds the matrix of all (U T1^i)  //
+        //-------------------------------------------------------//
+	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> & result,
+				 const LinBox::DenseMatrix<GF> & v_flat,
+	                         const LinBox::DenseMatrix<GF> & V,
+				 int c,
+	                         size_t to);
 
-	void find_sequences(const std::vector<LinBox::DenseMatrix<GF>> &carry_over_mats, 
-			    std::vector<LinBox::DenseMatrix<GF>> &mat_seq_left, // U*T^i
-			    std::vector<LinBox::DenseMatrix<GF>> &mat_seq,  
-			    int numvar);
+        //-------------------------------------------------------//
+        //-------------------------------------------------------//
+	void Omega(NTL::zz_pX & numerator, const PolMatDom::MatrixP &u_tilde,
+		   const PolMatDom::PMatrix &mat_gen,
+		   const LinBox::DenseMatrix<GF> &mat_seq_left_flat,
+		   const LinBox::DenseMatrix<GF> &right_mat);
 
-	std::vector<NTL::zz_pX> find_numerators(const std::vector<LinBox::DenseMatrix<GF>> &mat_seq_left,
-				      const std::vector<LinBox::DenseMatrix<GF>> &mat_seq);
+       //--------------------------------------------------------------------------------//
+       // builds a random V                                                              //
+       // applies matrix-BM and smith                                                    //
+       // return u_tilde, the minimal matrix generator and the sqfree part of minpoly    //
+       //--------------------------------------------------------------------------------//
+	void smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &mat_gen, NTL::zz_pX &min_poly_sqfree, NTL::zz_pX & min_poly_multiple,
+		   const LinBox::DenseMatrix<GF> &mat_seq_left_flat);
 
     public:
 	// length of the sequence:
 	size_t getLength() const { return 2*ceil(D/(double)M); };
 	// generic degree in matrix generator:
 	size_t getGenDeg() const { return ceil(D/(double)M); };
-	size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
+	size_t getThreshold() const { return threshold; };
 	
 	/* CTOR                                              */
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
-	std::vector<NTL::zz_pX> find_lex_basis();
-	// std::vector<NTL::zz_pX> find_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, int numvar);
+	std::vector<NTL::zz_pX> get_lex_basis_non_generic();
+	std::vector<NTL::zz_pX> get_lex_basis_generic();
+	std::vector<NTL::zz_pX> get_lex_basis();
 };
 
 
