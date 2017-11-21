@@ -9,8 +9,8 @@
 //#define SPARSITY_COUNT // shows the sparsity of the matrices
 // #define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
-#define TEST_KERNEL // testing / timing kernel basis algo
-//#define TEST_POL  // testing xgcd and division via pmbasis
+//#define TEST_KERNEL // testing / timing kernel basis algo
+#define TEST_INVARIANT_FACTOR // testing / timing heuristic invariant factor
 // #define OUTPUT_FUNC // outputs the computed functions
 
 #include "block-sparse-fglm.h"
@@ -31,11 +31,6 @@
 using namespace LinBox;
 using namespace std;
 using namespace NTL;
-
-
-
-
-
 
 //-----------------------------------------------//
 //-----------------------------------------------//
@@ -1696,6 +1691,7 @@ int main_polmatdom( int argc, char **argv ){
 	long seed = time(NULL);
 	typename GF::RandIter rd(field,0,seed);
 	PolMatDom PMD( field );
+	zz_p::init( p );
 
 #ifdef TEST_APPROX
 	cout << "~~~~~~~~~~~STARTING TESTS APPROXIMANTS~~~~~~~~~~~~~" << endl;
@@ -1776,163 +1772,51 @@ int main_polmatdom( int argc, char **argv ){
 	}
 #endif
 #ifdef TEST_KERNEL
-	cout << "~~~NOW TESTING KERNEL BASIS~~~" << endl;
-	size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
-	cout << "dimensions of input matrix : " << M << " x " << M-1 << endl;
-	cout << "degree of input matrix : " << degree << endl;
-	PolMatDom::PMatrix pmat( field, M, M-1, degree+1 );
-	for ( size_t d=0; d<=degree; ++d )
-		for ( size_t i=0; i<M; ++i )
-			for ( size_t j=0; j<M-1; ++j )
-				rd.random( pmat.ref( i, j, d ) );
-	Timer tm;
-	PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
-	tm.clear(); tm.start();
-	PMD.kernel_basis( kerbas, pmat, threshold );
-	tm.stop();
-	cout << "###OUTPUT### degrees in kernel basis: " << endl;
-	PMD.print_degree_matrix( kerbas );
-	cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
-	cout << "###TIME### kernel basis: " << tm.usertime() << endl;
-#endif
-// #ifdef TEST_POL
-// 	Timer tm2;
-// 	cout << "~~~~~~~~~~~STARTING TESTS POLY~~~~~~~~~~~~~" << endl;
-// 	{
-// 		cout << "small xgcd with coprime polynomials" << endl;
-// 		PolMatDom::Polynomial a = {1,1,-1,0,-1,1};
-// 		PolMatDom::Polynomial b = {-1,0,1,1,0,0,-1};
-// 		PolMatDom::Polynomial g,u,v;
-// 		// a = 1+X-X^2-X^4+X^5
-// 		// b = -1 + X^2 + X^3 -X^6
-// 		// xgcd(a,b) = (1,
-// 		//              15379115*X^5 + 15379116*X^2 + 7689558*X + 7689558,
-// 		//              15379115*X^4 + 7689558*X^3 + 15379116*X + 7689557)
-// 		// when over Z/pZ with p = 23068673 
-// 		tm2.clear(); tm2.start();
-// 		PMD.xgcd(a,b,g,u,v);
-// 		tm2.stop();
-// 		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
-// #ifdef VERBOSE_ON
-// 		cout << "###OUTPUT### xgcd input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### xgcd output: " << endl;
-// 		cout << g << endl;
-// 		cout << u << endl;
-// 		cout << v << endl;
-// #endif
-// 	}
-// 	{
-// 		cout << "small xgcd with gcd of degree 1" << endl;
-// 		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
-// 		PolMatDom::Polynomial b = {23068614,23068670,59,62,3,0,23068614,23068670};
-// 		PolMatDom::Polynomial g,u,v;
-// 		// same polynomials multiplied by 3*X + 59
-// 		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
-// 		// b = 23068670*X^7 + 23068614*X^6 + 3*X^4 + 62*X^3 + 59*X^2 + 23068670*X + 23068614
-// 		// xgcd(a,b) = (X + 15379135,
-// 		//              20505487*X^5 + 5126372*X^2 + 2563186*X + 2563186,
-// 		//              20505487*X^4 + 2563186*X^3 + 5126372*X + 17942301)
-// 		// when over Z/pZ with p = 23068673 
-// 		tm2.clear(); tm2.start();
-// 		PMD.xgcd(a,b,g,u,v);
-// 		tm2.stop();
-// 		cout << "###TIME### xgcd: " << tm2.usertime() << endl;
-// #ifdef VERBOSE_ON
-// 		cout << "###OUTPUT### xgcd input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### xgcd output: " << endl;
-// 		cout << g << endl;
-// 		cout << u << endl;
-// 		cout << v << endl;
-// #endif
-// 	}
-// 	{
-// 		cout << "###TIME### xgcd, random input (degree, time)" << endl;
-// 		for ( size_t deg = 5; deg<30000; deg=floor(1.6*deg) )
-// 		{
-// 			PolMatDom::Polynomial a( deg );
-// 			PolMatDom::Polynomial b( deg );
-// 			for ( size_t d=0; d<deg; ++d )
-// 			{
-// 				rd.random( a[d] );
-// 				rd.random( b[d] );
-// 			}
-// 			PolMatDom::Polynomial g,u,v;
-// 			tm2.clear(); tm2.start();
-// 			PMD.xgcd(a,b,g,u,v);
-// 			tm2.stop();
-// 			cout << deg-1 << ", " << tm2.usertime() << endl;
-// 		}
-// 	}
-// 	{
-// 		cout << "division with quotient of degree 1" << endl;
-// 		PolMatDom::Polynomial a = {59,62,23068617,23068670,23068614,56,3};
-// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-// 		PolMatDom::Polynomial q;
-// 		// a = 3*X^6 + 56*X^5 + 23068614*X^4 + 23068670*X^3 + 23068617*X^2 + 62*X + 59
-// 		// b = 1+X-X^2-X^4+X^5
-// 		// quotient should be X + 15379135,
-// 		// when over Z/pZ with p = 23068673 
-// 		tm2.clear(); tm2.start();
-// 		PMD.divide(a,b,q);
-// 		tm2.stop();
-// 		cout << "###TIME### divide: " << tm2.usertime() << endl;
-// #ifdef VERBOSE_ON
-// 		cout << "###OUTPUT### divide input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### divide output: " << endl;
-// 		cout << q << endl;
-// #endif
-// 	}
-// 	{
-// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-// 		PolMatDom::Polynomial q;
-// 		poly_add(q,a,b);
-// 		cout << "###OUTPUT### add input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### add output: " << endl;
-// 		cout << q << endl;
-// 	}
-// 	{
-// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-// 		PolMatDom::Polynomial b = {1,1,-1,0,-1,1};
-// 		PolMatDom::Polynomial q;
-// 		poly_subtract(q,a,b);
-// 		cout << "###OUTPUT### subtract input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### subtract output: " << endl;
-// 		cout << q << endl;
-// 	}
-// 	{
-// 		PolMatDom::Polynomial a = {59,62,10,3,0,56};
-// 		PolMatDom::Polynomial b = {1,1,-1};
-// 		PolMatDom::Polynomial q;
-// 		poly_mod(q,a,b);
-// 		cout << "###OUTPUT### mod input: " << endl;
-// 		cout << a << endl;
-// 		cout << b << endl;
-// 		cout << "###OUTPUT### mod output: " << endl;
-// 		cout << q << endl;
-// 	}
-// 	{
-// 		PolMatDom::Polynomial a = {59,62,10,3,0,56,3,5,5,5,5};
-// 		GF::Element e{10};
-// 		PolMatDom::Polynomial q;
-// 		poly_mul(q,e,a);
-// 		cout << "###OUTPUT### add input: " << endl;
-// 		cout << a << endl;
-// 		cout << "###OUTPUT### add output: " << endl;
-// 		cout << q << endl;
-// 	}
-// #endif
-
+	{
+		cout << "~~~NOW TESTING KERNEL BASIS~~~" << endl;
+		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
+		cout << "dimensions of input matrix : " << M << " x " << M-1 << endl;
+		cout << "degree of input matrix : " << degree << endl;
+		PolMatDom::PMatrix pmat( field, M, M-1, degree+1 );
+		for ( size_t d=0; d<=degree; ++d )
+			for ( size_t i=0; i<M; ++i )
+				for ( size_t j=0; j<M-1; ++j )
+					rd.random( pmat.ref( i, j, d ) );
+		Timer tm;
+		PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
+		tm.clear(); tm.start();
+		PMD.kernel_basis( kerbas, pmat, threshold );
+		tm.stop();
+		cout << "###OUTPUT### degrees in kernel basis: " << endl;
+		PMD.print_degree_matrix( kerbas );
+		cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
+		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
+	}
+#endif // TEST_KERNEL
+#ifdef TEST_INVARIANT_FACTOR
+	{
+		cout << "~~~NOW TESTING INVARIANT FACTOR~~~" << endl;
+		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
+		cout << "dimensions of input matrix : " << M << " x " << M << endl;
+		cout << "input matrix random of degree " << degree << endl;
+		PolMatDom::PMatrix pmat( field, M, M, degree+1 );
+		for ( size_t d=0; d<=degree; ++d )
+			for ( size_t i=0; i<M; ++i )
+				for ( size_t j=0; j<M; ++j )
+					rd.random( pmat.ref( i, j, d ) );
+		Timer tm;
+		vector<zz_pX> left_multiplier( M );
+		zz_pX factor;
+		cout << "OK" << endl;
+		tm.clear(); tm.start();
+		PMD.largest_invariant_factor( left_multiplier, factor, pmat, threshold );
+		tm.stop();
+		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
+		//PMD.print_degree_matrix( kerbas );
+		//cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
+		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
+	}
+#endif // TEST_INVARIANT_FACTOR
 	return 0;
 }
 
