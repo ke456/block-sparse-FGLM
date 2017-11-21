@@ -58,10 +58,6 @@ class PolMatDom {
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
 
-	void xgcd( const Polynomial & a, const Polynomial & b, Polynomial & g, Polynomial & u, Polynomial & v );
-	void divide( const Polynomial & a, const Polynomial & b, Polynomial & q );
-
-
 	// mbasis algorithm to compute approximant bases
 	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
 	std::vector<int> old_mbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
@@ -80,8 +76,8 @@ class PolMatDom {
 	// computing s-owP kernel basis
 	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
-	// (Heuristic) computes a vector v(x) such that v(x) pmat(x) = [0...0 f(x)],
-	// where f(x) is the largest Smith factor, and returns f(x)
+	// (Heuristic) computes a vector v(x) and a polynomial f(x) such that
+	// v(x) pmat(x) = [0...0 f(x)], where f(x) is the largest Smith factor
 	// Note: assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
 	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat );
 
