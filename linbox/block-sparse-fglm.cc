@@ -190,7 +190,7 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 
 void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat, const size_t threshold )
 {
-	// copy all columns except last one
+	// 1. main computation: find vector in the kernel of all columns except one
 	PolMatDom::PMatrix subcols( this->field(), pmat.rowdim(), pmat.coldim()-1, pmat.size() );
 	for (size_t d = 0; d < pmat.size(); ++d)
 	for (size_t i = 0; i < pmat.rowdim(); ++i)
@@ -200,6 +200,7 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 	PolMatDom::PMatrix kerbas( this->field(), 1, pmat.rowdim(), 0 );
 	this->kernel_basis( kerbas, subcols, threshold );
 
+	// 2. copy this into left_multiplier, and compute factor
 	factor = 0;
 	zz_pX pol(pmat.size());
 	for ( size_t i=0; i<pmat.rowdim(); ++i )
@@ -211,6 +212,12 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 
 		factor += left_multiplier[i] * pol;
 	}
+
+	// 3. make sure the factor is monic
+	zz_p lc = LeadCoeff( factor );
+	factor /= lc;
+	for ( size_t i=0; i<left_multiplier.size(); ++i )
+		left_multiplier[i] /= lc;
 }
 
 void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat, size_t threshold ) {
@@ -1668,6 +1675,67 @@ bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
 	return test;
 }
 
+template <typename PolMat>
+bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat, const size_t threshold=128 )
+{
+	PolMatDom PMD(pmat.field());
+	const size_t m = pmat.rowdim();
+	vector<PolMatDom::Polynomial> smith( m );
+	PolMatDom::PMatrix lfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
+	PolMatDom::PMatrix rfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
+	PMD.SmithForm( smith, lfac, rfac, pmat, threshold );
+
+	bool test = true;
+
+	// test if factor is same as factor in Smith form
+	size_t d = 0;
+	while ( test && d< std::min((long) smith[0].size(),deg(factor)+1) )
+	{
+		if ( smith[0][d] != coeff(factor,d) )
+			test = false;
+		++d;
+	}
+
+	// test if left multiplier is indeed left multiplier
+	size_t sz = 0;
+	for (size_t i=0; i<m; ++i)
+		if ( deg(left_multiplier[i])+1 > sz )
+			sz = deg(left_multiplier[i])+1;
+	PolynomialMatrixMulDomain<typename PolMat::Field> PMMD(pmat.field());
+	PolMatDom::PMatrix vec( pmat.field(), 1, m, sz );
+	for (size_t i=0; i<m; ++i)
+	for (size_t k=0; k<sz; ++k)
+	{
+		size_t a;
+		conv( a, left_multiplier[i][k] );
+		vec.ref(0,i,k) = a;
+	}
+	PolMatDom::PMatrix prod( pmat.field(), 1, m, sz+pmat.size()-1 );
+	PMMD.mul( prod, vec, pmat );
+	size_t i=0;
+	// check first entries are zero
+	while ( test && i<m-1 )
+	{
+		d=0;
+		while ( test && d<sz+pmat.size()-1 )
+		{
+			if ( prod.get(0,i,d) != 0 )
+				test = false;
+			++d;
+		}
+		++i;
+	}
+	d=0;
+	while ( test && d < std::min( sz+pmat.size()-1, (size_t) deg(factor)+1 ) )
+	{
+		if ( prod.get(0,m-1,d) != coeff(factor,d) )
+			test=false;
+		++d;
+	}
+
+	return test;
+}
+
 int main_polmatdom( int argc, char **argv ){
 	// default arguments
 	size_t p = 23068673;  // size of the base field
@@ -1807,13 +1875,12 @@ int main_polmatdom( int argc, char **argv ){
 		Timer tm;
 		vector<zz_pX> left_multiplier( M );
 		zz_pX factor;
-		cout << "OK" << endl;
 		tm.clear(); tm.start();
 		PMD.largest_invariant_factor( left_multiplier, factor, pmat, threshold );
 		tm.stop();
 		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
 		//PMD.print_degree_matrix( kerbas );
-		//cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
+		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, threshold ) << endl;
 		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 	}
 #endif // TEST_INVARIANT_FACTOR
