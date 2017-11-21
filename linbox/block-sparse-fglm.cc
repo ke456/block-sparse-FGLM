@@ -278,8 +278,8 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 #endif
 #endif
 
-	// extract the left factor lfac which is the bottom left block,
-	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
+	// extract the left factor lfac which is the left block of the smallest degree rows,
+	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the right block of the smallest degree rows.
 	app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
 	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
 	for ( size_t i=0; i<M; ++i )
@@ -455,43 +455,45 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 	/** Output: shifted row degrees of the computed approx **/
 	/** Complexity: O(m^w M(order) log(order) ) **/
 
-	if ( order <= this->getPMBasisThreshold() )
-	{
-		std::vector<size_t> mindeg = mbasis( approx, series, order, shift );
-		return mindeg;
-	}
-	else
-	{
-		size_t m = series.rowdim();
+	// 1. compute shift-owP approximant basis
+	size_t m = series.rowdim();
+	vector<size_t> mindeg = pmbasis( approx, series, order, shift );
+	
+	// 2. compute -mindeg-owP approximant basis
 
-		// 1. compute shift-owP approximant basis
-		vector<size_t> mindeg( m );
-		mindeg = pmbasis( approx, series, order, shift );
-		// TODO could test whether mindeg is already uniform and then avoid second call
-		// (and maybe also other trivial cases)
+	//// Note: if mindeg+shift is uniform,
+	//// then approx is already in -mindeg-owP form
+	//bool uniform=true;
+	//for ( size_t i=0; i<m-1; ++i )
+	//{
+	//	if ( (int)mindeg[i] + shift[i] != (int)mindeg[i+1] + shift[i+1]) {
+	//		uniform = false;
+	//	}
+	//}
 
-		// 2. compute -mindeg-owP approximant basis
+	//if ( !uniform )
+	//{
 		vector<int> mindegshift( m );
 		for ( size_t i=0; i<m; ++i )
 			mindegshift[i] = - (int)mindeg[i];
 		pmbasis( approx, series, order, mindegshift );
+	//}
 
-		// 3. left-multiply by inverse of -mindeg-row leading matrix
-		// Note: cdeg(approx) = mindeg
-		PolMatDom::MatrixP::Matrix lmat( this->field(), m, m );
-		for ( size_t i=0; i<m; ++i )
-			for ( size_t j=0; j<m; ++j )
-				lmat.setEntry( i, j, approx.get( i, j, mindeg[j] ) );
+	// 3. left-multiply by inverse of -mindeg-row leading matrix
+	// Note: cdeg(approx) = mindeg
+	PolMatDom::MatrixP::Matrix lmat( this->field(), m, m );
+	for ( size_t i=0; i<m; ++i )
+		for ( size_t j=0; j<m; ++j )
+			lmat.setEntry( i, j, approx.get( i, j, mindeg[j] ) );
 #ifdef EXTRA_VERBOSE_ON
-		cout << "###OUTPUT(popov_pmbasis)### leading matrix of -mindeg-owP app-basis:" << endl;
-		cout << lmat << endl;
+	cout << "###OUTPUT(popov_pmbasis)### leading matrix of -mindeg-owP app-basis:" << endl;
+	cout << lmat << endl;
 #endif
-		this->_BMD.invin( lmat );
-		for ( size_t k=0; k<approx.size(); ++k ) {
-			this->_BMD.mulin_right( lmat, approx[k] );
-		}
-		return mindeg;
+	this->_BMD.invin( lmat );
+	for ( size_t k=0; k<approx.size(); ++k ) {
+		this->_BMD.mulin_right( lmat, approx[k] );
 	}
+	return mindeg;
 }
 
 
