@@ -129,7 +129,8 @@ class Block_Sparse_FGLM{
 	int M; // number of blocks (set to number of CPUs?)
 	size_t n; // number of variables and size of vector mul_mats
 	size_t threshold; // FIXME temporary: threshold MBasis/PMBasis
-	
+	int deg_minpoly; // degree of minpoly
+
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	// coeffs in the random combination
@@ -189,8 +190,9 @@ class Block_Sparse_FGLM{
 	/* CTOR                                              */
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);
 
+	std::vector<NTL::zz_pX> get_lex_basis_non_generic();
+	std::vector<NTL::zz_pX> get_lex_basis_generic();
 	std::vector<NTL::zz_pX> get_lex_basis();
-	// std::vector<NTL::zz_pX> get_lex_basis(const std::vector<LinBox::DenseMatrix<GF>> &, int numvar);
 };
 
 
