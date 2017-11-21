@@ -33,16 +33,27 @@ class PolMatDom {
 	const GF* _field;
 	LinBox::BlasMatrixDomain<GF> _BMD;
 	LinBox::PolynomialMatrixMulDomain<GF> _PMMD;
+	size_t _pmbasis_threshold;
 	
     public:
 	
 	PolMatDom(const GF &f) :
 		_field(&f),
-		//_PD(f),
 		_BMD(f),
-		_PMMD(f) { }
+		_PMMD(f),
+		_pmbasis_threshold(16)
+	{ }
+
+	PolMatDom(const GF &f, const size_t threshold) :
+		_field(&f),
+		_BMD(f),
+		_PMMD(f),
+		_pmbasis_threshold(threshold)
+	{ }
 
 	inline const GF& field() const {return *_field;}
+
+	inline const size_t getPMBasisThreshold() const { return _pmbasis_threshold; }
 
 	template<typename PolMat>
 	void print_degree_matrix( const PolMat &pmat ) const;
@@ -60,27 +71,27 @@ class PolMatDom {
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
 	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				      const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+				      const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				     const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+				     const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-					   const std::vector<int> &shift=std::vector<int>(), const size_t threshold=16 );
+					   const std::vector<int> &shift=std::vector<int>() );
 
 	// computing s-owP kernel basis
-	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size_t threshold=16 );
+	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
 	// (Heuristic) computes a vector v(x) such that v(x) pmat(x) = [0...0 f(x)],
 	// where f(x) is the largest Smith factor, and returns f(x)
 	// Note: assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
-	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat, const size_t threshold=16 );
+	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat );
 
 	// (Heuristic) Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat, const size_t threshold=16 );
+	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat );
 
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
-	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq, const size_t threshold=16 );
+	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq );
 	
 };
 
@@ -185,7 +196,7 @@ class Block_Sparse_FGLM{
 	size_t getLength() const { return 2*ceil(D/(double)M); };
 	// generic degree in matrix generator:
 	size_t getGenDeg() const { return ceil(D/(double)M); };
-	size_t getThreshold() const { return threshold; }; // FIXME temporary: threshold MBasis/PMBasis
+	size_t getThreshold() const { return threshold; };
 	
 	/* CTOR                                              */
 	Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t threshold);

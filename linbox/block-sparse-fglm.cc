@@ -87,7 +87,7 @@ void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
 }
 
 template<typename Matrix>
-void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq, const size_t threshold ) {
+void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq ) {
 	// 0. initialize dimensions, shift, matrices
 	size_t M = mat_seq[0].rowdim();
 	size_t d = mat_seq.size();
@@ -117,7 +117,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::P
 #endif
 
 	// 2. compute approximant basis in ordered weak Popov form
-	vector<size_t> mindeg = this->pmbasis( app_bas, series, d, shift, threshold );
+	vector<size_t> mindeg = this->pmbasis( app_bas, series, d, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(MatrixBM)### Approximant basis: output rdeg and basis degrees" << endl;
 	cout << mindeg << endl;
@@ -160,7 +160,7 @@ void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::P
 /* TODO: <vneiger> only supports uniform shift */
 /* TODO: <vneiger> specific to our case -> in general might return only a part of the kernel basis */
 /* TODO: <vneiger> adjust number of rows in output kernel basis after computation */
-void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size_t threshold )
+void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 {
 	size_t m = pmat.rowdim();
 	size_t n = pmat.coldim();
@@ -173,7 +173,7 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 			for ( size_t i=0; i<m; ++i )
 				series.ref(i,j,k) = pmat.get(i,j,k);
 	const vector<int> shift( m, 0 );
-	vector<size_t> mindeg = this->pmbasis( appbas, series, order, shift, threshold );
+	vector<size_t> mindeg = this->pmbasis( appbas, series, order, shift );
 	kerbas.resize( order-d );
 	size_t row = 0;
 	for ( size_t i=0; i<m; ++i )
@@ -188,7 +188,7 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat, const size
 	}
 }
 
-void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat, const size_t threshold )
+void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat )
 {
 	// 1. main computation: find vector in the kernel of all columns except one
 	PolMatDom::PMatrix subcols( this->field(), pmat.rowdim(), pmat.coldim()-1, pmat.size() );
@@ -198,7 +198,7 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 		subcols.ref(i,j,d) = pmat.get(i,j,d);
 
 	PolMatDom::PMatrix kerbas( this->field(), 1, pmat.rowdim(), 0 );
-	this->kernel_basis( kerbas, subcols, threshold );
+	this->kernel_basis( kerbas, subcols );
 
 	// 2. copy this into left_multiplier, and compute factor
 	factor = 0;
@@ -220,7 +220,7 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 		left_multiplier[i] /= lc;
 }
 
-void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat, size_t threshold ) {
+void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat ) {
 	// Heuristic computation of the Smith form and multipliers
 	// Algorithm:
 	//    - compute left Hermite form hmat1 = umat pmat
@@ -267,7 +267,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 
 	// compute first approximant basis
 	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg = this->pmbasis( app_bas, series, order, shift, threshold );
+	vector<size_t> mindeg = this->pmbasis( app_bas, series, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
 	cout << mindeg << endl;
@@ -307,7 +307,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 
 	// compute second approximant basis
 	PolMatDom::PMatrix app_bas2( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg2 = this->popov_pmbasis( app_bas2, series2, order, shift, threshold );
+	vector<size_t> mindeg2 = this->popov_pmbasis( app_bas2, series2, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### Second approximant basis: shifted minimal degree and matrix degrees:" << endl;
 	cout << mindeg2 << endl;
@@ -376,7 +376,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 }
 
 
-vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold )
+vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
 {
 	/** Algorithm PM-Basis as detailed in Section 2.2 of
 	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
@@ -396,7 +396,7 @@ vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom:
 	/** Complexity: O(m^w M(order) log(order) ) **/
 	/** TODO study the impact of the threshold **/
 
-	if ( order <= threshold )
+	if ( order <= this->getPMBasisThreshold() )
 	{
 		std::vector<int> rdeg = old_mbasis( approx, series, order, shift );
 		return rdeg;
@@ -416,12 +416,12 @@ vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom:
 		{
 			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
 			res1.copy( series, 0, order1-1 );
-			rdeg = old_pmbasis( approx1, res1, order1, rdeg, threshold ); // first recursive call
+			rdeg = old_pmbasis( approx1, res1, order1, rdeg ); // first recursive call
 		} // end of scope: res1 is deallocated here
 		{
 			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
 			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
-			rdeg = old_pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
+			rdeg = old_pmbasis( approx2, res2, order2, rdeg ); // second recursive call
 		} // end of scope: res2 is deallocated here
 		
 		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
@@ -436,7 +436,7 @@ vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom:
 
 }
 
-vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold )
+vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
 {
 	/** Algorithm Popov-PM-Basis as detailed in
 	 *  [Jeannerod, Neiger, Villard. Fast Computation of approximant bases in
@@ -455,7 +455,7 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 	/** Output: shifted row degrees of the computed approx **/
 	/** Complexity: O(m^w M(order) log(order) ) **/
 
-	if ( order <= threshold )
+	if ( order <= this->getPMBasisThreshold() )
 	{
 		std::vector<size_t> mindeg = mbasis( approx, series, order, shift );
 		return mindeg;
@@ -466,7 +466,7 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 
 		// 1. compute shift-owP approximant basis
 		vector<size_t> mindeg( m );
-		mindeg = pmbasis( approx, series, order, shift, threshold );
+		mindeg = pmbasis( approx, series, order, shift );
 		// TODO could test whether mindeg is already uniform and then avoid second call
 		// (and maybe also other trivial cases)
 
@@ -474,7 +474,7 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 		vector<int> mindegshift( m );
 		for ( size_t i=0; i<m; ++i )
 			mindegshift[i] = - (int)mindeg[i];
-		pmbasis( approx, series, order, mindegshift, threshold );
+		pmbasis( approx, series, order, mindegshift );
 
 		// 3. left-multiply by inverse of -mindeg-row leading matrix
 		// Note: cdeg(approx) = mindeg
@@ -495,7 +495,7 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 }
 
 
-vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift, const size_t threshold )
+vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
 {
 	/** Algorithm PM-Basis as detailed in Section 2.2 of
 	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
@@ -519,7 +519,7 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 	/** Complexity: O(m^w M(order) log(order) ) **/
 	/** TODO study the impact of the threshold **/
 
-	if ( order <= threshold )
+	if ( order <= this->getPMBasisThreshold() )
 	{
 		vector<size_t> mindeg = mbasis( approx, series, order, shift );
 		return mindeg;
@@ -539,7 +539,7 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 		{
 			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
 			res1.copy( series, 0, order1-1 );
-			mindeg = pmbasis( approx1, res1, order1, shift, threshold ); // first recursive call
+			mindeg = pmbasis( approx1, res1, order1, shift ); // first recursive call
 		} // end of scope: res1 is deallocated here
 		{
 			vector<int> rdeg( shift ); // shifted row degrees = mindeg + shift
@@ -548,7 +548,7 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
 			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
 			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
 			vector<size_t> mindeg2( m );
-			mindeg2 = pmbasis( approx2, res2, order2, rdeg, threshold ); // second recursive call
+			mindeg2 = pmbasis( approx2, res2, order2, rdeg ); // second recursive call
 			for ( size_t i=0; i<m; ++i )
 				mindeg[i] += mindeg2[i];
 		} // end of scope: res2 is deallocated here
@@ -1228,11 +1228,11 @@ void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &m
 	//---------------------------------------
 	// 2. matrix Berlekamp-Massey
 	//---------------------------------------
-	PolMatDom PMD(field);
+	PolMatDom PMD(field,getThreshold());
 	mat_gen = PolMatDom::PMatrix (PMD.field(), M, M, getLength());
 	PolMatDom::PMatrix mat_num(PMD.field(), M, M, getLength());
 
- 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq, getThreshold() );
+ 	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
 
 #ifdef TIMINGS_ON
 	tm.stop();
@@ -1261,7 +1261,7 @@ void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &m
 	vector<PolMatDom::Polynomial> smith( M );
 	PolMatDom::PMatrix lfac(PMD.field(), M, M, M*this->getLength()+1);
 	PolMatDom::PMatrix rfac(PMD.field(), M, M, M*this->getLength()+1);
-	PMD.SmithForm( smith, lfac, rfac, mat_gen, this->getThreshold() );
+	PMD.SmithForm( smith, lfac, rfac, mat_gen );
 	vector<zz_pX> zz_pX_smith (M);
 	for (int i = 0; i < M; i++){
 		for (int j = 0; j < smith[i].size(); j++)
@@ -1676,14 +1676,14 @@ bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
 }
 
 template <typename PolMat>
-bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat, const size_t threshold=128 )
+bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat )
 {
 	PolMatDom PMD(pmat.field());
 	const size_t m = pmat.rowdim();
 	vector<PolMatDom::Polynomial> smith( m );
 	PolMatDom::PMatrix lfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
 	PolMatDom::PMatrix rfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
-	PMD.SmithForm( smith, lfac, rfac, pmat, threshold );
+	PMD.SmithForm( smith, lfac, rfac, pmat );
 
 	bool test = true;
 
@@ -1742,7 +1742,7 @@ int main_polmatdom( int argc, char **argv ){
 	size_t M = 4;   // row dimension for the blocks
 	size_t D = 512; // vector space dimension / dimension of multiplication matrices
 	size_t n = 2;  // number of variables / of multiplication matrices
-	size_t threshold = 16;  // threshold MBasis / PMBasis
+	size_t threshold = 128;  // threshold MBasis / PMBasis
 
 	static Argument args[] = {
 		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
@@ -1758,7 +1758,7 @@ int main_polmatdom( int argc, char **argv ){
 	GF field(p);
 	long seed = time(NULL);
 	typename GF::RandIter rd(field,0,seed);
-	PolMatDom PMD( field );
+	PolMatDom PMD( field, threshold );
 	zz_p::init( p );
 
 #ifdef TEST_APPROX
@@ -1790,7 +1790,7 @@ int main_polmatdom( int argc, char **argv ){
 		cout << "~~~NOW TESTING OLD PMBASIS~~~" << endl;
 		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
 		tm.clear(); tm.start();
-		vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift, threshold );
+		vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift );
 		tm.stop();
 #ifdef VERBOSE_ON
 		cout << "###OUTPUT### degrees in approx basis:" << endl;
@@ -1816,7 +1816,7 @@ int main_polmatdom( int argc, char **argv ){
 		cout << "~~~NOW TESTING NEW PMBASIS~~~" << endl;
 		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
 		tm.clear(); tm.start();
-		vector<size_t> mindeg4 = PMD.pmbasis( app_bas, series, order, shift, threshold );
+		vector<size_t> mindeg4 = PMD.pmbasis( app_bas, series, order, shift );
 		tm.stop();
 #ifdef VERBOSE_ON
 		cout << "###OUTPUT### degrees in approx basis:" << endl;
@@ -1829,7 +1829,7 @@ int main_polmatdom( int argc, char **argv ){
 		cout << "~~~NOW TESTING POPOV_PMBASIS~~~" << endl;
 		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
 		tm.clear(); tm.start();
-		vector<size_t> mindeg5 = PMD.popov_pmbasis( app_bas, series, order, shift, threshold );
+		vector<size_t> mindeg5 = PMD.popov_pmbasis( app_bas, series, order, shift );
 		tm.stop();
 #ifdef VERBOSE_ON
 		cout << "###OUTPUT### degrees in approx basis: " << endl;
@@ -1853,7 +1853,7 @@ int main_polmatdom( int argc, char **argv ){
 		Timer tm;
 		PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
 		tm.clear(); tm.start();
-		PMD.kernel_basis( kerbas, pmat, threshold );
+		PMD.kernel_basis( kerbas, pmat );
 		tm.stop();
 		cout << "###OUTPUT### degrees in kernel basis: " << endl;
 		PMD.print_degree_matrix( kerbas );
@@ -1876,11 +1876,11 @@ int main_polmatdom( int argc, char **argv ){
 		vector<zz_pX> left_multiplier( M );
 		zz_pX factor;
 		tm.clear(); tm.start();
-		PMD.largest_invariant_factor( left_multiplier, factor, pmat, threshold );
+		PMD.largest_invariant_factor( left_multiplier, factor, pmat );
 		tm.stop();
 		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
 		//PMD.print_degree_matrix( kerbas );
-		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, threshold ) << endl;
+		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat ) << endl;
 		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 	}
 #endif // TEST_INVARIANT_FACTOR
@@ -1891,7 +1891,7 @@ int main_fglm( int argc, char **argv ){
 	// default arguments
 	size_t M = 4;   // row dimension for the blocks
 	string F = "";
-	size_t threshold = 16;  // threshold MBasis / PMBasis
+	size_t threshold = 128;  // threshold MBasis / PMBasis
 
 	static Argument args[] = {
 		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
