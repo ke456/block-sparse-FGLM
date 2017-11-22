@@ -1331,7 +1331,7 @@ void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &m
 	zz_pX min_poly;
 	for (int i = 0; i < smith[0].size(); i++)
 		SetCoeff(min_poly, i, (long)smith[0][i]);
-	cout << "minpoly\n" << min_poly << endl;
+	//cout << "minpoly\n" << min_poly << endl;
 	zz_pX dM = diff(min_poly);
 	min_poly_multiple = GCD(min_poly, dM);
 	min_poly_sqfree = min_poly / min_poly_multiple;
