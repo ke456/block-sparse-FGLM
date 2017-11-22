@@ -201,33 +201,49 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 
 void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat )
 {
+	// Recall from .h : it is assumed that left_multiplier has been initialized with m zero polynomials
+	size_t m = pmat.rowdim();
+
 	// 1. main computation: find vector in the kernel of all columns except one
-	PolMatDom::PMatrix subcols( this->field(), pmat.rowdim(), pmat.coldim()-1, pmat.size() );
-	for (size_t d = 0; d < pmat.size(); ++d)
-	for (size_t i = 0; i < pmat.rowdim(); ++i)
-	for (size_t j = 0; j < pmat.coldim()-1; ++j)
-		subcols.ref(i,j,d) = pmat.get(i,j,d);
+	//     (being careful with the case of an 1x1 matrix pmat..
+	if ( m > 1 )
+	{
+		PolMatDom::PMatrix subcols( this->field(), m, m-1, pmat.size() );
+		for (size_t d = 0; d < pmat.size(); ++d)
+		for (size_t i = 0; i < m; ++i)
+		for (size_t j = 0; j < m-1; ++j)
+			subcols.ref(i,j,d) = pmat.get(i,j,d);
 
-	PolMatDom::PMatrix kerbas( this->field(), 1, pmat.rowdim(), 0 );
-	this->kernel_basis( kerbas, subcols );
+		PolMatDom::PMatrix kerbas( this->field(), 1, m, 0 );
+		this->kernel_basis( kerbas, subcols );
+		// copy this into left_multiplier
+		for ( size_t i=0; i<m; ++i )
+		{
+			for (size_t d=0; d<kerbas.size(); ++d)
+				SetCoeff(left_multiplier[i], d, (long)kerbas.get(0,i,d));
+			left_multiplier[i].normalize();
+		}
+	}
+	else
+	{
+		left_multiplier[0] = 1;
+	}
 
-	// 2. copy this into left_multiplier, and compute factor
+	// 2. compute factor
 	factor = 0;
 	zz_pX pol(pmat.size());
-	for ( size_t i=0; i<pmat.rowdim(); ++i )
+	for ( size_t i=0; i<m; ++i )
 	{
-		for (size_t d=0; d<kerbas.size(); ++d)
-			SetCoeff(left_multiplier[i], d, (long)kerbas.get(0,i,d));
 		for (size_t d=0; d<pmat.size(); ++d)
 			SetCoeff(pol, d, (long)pmat.get(i,pmat.coldim()-1,d));
-
 		factor += left_multiplier[i] * pol;
 	}
 
 	// 3. make sure the factor is monic
+	factor.normalize();
 	zz_p lc = LeadCoeff( factor );
 	factor /= lc;
-	for ( size_t i=0; i<left_multiplier.size(); ++i )
+	for ( size_t i=0; i<m; ++i )
 		left_multiplier[i] /= lc;
 }
 
