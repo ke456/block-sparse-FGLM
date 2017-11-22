@@ -211,8 +211,13 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 		PolMatDom::PMatrix subcols( this->field(), m, m-1, pmat.size() );
 		for (size_t d = 0; d < pmat.size(); ++d)
 		for (size_t i = 0; i < m; ++i)
-		for (size_t j = 0; j < m-1; ++j)
-			subcols.ref(i,j,d) = pmat.get(i,j,d);
+		for (size_t j = 0; j < m; ++j)
+		{
+			if ( j < position )
+				subcols.ref(i,j,d) = pmat.get(i,j,d);
+			else if ( j > position )
+				subcols.ref(i,j-1,d) = pmat.get(i,j,d);
+		}
 
 		PolMatDom::PMatrix kerbas( this->field(), 1, m, 0 );
 		this->kernel_basis( kerbas, subcols );
@@ -224,9 +229,10 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 			left_multiplier[i].normalize();
 		}
 	}
-	else
+	else // pmat is an 1x1 matrix
 	{
 		left_multiplier[0] = 1;
+		left_multiplier[0].normalize();
 	}
 
 	// 2. compute factor
@@ -235,7 +241,7 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 	for ( size_t i=0; i<m; ++i )
 	{
 		for (size_t d=0; d<pmat.size(); ++d)
-			SetCoeff(pol, d, (long)pmat.get(i,pmat.coldim()-1,d));
+			SetCoeff(pol, d, (long)pmat.get(i,position,d));
 		factor += left_multiplier[i] * pol;
 	}
 
@@ -2268,8 +2274,10 @@ int main_polmatdom( int argc, char **argv ){
 	{
 		cout << "~~~NOW TESTING INVARIANT FACTOR~~~" << endl;
 		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
+		size_t position = std::max(M-2,(size_t)0);
 		cout << "dimensions of input matrix : " << M << " x " << M << endl;
 		cout << "input matrix random of degree " << degree << endl;
+		cout << "position : " << position << endl;
 		PolMatDom::PMatrix pmat( field, M, M, degree+1 );
 		for ( size_t d=0; d<=degree; ++d )
 			for ( size_t i=0; i<M; ++i )
@@ -2279,11 +2287,11 @@ int main_polmatdom( int argc, char **argv ){
 		vector<zz_pX> left_multiplier( M );
 		zz_pX factor;
 		tm.clear(); tm.start();
-		PMD.largest_invariant_factor( left_multiplier, factor, pmat, pmat.coldim()-1 );
+		PMD.largest_invariant_factor( left_multiplier, factor, pmat, position );
 		tm.stop();
 		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
 		//PMD.print_degree_matrix( kerbas );
-		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, pmat.coldim()-1 ) << endl;
+		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, position ) << endl;
 		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 	}
 #endif // TEST_INVARIANT_FACTOR

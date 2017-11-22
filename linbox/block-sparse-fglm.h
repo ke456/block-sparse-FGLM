@@ -77,8 +77,10 @@ class PolMatDom {
 	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
 	// (Heuristic) computes a vector v(x) and a polynomial f(x) such that
-	// v(x) pmat(x) = [0...0 f(x)], where f(x) is the largest Smith factor
-	// Note: assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
+	// v(x) pmat(x) = [0...0 f(x) 0 ... 0], where f(x) is the largest Smith factor,
+	// and it is at position "position"
+	// Assumes 'position' is an integer between 0 and pmat.rowdim()-1
+	// Assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
 	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat, const size_t position );
 
 	// (Heuristic) Smith form of a nonsingular matrix; also computes the unimodular factors
