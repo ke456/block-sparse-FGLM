@@ -229,20 +229,22 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 	//    - then return (smith,lfac,rfac) = (hmat2,umat,vmat)
 	// Note: this is not guaranteed to be correct, but seems to true generically
 	// Implementation: Hermite form computed via kernel basis, itself computed via approximant basis
+	// FIXME degree bounds used to define orders could be improved
+	// FIXME need to use popov_pmbasis for both calls, or pmbasis could suffice?
 	const size_t M = pmat.rowdim();
 	const size_t deg = pmat.degree();
 
 	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
 	vector<int> shift( 2*M, 0 );
 	for ( size_t i=M; i<2*M; ++i ) {
-		shift[i] = (i-M)*(deg*M+1);
+		shift[i] = (i-M)*deg*M;
 	}
 
 	// order d such that approximant basis contains kernel basis
 	const size_t order = 2*M*deg+1;
 
 	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
-	PolMatDom::PMatrix series( this->field(), 2*M, M, order ); // TODO order-->deg
+	PolMatDom::PMatrix series( this->field(), 2*M, M, order );
 
 	for ( size_t k=0; k<=deg; ++k )
 		for ( size_t i=0; i<M; ++i )
