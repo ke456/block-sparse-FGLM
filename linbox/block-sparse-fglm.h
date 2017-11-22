@@ -176,8 +176,6 @@ class Block_Sparse_FGLM{
 	void Omega(std::vector<NTL::zz_pX> & numerator, const PolMatDom::MatrixP &u_tilde,
 		   const PolMatDom::PMatrix &mat_gen,
 		   const std::vector<LinBox::DenseMatrix<GF>> &seq,
-		   // const DenseMatrix<GF> &mat_seq_left_flat,
-		   // const DenseMatrix<GF> &right_mat, 
 		   int number_row = 1, int number_col = 1
 		);
 
