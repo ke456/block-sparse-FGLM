@@ -41,7 +41,7 @@ def setup(p, deg, terms):
 	init(ideal,GF(p))
 	write_mat('data/test{}.dat'.format(D), mul_mats, p, D)
 	f = open('data/test{}.sage'.format(D), 'w')
-	f.write("def eval(x1,x2,x3):\n\t[")
+	f.write("def eval(x1,x2,x3):\n\treturn [")
 	for i in range(len(fs)):
 		f.write("{}".format(fs[i]))
 		if (i != len(fs) -1):
