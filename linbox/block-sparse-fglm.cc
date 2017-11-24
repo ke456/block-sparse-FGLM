@@ -32,6 +32,16 @@ using namespace LinBox;
 using namespace std;
 using namespace NTL;
 
+//----------------------------------------------------------//
+// pretty print an NTL polynomial                           //
+//----------------------------------------------------------//
+void print_poly(const zz_pX& p, std::ostream &ofs){
+	ofs << "0";
+	for (int i = 0; i <= deg(p); i++)
+		ofs << " + "<< coeff(p, i) << "*t^" << i << " ";
+
+}
+
 //-----------------------------------------------//
 //-----------------------------------------------//
 //        Polynomial matrix stuff                //
@@ -39,12 +49,12 @@ using namespace NTL;
 //-----------------------------------------------//
 
 //shifts every entry by d
-void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, int row, int col, int deg){
-	for (int i = 0; i < row; i++)
-		for (int j = 0; j < col; j++){
+void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, int deg){
+	for (int i = 0; i < mat.rowdim(); i++)
+		for (int j = 0; j < mat.coldim(); j++){
 			for (int d = 0; d < deg && (d+deg) < mat(i,j).size(); d++){
-				auto element = mat.get(i,j,d+deg);
-				result.ref(i,j,d) = element;
+				auto element = mat.get(i, j, d+deg);
+				result.ref(i, j, d) = element;
 			}
 		}
 }
@@ -65,10 +75,11 @@ void mat_to_poly (PolMatDom::Polynomial &p, PolMatDom::MatrixP &mat, int size){
 
 // resize mat to x^(size-1)
 void mat_resize (GF &field, PolMatDom::MatrixP &mat, int size){
-	PolMatDom::MatrixP temp(field,1,1,size);
-	for (int i = 0; i < size; i++){
-		temp.ref(0,0,i) = mat.ref(0,0,i);
-	}
+	PolMatDom::MatrixP temp(field, mat.rowdim(), mat.coldim(), size);
+	for (int j = 0; j < mat.rowdim(); j++)
+		for (int k = 0; k < mat.coldim(); k++)
+			for (int i = 0; i < size; i++)
+				temp.ref(j, k, i) = mat.ref(j, k , i);
 	mat = temp;
 }
 
@@ -188,35 +199,57 @@ void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 	}
 }
 
-void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat )
+void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX & factor, const PMatrix & pmat, const size_t position )
 {
+	// Recall from .h : it is assumed that left_multiplier has been initialized with m zero polynomials
+	size_t m = pmat.rowdim();
+
 	// 1. main computation: find vector in the kernel of all columns except one
-	PolMatDom::PMatrix subcols( this->field(), pmat.rowdim(), pmat.coldim()-1, pmat.size() );
-	for (size_t d = 0; d < pmat.size(); ++d)
-	for (size_t i = 0; i < pmat.rowdim(); ++i)
-	for (size_t j = 0; j < pmat.coldim()-1; ++j)
-		subcols.ref(i,j,d) = pmat.get(i,j,d);
+	//     (being careful with the case of an 1x1 matrix pmat..
+	if ( m > 1 )
+	{
+		PolMatDom::PMatrix subcols( this->field(), m, m-1, pmat.size() );
+		for (size_t d = 0; d < pmat.size(); ++d)
+		for (size_t i = 0; i < m; ++i)
+		for (size_t j = 0; j < m; ++j)
+		{
+			if ( j < position )
+				subcols.ref(i,j,d) = pmat.get(i,j,d);
+			else if ( j > position )
+				subcols.ref(i,j-1,d) = pmat.get(i,j,d);
+		}
 
-	PolMatDom::PMatrix kerbas( this->field(), 1, pmat.rowdim(), 0 );
-	this->kernel_basis( kerbas, subcols );
+		PolMatDom::PMatrix kerbas( this->field(), 1, m, 0 );
+		this->kernel_basis( kerbas, subcols );
+		// copy this into left_multiplier
+		for ( size_t i=0; i<m; ++i )
+		{
+			for (size_t d=0; d<kerbas.size(); ++d)
+				SetCoeff(left_multiplier[i], d, (long)kerbas.get(0,i,d));
+			left_multiplier[i].normalize();
+		}
+	}
+	else // pmat is an 1x1 matrix
+	{
+		left_multiplier[0] = 1;
+		left_multiplier[0].normalize();
+	}
 
-	// 2. copy this into left_multiplier, and compute factor
+	// 2. compute factor
 	factor = 0;
 	zz_pX pol(pmat.size());
-	for ( size_t i=0; i<pmat.rowdim(); ++i )
+	for ( size_t i=0; i<m; ++i )
 	{
-		for (size_t d=0; d<kerbas.size(); ++d)
-			SetCoeff(left_multiplier[i], d, (long)kerbas.get(0,i,d));
 		for (size_t d=0; d<pmat.size(); ++d)
-			SetCoeff(pol, d, (long)pmat.get(i,pmat.coldim()-1,d));
-
+			SetCoeff(pol, d, (long)pmat.get(i,position,d));
 		factor += left_multiplier[i] * pol;
 	}
 
 	// 3. make sure the factor is monic
+	factor.normalize();
 	zz_p lc = LeadCoeff( factor );
 	factor /= lc;
-	for ( size_t i=0; i<left_multiplier.size(); ++i )
+	for ( size_t i=0; i<m; ++i )
 		left_multiplier[i] /= lc;
 }
 
@@ -229,20 +262,22 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 	//    - then return (smith,lfac,rfac) = (hmat2,umat,vmat)
 	// Note: this is not guaranteed to be correct, but seems to true generically
 	// Implementation: Hermite form computed via kernel basis, itself computed via approximant basis
+	// FIXME degree bounds used to define orders could be improved
+	// FIXME need to use popov_pmbasis for both calls, or pmbasis could suffice?
 	const size_t M = pmat.rowdim();
 	const size_t deg = pmat.degree();
 
 	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
 	vector<int> shift( 2*M, 0 );
 	for ( size_t i=M; i<2*M; ++i ) {
-		shift[i] = (i-M)*(deg*M+1);
+		shift[i] = (i-M)*deg*M;
 	}
 
 	// order d such that approximant basis contains kernel basis
 	const size_t order = 2*M*deg+1;
 
 	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
-	PolMatDom::PMatrix series( this->field(), 2*M, M, order ); // TODO order-->deg
+	PolMatDom::PMatrix series( this->field(), 2*M, M, order );
 
 	for ( size_t k=0; k<=deg; ++k )
 		for ( size_t i=0; i<M; ++i )
@@ -267,7 +302,7 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 
 	// compute first approximant basis
 	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg = this->pmbasis( app_bas, series, order, shift );
+	vector<size_t> mindeg = this->popov_pmbasis( app_bas, series, order, shift );
 #ifdef VERBOSE_ON
 	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
 	cout << mindeg << endl;
@@ -278,8 +313,8 @@ void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMat
 #endif
 #endif
 
-	// extract the left factor lfac which is the bottom left block,
-	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the bottom right block
+	// extract the left factor lfac which is the left block of the smallest degree rows,
+	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the right block of the smallest degree rows.
 	app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
 	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
 	for ( size_t i=0; i<M; ++i )
@@ -455,43 +490,45 @@ vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMa
 	/** Output: shifted row degrees of the computed approx **/
 	/** Complexity: O(m^w M(order) log(order) ) **/
 
-	if ( order <= this->getPMBasisThreshold() )
-	{
-		std::vector<size_t> mindeg = mbasis( approx, series, order, shift );
-		return mindeg;
-	}
-	else
-	{
-		size_t m = series.rowdim();
+	// 1. compute shift-owP approximant basis
+	size_t m = series.rowdim();
+	vector<size_t> mindeg = pmbasis( approx, series, order, shift );
+	
+	// 2. compute -mindeg-owP approximant basis
 
-		// 1. compute shift-owP approximant basis
-		vector<size_t> mindeg( m );
-		mindeg = pmbasis( approx, series, order, shift );
-		// TODO could test whether mindeg is already uniform and then avoid second call
-		// (and maybe also other trivial cases)
+	//// Note: if mindeg+shift is uniform,
+	//// then approx is already in -mindeg-owP form
+	//bool uniform=true;
+	//for ( size_t i=0; i<m-1; ++i )
+	//{
+	//	if ( (int)mindeg[i] + shift[i] != (int)mindeg[i+1] + shift[i+1]) {
+	//		uniform = false;
+	//	}
+	//}
 
-		// 2. compute -mindeg-owP approximant basis
+	//if ( !uniform )
+	//{
 		vector<int> mindegshift( m );
 		for ( size_t i=0; i<m; ++i )
 			mindegshift[i] = - (int)mindeg[i];
 		pmbasis( approx, series, order, mindegshift );
+	//}
 
-		// 3. left-multiply by inverse of -mindeg-row leading matrix
-		// Note: cdeg(approx) = mindeg
-		PolMatDom::MatrixP::Matrix lmat( this->field(), m, m );
-		for ( size_t i=0; i<m; ++i )
-			for ( size_t j=0; j<m; ++j )
-				lmat.setEntry( i, j, approx.get( i, j, mindeg[j] ) );
+	// 3. left-multiply by inverse of -mindeg-row leading matrix
+	// Note: cdeg(approx) = mindeg
+	PolMatDom::MatrixP::Matrix lmat( this->field(), m, m );
+	for ( size_t i=0; i<m; ++i )
+		for ( size_t j=0; j<m; ++j )
+			lmat.setEntry( i, j, approx.get( i, j, mindeg[j] ) );
 #ifdef EXTRA_VERBOSE_ON
-		cout << "###OUTPUT(popov_pmbasis)### leading matrix of -mindeg-owP app-basis:" << endl;
-		cout << lmat << endl;
+	cout << "###OUTPUT(popov_pmbasis)### leading matrix of -mindeg-owP app-basis:" << endl;
+	cout << lmat << endl;
 #endif
-		this->_BMD.invin( lmat );
-		for ( size_t k=0; k<approx.size(); ++k ) {
-			this->_BMD.mulin_right( lmat, approx[k] );
-		}
-		return mindeg;
+	this->_BMD.invin( lmat );
+	for ( size_t k=0; k<approx.size(); ++k ) {
+		this->_BMD.mulin_right( lmat, approx[k] );
 	}
+	return mindeg;
 }
 
 
@@ -991,8 +1028,9 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
         M(M),
 	n(mat.n),
         threshold(threshold),
+	U_rows(M, DenseMatrix<GF>(field, 1, D)),
+	V(field, D, M),
 	mul_mats(n+1, SparseMatrix<GF>(field, D, D)),
-//	V(field, D, M),
 	sparsity(mat.sparsity),
 	name(mat.name),
 	filename(mat.filename),
@@ -1033,6 +1071,15 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 #endif
 
 	zz_p::init(prime);
+
+	create_random_matrix(V);
+	for (auto &i : U_rows){
+		create_random_matrix(i);
+#ifdef EXTRA_VERBOSE_ON
+		i.write(cout << "###OUTPUT### U_row:= ", Tag::FileFormat::Maple) << endl;
+#endif
+	}
+
 }
 
 
@@ -1051,29 +1098,15 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 // v_flat is v flattened into a single matrix            //
 // numvar = n means we are using a random combination    //
 //-------------------------------------------------------//
-void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int numvar){
+void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int numvar, int number){
 	MatrixDomain<GF> MD{field};
 
 	// initialize the left block (random MxD)
-	vector<DenseMatrix<GF>> v = vector<DenseMatrix<GF>>(getLength(), DenseMatrix<GF>(field, M, D));
+	vector<DenseMatrix<GF>> v = vector<DenseMatrix<GF>>(number, DenseMatrix<GF>(field, M, D));
 
-// ??????????????????????? we create U here???????????????????????
-	vector<DenseMatrix<GF>> U_rows(M, DenseMatrix<GF>(field, 1, D));
-	for (auto &i : U_rows){
-		create_random_matrix(i);
-#ifdef EXTRA_VERBOSE_ON
-		i.write(cout << "###OUTPUT### U_row: ", Tag::FileFormat::Maple) << endl;
-#endif
-	}
-	
-
-
-
-	// stores U_i*T1^j at mat_seq[i][j]
 	vector<vector<DenseMatrix<GF>>> mat_seq(M);
 	for (auto &i : mat_seq)
-		i = vector<DenseMatrix<GF>>(getLength(), DenseMatrix<GF>(field, 1, D));
-
+		i = vector<DenseMatrix<GF>>(number, DenseMatrix<GF>(field, 1, D));
 
 	// initialize the first multiplication matrix
 	SparseMatrix<GF> *T1 = &mul_mats[numvar];
@@ -1085,15 +1118,14 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int nu
 #pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
 		MatrixDomain<GF> MD2{field};
-		vector<DenseMatrix<GF>> temp_mat_seq(getLength(), DenseMatrix<GF>(field, 1, D)); 
+		vector<DenseMatrix<GF>> temp_mat_seq(number, DenseMatrix<GF>(field, 1, D)); 
 		temp_mat_seq[0] = U_rows[i];
-		for (size_t j  = 1; j < getLength(); j++){
+		for (size_t j  = 1; j < number; j++) 
 			MD2.mul(temp_mat_seq[j], temp_mat_seq[j-1], *T1);
-		}
 		mat_seq[i] = temp_mat_seq;
 	}
-	
-	for (size_t i = 0; i < getLength(); i++){
+
+	for (size_t i = 0; i < number; i++){
 		auto &temp = v[i];
 		for (int row = 0; row < M; row++){
 			for (int col = 0; col < D; col++){
@@ -1104,9 +1136,9 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int nu
 		}
 	} 
 
-	// gather all the matrices of l in a single (seq_length*M) x D matrix
-	v_flat = DenseMatrix<GF>(field, getLength()*M, D);
-	for (size_t i = 0; i < getLength(); i++){
+	// gather all the matrices of l in a single (number*M) x D matrix
+	v_flat = DenseMatrix<GF>(field, number*M, D);
+	for (size_t i = 0; i < number; i++){
 		auto &m = v[i];
 		for (int row = 0; row < M; row++){
 			int r = i * M + row; // starting point for mat
@@ -1125,15 +1157,16 @@ void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int nu
 //-------------------------------------------------------//
 void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v, 
 					    const DenseMatrix<GF> &l_flat, 
-					    const DenseMatrix<GF> &V, int c, size_t to){
+					    const DenseMatrix<GF> &V){
 
 	// multiplication
 	MatrixDomain<GF> MD(field);
+	int to = l_flat.rowdim() / M;
+	int c = V.coldim(); 
 	DenseMatrix<GF> result(field, to*M, c);
 	MD.mul(result, l_flat, V);
 
-	v = vector<DenseMatrix<GF>>(getLength(), DenseMatrix<GF>(field, M, M));
-	v.resize(to, DenseMatrix<GF>(field, M, c));
+	v = vector<DenseMatrix<GF>>(to, DenseMatrix<GF>(field, M, c));
 	for (size_t i = 0; i < to; i++){
 		v[i] = DenseMatrix<GF>(field, M, c);
 		for (int row = 0; row < M; row++){
@@ -1149,94 +1182,101 @@ void Block_Sparse_FGLM::get_matrix_sequence(vector<DenseMatrix<GF>> &v,
 
 
 //-------------------------------------------------------//
+// reconstructs a number x number matrix of numerators   //
 //-------------------------------------------------------//
-void Block_Sparse_FGLM::Omega(zz_pX & numerator, const PolMatDom::MatrixP &u_tilde,
-			      const PolMatDom::PMatrix &mat_gen,
-			      const DenseMatrix<GF> &mat_seq_left_flat,
-			      const DenseMatrix<GF> &right_mat){
+void Block_Sparse_FGLM::Omega(vector<zz_pX> & numerator, const PolMatDom::MatrixP &u_tilde, const PolMatDom::PMatrix &mat_gen,
+			      const vector<DenseMatrix<GF>> &seq,
+			      int number_row, int number_col){
 
 	PolMatDom PMD(field);
 	PolynomialMatrixMulDomain<GF> PMMD(field);
+	int deg = seq.size();
 
-	vector<DenseMatrix<GF>> seq(getGenDeg(), DenseMatrix<GF>(field, M, 1));
-	get_matrix_sequence(seq, mat_seq_left_flat, right_mat, 1, getGenDeg());
-
-
-	PolMatDom::PMatrix polys(PMD.field(), M, 1, getGenDeg());
+	PolMatDom::PMatrix polys(PMD.field(), M, number_col, deg);
 	// creating the poly matrix from the sequence in reverse order
-	int index = 0;
-	for (int j = seq.size()-1; j >= 0; j--){
-		for (int q = 0; q < M; q++){
-			auto element = seq[j].refEntry(q, 0);
-			polys.ref(q, 0, index) = element;
+	for (int k = 0; k < number_col; k++){
+		int index = 0;
+		for (int j = seq.size()-1; j >= 0; j--){
+			for (int q = 0; q < M; q++){
+				auto element = seq[j].getEntry(q, k);
+				polys.ref(q, k, index) = element;
+			}
+			index++;
 		}
-		index++;
 	}
-	PolMatDom::PMatrix N(PMD.field(), M, 1, 1+getLength());
-	PolMatDom::PMatrix N_shift(PMD.field(), M, 1, 1+getLength());
-	for (long j = 0; j < M; j++)
-		for (long i = 0; i < (1+getLength()); i++){
-			N.ref(j, 0, i) = 0;
-		}
-	for (long j = 0; j < M; j++)
-		for (long i = 0; i < 1+getLength(); i++){
-			N_shift.ref(j, 0, i) = 0;
-		}
 
+	PolMatDom::PMatrix N(PMD.field(), M, number_col, 1+2*deg); //was :1+getLength()
+	PolMatDom::PMatrix N_shift(PMD.field(), M, number_col, 1+2*deg);//was :1+getLength()
+	for (int k = 0; k < number_col; k++)
+		for (long j = 0; j < M; j++)
+			for (long i = 0; i < 1+2*deg; i++){ //was :1+getLength()
+				N.ref(j, k, i) = 0;
+				N_shift.ref(j, k, i) = 0;
+			}
+	
 	PMMD.mul(N, mat_gen, polys);
-	shift(N_shift, N, M, 1, getGenDeg());
+	shift(N_shift, N, deg);
 
-	PolMatDom::MatrixP n_mat(PMD.field(), 1, 1, D+1);
-	for (long i = 0; i < (D+1); i++)
-		n_mat.ref(0, 0, i) = 0;
+// we could do this product using only number_row rows
+	PolMatDom::MatrixP n_mat(PMD.field(), u_tilde.rowdim(), number_col, D+1);
+	for (int k = 0; k < number_col; k++)
+		for (long j = 0; j < u_tilde.rowdim(); j++)
+			for (long i = 0; i < (D+1); i++)
+				n_mat.ref(j, k, i) = 0;
 	PMMD.mul(n_mat, u_tilde, N_shift);
 	mat_resize(field, n_mat, D);
 
-	numerator = 0;
-	for (int i  = 0; i < D; i++)
-		SetCoeff(numerator, i, (long)n_mat.get(0, 0, i));
+	numerator.resize(number_row*number_col);
+	long index = 0;
+	for (long j = 0; j < number_row; j++){
+		for (int k = 0; k < number_col; k++){
+			numerator[index] = 0;
+			for (int i  = 0; i < D; i++)
+				SetCoeff(numerator[index], i, (long)n_mat.get(j, k, i));
+			index++;
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------//
 // builds a random V                                                              //
 // applies matrix-BM and smith                                                    //
-// return u_tilde, the minimal matrix generator and the sqfree part of minpoly    //
+// return u_tilde, the minimal matrix generator and the minpoly                   //
+// put "number" rows in u_tilde
 //--------------------------------------------------------------------------------//
-void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &mat_gen, zz_pX &min_poly_sqfree, 
-			      zz_pX &min_poly_multiple, const DenseMatrix<GF> &mat_seq_left_flat){
+void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &mat_gen, zz_pX &min_poly, 
+			      const vector<DenseMatrix<GF>> &mat_seq,
+			      int number){
 
 #ifdef TIMINGS_ON
 	Timer tm;
-	tm.clear(); 
-	tm.start();
 #endif
+
 	//---------------------------------------
-	// 1. compute the whole matrix sequence
+	// 1. matrix Berlekamp-Massey
 	//---------------------------------------
-	DenseMatrix<GF> V = DenseMatrix<GF>(field, D, M); //right side of U*T1*V
-	create_random_matrix(V);
-	vector<DenseMatrix<GF>> mat_seq;
-	get_matrix_sequence(mat_seq, mat_seq_left_flat, V, M, getLength());
 
 #ifdef TIMINGS_ON
-	tm.stop();
-	cout << "###TIME### matrix_sequence: " << tm.usertime() << endl; 
 	tm.clear(); 
 	tm.start();
 #endif
 
-	//---------------------------------------
-	// 2. matrix Berlekamp-Massey
-	//---------------------------------------
-	PolMatDom PMD(field,getThreshold());
-	mat_gen = PolMatDom::PMatrix (PMD.field(), M, M, getLength());
-	PolMatDom::PMatrix mat_num(PMD.field(), M, M, getLength());
-
+	int length = mat_seq.size();
+	PolMatDom PMD(field, getThreshold());
+	mat_gen = PolMatDom::PMatrix (PMD.field(), M, M, length);
+	PolMatDom::PMatrix mat_num(PMD.field(), M, M, length);
  	PMD.MatrixBerlekampMassey<DenseMatrix<GF>>( mat_gen, mat_num, mat_seq );
 
+	// //---------------------------------------
+	// // 2. matrix Berlekamp-Massey
+	// //---------------------------------------
+	// PolMatDom PMD(field,getThreshold());
+	// mat_gen = PolMatDom::PMatrix (PMD.field(), M, M, getLength());
+	// PolMatDom::PMatrix mat_num(PMD.field(), M, M, getLength());
+
 #ifdef TIMINGS_ON
 	tm.stop();
-	cout << "###TIME### Matrix Berlekamp Massey: " << tm.usertime() << endl; 
+	cout << " ###TIME### Matrix Berlekamp Massey: " << tm.usertime() << endl; 
 #endif
 #ifdef VERBOSE_ON
   	cout << "###OUTPUT### Matrix generator degrees:" << endl;
@@ -1250,104 +1290,29 @@ void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &m
   	cout << "###OUTPUT### Matrix numerator entries:" << endl;
 	cout << mat_num << endl;
 #endif
-#ifdef TIMINGS_ON
-	tm.clear(); 
-	tm.start();
-#endif
 
 	//---------------------------------------
-	// 3. smith form and transformations
+	// 3. u_tilde and minpoly
 	//---------------------------------------
-	vector<PolMatDom::Polynomial> smith( M );
-	PolMatDom::PMatrix lfac(PMD.field(), M, M, M*this->getLength()+1);
-	PolMatDom::PMatrix rfac(PMD.field(), M, M, M*this->getLength()+1);
-	PMD.SmithForm( smith, lfac, rfac, mat_gen );
-	vector<zz_pX> zz_pX_smith (M);
-	for (int i = 0; i < M; i++){
-		for (int j = 0; j < smith[i].size(); j++)
-			SetCoeff(zz_pX_smith[i], j, (long)smith[i][j]);
-		zz_pX_smith[i].normalize();
-	}
+	vector<zz_pX> u_tilde_ntl( M );
 
-#ifdef TIMINGS_ON
-	tm.stop();
-	cout << "###TIME### Smith form and transformations: " << tm.usertime() << endl; 
-	tm.clear();
-	tm.start();
-#endif
-
-	//---------------------------------------
-	// 4. finding u_tilde
-	//---------------------------------------
-	// Making a matrix with just minpoly as the entry
-	PolMatDom::MatrixP P_mat(PMD.field(), 1, 1, D+1);
-	for (int i = 0; i < smith[0].size(); i++){
-		auto element = smith[0][i];
-		P_mat.ref(0, 0, i) = element;
-	}
-
-	PolynomialMatrixMulDomain<GF> PMMD(field);
-	PolMatDom::MatrixP rfac_row(PMD.field(), 1, M, M*getLength()+1);
-	PolMatDom::MatrixP result(PMD.field(), 1, M, M*getLength()+1);
-	
-	// extracting the first row of rfac
-	for (int i = 0; i < M; i++)
-		for (int j = 0; j < M*getLength()+1; j++){
-			auto element = rfac.get(0, i, j);
-			rfac_row.ref(0, i, j) = element;
+	u_tilde = PolMatDom::MatrixP(PMD.field(), number, M, D+3);
+	for (long m = 0; m < number; m++){
+		PMD.largest_invariant_factor( u_tilde_ntl, min_poly, mat_gen, m );
+		for ( size_t i=0; i<M; ++i ){
+			for ( long d=0; d<=deg(u_tilde_ntl[i]); ++d ) // not size_t (unsigned)
+			{
+				size_t coeff_size_t;
+				conv( coeff_size_t, coeff( u_tilde_ntl[i], d ) );
+				u_tilde.ref(m, i, d) = coeff_size_t;
+			}
 		}
-	PMMD.mul(result, P_mat, rfac_row);
-
-	vector<zz_pX> rfac_polys(M);
-	vector<zz_pX> div(M);
-	for (int i = 0; i < M; i++){
-		for (int j = 0; j < M*getLength()+1; j++)
-			SetCoeff(rfac_polys[i], j, (long)result.get(0, i, j));
-		rfac_polys[i].normalize();
-		div[i] = rfac_polys[i] / zz_pX_smith[i];
 	}
-	PolMatDom::MatrixP w(PMD.field(), 1, M, M*getLength()+1);
-	for (int i = 0; i < M; i++)
-		for (int j = 0; j < M*getLength()+1; j++)
-			w.ref(0, i, j) = coeff(div[i], j)._zz_p__rep;
-  
-	u_tilde = PolMatDom::MatrixP(PMD.field(), 1, M, D+3);
-	PMMD.mul(u_tilde, w, lfac);
 
 #ifdef TIMINGS_ON
 	tm.stop();
-	cout << "###TIME### Computing u_tilde: " << tm.usertime() << endl;;
-	tm.clear();
-	tm.start();
+	cout << " ###TIME### Computing u_tilde: " << tm.usertime() << endl;;
 #endif
-
-	//---------------------------------------
-	// 5. finding the min poly
-	//---------------------------------------
-	zz_pX min_poly;
-	for (int i = 0; i < smith[0].size(); i++)
-		SetCoeff(min_poly, i, (long)smith[0][i]);
-	cout << "minpoly\n" << min_poly << endl;
-	zz_pX dM = diff(min_poly);
-	min_poly_multiple = GCD(min_poly, dM);
-	min_poly_sqfree = min_poly / min_poly_multiple;
-	min_poly_multiple = GCD(min_poly_sqfree, min_poly_multiple);
-
-#ifdef TIMINGS_ON
-	tm.stop();
-	cout << "###TIME### squarefree: " << tm.usertime() << endl;
-	tm.clear();
-	tm.start();
-#endif
-}
-
-//----------------------------------------------------------//
-//----------------------------------------------------------//
-
-void print_poly(const zz_pX& p, std::ostream &ofs){
-	ofs << "0";
-	for (int i = 0; i <= deg(p); i++)
-		ofs << " + "<< coeff(p, i) << "*t^" << i << " ";
 
 }
 
@@ -1359,27 +1324,38 @@ void print_poly(const zz_pX& p, std::ostream &ofs){
 //----------------------------------------------------------//
 vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 
-	int numvar = n-1;
+#ifdef TIMINGS_ON
+	Timer tm, tm_total;
+	cout << "###------------ ENTER NON GENERIC LEX -------------" << tm.usertime() << endl;
+	tm_total.clear(); 
+	tm_total.start();
+#endif
 
+	int numvar = n-1;
 	PolMatDom PMD(field);
 	vector<DenseMatrix<GF>> mat_seq;
-
 	DenseMatrix<GF> mat_seq_left_flat = DenseMatrix<GF>(field, getLength()*M, D);
 	DenseMatrix<GF> mat_seq_left_short = DenseMatrix<GF>(field, getGenDeg()*M, D);
-#ifdef TIMINGS_ON
-	Timer tm;
-	tm.clear(); 
-	tm.start();
-#endif
+
 	// ----------------------------------------------
 	// 1. compute the left matrix sequence (U T^i)
 	// ----------------------------------------------
-	get_matrix_sequence_left(mat_seq_left_flat, numvar);
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	get_matrix_sequence_left(mat_seq_left_flat, numvar, getLength());
 	for (int i = 0; i < getGenDeg()*M; i++)
 		for (int j = 0; j < D; j++)
 			mat_seq_left_short.refEntry(i, j) = mat_seq_left_flat.getEntry(i, j);
 
-
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << " (user time)" << endl;
+	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
+#endif
 #ifdef VERBOSE_ON	
 	cout << "###OUTPUT### Matrix sequence (U T^i)_i :" << endl;
 	cout << "Length d = " << getLength() << endl;
@@ -1389,35 +1365,57 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 		i.write(cout, Tag::FileFormat::Maple)<<endl;
 #endif
 #endif
+
+	// ----------------------------------------------
+	// 2. get the matrix generator, the minpoly, the vector u_tilde
+	// ----------------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+	PolMatDom::MatrixP u_tilde(PMD.field(), 1, M, M*getLength()+1);
+	PolMatDom::PMatrix mat_gen;
+	zz_pX min_poly, min_poly_sqfree, min_poly_multiple;
+
+	get_matrix_sequence(mat_seq, mat_seq_left_flat, V);
+
+	smith(u_tilde, mat_gen, min_poly, mat_seq, M);
+	zz_pX dM = diff(min_poly);
+	min_poly_multiple = GCD(min_poly, dM);
+	min_poly_sqfree = min_poly / min_poly_multiple;
+	min_poly_multiple = GCD(min_poly_sqfree, min_poly_multiple);
+	min_poly_sqfree /= min_poly_multiple; // only keep roots w/o multiplicities
+
 #ifdef TIMINGS_ON
 	tm.stop();
-	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << " (user time)" << endl;
-	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
+	cout << "###TIME### Total Smith / u_tilde / min_poly: " << tm.usertime() << endl;
+#endif
+
+	//---------------------------------------
+	// 3. cleanup
+	//---------------------------------------
+
+#ifdef TIMINGS_ON
 	tm.clear(); 
 	tm.start();
 #endif
 
-	// ----------------------------------------------
-	// 2 get the matrix generator, the minpoly, the vector u_tilde
-	// ----------------------------------------------
-	PolMatDom::MatrixP u_tilde(PMD.field(), 1, M, M*getLength()+1);
-	PolMatDom::PMatrix mat_gen;
-	zz_pX min_poly_sqfree, min_poly_multiple;
-	smith(u_tilde, mat_gen, min_poly_sqfree, min_poly_multiple, mat_seq_left_flat);
-
-	//---------------------------------------
-	// 4 cleanup
-	//---------------------------------------
 	zz_pX n1, n1_inv;
 	MatrixDomain<GF> MD2{field};
 	DenseMatrix<GF> rhs_2(field, D, 1);
 	DenseMatrix<GF> tmp(field, D, 1);
 	DenseMatrix<GF> rhs(field, D, 1);
+	vector<zz_pX> vec_numers, vec_numers_1, tmp_vec;
 
 	rhs.refEntry(0, 0) = 1;
 	for (int i = 1; i < D; i++)
 		rhs.refEntry(i, 0) = 0;
-	Omega(n1, u_tilde, mat_gen, mat_seq_left_short, rhs);
+
+	vector<DenseMatrix<GF>> seq(mat_seq_left_short.rowdim() / M, DenseMatrix<GF>(field, M, 1));
+	get_matrix_sequence(seq, mat_seq_left_short, rhs);
+	Omega(vec_numers_1, u_tilde, mat_gen, seq, M, 1);  
+	n1 = vec_numers_1[0];
 
 	vector <GF::Element> rand_check;
 	for (int i = 0; i < n; i++)
@@ -1437,7 +1435,9 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 			}
 	}
 	zz_pX n_check;
-	Omega(n_check, u_tilde, mat_gen, mat_seq_left_short, rhs);
+	get_matrix_sequence(seq, mat_seq_left_short, rhs);
+	Omega(tmp_vec, u_tilde, mat_gen, seq);
+	n_check = tmp_vec[0];
 
 	for (long i = 0; i < D; i++)
 		rhs_2.refEntry(i ,0) = 0;
@@ -1453,23 +1453,57 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 		}
 	
 	zz_pX n_check2;
-	Omega(n_check2, u_tilde, mat_gen, mat_seq_left_short, rhs_2);
-
-	min_poly_sqfree /= min_poly_multiple;
+	get_matrix_sequence(seq, mat_seq_left_short, rhs_2);
+	Omega(tmp_vec, u_tilde, mat_gen, seq);
+	n_check2 = tmp_vec[0];
 	min_poly_sqfree = GCD(n1*n_check2 - n_check*n_check, min_poly_sqfree);
-	InvMod(n1_inv, n1 % min_poly_sqfree, min_poly_sqfree);
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### clean-up: " << tm.usertime() << endl;
+#endif
+
+	//---------------------------------------
+	// 4. get numerators -> output
+	//---------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	long d = deg(min_poly_sqfree);
+	long dp = deg(min_poly);
+	if (d == 0)
+		n1_inv = 0;
+	else
+		InvMod(n1_inv, n1 % min_poly_sqfree, min_poly_sqfree);
 
 	vector<zz_pX> output;
-
 	for (int j = 0; j < n; j++){
 		for (int i = 0; i < D; i++)
 			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
-		zz_pX num;
-		Omega(num, u_tilde, mat_gen, mat_seq_left_short, rhs);
-		output.emplace_back( (num * n1_inv) % min_poly_sqfree );
+		get_matrix_sequence(seq, mat_seq_left_short, rhs);
+		Omega(tmp_vec, u_tilde, mat_gen, seq);
+		output.emplace_back( (tmp_vec[0] * n1_inv) % min_poly_sqfree );
+	}
+	output.emplace_back(min_poly_sqfree);
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### parametrizations: " << tm.usertime() << endl;
+#endif
+        // fix this
+	if (d == 0){
+#ifdef TIMINGS_ON
+		tm_total.stop();
+		cout << "###TIME### Total real time " << tm_total.realtime() << endl;
+		cout << "###TIME### Total user time " << tm_total.usertime() << endl;	
+		cout << "###------------ ABORT NON GENERIC LEX -------------" << tm.usertime() << endl;
+#endif
+		return output;
 	}
 
-	output.emplace_back(min_poly_sqfree);
 
 #ifdef OUTPUT_FUNC
 	ofs << "p = " << prime << endl;
@@ -1503,6 +1537,267 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 	for (int i = 0; i < n-1; i++)
 		ofs << "S" << i << ", ";
 	ofs << "S" << (n-1) << "))\n";
+#endif
+
+	if (D == d){
+#ifdef TIMINGS_ON
+		tm_total.stop();
+		cout << "###TIME### Total real time " << tm_total.realtime() << endl;
+		cout << "###TIME### Total user time " << tm_total.usertime() << endl;	
+		cout << "###------------ EXIT NON GENERIC LEX -------------" << tm.usertime() << endl;
+#endif
+		return output;
+	}
+
+	//---------------------------------------
+	// 5. prepare the update
+	//---------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+	// +4 extra for safety (?)
+	int short_length = (int)(2*ceil((D-d)/(double)M)) + 4;
+
+	zz_pXModulus min_poly_modulus(min_poly_sqfree);
+	zz_pX revP, B;
+	for (long i = 0; i <= d; i++)
+		SetCoeff(revP, d-i, coeff(min_poly_sqfree, i));
+	for (long i = 0; i <= dp; i++)
+		SetCoeff(B, dp-i, coeff(min_poly, i));
+	zz_pX rest = B / revP;
+	zz_pX inv_revP = InvMod(revP % rest, rest);
+	zz_pX inv_rest = InvMod(rest % revP, revP);
+
+	zz_pX T; // the random linear form, written mod min_poly_sqfree
+	for (long i = 0; i < n; i++)
+		T += output[i] * (long) rand_comb[i];
+
+        // correction terms for the parametrizations
+	vector<mat_zz_p> correction_parametrizations;
+	for (long i = 0; i < n+1; i++){
+		mat_zz_p mati;
+		mati.SetDims(M, short_length/2);
+		correction_parametrizations.emplace_back(mati);
+	}
+
+	for (long m = 0; m < M; m++){
+		zz_pX A1 = vec_numers_1[m];
+		zz_pX rA1;
+		for (long i = 0; i < dp; i++)
+			SetCoeff(rA1, i, coeff(A1, dp-1-i));
+		zz_pX num1 = (rA1*inv_rest) % revP;
+		zz_pX num2 = (rA1*inv_revP) % rest;
+		zz_pX num3 = (rA1-num1*rest-num2*revP) / B;
+		if (coeff(min_poly_sqfree, 0) == 0)
+			num1 = num1+revP*num3;
+
+		vec_zz_p coeffs;
+		zz_pX gen_series = num1*InvTrunc(revP, d);
+		coeffs.SetLength(d);
+		for (long i = 0; i < d; i++)
+			coeffs[i] = coeff(gen_series, i);
+		
+		vec_zz_p values = ProjectPowers(coeffs, short_length / 2, T, min_poly_modulus);
+		for (long i = 0; i < short_length/2; i++)
+			correction_parametrizations[0][m][i] = values[i];
+		
+		for (long j = 0; j < n; j++){
+			zz_pXMultiplier mult(output[j], min_poly_modulus);
+			vec_zz_p Xi_coeffs = UpdateMap(coeffs, mult, min_poly_modulus);
+			values = ProjectPowers(Xi_coeffs, short_length / 2, T, min_poly_modulus);
+			for (long i = 0; i < short_length/2; i++)
+				correction_parametrizations[j+1][m][i] = values[i];
+		}
+	}
+
+	// correction terms for BM
+	seq = vector<DenseMatrix<GF>>(mat_seq_left_short.rowdim() / M, DenseMatrix<GF>(field, M, V.coldim()));
+	get_matrix_sequence(seq, mat_seq_left_short, V);
+	Omega(vec_numers, u_tilde, mat_gen, seq, M, M);
+
+	LinBox::DenseMatrix<GF> carry_over(field, short_length*M, M);
+
+	for (long k = 0; k < M; k++){
+		for (long ell = 0; ell < M; ell++){
+			zz_pX A1 = vec_numers[k*M + ell];
+			zz_pX rA1;
+			for (long i = 0; i < deg(min_poly); i++)
+				SetCoeff(rA1, i, coeff(A1, deg(min_poly)-1-i));
+			zz_pX num1 = (rA1*inv_rest) % revP;
+			zz_pX num2 = (rA1*inv_revP) % rest;
+			zz_pX num3 = (rA1-num1*rest-num2*revP) / B;
+			if (coeff(min_poly_sqfree, 0) == 0)
+				num1 = num1+revP*num3;
+
+			vec_zz_p coeffs;
+			zz_pX gen_series = num1*InvTrunc(revP, d);
+			coeffs.SetLength(d);
+			for (long i = 0; i < d; i++)
+				coeffs[i] = coeff(gen_series, i);
+		
+			vec_zz_p sequence =  ProjectPowers(coeffs, short_length, T, min_poly_modulus);
+			for (long i = 0; i < short_length; i++){
+				carry_over.refEntry(i*M + k, ell) = sequence[i]._zz_p__rep;
+			}
+		}
+	}
+
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### get correction terms: " << tm.usertime() << endl;
+#endif
+
+	// ----------------------------------------------
+	// 6. compute the left matrix sequence (U T^i), generic T
+	// ----------------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	DenseMatrix<GF> mat_seq_left_generic_flat = DenseMatrix<GF>(field, short_length*M, D);
+	DenseMatrix<GF> mat_seq_left_generic_short = DenseMatrix<GF>(field, (short_length / 2)*M, D);
+	
+	get_matrix_sequence_left(mat_seq_left_generic_flat, n, short_length);
+	for (int i = 0; i < (short_length / 2)*M; i++)
+		for (int j = 0; j < D; j++)
+			mat_seq_left_generic_short.refEntry(i, j) = mat_seq_left_generic_flat.getEntry(i, j);
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### second left sequence (UT^i): " << ": " << tm.usertime() << " (user time)" << endl;
+	cout << "###TIME### second left sequence (UT^i): " << tm.realtime() << " (real time)" << endl;
+#endif
+
+	// ----------------------------------------------
+	// 7. get the new matrix generator, minpoly, u_tilde
+	// ----------------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	PolMatDom::MatrixP u_tilde_generic(PMD.field(), 1, M, M*getLength()+1);
+	PolMatDom::PMatrix mat_gen_generic;
+	zz_pX min_poly_generic, min_poly_sqfree_generic, min_poly_multiple_generic;
+
+	vector<DenseMatrix<GF>> mat_seq_generic;
+	get_matrix_sequence(mat_seq_generic, mat_seq_left_generic_flat, V);
+	for (long i = 0; i < mat_seq_left_generic_flat.rowdim(); i++)
+		for (long j = 0; j < M; j++){
+			auto e = mat_seq_generic[i / M].getEntry(i % M, j);
+			field.sub(e, e, carry_over.getEntry(i, j));
+			mat_seq_generic[i / M].refEntry(i % M, j) = e;
+		}
+
+	smith(u_tilde_generic, mat_gen_generic, min_poly_generic, mat_seq_generic);
+	zz_pX dM_generic = diff(min_poly_generic);
+	min_poly_multiple_generic = GCD(min_poly_generic, dM_generic);
+	min_poly_sqfree_generic = min_poly_generic / min_poly_multiple_generic;
+	min_poly_multiple_generic = GCD(min_poly_sqfree_generic, min_poly_multiple_generic);
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### Total second Smith / u_tilde / min_poly: " << tm.usertime() << endl;
+#endif
+
+	//---------------------------------------
+	// 8. finding denominator and numerators
+	//---------------------------------------
+
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	rhs.refEntry(0, 0) = 1;
+	for (int i = 1; i < D; i++)
+		rhs.refEntry(i, 0) = 0;
+
+	seq = vector<DenseMatrix<GF>>(mat_seq_left_generic_short.rowdim() / M, DenseMatrix<GF>(field, M, 1));
+	get_matrix_sequence(seq, mat_seq_left_generic_short, rhs);
+
+	for (long m = 0; m < M; m++)
+		for (long i = 0; i < short_length/2; i++){
+			auto e = seq[i].getEntry(m, 0);
+			field.sub(e, e, correction_parametrizations[0][m][i]._zz_p__rep);
+			seq[i].refEntry(m, 0) = e;
+		}
+	Omega(tmp_vec, u_tilde_generic, mat_gen_generic, seq);
+	n1 = tmp_vec[0];
+	InvMod(n1_inv, n1 % min_poly_sqfree_generic, min_poly_sqfree_generic);
+
+	vector<zz_pX> output_generic;
+	for (int j = 0; j < n; j++){
+		for (int i = 0; i < D; i++)
+			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
+		vector<zz_pX> tmp_vec;
+		get_matrix_sequence(seq, mat_seq_left_generic_short, rhs);
+
+		for (long m = 0; m < M; m++)
+			for (long i = 0; i < short_length/2; i++){
+				auto e = seq[i].getEntry(m, 0);
+				field.sub(e, e, correction_parametrizations[j+1][m][i]._zz_p__rep);
+				seq[i].refEntry(m, 0) = e;
+			}
+
+		Omega(tmp_vec, u_tilde_generic, mat_gen_generic, seq);
+		output_generic.emplace_back( (tmp_vec[0] * n1_inv) % min_poly_sqfree_generic );
+	}
+
+	output_generic.emplace_back(min_poly_sqfree_generic);
+
+
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### second parametrizations: " << tm.usertime() << endl;
+#endif
+
+#ifdef OUTPUT_FUNC
+	ofs << "p = " << prime << endl;
+	ofs << "k = GF(p)\n";
+	ofs << "coefs = [";
+	for (int i = 0; i < n-1; i++)
+		ofs << rand_comb[i] << ", ";
+	ofs << rand_comb[n-1];
+	ofs << "]\n";
+	ofs << "U.<t> = PolynomialRing(k)\n";
+	ofs << "R = []" << endl;
+	for (int j = 0; j < n; j++){
+		ofs << "R.append(";
+		print_poly(output_generic[j], ofs);
+		ofs <<")"<< endl;
+	}
+	ofs << "P = ";
+	print_poly(output_generic[n], ofs);
+	ofs << endl;
+
+	ofs << "Pmult = ";
+	print_poly(min_poly_multiple, ofs);
+	ofs << endl;
+
+	ofs << "Q.<tt> = U.quo(P)\n";
+	for (int i = 0; i < n; i++)
+		ofs << "S" << i << " = Q(R[" << i << "])\n";
+	ofs << endl;
+	ofs << "load (\"" << filename.substr(0, filename.size()-4) << ".sage\")\n";
+	ofs << "print (eval(";
+	for (int i = 0; i < n-1; i++)
+		ofs << "S" << i << ", ";
+	ofs << "S" << (n-1) << "))\n";
+#endif
+
+#ifdef TIMINGS_ON
+	tm_total.stop();
+	cout << "###TIME### Total real time " << tm_total.realtime() << endl;
+	cout << "###TIME### Total user time " << tm_total.usertime() << endl;	
+	cout << "###------------ EXIT NON GENERIC LEX -------------" << tm.usertime() << endl;
 #endif
 
 	return output; 
@@ -1516,27 +1811,36 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 //----------------------------------------------------------//
 vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 
+#ifdef TIMINGS_ON
+	Timer tm, tm_total;
+	cout << "###------------ ENTER GENERIC LEX -------------" << tm.usertime() << endl;
+	tm_total.clear(); 
+	tm_total.start();
+#endif
+
 	int numvar = n;
-
 	PolMatDom PMD(field);
-	vector<DenseMatrix<GF>> mat_seq;
-
 	DenseMatrix<GF> mat_seq_left_flat = DenseMatrix<GF>(field, getLength()*M, D);
 	DenseMatrix<GF> mat_seq_left_short = DenseMatrix<GF>(field, getGenDeg()*M, D);
-#ifdef TIMINGS_ON
-	Timer tm;
-	tm.clear(); 
-	tm.start();
-#endif
+
 	// ----------------------------------------------
 	// 1. compute the left matrix sequence (U T^i)
 	// ----------------------------------------------
-	get_matrix_sequence_left(mat_seq_left_flat, numvar);
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
+	get_matrix_sequence_left(mat_seq_left_flat, numvar, getLength());
 	for (int i = 0; i < getGenDeg()*M; i++)
 		for (int j = 0; j < D; j++)
 			mat_seq_left_short.refEntry(i, j) = mat_seq_left_flat.getEntry(i, j);
 
-
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### left sequence (UT^i): " << ": " << tm.usertime() << " (user time)" << endl;
+	cout << "###TIME### left sequence (UT^i): " << tm.realtime() << " (real time)" << endl;
+#endif
 #ifdef VERBOSE_ON	
 	cout << "###OUTPUT### Matrix sequence (U T^i)_i :" << endl;
 	cout << "Length d = " << getLength() << endl;
@@ -1546,32 +1850,54 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 		i.write(cout, Tag::FileFormat::Maple)<<endl;
 #endif
 #endif
-#ifdef TIMINGS_ON
-	tm.stop();
-	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << " (user time)" << endl;
-	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
-	tm.clear(); 
-	tm.start();
-#endif
 
 	// ----------------------------------------------
 	// 2 get the matrix generator, the minpoly, the vector u_tilde
 	// ----------------------------------------------
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
 	PolMatDom::MatrixP u_tilde(PMD.field(), 1, M, M*getLength()+1);
 	PolMatDom::PMatrix mat_gen;
-	zz_pX min_poly_sqfree, min_poly_multiple;
-	smith(u_tilde, mat_gen, min_poly_sqfree, min_poly_multiple, mat_seq_left_flat);
+	zz_pX min_poly, min_poly_sqfree, min_poly_multiple;
+
+	vector<DenseMatrix<GF>> mat_seq;
+	get_matrix_sequence(mat_seq, mat_seq_left_flat, V);
+	smith(u_tilde, mat_gen, min_poly, mat_seq);
+//	smith(u_tilde, mat_gen, min_poly, mat_seq_left_flat);
+	zz_pX dM = diff(min_poly);
+	min_poly_multiple = GCD(min_poly, dM);
+	min_poly_sqfree = min_poly / min_poly_multiple;
+	min_poly_multiple = GCD(min_poly_sqfree, min_poly_multiple);
+
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### Total Smith / u_tilde / min_poly: " << tm.usertime() << endl;
+#endif
 
 	//---------------------------------------
 	// 3 finding denominator and numerators
 	//---------------------------------------
+#ifdef TIMINGS_ON
+	tm.clear(); 
+	tm.start();
+#endif
+
 	zz_pX n1, n1_inv;
 	DenseMatrix<GF> rhs(field, D, 1);
+	vector<zz_pX> tmp_vec;
 
 	rhs.refEntry(0, 0) = 1;
 	for (int i = 1; i < D; i++)
 		rhs.refEntry(i, 0) = 0;
-	Omega(n1, u_tilde, mat_gen, mat_seq_left_short, rhs);
+
+	vector<DenseMatrix<GF>> seq(mat_seq_left_short.rowdim() / M, DenseMatrix<GF>(field, M, rhs.coldim()));
+
+	get_matrix_sequence(seq, mat_seq_left_short, rhs);
+	Omega(tmp_vec, u_tilde, mat_gen, seq);  
+	n1 = tmp_vec[0];
 	InvMod(n1_inv, n1 % min_poly_sqfree, min_poly_sqfree);
 
 	vector<zz_pX> output;
@@ -1579,13 +1905,18 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 	for (int j = 0; j < n; j++){
 		for (int i = 0; i < D; i++)
 			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
-		zz_pX num;
-		Omega(num, u_tilde, mat_gen, mat_seq_left_short, rhs);
-		output.emplace_back( (num * n1_inv) % min_poly_sqfree );
+		vector<zz_pX> tmp_vec;
+		get_matrix_sequence(seq, mat_seq_left_short, rhs);
+		Omega(tmp_vec, u_tilde, mat_gen, seq);  
+		output.emplace_back( (tmp_vec[0] * n1_inv) % min_poly_sqfree );
 	}
 
 	output.emplace_back(min_poly_sqfree);
 
+#ifdef TIMINGS_ON
+	tm.stop();
+	cout << "###TIME### parametrizations: " << tm.usertime() << endl;
+#endif
 
 #ifdef OUTPUT_FUNC
 	ofs << "p = " << prime << endl;
@@ -1619,6 +1950,13 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 	for (int i = 0; i < n-1; i++)
 		ofs << "S" << i << ", ";
 	ofs << "S" << (n-1) << "))\n";
+#endif
+
+#ifdef TIMINGS_ON
+	tm_total.stop();
+	cout << "###TIME### Total real time " << tm_total.realtime() << endl;
+	cout << "###TIME### Total user time " << tm_total.usertime() << endl;	
+	cout << "###------------ EXIT GENERIC LEX -------------" << tm.usertime() << endl;
 #endif
 
 	return output; 
@@ -1676,7 +2014,7 @@ bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
 }
 
 template <typename PolMat>
-bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat )
+bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat, const size_t position )
 {
 	PolMatDom PMD(pmat.field());
 	const size_t m = pmat.rowdim();
@@ -1713,22 +2051,25 @@ bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & f
 	PolMatDom::PMatrix prod( pmat.field(), 1, m, sz+pmat.size()-1 );
 	PMMD.mul( prod, vec, pmat );
 	size_t i=0;
-	// check first entries are zero
-	while ( test && i<m-1 )
+	// check if all entries but position are zero
+	while ( test && i<m )
 	{
-		d=0;
-		while ( test && d<sz+pmat.size()-1 )
+		if ( i!=position )
 		{
-			if ( prod.get(0,i,d) != 0 )
-				test = false;
-			++d;
+			d=0;
+			while ( test && d<sz+pmat.size()-1 )
+			{
+				if ( prod.get(0,i,d) != 0 )
+					test = false;
+				++d;
+			}
 		}
 		++i;
 	}
 	d=0;
 	while ( test && d < std::min( sz+pmat.size()-1, (size_t) deg(factor)+1 ) )
 	{
-		if ( prod.get(0,m-1,d) != coeff(factor,d) )
+		if ( prod.get(0,position,d) != coeff(factor,d) )
 			test=false;
 		++d;
 	}
@@ -1865,8 +2206,10 @@ int main_polmatdom( int argc, char **argv ){
 	{
 		cout << "~~~NOW TESTING INVARIANT FACTOR~~~" << endl;
 		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
+		size_t position = std::max(M-2,(size_t)0);
 		cout << "dimensions of input matrix : " << M << " x " << M << endl;
 		cout << "input matrix random of degree " << degree << endl;
+		cout << "position : " << position << endl;
 		PolMatDom::PMatrix pmat( field, M, M, degree+1 );
 		for ( size_t d=0; d<=degree; ++d )
 			for ( size_t i=0; i<M; ++i )
@@ -1876,14 +2219,15 @@ int main_polmatdom( int argc, char **argv ){
 		vector<zz_pX> left_multiplier( M );
 		zz_pX factor;
 		tm.clear(); tm.start();
-		PMD.largest_invariant_factor( left_multiplier, factor, pmat );
+		PMD.largest_invariant_factor( left_multiplier, factor, pmat, position );
 		tm.stop();
 		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
 		//PMD.print_degree_matrix( kerbas );
-		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat ) << endl;
+		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, position ) << endl;
 		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
 	}
 #endif // TEST_INVARIANT_FACTOR
+
 	return 0;
 }
 

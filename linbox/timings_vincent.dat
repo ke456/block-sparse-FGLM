@@ -1,3 +1,312 @@
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+We 23 Nov 14:39 we actually need several system solving (u_tilde slower)
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./fglm -F test256.dat ; ./fglm -F test625.dat ; ./fglm -F test1000.dat ; ./fglm -F test1296.dat ; ./fglm -F test3375.dat
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test256.dat
+###------------ ENTER NON GENERIC LEX -------------0
+###TIME### left sequence (UT1^i): : 0.397274 (user time)
+###TIME### left sequence (UT1^i): 0.116328 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.025401
+ ###TIME### Computing u_tilde: 0.164278
+###TIME### Total Smith / u_tilde / min_poly: 0.165224
+###TIME### clean-up: 0.031239
+###TIME### parametrizations: 0.043247
+###TIME### Total real time 0.324522
+###TIME### Total user time 0.637698
+###------------ EXIT NON GENERIC LEX -------------0.043247
+###------------ ENTER GENERIC LEX -------------0
+###TIME### left sequence (UT^i): : 0.85972 (user time)
+###TIME### left sequence (UT^i): 0.284008 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.029675
+ ###TIME### Computing u_tilde: 0.071137
+###TIME### Total Smith / u_tilde / min_poly: 0.072099
+###TIME### parametrizations: 0.051441
+###TIME### Total real time 0.374598
+###TIME### Total user time 0.985084
+###------------ EXIT GENERIC LEX -------------0.051441
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test625.dat
+###------------ ENTER NON GENERIC LEX -------------0
+###TIME### left sequence (UT1^i): : 4.23431 (user time)
+###TIME### left sequence (UT1^i): 1.08453 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.052611
+ ###TIME### Computing u_tilde: 0.276648
+###TIME### Total Smith / u_tilde / min_poly: 0.28628
+###TIME### clean-up: 0.022047
+###TIME### parametrizations: 0.048199
+###TIME### Total real time 1.42344
+###TIME### Total user time 4.59359
+###------------ EXIT NON GENERIC LEX -------------0.048199
+###------------ ENTER GENERIC LEX -------------0
+###TIME### left sequence (UT^i): : 9.87469 (user time)
+###TIME### left sequence (UT^i): 2.53218 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.043735
+ ###TIME### Computing u_tilde: 0.112433
+###TIME### Total Smith / u_tilde / min_poly: 0.128957
+###TIME### parametrizations: 0.055795
+###TIME### Total real time 2.70083
+###TIME### Total user time 10.0635
+###------------ EXIT GENERIC LEX -------------0.055795
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1000.dat
+###------------ ENTER NON GENERIC LEX -------------0
+###TIME### left sequence (UT1^i): : 9.52526 (user time)
+###TIME### left sequence (UT1^i): 2.46516 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.075588
+ ###TIME### Computing u_tilde: 0.422946
+###TIME### Total Smith / u_tilde / min_poly: 0.433328
+###TIME### clean-up: 0.050923
+###TIME### parametrizations: 0.059071
+###TIME### Total real time 3.02296
+###TIME### Total user time 10.0702
+###------------ EXIT NON GENERIC LEX -------------0.059071
+###------------ ENTER GENERIC LEX -------------0
+###TIME### left sequence (UT^i): : 21.579 (user time)
+###TIME### left sequence (UT^i): 5.46987 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.052683
+ ###TIME### Computing u_tilde: 0.157951
+###TIME### Total Smith / u_tilde / min_poly: 0.168354
+###TIME### parametrizations: 0.055841
+###TIME### Total real time 5.70883
+###TIME### Total user time 21.8054
+###------------ EXIT GENERIC LEX -------------0.055841
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1296.dat
+###------------ ENTER NON GENERIC LEX -------------0
+###TIME### left sequence (UT1^i): : 30.6977 (user time)
+###TIME### left sequence (UT1^i): 7.79819 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.10498
+ ###TIME### Computing u_tilde: 0.900107
+###TIME### Total Smith / u_tilde / min_poly: 0.921957
+###TIME### clean-up: 0.048031
+###TIME### parametrizations: 0.066332
+###TIME### Total real time 8.8451
+###TIME### Total user time 31.7364
+###------------ EXIT NON GENERIC LEX -------------0.066332
+###------------ ENTER GENERIC LEX -------------0
+###TIME### left sequence (UT^i): : 78.4762 (user time)
+###TIME### left sequence (UT^i): 19.8073 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.074057
+ ###TIME### Computing u_tilde: 0.229895
+###TIME### Total Smith / u_tilde / min_poly: 0.25063
+###TIME### parametrizations: 0.077781
+###TIME### Total real time 20.1495
+###TIME### Total user time 78.8102
+###------------ EXIT GENERIC LEX -------------0.077781
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test3375.dat
+###------------ ENTER NON GENERIC LEX -------------0
+###TIME### left sequence (UT1^i): : 269.43 (user time)
+###TIME### left sequence (UT1^i): 68.3084 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.201823
+ ###TIME### Computing u_tilde: 2.053
+###TIME### Total Smith / u_tilde / min_poly: 2.17528
+###TIME### clean-up: 0.183238
+###TIME### parametrizations: 0.20625
+###TIME### Total real time 70.9359
+###TIME### Total user time 272.012
+###------------ EXIT NON GENERIC LEX -------------0.20625
+###------------ ENTER GENERIC LEX -------------0
+###TIME### left sequence (UT^i): : 626.457 (user time)
+###TIME### left sequence (UT^i): 158.919 (real time)
+ ###TIME### Matrix Berlekamp Massey: 0.281912
+ ###TIME### Computing u_tilde: 0.661778
+###TIME### Total Smith / u_tilde / min_poly: 0.783311
+###TIME### parametrizations: 0.206571
+###TIME### Total real time 160.007
+###TIME### Total user time 627.458
+###------------ EXIT GENERIC LEX -------------0.206571
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+We 22 Nov 01:15 (after replacing Smith form with left kernel --> u_tilde & minpoly much faster)
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./fglm -F test256.dat ; ./fglm -F test625.dat ; ./fglm -F test1000.dat ; ./fglm -F test1296.dat ; ./fglm -F test3375.dat
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test256.dat
+###TIME### left sequence (UT1^i): : 0.370979 (user time)
+###TIME### left sequence (UT1^i): 0.0953059 (real time)
+###TIME### matrix_sequence: 0.00778
+###TIME### Matrix Berlekamp Massey: 0.01757
+###TIME### Computing u_tilde & minpoly: 0.03678
+###TIME### squarefree: 0.000172
+###TIME### left sequence (UT1^i): : 0.864759 (user time)
+###TIME### left sequence (UT1^i): 0.220568 (real time)
+###TIME### matrix_sequence: 0.000818
+###TIME### Matrix Berlekamp Massey: 0.026879
+###TIME### Computing u_tilde & minpoly: 0.031654
+###TIME### squarefree: 0.000136
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test625.dat
+###TIME### left sequence (UT1^i): : 4.22319 (user time)
+###TIME### left sequence (UT1^i): 1.06303 (real time)
+###TIME### matrix_sequence: 0.015805
+###TIME### Matrix Berlekamp Massey: 0.038063
+###TIME### Computing u_tilde & minpoly: 0.076495
+###TIME### squarefree: 0.000661
+###TIME### left sequence (UT1^i): : 9.90208 (user time)
+###TIME### left sequence (UT1^i): 2.48641 (real time)
+###TIME### matrix_sequence: 0.015943
+###TIME### Matrix Berlekamp Massey: 0.050275
+###TIME### Computing u_tilde & minpoly: 0.06414
+###TIME### squarefree: 0.000668
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1000.dat
+###TIME### left sequence (UT1^i): : 9.4214 (user time)
+###TIME### left sequence (UT1^i): 2.37784 (real time)
+###TIME### matrix_sequence: 0.00935
+###TIME### Matrix Berlekamp Massey: 0.056707
+###TIME### Computing u_tilde & minpoly: 0.081455
+###TIME### squarefree: 0.001236
+###TIME### left sequence (UT1^i): : 21.6361 (user time)
+###TIME### left sequence (UT1^i): 5.45937 (real time)
+###TIME### matrix_sequence: 0.00933
+###TIME### Matrix Berlekamp Massey: 0.0519
+###TIME### Computing u_tilde & minpoly: 0.095115
+###TIME### squarefree: 0.001232
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1296.dat
+###TIME### left sequence (UT1^i): : 30.6308 (user time)
+###TIME### left sequence (UT1^i): 7.70526 (real time)
+###TIME### matrix_sequence: 0.015502
+###TIME### Matrix Berlekamp Massey: 0.102847
+###TIME### Computing u_tilde & minpoly: 0.117154
+###TIME### squarefree: 0.00184
+###TIME### left sequence (UT1^i): : 72.1253 (user time)
+###TIME### left sequence (UT1^i): 18.1564 (real time)
+###TIME### matrix_sequence: 0.016328
+###TIME### Matrix Berlekamp Massey: 0.096672
+###TIME### Computing u_tilde & minpoly: 0.11739
+###TIME### squarefree: 0.001842
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test3375.dat
+###TIME### left sequence (UT1^i): : 259.682 (user time)
+###TIME### left sequence (UT1^i): 65.3483 (real time)
+###TIME### matrix_sequence: 0.101318
+###TIME### Matrix Berlekamp Massey: 0.207591
+###TIME### Computing u_tilde & minpoly: 0.401217
+###TIME### squarefree: 0.006435
+###TIME### left sequence (UT1^i): : 596.861 (user time)
+###TIME### left sequence (UT1^i): 150.056 (real time)
+###TIME### matrix_sequence: 0.101332
+###TIME### Matrix Berlekamp Massey: 0.187203
+###TIME### Computing u_tilde & minpoly: 0.448291
+###TIME### squarefree: 0.006374
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Wed 22 Nov 10:45 (after corrections in Smith form, slight decrease in speed of Smith form)
+
+vneiger@vneiger-laptop:~/repository/block-sparse-FGLM/linbox$ ./fglm -F test256.dat ; ./fglm -F test625.dat ; ./fglm -F test1000.dat ; ./fglm -F test1296.dat ; ./fglm -F test3375.dat
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test256.dat
+###TIME### left sequence (UT1^i): : 0.373219 (user time)
+###TIME### left sequence (UT1^i): 0.0962141 (real time)
+###TIME### matrix_sequence: 0.000809
+###TIME### Matrix Berlekamp Massey: 0.026334
+###TIME### Smith form and transformations: 0.254524
+###TIME### Computing u_tilde: 0.007177
+###TIME### squarefree: 0.000131
+###TIME### left sequence (UT1^i): : 0.864689 (user time)
+###TIME### left sequence (UT1^i): 0.221187 (real time)
+###TIME### matrix_sequence: 0.003913
+###TIME### Matrix Berlekamp Massey: 0.024989
+###TIME### Smith form and transformations: 0.254793
+###TIME### Computing u_tilde: 0.007168
+###TIME### squarefree: 0.000142
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test625.dat
+###TIME### left sequence (UT1^i): : 4.25779 (user time)
+###TIME### left sequence (UT1^i): 1.09275 (real time)
+###TIME### matrix_sequence: 0.015899
+###TIME### Matrix Berlekamp Massey: 0.053905
+###TIME### Smith form and transformations: 0.917843
+###TIME### Computing u_tilde: 0.014304
+###TIME### squarefree: 0.000694
+###TIME### left sequence (UT1^i): : 9.95481 (user time)
+###TIME### left sequence (UT1^i): 2.53911 (real time)
+###TIME### matrix_sequence: 0.015858
+###TIME### Matrix Berlekamp Massey: 0.040865
+###TIME### Smith form and transformations: 0.710304
+###TIME### Computing u_tilde: 0.014018
+###TIME### squarefree: 0.000715
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1000.dat
+###TIME### left sequence (UT1^i): : 9.41172 (user time)
+###TIME### left sequence (UT1^i): 2.44283 (real time)
+###TIME### matrix_sequence: 0.009444
+###TIME### Matrix Berlekamp Massey: 0.060206
+###TIME### Smith form and transformations: 1.0007
+###TIME### Computing u_tilde: 0.017829
+###TIME### squarefree: 0.001291
+###TIME### left sequence (UT1^i): : 21.5643 (user time)
+###TIME### left sequence (UT1^i): 5.55757 (real time)
+###TIME### matrix_sequence: 0.009395
+###TIME### Matrix Berlekamp Massey: 0.049043
+###TIME### Smith form and transformations: 1.09998
+###TIME### Computing u_tilde: 0.017791
+###TIME### squarefree: 0.001284
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test1296.dat
+###TIME### left sequence (UT1^i): : 30.9283 (user time)
+###TIME### left sequence (UT1^i): 8.02638 (real time)
+###TIME### matrix_sequence: 0.015832
+###TIME### Matrix Berlekamp Massey: 0.109722
+###TIME### Smith form and transformations: 1.60001
+###TIME### Computing u_tilde: 0.027956
+###TIME### squarefree: 0.001948
+###TIME### left sequence (UT1^i): : 79.8855 (user time)
+###TIME### left sequence (UT1^i): 20.6449 (real time)
+###TIME### matrix_sequence: 0.01583
+###TIME### Matrix Berlekamp Massey: 0.070047
+###TIME### Smith form and transformations: 1.59812
+###TIME### Computing u_tilde: 0.028209
+###TIME### squarefree: 0.002236
+
+blocking dimension: M=4
+threshold mbasis/pmbasis (advice: take 128 if p==9001): 128
+F=test3375.dat
+###TIME### left sequence (UT1^i): : 263.364 (user time)
+###TIME### left sequence (UT1^i): 68.0187 (real time)
+###TIME### matrix_sequence: 0.102163
+###TIME### Matrix Berlekamp Massey: 0.271922
+###TIME### Smith form and transformations: 4.32314
+###TIME### Computing u_tilde: 0.074013
+###TIME### squarefree: 0.006658
+###TIME### left sequence (UT1^i): : 606.762 (user time)
+###TIME### left sequence (UT1^i): 155.883 (real time)
+###TIME### matrix_sequence: 0.101842
+###TIME### Matrix Berlekamp Massey: 0.267054
+###TIME### Smith form and transformations: 4.37242
+###TIME### Computing u_tilde: 0.074897
+###TIME### squarefree: 0.006607
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Fri 17 Nov 18:00 (after NTL incorporation --> timings unchanged except "R_j computations")

@@ -77,9 +77,11 @@ class PolMatDom {
 	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
 	// (Heuristic) computes a vector v(x) and a polynomial f(x) such that
-	// v(x) pmat(x) = [0...0 f(x)], where f(x) is the largest Smith factor
-	// Note: assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
-	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat );
+	// v(x) pmat(x) = [0...0 f(x) 0 ... 0], where f(x) is the largest Smith factor,
+	// and it is at position "position"
+	// Assumes 'position' is an integer between 0 and pmat.rowdim()-1
+	// Assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
+	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat, const size_t position );
 
 	// (Heuristic) Smith form of a nonsingular matrix; also computes the unimodular factors
 	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat );
@@ -98,8 +100,8 @@ class PolMatDom {
 //-----------------------------------------------//
 //-----------------------------------------------//
 
-//shifts every entry by d
-void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, int row, int col, int deg);
+//shifts every entry by deg
+void shift(PolMatDom::PMatrix &result, const PolMatDom::PMatrix &mat, int deg);
 void mat_to_poly (PolMatDom::Polynomial &p, PolMatDom::MatrixP &mat, int size);
 void mat_resize (GF &field, PolMatDom::MatrixP &mat, int size);
 
@@ -136,8 +138,9 @@ class Block_Sparse_FGLM{
 	int M; // number of blocks (set to number of CPUs?)
 	size_t n; // number of variables and size of vector mul_mats
 	size_t threshold; // FIXME temporary: threshold MBasis/PMBasis
-	int deg_minpoly; // degree of minpoly
 
+	std::vector<LinBox::DenseMatrix<GF>> U_rows;
+	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	// stores the multiplication matrices T_i
 	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
 	// coeffs in the random combination
@@ -160,7 +163,7 @@ class Block_Sparse_FGLM{
         // numvar = n means we are using a random combination    //
         //-------------------------------------------------------//
 	void get_matrix_sequence_left(LinBox::DenseMatrix<GF>& v_flat,
-				      int numvar);
+				      int numvar, int number);
 	
         //-------------------------------------------------------//
 	// Computes sequence (UT1^i)V                            //
@@ -168,24 +171,23 @@ class Block_Sparse_FGLM{
         //-------------------------------------------------------//
 	void get_matrix_sequence(std::vector<LinBox::DenseMatrix<GF>> & result,
 				 const LinBox::DenseMatrix<GF> & v_flat,
-	                         const LinBox::DenseMatrix<GF> & V,
-				 int c,
-	                         size_t to);
+	                         const LinBox::DenseMatrix<GF> & V);
 
         //-------------------------------------------------------//
         //-------------------------------------------------------//
-	void Omega(NTL::zz_pX & numerator, const PolMatDom::MatrixP &u_tilde,
+	void Omega(std::vector<NTL::zz_pX> & numerator, const PolMatDom::MatrixP &u_tilde,
 		   const PolMatDom::PMatrix &mat_gen,
-		   const LinBox::DenseMatrix<GF> &mat_seq_left_flat,
-		   const LinBox::DenseMatrix<GF> &right_mat);
+		   const std::vector<LinBox::DenseMatrix<GF>> &seq,
+		   int number_row = 1, int number_col = 1
+		);
 
        //--------------------------------------------------------------------------------//
        // builds a random V                                                              //
        // applies matrix-BM and smith                                                    //
-       // return u_tilde, the minimal matrix generator and the sqfree part of minpoly    //
+       // return u_tilde, the minimal matrix generator and the minpoly                   //
        //--------------------------------------------------------------------------------//
-	void smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &mat_gen, NTL::zz_pX &min_poly_sqfree, NTL::zz_pX & min_poly_multiple,
-		   const LinBox::DenseMatrix<GF> &mat_seq_left_flat);
+	void smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &mat_gen, NTL::zz_pX &min_poly,
+		   const std::vector<LinBox::DenseMatrix<GF>> &mat_seq, int number = 1);
 
     public:
 	// length of the sequence:
