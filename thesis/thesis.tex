@@ -359,7 +359,9 @@ coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
 variable instead), and performing the union of the two components $V'$
 and $V''$.
 
-\subsubsection{Basic facts on linearly recurrent sequences.} Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
+\subsubsection{Basic facts on linearly recurrent sequences.} 
+\label{section:linseq}
+Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
 and the associated generating series $Z=\sum_{s \ge 0} \ell_s T^s \in
 \K[[T]]$. The sequence $(\ell_s)_{s \ge 0}$ is {\rm linearly recurrent} if and
 only if its generating series is {\em rational} that is, if there
@@ -1246,10 +1248,10 @@ $$ \mU^{tr} \mM^i = [u_1^{tr} \dots u_m^{tr}] \mM^i = [u_1^{tr} \mM^i \dots u_m^
 where each product $u_k^{tr} \mM^i$ is independent of others. Therefore, to generate the
 sequence $(\mU^{tr}\mM^i)_{i\ge0}$, we generate, in parallel, 
 the sequences $(u_k^{tr} \mM^i)_{i\ge0}$, $1 \le k \le m$, and concatenate them together as above.
-Let $c$ be the sparsity of $M$, then generating $(u_k^{tr} \mM^i)_{0 \le i < 2d}$ costs 
-$O(d cD^2) = O(\frac{cD^3}{m} )$ field operations. If we are able to compute $m$ 
+Let $c$ be the sparsity of $\mM$, then generating $(u_k^{tr} \mM^i)_{0 \le i < 2d}$ costs 
+$O(d cD^2) = O(cD^3/m )$ field operations. If we are able to compute $m$ 
 vector-matrix products in parallel at once, the total cost of generating $(\mU^{tr}\mM^i)_{0 \le i < 2d}$
-is $O(\frac{cD^3}{m})$. We can then compute $(\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$ by a product
+is $O(cD^3/m)$. We can then compute $(\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$ by a product
 $$
 \begin{bmatrix}
 \mU^{tr}\\
@@ -1267,10 +1269,26 @@ $$
 \mU^{tr} \mM^{2d} \mV\\
 \end{bmatrix}
 $$
-in cost $O(mD^2)$.
+in cost $O(m^{\omega-2}D^2)$.
+
+Recall, from section \ref{section:matrix_seq}, that we can compute
+the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
+We can compute $P$ and $a$ in lines 5 and 7 respectively by using the high-order
+lifting algorithm of \cite[algorithm 5]{Stor03}. 
+By corollary 16 of \cite{Stor03}, the cost of this is 
+$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$.
+Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
+$O(D^2)$ by using the above method. Recall, from section \ref{section:linseq}, that
+we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
+doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
+Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
+have degree at most $d$, this product can be done in cost $O(m(md)) = O(mD)$.
+Now, $\mN_v^*$ has degree less than $d$ and $a$ has degree at most $D$, so
+computing $a \mN_v^*$ costs $O(mD)$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(nmD)$
 Since $\mF^{U,M,V}$ has degree $d$ and $a$ has degree $D$ at most, we
-can compute $N,N_1,\dots,N_j$ in cost $O(nmD)$. Since $P,R,N,N_j$, $1\le j \le n$
+can compute . Since $P,R,N,N_j$, $1\le j \le n$
 have degree at most $D$, lines 6 and 9.3 costs $O(D)$.
+Finally, we get the cost $O(cD^3/m + m^{\omega-2}D^2 + m^{\omega-1} D \log(D) + nmD )$.
 
 
 
