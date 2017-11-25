@@ -1171,23 +1171,26 @@ $$
 in cost $O(m^{\omega-2}D^2)$.
 
 Recall, from \cref{section:matrix_seq}, that we can compute
-the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
+the minimum generating polynomial matrix in $O(m^{\omega} M(D/m) \log(D/m))$.
 The largest invariant factor $P$ and the quotient $a$ in lines 5 and 6 respectively by using the high-order
 lifting algorithm of \cite[Algorithm~5]{Stor03}. 
 By \cite[Corollary~16]{Stor03}, the cost of this is 
-\todo{$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$}.
+\todo{$O(m^{\omega} M(D/m) \log(D/m) \log(m))$}.
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
-$O(D^2)$ by using the above method. Recall, from \cref{section:linseq}, that
+$O(D^2)$ by using the above method.
+Recall, from \cref{section:linseq}, that
 we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
 doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
 Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
-have degree at most $d$, this product can be done in cost $O(m(md)) = O(mD)$.
-Now, $\mN_v^*$ has degree less than $d$ and $a$ has degree at most $D$, so
-computing $a \mN_v^*$ costs $O(mD)$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(nmD)$
-Since $\mF^{U,M,V}$ has degree $d$ and $a$ has degree $D$ at most, we
-can compute . Since $P,R,N,N_j$, $1\le j \le n$
-have degree at most $D$, lines 6 and 9.3 costs $O(D)$.
-Finally, we get the cost $O(cD^3/m + m^{\omega-2}D^2 + m^{\omega-1} D \log(D) + nmD )$.
+have degree at most $d$, this product can be done in cost $O(m^2M(D/m))$.
+
+Now, $\mN_v^*$ has degree less than $D/m$ and $a$ has degree at most $D$, so
+computing $a \mN_v^*$ costs $O(m^2M(D/m))$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(n(m^2M(D/m)))$.
+Since $P,R,N,N_j$, $1\le j \le n$
+have degree at most $D$, lines 6 and 9.3 costs $O^{\tilde{~}}(D)$.
+Finally, assuming perfect parallelization and $m << D$, we get the cost 
+$$O(cD^3/m + m^{\omega} M(D/m) \log(D/m) \log(m) + nm^2M(D/m)),$$
+
 
 
 
