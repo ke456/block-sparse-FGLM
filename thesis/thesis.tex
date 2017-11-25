@@ -359,7 +359,9 @@ coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
 variable instead), and performing the union of the two components $V'$
 and $V''$.
 
-\subsubsection{Basic facts on linearly recurrent sequences.} Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
+\subsubsection{Basic facts on linearly recurrent sequences.} 
+\label{section:linseq}
+Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
 and the associated generating series $Z=\sum_{s \ge 0} \ell_s T^s \in
 \K[[T]]$. The sequence $(\ell_s)_{s \ge 0}$ is {\rm linearly recurrent} if and
 only if its generating series is {\em rational} that is, if there
@@ -1201,7 +1203,7 @@ of $\mM$ by using the block Wiedemann algorithm.
 This is done by applying the Matrix Berlekamp-Massey algorithm of
 section \ref{section:matrix_seq} on the sequence 
 $S = (\mU^{tr}\mM^i\mV)_{0 \le i < 2 \lceil \frac{D}{m} \rceil}$,
-for some $m \in \mathbb{N}$ and $U,V \in \mathbb{K}^{m \times D}$,
+for some $m \in \mathbb{N}$ and $U,V \in \mathbb{K}^{D \times m}$,
 and taking the largest invariant factor.
 We find the rest of the polynomials in the output by extracting
 the scalar closed forms from the matrix closed forms. Lastly,
@@ -1219,7 +1221,7 @@ as $ (\mN)_{T^{\ge 0}} $
 	\end{itemize}
 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
 	\begin{itemize}\setlength\itemsep{0em}
-		\item[]{\bf 1.~} {\sf choose $\mU,\mV \in \mathbb{K}^{m \times D}$}
+		\item[]{\bf 1.~} {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
 		\item[]{\bf 2.~} {\sf $S= (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
 		\item[]{\bf 3.~} {\sf $\mF^{U,M,V} = {\sf MatrixBerlekampMassey}(S)$}
 		\item[]{\bf 4.~} {\sf $\mN^* = (\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
@@ -1237,6 +1239,58 @@ as $ (\mN)_{T^{\ge 0}} $
 	\end{itemize}
 	\label{algo:block-sparse-fglm}
 \end{algorithm}
+
+In lines 2,4, and 9.1 of the above algorithm, we use $(\mU^{tr}\mM^i)_{i\ge 0}$, which we compute once
+in line 2 and store. Computing this sequence is the bottleneck of the algorithm, but this can be
+parallelized. Let $\mU \in \mathbb{K}^{D \times m}$, then we can write $\mU$ as $[u_1 u_2 \dots u_m]$ where
+$u_k \in \mathbb{K}^{D \times 1}$, $1 \le k \le m$, is a vector. Now,
+$$ \mU^{tr} \mM^i = [u_1^{tr} \dots u_m^{tr}] \mM^i = [u_1^{tr} \mM^i \dots u_m^{tr} \mM^i],$$
+where each product $u_k^{tr} \mM^i$ is independent of others. Therefore, to generate the
+sequence $(\mU^{tr}\mM^i)_{i\ge0}$, we generate, in parallel, 
+the sequences $(u_k^{tr} \mM^i)_{i\ge0}$, $1 \le k \le m$, and concatenate them together as above.
+Let $c$ be the sparsity of $\mM$, then generating $(u_k^{tr} \mM^i)_{0 \le i < 2d}$ costs 
+$O(d cD^2) = O(cD^3/m )$ field operations. If we are able to compute $m$ 
+vector-matrix products in parallel at once, the total cost of generating $(\mU^{tr}\mM^i)_{0 \le i < 2d}$
+is $O(cD^3/m)$. We can then compute $(\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$ by a product
+$$
+\begin{bmatrix}
+\mU^{tr}\\
+\mU^{tr} \mM\\
+\mU^{tr} \mM^2\\
+\vdots\\
+\mU^{tr} \mM^{2d}\\
+\end{bmatrix} \mV
+= 
+\begin{bmatrix}
+\mU^{tr} \mV\\
+\mU^{tr} \mM \mV\\
+\mU^{tr} \mM^2 \mV\\
+\vdots \\
+\mU^{tr} \mM^{2d} \mV\\
+\end{bmatrix}
+$$
+in cost $O(m^{\omega-2}D^2)$.
+
+Recall, from section \ref{section:matrix_seq}, that we can compute
+the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
+We can compute $P$ and $a$ in lines 5 and 7 respectively by using the high-order
+lifting algorithm of \cite[algorithm 5]{Stor03}. 
+By corollary 16 of \cite{Stor03}, the cost of this is 
+$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$.
+Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
+$O(D^2)$ by using the above method. Recall, from section \ref{section:linseq}, that
+we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
+doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
+Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
+have degree at most $d$, this product can be done in cost $O(m(md)) = O(mD)$.
+Now, $\mN_v^*$ has degree less than $d$ and $a$ has degree at most $D$, so
+computing $a \mN_v^*$ costs $O(mD)$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(nmD)$
+Since $\mF^{U,M,V}$ has degree $d$ and $a$ has degree $D$ at most, we
+can compute . Since $P,R,N,N_j$, $1\le j \le n$
+have degree at most $D$, lines 6 and 9.3 costs $O(D)$.
+Finally, we get the cost $O(cD^3/m + m^{\omega-2}D^2 + m^{\omega-1} D \log(D) + nmD )$.
+
+
 
 \subsection{Proof of Correctness}
 
@@ -1563,9 +1617,32 @@ $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 
 \newpage
 \section{Experimental Results}\label{section:ex}
+\bgroup
+\def\arraystretch{2}
+\setlength\tabcolsep{10pt}
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c}
+	\textbf{name}& $\mathbf{D}$ & \textbf{Sparsity} & $\mathbf{m = 1}$ & $\mathbf{m = 4}$ & $\mathbf{m = 8}$ & $\mathbf{deg(P) = D}$\\
+	\cline{1-7}
+	rand3-1   & 512 & 0.08     & 2.853   & 0.798   & 0.592   & yes \\
+	rand3-2   & 1728& 0.05     & 70.626  & 21.941  & 13.381  & yes \\
+	rand3-3   & 3375& 0.04     & 418.708 & 113.336 & 77.259  & yes \\
+	randsq3-1 & 1728& 0.05     & 70.633  & 19.770  & 13.249  & no  \\
+	randsq3-2 & 2744& 0.04     & 241.162 & 63.778  & 44.829  & no  \\
+	randsq3-2 & 4096& 0.04     & 699.944 & 187.988 & 128.88  & no  \\
+	bannwarth & 284 & 0.27     & 1.027   & 0.364   & 0.220   & yes \\
+	cyclic7   & 924 & 0.02     & 7.038   & 1.954   & 1.448   & yes \\
+	eco12     & 1024& 0.13     & 62.294  & 16.427  & 11.539  & yes \\
+	katsura8  & 256 & 0.28     & 1.207   & 0.338   & 0.249   & yes \\
+	katsura9  & 512 & 0.26     & 9.210   & 2.453   & 1.865   & yes \\
+	katsura10 & 1024& 0.25     & 71.243  & 18.867  & 13.218  & yes \\
+	sot1      & 8694& 0.001    & 762.063 & 208.25  & 143.281 & yes \\
+	vor2      & 574 & 0.24     & 10.238  & 2.749   & 1.972   & yes 
+\end{tabular}
+\end{center}
 
 \newpage
-\section{Improvements for Special case}
+\section{Improvements for Special cases}
 \subsection{Choice of the blocking size}
 In general, experiments show that choosing $1 \le m \le D$ that matches
 the number of cores is optimal in section \ref{section:ex}. However,
@@ -1617,10 +1694,10 @@ Thus, we get the following algorithm:
 \end{algorithm}
 Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
 in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
-and computing $N,N_1,\dots,N_n$ costs $O(nD^3)$. We can solve for $a$ by
+and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. We can solve for $a$ by
 using the high-order lifting algorithm of \cite[algorithm 5]{Stor03}. 
-By corollary 16 of \cite{Stor03}, the cost of this is $O(D^\omega \log(n))$.
-Putting everything together, we get the final cost of $O(D^\omega\log(n) + nD^3)$.
+By corollary 16 of \cite{Stor03}, the cost of this is $O(D^\omega \log(D))$.
+Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 \subsection{Decomposition of linear forms.}
 
