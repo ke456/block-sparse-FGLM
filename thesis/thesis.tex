@@ -86,7 +86,6 @@
 \def\A {\ensuremath{\mathbb{A}}}
 \def\D {\ensuremath{D}}
 \def\m {\ensuremath{\mathfrak{m}}}
-\def\todo#1{(\textbf{todo:} #1)}
 
 \def\scrM {\ensuremath{\mathscr{M}}}
 \def\calL {\ensuremath{\mathcal{L}}}
@@ -1120,23 +1119,23 @@ as $ (\mN)_{T^{\ge 0}} $
 		\item dimension of the blocks $m \in \mathbb{N}$
 	\end{itemize}
 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
-	\begin{itemize}\setlength\itemsep{0em}
-		\item[]{\bf 1.~} {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
-		\item[]{\bf 2.~} {\sf $S= (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
-		\item[]{\bf 3.~} {\sf $\mF^{U,M,V} = {\sf MatrixBerlekampMassey}(S)$}
-		\item[]{\bf 4.~} {\sf $\mN^* = (\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
-		\item[]{\bf 5.~} {\sf $P=$ largest invariant factor of $\mF^{U,M,V}$}
-		\item[]{\bf 6.~} {\sf $R={\sf SquareFreePart}(P)$} 
-		\item[]{\bf 7.~} {\sf $a = [0 ~\cdots 0 P] (\mF^{U,M,V})^{-1}$}
-		\item[]{\bf 8.~} {\sf $N=a\mN^*$}
-		\item[]{\bf 9.~} {\sf for $j = 1 \dots n$:}
-		\begin{itemize}
-			\item[]{\bf 9.1.} ~~{\sf	$\mN_j^* = (\mF^{U,M,V}
+  \begin{enumerate}[{\bf 1.}]
+		\item {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
+		\item {\sf $S= (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+		\item {\sf $\mF^{U,M,V} = {\sf MatrixBerlekampMassey}(S)$}
+		\item {\sf $\mN^* = (\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
+		\item {\sf $P=$ largest invariant factor of $\mF^{U,M,V}$}
+		\item {\sf $R={\sf SquareFreePart}(P)$} 
+		\item {\sf $a = [0 ~\cdots~ 0 ~ P] (\mF^{U,M,V})^{-1}$}
+		\item {\sf $N=a\mN^*$}
+		\item {\sf for $j = 1 \dots n$:}
+    \begin{enumerate}[{\bf 9.1.}]
+			\item {\sf	$\mN_j^* = (\mF^{U,M,V}
 				\sum_{i= 0}^{d-1} {(\mU^{tr}\mM^i \mM_j e)}/{T^{i+1}})_{T^{\ge0}}$}
-			\item[]{\bf 9.2.} ~~{\sf $N_j=a\mN_j^*$}
-			\item[]{\bf 9.3.} ~~{\sf $R_j=N_j/N$ mod $R$}
-		\end{itemize}
-	\end{itemize}
+			\item {\sf $N_j=a\mN_j^*$}
+			\item {\sf $R_j=N_j/N$ mod $R$}
+		\end{enumerate}
+	\end{enumerate}
 	\label{algo:block-sparse-fglm}
 \end{algorithm}
 
@@ -1173,10 +1172,10 @@ in cost $O(m^{\omega-2}D^2)$.
 
 Recall, from \cref{section:matrix_seq}, that we can compute
 the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
-We can compute $P$ and $a$ in lines 5 and 7 respectively by using the high-order
+The largest invariant factor $P$ and the quotient $a$ in lines 5 and 6 respectively by using the high-order
 lifting algorithm of \cite[Algorithm~5]{Stor03}. 
 By \cite[Corollary~16]{Stor03}, the cost of this is 
-$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$.
+\todo{$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$}.
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
 $O(D^2)$ by using the above method. Recall, from \cref{section:linseq}, that
 we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
@@ -1304,8 +1303,12 @@ randomly, we will have that the
 largest invariant factor of $\mF^{U,M,V}$ is the minimal
 polynomial of $\mM	$  with high probability.
 
-Next, we prove that one can recover a scalar numerator
-through a matrix numerator.
+Next, we prove that one can recover a scalar numerator through a matrix
+numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
+  deserve a statement/proof. The inverse can be written $(\mF^{U,M,V})^{-1} =
+  \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
+$\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
+invariant factor $P$. So there's nothing to prove.}
 
 \begin{lemma}\label{utilde}
 	Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
