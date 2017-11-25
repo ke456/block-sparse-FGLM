@@ -805,8 +805,8 @@ Now, $ R_2(1) = 4$ and $R_2(3) = 2$ as needed.
 We first present the notion of linear recurrence for sequences of matrices over
 a field $\field$, which extends the well-known notion for sequences in
 $\field^\NN$.
-\begin{definition}[{\cite[Sec.\,3]{KalVil01}}]
-	%% also \cite[Def.\,4.2]{Turner02}.. any earlier ref?
+\begin{definition}[{\cite[Section~3]{KalVil01}}]
+	%% also \cite[Definition~4.2]{Turner02}.. any earlier ref?
 	\label{dfn:recurrence_relation}
 	Let $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ be a
 	matrix sequence.  Then,
@@ -856,7 +856,7 @@ following basic result, which can be found for example in
 \begin{proof}
 	The set of vector relations for $\seq$ is a $\polRing$-submodule of
 	$\relSpace$, and hence is free of rank at most $\rdim$
-	\cite[Chap.\,12]{DumFoo04}.
+	\cite[Chapter~12]{DumFoo04}.
 	
 	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
 	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
@@ -921,8 +921,8 @@ change the degree, any left minimal matrix generator $\relbas$ has the same
 degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
 a bound on the degree of any left minimal generator. The same remark holds for
 $\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
-the same as $\gamma_1,\gamma_2$ in \cite[Def.\,4.6~and\,4.7]{Turner02}; see
-also $\delta_l,\delta_r$ in \cite[Sec.\,4.2]{Villard97a}.)
+the same as $\gamma_1,\gamma_2$ in \cite[Definitions~4.6~and~4.7]{Turner02};
+see also $\delta_l,\delta_r$ in \cite[Section~4.2]{Villard97a}.)
 
 \begin{lemma}
 	\label{lem:finitely_many_terms}
@@ -962,13 +962,13 @@ also $\delta_l,\delta_r$ in \cite[Sec.\,4.2]{Villard97a}.)
 	and the proof is complete.
 \end{proof}
 
-(A similar result is in \cite[Thm.\,4.5]{Turner02}.)
+(A similar result is in \cite[Theorem~4.5]{Turner02}.)
 
 The fast computation of matrix generators is usually handled via algorithms for
 computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
 next result gives the main idea behind this approach. This result is similar to
-\cite[Thm.\,4.6]{Turner02} (see also
-\cite[Thm.\,4.7,\,4.8,\,4.9,\,4.10]{Turner02}), but in some sense the reversal
+\cite[Theorem~4.6]{Turner02} (see also
+\cite[Theorems~4.7,~4.8,~4.9,~4.10]{Turner02}), but in some sense the reversal
 is on the input sequence rather than on the output matrix generator.
 
 We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
@@ -1174,8 +1174,8 @@ in cost $O(m^{\omega-2}D^2)$.
 Recall, from \cref{section:matrix_seq}, that we can compute
 the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
 We can compute $P$ and $a$ in lines 5 and 7 respectively by using the high-order
-lifting algorithm of \cite[algorithm 5]{Stor03}. 
-By \cite[Cor.\,16]{Stor03}, the cost of this is 
+lifting algorithm of \cite[Algorithm~5]{Stor03}. 
+By \cite[Corollary~16]{Stor03}, the cost of this is 
 $O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$.
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
 $O(D^2)$ by using the above method. Recall, from \cref{section:linseq}, that
@@ -1199,7 +1199,7 @@ the minimal polynomial of $\mM$ from the
 output of Matrix Berlekamp-Massey if we choose
 the blocking matrices $\mU$ and $\mV$ generically.
 This result had been previously been proven by
-Kaltofen and Villard \cite{KaVi04}\cite{Villard97a}.
+Kaltofen and Villard \cite{KaVi04,Villard97a}.
 
 Let $\mM$ be in $\mathbb{K}^{D \times D}$ and 
 $\mU,\mV \in \mathbb{K}^{D \times m}$ be two blocking matrices. Now, define two matrix sequences
@@ -1253,7 +1253,7 @@ for $i > k$, we let $\sigma_i = 1$.
 	\times m$, and let $\mF^{M,\scrV}$ be the minimal generating polynomial
 	of the ``generic'' sequence $(\mM^i \scrV)_{i \ge 0}$. The notation
 	$\langle \scrV \rangle$ and $D_\scrV$ are defined as above.  In
-	particular, by~\cite[Proposition 6.1]{Villard97a}, the minimal
+	particular, by~\cite[Proposition~6.1]{Villard97a}, the minimal
 	generating polynomial $\mF^{M,\scrV}$ has degree $\delta$ and
 	determinantal degree $\nu$.
 	
@@ -1595,8 +1595,8 @@ Thus, we get the following algorithm:
 Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
 in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
 and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. We can solve for $a$ by
-using the high-order lifting algorithm of \cite[algorithm 5]{Stor03}. 
-By \cite[Cor.\,16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.
+using the high-order lifting algorithm of \cite[Algorithm~5]{Stor03}. 
+By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.
 Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 \subsection{Decomposition of linear forms.}
