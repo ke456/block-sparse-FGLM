@@ -1,30 +1,19 @@
 \documentclass[12pt]{article}
-\usepackage{bbm,fullpage,amsthm}
+\usepackage{bbm,fullpage}
 \usepackage{alltt}
 \usepackage{bm}
-\usepackage{amsmath,amssymb,epsfig,color,xspace,mathrsfs}
-\usepackage{bbm,fullpage}
-\usepackage{amsmath}
-\usepackage{alltt, amssymb, amsthm}
+\usepackage{amsmath,amssymb,amsfonts,epsfig,color,xspace,mathrsfs}
 \usepackage{algorithm, pseudocode}
-\usepackage{mathrsfs}
-\usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
-\usepackage{bm}
+\usepackage[shortlabels]{enumitem}% for enumerate / itemize: define reasonable margins
+\setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
 \pagestyle{empty}
 
-\usepackage{enumerate}
-\usepackage{fullpage}
-\usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
-\usepackage{color}
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 
-% for enumerate / itemize: define reasonable margins
-\usepackage[shortlabels]{enumitem}
-\setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
-
 % math and theorem names
-\usepackage{amsmath,amsfonts,amssymb,amsthm,thmtools}
+\usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
+\usepackage{amsthm,thmtools}
 \declaretheorem[style=plain,parent=section]{definition}
 \declaretheorem[sibling=definition]{theorem}
 \declaretheorem[sibling=definition]{corollary}
@@ -32,16 +21,12 @@
 \declaretheorem[sibling=definition]{lemma}
 \declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{remark}
 \declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{example}
-\declaretheoremstyle[headpunct={},notebraces={\textbf{--}~}{}]{algorithm}
-\declaretheorem[style=algorithm]{problem}
-
-% for our algorithms & problems
-\usepackage{mdframed}
-
 \usepackage[capitalize]{cleveref}
-\crefname{problem}{Problem}{Problems}
-\Crefname{problem}{Problem}{Problems}
 
+%% ------------------------------------------------
+%% --------- FOR MATRIX BERLEKAMP-MASSEY ----------
+%% ------------------------------------------------
+%%% 
 %%%notation
 %misc
 \newcommand{\storeArg}{} % aux, not to be used in document!!
@@ -88,91 +73,6 @@
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
 \newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
 \newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
-
-%% ------------------------------------------------
-%% --------- For problems and algorithms ----------
-%% ------------------------------------------------
-\newcommand{\argfig}[1]{\begin{figure}[#1]} % to be able to feed an optional argument to the inside figure
-	
-	\newenvironment{algobox}[1][htbp]{
-		\newcommand{\algoInfo}[3]{
-			\begin{algorithm}[{name=[\algoname{##2}:~##1]\algoname{##2}}]
-				\label{##3}
-				~ \hfill
-				{\small\emph{(##1)}}
-				\smallskip
-				
-			}
-			\newcommand{\dataInfos}[2]{
-				\algoword{##1:}
-				\begin{itemize}[topsep=0pt]
-					##2
-				\end{itemize}
-				\smallskip
-			}
-			\newcommand{\dataInfo}[2]{
-				\algoword{##1:} ##2 
-				%\smallskip
-			}
-			\newcommand{\algoSteps}[1]{
-				%\smallskip
-				\addtolength{\leftmargini}{-0.35cm}
-				\begin{enumerate}[{\bf 1.}]
-					##1
-				\end{enumerate}
-				\smallskip
-			}
-			
-			\expandafter\argfig\expandafter{#1}
-			\centering
-			\begin{minipage}{0.99\textwidth}
-				\begin{mdframed}
-					\smallskip
-				}
-				{
-				\end{algorithm}
-			\end{mdframed}
-		\end{minipage}
-	\end{figure}
-}
-
-\newenvironment{problembox}[1][htbp]{
-	\newcommand{\problemInfo}[3]{
-		\begin{problem}[{name=[\emph{##2}\ifx&##1&\else##1\fi]\emph{##2}}]
-			\label{##3}
-			~\smallskip
-			
-		}
-		\newcommand{\dataInfos}[2]{
-			\emph{##1:}
-			\begin{itemize}[topsep=0pt]
-				##2
-			\end{itemize}
-			\smallskip
-		}
-		\newcommand{\dataInfo}[2]{
-			\emph{##1:}  ##2
-		}
-		
-		\expandafter\argfig\expandafter{#1}
-		\centering
-		\begin{minipage}{0.75\textwidth}
-			\begin{mdframed}
-			}
-			{
-			\end{problem}
-		\end{mdframed}
-	\end{minipage}
-\end{figure}
-}
-
-
-\newtheorem*{Example}{Example}
-\newtheorem{Coro}{Corollary}
-\newtheorem{Def}{Definition}
-\newtheorem{Theo}{Theorem}
-\newtheorem{Prop}{Proposition}
-\newtheorem{Lemma}{Lemma}
 
 \def\C {\ensuremath{\mathbb{C}}}
 \def\Q {\ensuremath{\mathbb{Q}}}
@@ -300,7 +200,7 @@ More general versions of the Sparse-FGLM algorithm exist to handle
 non-radical ideals using the Berlekamp-Massey-Sakata algorithm \cite{FaMo17}.
 
 \newpage
-\section{Previously Results on Generating Series}
+\section{Previous Results on Generating Series}
 
 \subsection{Overview}
 In what follows, $\K$ is a field.  Let $I$ be an ideal in
@@ -430,12 +330,12 @@ $$Z = \frac{A}{B} = \frac{1}{1-T-T^2}$$
 The sequences we consider below are of the form $(\ell(t^s))_{s \ge
 	0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $t$ in $Q$. For such
 sequences, the following standard result will be useful.
-\begin{Lemma}\label{lemma:minpoly}
+\begin{lemma}\label{lemma:minpoly}
 	Let $t$ be in $Q$ and let $P \in \K[T]$ be its minimal
 	polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(Q,\K)$,
 	$P$ is the minimal polynomial of the sequence $(\ell(t^s))_{s \ge
 		0}$.
-\end{Lemma}
+\end{lemma}
 
 
 
@@ -510,11 +410,11 @@ X_n^{\mu_n}$$ be the {\em symbol} of $\lambda$; by construction,
 this is a non-zero polynomial. In the following paragraphs, we will
 need the next easy lemma.
 
-\begin{Lemma}\label{lemma:symbol0}
+\begin{lemma}\label{lemma:symbol0}
 	Fix $i$ in $\{1,\dots,d\}$. For a generic choice of $\lambda$ in ${\rm
 		hom}_\Kbar(Q_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
 	$\pi_i(t_1,\dots,t_n)$ is non-zero.
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
 	$\mu=(\mu_1,\dots,\mu_n)$ in $S_i$, and define 
@@ -522,7 +422,7 @@ need the next easy lemma.
 	X_n^{\mu_n} \in \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this
 	is by construction a non-zero polynomial.  Thus, for a generic
 	choice of $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, that define a linear form
-	$\lambda$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$ as in~\eqref{ell_param},
+	$\lambda$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$ as in \cref{ell_param},
 	and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
 	$\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. As a
 	result, the symbol of such a linear form $\lambda$ is $\pi =\sum_{\mu \in
@@ -556,7 +456,7 @@ gives an explicit form for a generating series of the form $\sum_{\ell
 	\ge 0} \ell(v t^i)T^\ell$, for a linear form $\ell:Q \to \K$. A
 slightly less precise version of it is in~\cite{BoSaSc03}.
 
-\begin{Lemma}\label{lemma:formula}
+\begin{lemma}\label{lemma:formula}
 	Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, with support $\mathfrak{S}$,
 	and let $\{\pi_i \mid i \in \mathfrak{S}\}$ and $\{w_i \mid i \in
 	\mathfrak{S}\}$ be as above.
@@ -573,7 +473,7 @@ slightly less precise version of it is in~\cite{BoSaSc03}.
 	for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ (that
 	depend on the choice of $v$), with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
 	$\mathfrak{S}$.
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	Take $v$ and $t$ as above. Consider first
 	an operator of the form $f \mapsto \frac{ \partial^{|\mu|}  f}
@@ -646,7 +546,7 @@ slightly less precise version of it is in~\cite{BoSaSc03}.
 	\frac {1}{(T-t )^{w+1}}
 	+ \frac{A(\bX,T)}{(T-t )^{w}}.
 	\end{align*}
-	Applying this formula to the sum in~\eqref{eq:fui}, we obtain the
+	Applying this formula to the sum in \cref{eq:fui}, we obtain the
 	claim in the lemma.
 \end{proof}
 
@@ -657,7 +557,7 @@ $\{1,\dots,d\}$. The mapping $t:V_\mathfrak{S} \to \Kbar$
 defined by $\balpha_i \mapsto t(\balpha_{i})$ plays a special role in
 the formula in the lemma; this leads us to the following definitions.
 \begin{itemize}
-	\item We consider $\ell$ and $t$ as in Lemma~\ref{lemma:formula}, such
+	\item We consider $\ell$ and $t$ as in \cref{lemma:formula}, such
 	that $\ell$ has support $\mathfrak{S}$.
 	\item $\mathfrak{T}$ is the subset of $\mathfrak{S}$ consisting of
 	all indices $i$ such that 
@@ -679,7 +579,7 @@ the formula in the lemma; this leads us to the following definitions.
 	between  $\mathfrak{t}$ and  $\mathfrak{T}$.
 \end{itemize}
 
-\begin{Lemma} \label{lemma:anyv}
+\begin{lemma} \label{lemma:anyv}
 	Let $\ell$, $t$ and all other notation be as above. Let further
 	$M$ be the minimal polynomial of $t$ in $Q_\mathfrak{S}$. Suppose that 
 	$M$ is also the minimal polynomial of the sequence $(\ell(t^s))_{s \ge 0}$,
@@ -687,7 +587,7 @@ the formula in the lemma; this leads us to the following definitions.
 	\mathfrak{t}\}$  such that for $v$ in
 	$\K[X_1,\dots,X_n]$,
 	$$\Omega((\ell(v t^s))_{s\ge0},M) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
 	$\mathfrak{S}$ such that $t(\balpha_{i})=r_j$; the sets
@@ -695,7 +595,7 @@ the formula in the lemma; this leads us to the following definitions.
 	cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
 	
 	Take an arbitrary $v$ in $\K[X_1,\dots,X_n]$ and let us
-	collect terms in~\eqref{eq:sumgenseries} as
+	collect terms in \cref{eq:sumgenseries} as
 	\begin{align*}
 	\sum_{s \ge 0} \ell(v t^s)\frac{1}{T^{s+1}} =&
 	\sum_{j \in \{1,\dots,c\}}
@@ -781,7 +681,7 @@ the formula in the lemma; this leads us to the following definitions.
 	$(\ell(v t^s))_{s \ge 0}$, $\Omega((\ell(v t^s))_{s \ge 0} ,M)$ in the statement of
 	the lemma is indeed a polynomial of degree less than $\delta$ (this
 	proves our first claim). We can then rewrite the
-	sum in~\eqref{eq:sumgenseries_collect1} as $ \sum_{s \ge 0} \ell(v
+	sum in \cref{eq:sumgenseries_collect1} as $ \sum_{s \ge 0} \ell(v
 	t^s)/T^{s+1} =\Omega((\ell(v t^s))_{s \ge 0} ,M)/M$, with
 	\begin{align*}
 	\Omega((\ell(v t^s))_{s \ge 0} ,M)=&\sum_{j \in \mathfrak{t}} \Big(\big[
@@ -839,22 +739,22 @@ zero-dimensional parametrization of $V_{\mathfrak{S}}$.
 	\label{algo:para2}
 \end{algorithm}
 
-\begin{Lemma}
+\begin{lemma}
 	Suppose that $\ell$ is a generic element of ${\rm
 		hom}_{\Kbar}(Q_\mathfrak{K},\Kbar)$ and that $t$ is a generic
 	linear form. Then the output $((P,V_1,\dots,V_n),t)$ of
 	$\mathsf{Parametrization}(\ell,t)$ is a zero-dimensional
 	parametrization of $V_{\mathfrak{S}}$.
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	A generic choice of $t$ separates the points of $V_{\mathfrak{S}}$,
-	and we saw in Lemma~\ref{lemma:symbol0} that for a generic choice of
+	and we saw in \cref{lemma:symbol0} that for a generic choice of
 	$\ell$, $\pi_i(t_1,\dots,t_n)$ vanishes for no $i$ in
 	$\mathfrak{S}$.  As a result, $\mathfrak{T}=\mathfrak{S}$.  Besides,
 	we recall that for a generic $\ell$ in ${\rm
 		hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$, the minimal polynomials of
 	$(\ell(t^s))_{s \ge 0}$ and of $t$ are the same
-	(Lemma~\ref{lemma:minpoly}).
+	(\cref{lemma:minpoly}).
 	
 	Thus, the polynomial $M$ we compute at step 1 is indeed the minimal
 	polynomial of $t$, and we can apply the previous lemma, and for 
@@ -1201,7 +1101,7 @@ $R$, $\{ (R_1(\alpha),\dots,R_n(\alpha)) \} = V(I)$
 The main idea is to compute the minimal polynomial
 of $\mM$ by using the block Wiedemann algorithm.
 This is done by applying the Matrix Berlekamp-Massey algorithm of
-section \ref{section:matrix_seq} on the sequence 
+\cref{section:matrix_seq} on the sequence 
 $S = (\mU^{tr}\mM^i\mV)_{0 \le i < 2 \lceil \frac{D}{m} \rceil}$,
 for some $m \in \mathbb{N}$ and $U,V \in \mathbb{K}^{D \times m}$,
 and taking the largest invariant factor.
@@ -1271,14 +1171,14 @@ $$
 $$
 in cost $O(m^{\omega-2}D^2)$.
 
-Recall, from section \ref{section:matrix_seq}, that we can compute
+Recall, from \cref{section:matrix_seq}, that we can compute
 the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
 We can compute $P$ and $a$ in lines 5 and 7 respectively by using the high-order
 lifting algorithm of \cite[algorithm 5]{Stor03}. 
-By corollary 16 of \cite{Stor03}, the cost of this is 
+By \cite[Cor.\,16]{Stor03}, the cost of this is 
 $O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$.
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
-$O(D^2)$ by using the above method. Recall, from section \ref{section:linseq}, that
+$O(D^2)$ by using the above method. Recall, from \cref{section:linseq}, that
 we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
 doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
 Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
@@ -1407,10 +1307,10 @@ polynomial of $\mM	$  with high probability.
 Next, we prove that one can recover a scalar numerator
 through a matrix numerator.
 
-\begin{Lemma}\label{utilde}
-	Let $\textbf{a}$ be defined as line 7 of algorithm \ref{algo:block-sparse-fglm}, 
+\begin{lemma}\label{utilde}
+	Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
 	then $\textbf{a}$ has polynomial entries.
-\end{Lemma}
+\end{lemma}
 
 \begin{proof}
 	Let $\mathscr{D} = \mA\mF^{U,M,V}\mB$ be the Smith normal form of $\mF^{U,M,V}$ and $s_1, \cdots s_m$ be
@@ -1468,7 +1368,7 @@ through a matrix numerator.
 	\vdots                   \\
 	\sum_{i\ge 0} u_m^{tr}\mM^iv/T^{i+1}
 	\end{bmatrix}$$
-	Recall $\Omega$ from definition \ref{def:omega}.
+	Recall $\Omega$ from \cref{def:omega}.
 	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
 	$$ \mN^* = \mF^{U,M,V}
 	\begin{bmatrix}
@@ -1477,10 +1377,10 @@ through a matrix numerator.
 	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}
 	$$
-	By theorem \ref{randXY}, the $i^{th}$ invariant factor of
+	By \cref{randXY}, the $i^{th}$ invariant factor of
 	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{U,M,V}$ 
 	for generic choice of
-	$\mU,\mV$. Thus, $s_1 = P$ and by lemma \ref{utilde}
+	$\mU,\mV$. Thus, $s_1 = P$ and by \cref{utilde}
 	\begin{align*}
 	a \mN^* &= a \mF^{U,M,V}
 	\begin{bmatrix}
@@ -1501,10 +1401,10 @@ through a matrix numerator.
 
 % l_{u_m} for linear form of u_m
 Finally, we conclude by seeing what happens
-when we pick specific values for $v$ and applying theorem \ref{theorem:anyv}.
-In line 4 of algorithm \ref{algo:block-sparse-fglm}, we have $v = e$, 
+when we pick specific values for $v$ and applying \cref{theorem:anyv}.
+In line 4 of \cref{algo:block-sparse-fglm}, we have $v = e$, 
 where $e$ is the coordinate vector for $1 \in \mathbb{B}$.
-By applying theorem \ref{theorem:anyv}, we have that
+By applying \cref{theorem:anyv}, we have that
 $$\mN^* = \mF^{U,M,V}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
 $$N = a\mN^* = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P).$$
 By construction,
@@ -1513,15 +1413,15 @@ $$\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$
 where $\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
 $$N = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
 
-Similarly, in line 7.1 of algorithm \ref{algo:block-sparse-fglm}, we compute
-$\mN^*_j = \mF^{U,M,V}\sum_{i\ge0} \mU^{tr} \mM \mM_j e / T^{i+1}$. By theorem \ref{theorem:anyv},
+Similarly, in line 7.1 of \cref{algo:block-sparse-fglm}, we compute
+$\mN^*_j = \mF^{U,M,V}\sum_{i\ge0} \mU^{tr} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
 $$N_j = a \mN^*_j = \Omega((u_m^{tr} \mM^i \mM_j e)_{i\ge 0},P) $$
 Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
 $\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
 $\mathbb{B}$. Therefore,
 $$ N_j =  \Omega((u_m^{tr} \mM^i \mT_j e)_{i\ge 0},P) =
  \Omega( (\ell_{u_m}(X_jt^i))_{i\ge 0},P)$$
-By the correctness of algorithm \ref{algo:para2}, we have the proof
+By the correctness of \cref{algo:para2}, we have the proof
 of correctness for the Block Sparse-FGLM algorithm.
 
 \newpage
@@ -1645,12 +1545,12 @@ $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 \section{Improvements for Special cases}
 \subsection{Choice of the blocking size}
 In general, experiments show that choosing $1 \le m \le D$ that matches
-the number of cores is optimal in section \ref{section:ex}. However,
+the number of cores is optimal in \cref{section:ex}. However,
 when $m=1$, blocking has no effect and there is no parallelization
 to be had. In particular, the minimum generating polynomial matrix
 $\mF^{U,M,V}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
 $a = P (\mF^{U,M,V})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
-algorithm \ref{algo:block-sparse-fglm}.
+\cref{algo:block-sparse-fglm}.
 
 If the multiplication matrices are dense, then it is
 better to compute the product $\mU \mM^i$ using a single matrix multiplication,
@@ -1696,7 +1596,7 @@ Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
 in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
 and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. We can solve for $a$ by
 using the high-order lifting algorithm of \cite[algorithm 5]{Stor03}. 
-By corollary 16 of \cite{Stor03}, the cost of this is $O(D^\omega \log(D))$.
+By \cite[Cor.\,16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.
 Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 \subsection{Decomposition of linear forms.}
@@ -1727,13 +1627,13 @@ as $\ell=\sum_{i\in \{1,\dots,d\}} \ell_i$, with $\ell_i:Q_i \to
 of the form $\lambda_j(1)$. We will do this for some values of $j$
 only, namely those $j$ for which $m_j=1$.
 
-\begin{Lemma}\label{lemma:valuelambda}
+\begin{lemma}\label{lemma:valuelambda}
 	Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, let $M$ be the minimal
 	polynomial of $X_1$ in $Q$ and let $\delta$ be its degree. Then, 
 	the polynomial $\Omega((\ell(X_1^s))_{s\ge0},M)$ satisfies
 	$$\Omega((\ell(X_1^s))_{s\ge0},M)(r_j) = \lambda_j(1) M'(r_j) \quad \text{for all $j$ such that $m_j=1$.}$$
 	
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	Let $\mathfrak{e}$ be the set of all indices $j$ in $\{1,\dots,c\}$
 	such that $m_j=1$, and let $\mathfrak{f}=\{1,\dots,c\}-\mathfrak{e}$;
@@ -1745,7 +1645,7 @@ only, namely those $j$ for which $m_j=1$.
 	&=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1} +
 	\sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1}.
 	\end{align*}
-	Using Lemma~\ref{lemma:formula} with $t=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \lambda_j(X_1^s)/T^{s+1}$ 
+	Using \cref{lemma:formula} with $t=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \lambda_j(X_1^s)/T^{s+1}$ 
 	in the second summand
 	can be rewritten as 
 	$$\frac{C_j}{(T-r_j)^{v_j}},$$
@@ -1836,14 +1736,14 @@ paragraph will compute a zero-dimensional parametrization of
 $V_{\mathfrak{A}}$; we use the following lemma to perform this
 decomposition of $V$.
 
-\begin{Lemma}\label{lemma:acb2}
+\begin{lemma}\label{lemma:acb2}
 	Let $j$ be in $\{1,\dots,c\}$ such that $m_j=1$, let $\lambda$ be a
 	linear form over $\prod_{i \in T_j} Q_i$ and let $t=t_2 X_2
 	+ \cdots + t_n X_n$. Define constants $a,b,c$ in $\Kbar$ by
 	$$a=\lambda(1),\quad b=\lambda(t),\quad c=\lambda(t^2).$$
 	Then, $j$ is in $\mathfrak{a}$
 	if and only if, for a generic choice of $\lambda$ and $t$, $ac=b^2$.
-\end{Lemma}
+\end{lemma}
 \begin{proof}
 	The assumption that $m_j=1$ means that for all $i$ in $T_j$,
 	$\nu_i=1$. The linear 
@@ -1852,7 +1752,7 @@ decomposition of $V$.
 	The fact that all $\nu_i$ are equal to $1$ then implies that each $\ell_i$ takes the form 
 	$$\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i),$$
 	where $\Lambda_{i}$ is a differential operator that does not 
-	involve $\partial/\partial X_1$. Thus, as in~\eqref{ell_param}, we can write a general
+	involve $\partial/\partial X_1$. Thus, as in \cref{ell_param}, we can write a general
 	$\Lambda_i$ of this form as
 	$$\Lambda_i: f \mapsto u_{i,1} f + \sum_{2 \le r \le n}
 	P_{i,r}(u_{i,2},\dots,u_{i,D_i}) \frac{\partial}{\partial X_j} f +
@@ -1954,33 +1854,32 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	\label{algo:para}
 \end{algorithm}
 
-
-\begin{Lemma}
+\begin{lemma}
 	Suppose that $\ell$ is a generic element of ${\rm
 		hom}_{\Kbar}(Q,\Kbar)$ and that $t$ is a generic linear form. Then
 	the output $((P,V_1,\dots,V_n),X_1)$ of
 	$\mathsf{ParametrizationX}_1(\ell,t)$ is a zero-dimensional
 	parametrization of $V_{\mathfrak{A}}$.
-\end{Lemma}
+\end{lemma}
 \begin{proof}
-	Lemma~\ref{lemma:minpoly} shows that for a generic choice of $\ell$,
+	\cref{lemma:minpoly} shows that for a generic choice of $\ell$,
 	$M$ is the minimal polynomial of $X_1$, so that we indeed have
 	$P=\prod_{j \in \{1,\dots,c\}, m_j=1} (T-r_j)$. Let then $r_j$ be
-	one of these roots; by Lemma~\ref{lemma:valuelambda}, for $i=0,1,2$
+	one of these roots; by \cref{lemma:valuelambda}, for $i=0,1,2$
 	we have $ A_i(r_j) = M'(r_j) (t^i \cdot \lambda_j)(1)$, where
 	$\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
 	components of $\ell$. 
 	
 	As a result, the value of $ A_0  A_2 -  A_1^2$ at
 	$r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
-	quantity $ac-b^2$ defined in Lemma~\ref{lemma:acb2}, so for a
+	quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
 	generic choice of $\ell$ and $t$, it vanishes if and only if $j$ is
 	in $\mathfrak{a}$. Thus, after Step~\ref{step:updateP}, 
 	$P$ is equal to $\prod_{j \in \mathfrak{a}} (T-r_j)$.
 	
 	The last step is to compute the zero-dimensional parametrization of
 	$V_{\mathfrak{A}}$. This is done using again
-	Lemma~\ref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
+	\cref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
 	$T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
 	$$ A_1(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
 	A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
