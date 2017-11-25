@@ -1577,29 +1577,29 @@ Thus, we get the following algorithm:
 		\item $\mM,\mM_1,\dots,\mM_n$ defined as above
 	\end{itemize}
 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
-	\begin{enumerate}\setlength\itemsep{0em}
+  \begin{enumerate}[{\bf 1.}]
 		\item choose $\mU \in \mathbb{K}^{D\times D}$
 		\item $\mF^{U,M} = T - \mU\mM\mU^{-1}$
 		\item $\mN^{*} = \mU$
 		\item $P =$ largest invariant factor of $\mF^{U,M}$
 		\item $R =$ SquareFreePart$(P)$
-		\item {\sf $a = [0 ~\cdots 0 P] (\mF^{U,M,V})^{-1}$}
+		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{U,M,V})^{-1}$}
 		\item {\sf $N=a\mN^*e$}
 		\item {for j = $1 \dots n$:}
-		\begin{itemize}
-			\item[8.1. ] $\mN_j^* = \mU\mM_j$
-			\item[8.2. ] $N_j = a\mN_j^*e$
-			\item[8.3. ] $R_j = N_j/N$ mod $R$
-		\end{itemize}
+      \begin{enumerate}[{\bf 8.1.}]
+			\item $\mN_j^* = \mU\mM_j$
+			\item $N_j = a\mN_j^*e$
+			\item $R_j = N_j/N$ mod $R$
+		\end{enumerate}
 		\item return $((R, R_1,\dots,R_n),t)$
 	\end{enumerate}
 	\label{algo:dense-block-sparse-fglm}
 \end{algorithm}
 Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
 in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
-and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. We can solve for $a$ by
+and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. \todo{We can solve for $a$ by
 using the high-order lifting algorithm of \cite[Algorithm~5]{Stor03}. 
-By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.
+By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.}
 Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 \subsection{Decomposition of linear forms.}
