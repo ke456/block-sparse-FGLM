@@ -238,16 +238,19 @@ in~\eqref{eq:RUR} by means of some structured linear algebra calculation.
 A drawback of this approach is that we need to know the trace of all
 elements of the basis $\basis$; while feasible in polynomial time,
 this is by no means straightforward. In~\cite{BoSaSc03}, Bostan {\it
-  et al.} introduced randomization to alleviate this issue: they show
-that computing values such as $\ell(X^i)$ and $\ell(X^i X_j)$, where $\ell$ is
-a random $\K$-linear form $Q \to \K$, allows one to compute a
-description of $V(I)$ of the form
+  et al.} introduced randomization to alleviate this issue. They show
+that computing values such as $\ell(X^i)$ and $\ell(X^i X_j)$, where
+$X$ is as above and 
+$\ell$ is a random $\K$-linear form $Q \to \K$, allows one to deduce
+a description of $V(I)$ of the form
 \begin{equation}\label{eq:BoSaSc03}
  \{  P(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
 \end{equation}
 where $P$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
-$\K[T]$ of degree less than $\deg(P)$ for all $i$.  In particular,
-this output will in general differ from the description
+$\K[T]$ of degree less than $\deg(P)$ for all $i$. Precisely, the
+output of such algorithms is the tuple $((P,V_1,\dots,V_n),X)$; this
+will be called a {\em zero-dimensional parametrization} of $V(I)$. In
+particular, this output will in general differ from the description
 in~\eqref{eq:RUR}, since the latter keeps trace of the multiplicities
 of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
 the {\em nil-indices} of the solutions).
@@ -286,14 +289,26 @@ Our first contribution is to give a block version of
 the algorithm in~\cite{BoSaSc03} that extends the approach
 in~\cite{Steel15} to compute all polynomials in~\eqref{eq:BoSaSc03}
 for essentially the same cost as the computation of $P$.
-\todo{define the output}
 
-\paragraph{Basic algorithms.}
-Over a field $\mathbb{K}$, recall that we can compute
-multiplication, division with remainder, extended GCD, and square
-free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
-field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
+
+\paragraph{Complexity model.}
+We measure the cost of our algorithms by counting all operations in
+$\K$ at unit cost. Most algorithms are randomized; they involve the
+choice of a vector $\gamma \in \K^S$ of field elements, for some $S$
+that depends on the size of our input, and success is guaranteed if
+the vector $\gamma$ avoid a hypersurface of the parameter space
+$\K^S$. Given a zero-dimensional parametrization computed by one of
+these algorithms, one can always evaluate 
+
+We rely 
+Over a field $\mathbb{K}$, recall that we can compute multiplication,
+division with remainder, extended GCD, and square free part of
+polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$ field
+operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
 \cite{GaGe13}.
+
+
+
 
 %% \subsection{Sparse-FGLM Algorithm}
 %% The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
@@ -589,7 +604,9 @@ lemma is in \cite[Theorem~4.5]{Turner02}.
     < \degBdr} Q_k \var^k$, we have $\seqelt{s+\degBdr} = \sum_{0
     \le k < \degBdr} \seqelt{s+k} Q_k$ for all $s \ge 0$.
 	
-  Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{s + k} = 0$ holds
+  Assuming that 
+ $p_0 \seqelt{s} + \cdots +
+  p_{\degBd} \seqelt{s + \degBd} = 0$ holds
   for all $s \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
   holds for all $s\in\NN$. Let $s \ge \degBdr-1$ and assume that this
   identity holds for all integers up to $s$. Then, the identity concluding
@@ -683,7 +700,7 @@ may find further applications. The proof is a direct consequence of
 the previous theorem, using the algorithms of
 respectively~\cite{GiJeVi03},~\cite{ZhoLab12} and~\cite{JeNeScVi16}.
 \todo{choose $d \ge \dots$}
-\begin{corollary}
+\begin{corollary}\label{coro:cost_approx}
   Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and
   let $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in
   \NN^2$ are such that the left (resp.~right) canonical matrix
@@ -726,14 +743,15 @@ is a scalar relation for it. The following theorem gives a bound on
 the degree of a minimal left generator of $\seq^{\mU,\mV}$,
 for generic choices of $\mU$ and $\mV$; we also
 state properties of the invariant factors of such a generator.
-\todo{check Turner} \todo{define genericity}
+\todo{check Turner}
 
 To do so, we let $s_1, \dots, s_r$ be the invariant factors of $T\mI_D
 - \mM$, ordered in such a way that $s_r | s_{r-1}| \dots | s_1$, and
 let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
 with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
-\todo{unify subscripts  $\mat{P}^{\mU,\mM,\mV}$ or   $\seq^{\mU,\mV}$}
+
+%% \todo{unify subscripts  $\mat{P}^{\mU,\mV}$ or   $\seq^{\mU,\mV}$}
 
 %% First, we present a proof that one can compute the minimal polynomial
 %% of $\mM$ from the output of Matrix Berlekamp-Massey if we choose the
@@ -742,21 +760,21 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 \begin{theorem}
   \label{randXY}
   For a generic choice of $\mU$ and $\mV$, the following holds.  Let
-  $\mat{P}^{\mU,\mM,\mV}$ be a minimal left generator for
+  $\mat{P}^{\mU,\mV}$ be a minimal left generator for
   $\seq^{\mU,\mV}$ and denote by $\sigma_1, \dots, \sigma_k$ the
-  invariant factors of $\mat{P}^{\mU,\mM,\mV}$, for some $k \le m$,
+  invariant factors of $\mat{P}^{\mU,\mV}$, for some $k \le m$,
   ordered as above; write $\sigma_i=1$ for $i > k$. Then,
   \begin{itemize}
-  \item $\mat{P}^{\mU,\mM,\mV}$ has degree $\delta$;
+  \item $\mat{P}^{\mU,\mV}$ has degree $\delta$;
   \item $s_i = \sigma_i$ for $1 \le i \le m$.
   \end{itemize}
 \end{theorem}
 \begin{proof}
   Without loss of generality, we can assume that
-  $\mat{P}^{\mU,\mM,\mV}$ is a canonical left generator. Then, define
+  $\mat{P}^{\mU,\mV}$ is a canonical left generator. Then, define
   the matrix sequence $\seq^{\mV} = (\mM^s \mV)_{s \ge 0}$; this
   sequence is linearly generated as well, and we let
-  $\mat{P}^{\mM,\mV}$ be a canonical left generator for it.
+  $\mat{P}^{\mV}$ be a canonical left generator for it.
 
   We denote by $\langle \mV \rangle$ the vector space generated by the
   columns of $\mV,\mM\mV,\mM^2\mV,\dots$, and we write
@@ -764,26 +782,26 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 	
   First, we prove that for any $\mV$ in $\K^{D \times m}$, for a
   generic $\mU$ in $\K^{D\times m}$,
-  $\mat{P}^{\mM,\mV}=\mat{P}^{\mU,\mM,\mV}$.  Indeed,
+  $\mat{P}^{\mV}=\mat{P}^{\mU,\mV}$.  Indeed,
   by~\cite[Lemma~4.2]{Villard97a}, there exists matrices $\mat{Q}_\mV$
   in $\K^{D\times D_\mV}$ and $\mM_\mV \in \K^{D_\mV \times D_\mV}$, with
   $\mat{Q}_\mV$ of full rank $D_\mV$, and where $\mM_\mV$ is a matrix of the
   restriction of $\mM$ to $\langle \mV \rangle$, such that
-  $\mat{P}^{\mU,\mM,\mV}=\mat{P}^{\mM,\mV}$ if and only if the
+  $\mat{P}^{\mU,\mV}=\mat{P}^{\mV}$ if and only if the
   dimension of the span of $[\mZ ~ \mB_\mV \mZ ~\mB_\mV^2 \mZ ~ \cdots]$
   is equal to $D_\mV$, with $\mB_\mV=\mM_\mV^\perp$ and $\mZ=\mat{P}_\mV^\perp
   \mU \in \K^{D_\mV \times m}$.
 	
   By construction, one can find a basis of $\langle \mV \rangle$ in
-  which the matrix of $\mM_\mV$ is block-companion, with $m' \le m$
+  which the matrix of $\mM_\mV$ is block-companion, with $\mu \le m$
   blocks (take the $\mM_\mV$-span of the first column of $\mV$, then of
   the second column, working modulo the previous vector space, etc.)
-  Thus, $\mB_\mV$ is similar to a block-companion matrix with $m'$
+  Thus, $\mB_\mV$ is similar to a block-companion matrix with $\mu$
   blocks as well; since $\mZ$ has $m$ columns, the span of $[\mZ ~
     \mB_\mV \mZ ~\mB_\mV^2 \mZ ~ \cdots]$ has full dimension $D_\mV$ for a
   generic $\mZ$ (and for a generic $\mU$, since $P_\mV$ has rank
   $D_\mV$). Thus, as claimed, for generic choices of $\mU$ and $\mV$,
-  $\mat{P}^{\mU,\mM,\mV}=\mat{P}^{\mM,\mV}$.
+  $\mat{P}^{\mU,\mV}=\mat{P}^{\mV}$.
 	
   Let us next introduce a matrix $\scrV$ of indeterminates of size $D
   \times m$, and let $\mat{P}^{\mM,\scrV}$ be the canonical generating
@@ -803,18 +821,18 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 %%  we have equality of the dimensions.
   Now, for a generic $\mV$ in $\K^{D\times m}$, $D_\mV=D_\scrV$. On the
   other hand, by~\cite[Lemma~4.3]{Villard97a}, for any $\mV$
-  (including $\scrV$), the degree of $\mat{P}^{\mM,\mV}$ is equal to
-  the first index $d$ such that $\dim({\rm span}([\mV ~ \mM \mV ~
-    \cdots ~\mM^{d-1} \mV]))=D_\mV$. As a result, for generic $\mV$,
-  $\mat{P}^{\mM,\mV}$ and $\mat{P}^{\mM,\scrV}$ have the same degree,
+  (including $\scrV$), the degree of $\mat{P}^{\mV}$ is equal to
+  the first index $d$ such that the dimension of ${\rm span}([\mV ~ \mM \mV ~
+    \cdots ~\mM^{d-1} \mV])$ is $D_\mV$. As a result, for generic $\mV$,
+  $\mat{P}^{\mV}$ and $\mat{P}^{\mM,\scrV}$ have the same degree,
   that is, $\delta$.  The first item is proved.
 	
   We conclude by proving that for generic $\mU,\mV$, the invariant
-  factors $\sigma_1,\dots,\sigma_m$ of $\mat{P}^{\mU,\mM,\mV}$ are
+  factors $\sigma_1,\dots,\sigma_m$ of $\mat{P}^{\mU,\mV}$ are
   $s_1,\dots,s_m$.  By~\cite[Theorem~2.12]{KaVi04}, for any $\mU$ and
   $\mV$ in $\K^{D\times m}$, for $i=1,\dots,m$, the $i$-th invariant
-  factor $\sigma_i$ of $\mat{P}^{\mU,\mM,\mV}$ divides $s_i$, so that
-  $\deg(\det(\mat{P}^{\mU,\mM,\mV}))\le\nu$, with equality if and only
+  factor $\sigma_i$ of $\mat{P}^{\mU,\mV}$ divides $s_i$, so that
+  $\deg(\det(\mat{P}^{\mU,\mV}))\le\nu$, with equality if and only
   if $\sigma_i=s_i$ for all $i \le m$.
 	
   For $\mV$ as above and any integers $e,d$, we let ${\rm
@@ -827,21 +845,32 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
     \mV & \mM\mV & \mM^2\mV &\cdots& \mM^{d-1}\mV
   \end{bmatrix}
   $$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}(\mV)) =
-  \deg(\det(\mat{P}^{\mM,\mV}))$ for $d \ge \deg(\mat{P}^{\mM,\mV})$
+  \deg(\det(\mat{P}^{\mV}))$ for $d \ge \deg(\mat{P}^{\mV})$
   and $e \ge D$.  We take $e=D$, so that ${\rm rank}({\rm
-    Hk}_{D,d}(\mV)) = \deg(\det(\mat{P}^{\mM,\mV}))$ for $d \ge
-  \deg(\mat{P}^{\mM,\mV})$. On the other hand, the sequence ${\rm
+    Hk}_{D,d}(\mV)) = \deg(\det(\mat{P}^{\mV}))$ for $d \ge
+  \deg(\mat{P}^{\mV})$. On the other hand, the sequence ${\rm
     rank}({\rm Hk}_{N,d}(\mV))$ is constant for $d \ge D$; as a
   result, ${\rm rank}({\rm Hk}_{D,D}(\mV)) =
-  \deg(\det(\mat{P}^{\mM,\mV}))$. For the same reason, we also have ${\rm
+  \deg(\det(\mat{P}^{\mV}))$. For the same reason, we also have ${\rm
     rank}({\rm Hk}_{D,D}(\scrV)) = \deg(\det(\mat{P}^{\mM,\scrV}))$, so that
-  for a generic $\mV$, $\mat{P}^{\mM,\mV}$ and $\mat{P}^{\mM,\scrV}$
+  for a generic $\mV$, $\mat{P}^{\mV}$ and $\mat{P}^{\mM,\scrV}$
   have the same determinantal degree, that is, $\nu$.  As a result,
   for generic $\mU$ and $\mV$, we also have
-  $\deg(\det(\mat{P}^{\mU,\mM,\mV}))=\nu$, and the conclusion follows.
+  $\deg(\det(\mat{P}^{\mU,\mV}))=\nu$, and the conclusion follows.
 \end{proof} 
 
+In particular, combining \cref{coro:cost_approx} and \cref{randXY}, we
+deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
+\rceil$ terms of the sequence $\seq^{\mU,\mV}$, we can recover a
+minimal matrix generator of it using $O(m^\omega \M(D/m) \log(D/m))
+\subset \softO{m^{\omega-1} D}$ operations in $\K$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Computing a numerator}
+
+The main advantage of the block Wiedemann algorithm is that it allows
+one to distribute the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1444,15 +1473,15 @@ as $ (\mN)_{T^{\ge 0}} $
   \begin{enumerate}[{\bf 1.}]
 		\item {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
 		\item {\sf $S= (\mU^{\perp}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
-		\item {\sf $\mF^{\mU,\mM,\mV} = {\sf MatrixBerlekampMassey}(S)$}
-		\item {\sf $\mN^* = (\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
-		\item {\sf $P=$ largest invariant factor of $\mF^{\mU,\mM,\mV}$}
+		\item {\sf $\mF^{\mU,\mV} = {\sf MatrixBerlekampMassey}(S)$}
+		\item {\sf $\mN^* = (\mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
+		\item {\sf $P=$ largest invariant factor of $\mF^{\mU,\mV}$}
 		\item {\sf $R={\sf SquareFreePart}(P)$} 
-		\item {\sf $a = [0 ~\cdots~ 0 ~ P] (\mF^{\mU,\mM,\mV})^{-1}$}
+		\item {\sf $a = [0 ~\cdots~ 0 ~ P] (\mF^{\mU,\mV})^{-1}$}
 		\item {\sf $N=a\mN^*$}
 		\item {\sf for $j = 1 \dots n$:}
     \begin{enumerate}[{\bf 9.1.}]
-			\item {\sf	$\mN_j^* = (\mF^{\mU,\mM,\mV}
+			\item {\sf	$\mN_j^* = (\mF^{\mU,\mV}
 				\sum_{i= 0}^{d-1} {(\mU^{\perp}\mM^i \mM_j e)}/{T^{i+1}})_{T^{\ge0}}$}
 			\item {\sf $N_j=a\mN_j^*$}
 			\item {\sf $R_j=N_j/N$ mod $R$}
@@ -1501,9 +1530,9 @@ By \cite[Corollary~16]{Stor03}, the cost of this is
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
 $O(D^2)$ by using the above method.
 Recall, from \cref{section:linseq}, that
-we can compute $\mN_v^* = \mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}/{T^{i+1}}$ by first
-doing a product $\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$.
-Since both $\mF^{\mU,\mM,\mV}$ and $\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$
+we can compute $\mN_v^* = \mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}/{T^{i+1}}$ by first
+doing a product $\mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$.
+Since both $\mF^{\mU,\mV}$ and $\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$
 have degree at most $d$, this product can be done in cost $O(m^2M(D/m))$.
 
 Now, $\mN_v^*$ has degree less than $D/m$ and $a$ has degree at most $D$, so
@@ -1522,12 +1551,12 @@ $$O(cD^3/m + m^{\omega} M(D/m) \log(D/m) \log(m) + nm^2M(D/m)),$$
 The largest invariant factor of $T\mI - \mM$ is the minimal polynomial
 of $\mM$. Therefore, the above theorem shows that if we choose the
 entries of $\mU$ and $\mV$ randomly, we will have that the largest
-invariant factor of $\mF^{\mU,\mM,\mV}$ is the minimal polynomial of $\mM $
+invariant factor of $\mF^{\mU,\mV}$ is the minimal polynomial of $\mM $
 with high probability.
 
 Next, we prove that one can recover a scalar numerator through a matrix
 numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
-  deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mM,\mV})^{-1} =
+  deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mV})^{-1} =
   \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
 $\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
 invariant factor $P$. So there's nothing to prove.}
@@ -1538,8 +1567,8 @@ invariant factor $P$. So there's nothing to prove.}
 \end{lemma}
 
 \begin{proof}
-	Let $\mathscr{D} = \mA\mF^{\mU,\mM,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mM,\mV}$ and $s_1, \cdots s_m$ be
-	invariant factors of $\mF^{\mU,\mM,\mV}$ such that 
+	Let $\mathscr{D} = \mA\mF^{\mU,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mV}$ and $s_1, \cdots s_m$ be
+	invariant factors of $\mF^{\mU,\mV}$ such that 
 	$s_m | s_{m-1} | \cdots | s_1$.
 	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
 	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
@@ -1554,17 +1583,17 @@ invariant factor $P$. So there's nothing to prove.}
 	&= [0,\cdots,0,s_1] \mB
 	\end{align*}
 	Therefore, if $a = w \mA$, we get
-	$ a \mF^{\mU,\mM,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
+	$ a \mF^{\mU,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
 	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
 	entries, $a$ must also have polynomial entries.\\
 \end{proof}
 
 \begin{theorem}
 	 Let $U = [u_1,u_2,\dots,u_m]$be in $\K^{D\times m}$,
-	 $\mF^{\mU,\mM,\mV}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
+	 $\mF^{\mU,\mV}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
 	 and $P$ be the minimal polynomial of $\mM$. For any 
 	 $v \in \K^{D}$, if\\ 
-	 $\mN^* = (\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1})_{T^{\ge0}}$ 
+	 $\mN^* = (\mF^{\mU,\mV}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1})_{T^{\ge0}}$ 
 	 and $N = a\mN^*$,
 	 then $N = \Omega((u_m^t \mM^i v)_{i\ge0},P)$.
 	 \label{theorem:anyv}
@@ -1572,11 +1601,11 @@ invariant factor $P$. So there's nothing to prove.}
 
 \begin{proof}
 	Let $Z = \sum_{i=0}^{\infty} (\mU^t\mM^iv)/T^{i+1}$ and
-	$\mN^{*'} = \mF^{\mU,\mM,\mV} Z$.
+	$\mN^{*'} = \mF^{\mU,\mV} Z$.
 	Since the highest power of the entries in 
 	$Z$ is $T^{-1}$, the 
 	entries of the product $\mN^{*'}$ must have degree less 
-	than $d = deg(\mF^{\mU,\mM,\mV})$. Furthermore, since $\mF^{\mU,\mM,\mV}$ cancels 
+	than $d = deg(\mF^{\mU,\mV})$. Furthermore, since $\mF^{\mU,\mV}$ cancels 
 	the sequence $(\mU\mM^i\mV)_{i \ge 0}$, $\mN^{*'}$ is a
 	polynomial matrix and does not have any terms of negative exponents.
 	This means that all terms in $Z$ with degree less than $T^{-d}$ must vanish in the
@@ -1586,7 +1615,7 @@ invariant factor $P$. So there's nothing to prove.}
 	
 	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_m]$, then
 	$$
-	\mN^* = \mF^{\mU,\mM,\mV}
+	\mN^* = \mF^{\mU,\mV}
 	\sum_{i=0}^{\infty} \mU^{\perp} \mM^i v / T^{i+1} =
 	\begin{bmatrix}
 	\sum_{i\ge 0} u_1^{\perp}\mM^iv/T^{i+1}\\
@@ -1595,7 +1624,7 @@ invariant factor $P$. So there's nothing to prove.}
 	\end{bmatrix}$$
 	Recall $\Omega$ from \cref{def:omega}.
 	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
-	$$ \mN^* = \mF^{\mU,\mM,\mV}
+	$$ \mN^* = \mF^{\mU,\mV}
 	\begin{bmatrix}
 	\Omega( (u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
@@ -1603,11 +1632,11 @@ invariant factor $P$. So there's nothing to prove.}
 	\end{bmatrix}
 	$$
 	By \cref{randXY}, the $i^{th}$ invariant factor of
-	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{\mU,\mM,\mV}$ 
+	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{\mU,\mV}$ 
 	for generic choice of
 	$\mU,\mV$. Thus, $s_1 = P$ and by \cref{utilde}
 	\begin{align*}
-	a \mN^* &= a \mF^{\mU,\mM,\mV}
+	a \mN^* &= a \mF^{\mU,\mV}
 	\begin{bmatrix}
 	\Omega((u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
@@ -1630,7 +1659,7 @@ when we pick specific values for $v$ and applying \cref{theorem:anyv}.
 In line 4 of \cref{algo:block-sparse-fglm}, we have $v = e$, 
 where $e$ is the coordinate vector for $1 \in \mathbb{B}$.
 By applying \cref{theorem:anyv}, we have that
-$$\mN^* = \mF^{\mU,\mM,\mV}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
+$$\mN^* = \mF^{\mU,\mV}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
 $$N = a\mN^* = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P).$$
 By construction,
 $\mM^i e$ gives the coordinate vector of $t^i$ in $\mathbb{B}$, so
@@ -1639,7 +1668,7 @@ where $\ell_{u_m}$ is the linear form associated with $u_m$. Therefore,
 $$N = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
 
 Similarly, in line 7.1 of \cref{algo:block-sparse-fglm}, we compute
-$\mN^*_j = \mF^{\mU,\mM,\mV}\sum_{i\ge0} \mU^{\perp} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
+$\mN^*_j = \mF^{\mU,\mV}\sum_{i\ge0} \mU^{\perp} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
 $$N_j = a \mN^*_j = \Omega((u_m^{\perp} \mM^i \mM_j e)_{i\ge 0},P) $$
 Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
 $\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
@@ -1708,13 +1737,13 @@ $$ S = (
 26& 76
 \end{bmatrix}
 )$$
-$$ \mF^{\mU,\mM,\mV} =
+$$ \mF^{\mU,\mV} =
 \begin{bmatrix}
 T^2 + 76T + 8&       87T + 31\\
     100T + 46& T^2 + 87T + 44
 \end{bmatrix}
 $$
-The biggest invariant factor of $\mF^{\mU,\mM,\mV}$ is 
+The biggest invariant factor of $\mF^{\mU,\mV}$ is 
 $$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = R$$
 since $P$ is square free. 
 Now, we compute $\mN^*$ and $a$:
@@ -1787,8 +1816,8 @@ In general, experiments show that choosing $1 \le m \le D$ that matches
 the number of cores is optimal in \cref{section:ex}. However,
 when $m=1$, blocking has no effect and there is no parallelization
 to be had. In particular, the minimum generating polynomial matrix
-$\mF^{\mU,\mM,\mV}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
-$a = P (\mF^{\mU,\mM,\mV})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
+$\mF^{\mU,\mV}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
+$a = P (\mF^{\mU,\mV})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
 \cref{algo:block-sparse-fglm}.
 
 If the multiplication matrices are dense, then it is
@@ -1819,7 +1848,7 @@ Thus, we get the following algorithm:
 		\item $\mN^{*} = \mU$
 		\item $P =$ largest invariant factor of $\mF^{U,M}$
 		\item $R =$ SquareFreePart$(P)$
-		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mM,\mV})^{-1}$}
+		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mV})^{-1}$}
 		\item {\sf $N=a\mN^*e$}
 		\item {for j = $1 \dots n$:}
       \begin{enumerate}[{\bf 8.1.}]
