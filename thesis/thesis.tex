@@ -1328,23 +1328,26 @@ $$
 in cost $O(m^{\omega-2}D^2)$.
 
 Recall, from \cref{section:matrix_seq}, that we can compute
-the minimum generating polynomial matrix in $O(m^{\omega-1} D \log(D/m))$.
+the minimum generating polynomial matrix in $O(m^{\omega} M(D/m) \log(D/m))$.
 The largest invariant factor $P$ and the quotient $a$ in lines 5 and 6 respectively by using the high-order
 lifting algorithm of \cite[Algorithm~5]{Stor03}. 
 By \cite[Corollary~16]{Stor03}, the cost of this is 
-\todo{$O(m^{\omega} d \log(m)) = O(m^{\omega-1} D \log(m))$}.
+\todo{$O(m^{\omega} M(D/m) \log(D/m) \log(m))$}.
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
-$O(D^2)$ by using the above method. Recall, from \cref{section:linseq}, that
+$O(D^2)$ by using the above method.
+Recall, from \cref{section:linseq}, that
 we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
 doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
 Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
-have degree at most $d$, this product can be done in cost $O(m(md)) = O(mD)$.
-Now, $\mN_v^*$ has degree less than $d$ and $a$ has degree at most $D$, so
-computing $a \mN_v^*$ costs $O(mD)$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(nmD)$
-Since $\mF^{U,M,V}$ has degree $d$ and $a$ has degree $D$ at most, we
-can compute . Since $P,R,N,N_j$, $1\le j \le n$
-have degree at most $D$, lines 6 and 9.3 costs $O(D)$.
-Finally, we get the cost $O(cD^3/m + m^{\omega-2}D^2 + m^{\omega-1} D \log(D) + nmD )$.
+have degree at most $d$, this product can be done in cost $O(m^2M(D/m))$.
+
+Now, $\mN_v^*$ has degree less than $D/m$ and $a$ has degree at most $D$, so
+computing $a \mN_v^*$ costs $O(m^2M(D/m))$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(n(m^2M(D/m)))$.
+Since $P,R,N,N_j$, $1\le j \le n$
+have degree at most $D$, lines 6 and 9.3 costs $O^{\tilde{~}}(D)$.
+Finally, assuming perfect parallelization and $m << D$, we get the cost 
+$$O(cD^3/m + m^{\omega} M(D/m) \log(D/m) \log(m) + nm^2M(D/m)),$$
+
 
 
 
@@ -1684,20 +1687,20 @@ $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 \begin{tabular}{c|c|c|c|c|c|c|c}
 	\textbf{name}& n& $\mathbf{D}$ & \textbf{Sparsity} & $\mathbf{m = 1}$ & $\mathbf{m = 4}$ & $\mathbf{m = 8}$ & $\mathbf{deg(P) = D}$\\
 	\cline{1-8}
-	rand3-1   &3 & 512 & 0.08     & 2.853   & 0.798   & 0.592   & yes \\
-	rand3-2   &3 & 1728& 0.05     & 70.626  & 21.941  & 13.381  & yes \\
-	rand3-3   &3 & 3375& 0.04     & 418.708 & 113.336 & 77.259  & yes \\
-	randsq3-1 &3 &  1728& 0.05     & 70.633  & 19.770  & 13.249  & no  \\
-	randsq3-2 &3 & 2744& 0.04     & 241.162 & 63.778  & 44.829  & no  \\
-	randsq3-2 &3 & 4096& 0.04     & 699.944 & 187.988 & 128.88  & no  \\
-	bannwarth &5 & 284 & 0.27     & 1.027   & 0.364   & 0.220   & yes \\
-	cyclic7   &7 & 924 & 0.02     & 7.038   & 1.954   & 1.448   & yes \\
-	eco12     &12& 1024& 0.13     & 62.294  & 16.427  & 11.539  & yes \\
-	katsura8  &9 & 256 & 0.28     & 1.207   & 0.338   & 0.249   & yes \\
-	katsura9  &10& 512 & 0.26     & 9.210   & 2.453   & 1.865   & yes \\
-	katsura10 &11& 1024& 0.25     & 71.243  & 18.867  & 13.218  & yes \\
-	sot1      &5 & 8694& 0.001    & 762.063 & 208.25  & 143.281 & yes \\
-	vor2      &6& 574 & 0.24     & 10.238  & 2.749   & 1.972   & yes 
+	rand(3,10)&3 & 1000& 0.06  & 16.550  & 4.45    & 3.305   & yes \\
+	rand(3,12)&3 & 1728& 0.05  & 70.703  & 18.74   & 13.250  & yes \\
+	rand(3,14)&3 & 2744& 0.05  & 240.992 & 64.619  & 44.737  & yes \\
+	rand(3,16)&3 & 4096& 0.04  & 697.91  & 191.327 & 129.598 & yes \\
+	rand(3,18)&3 & 5832& 0.03  & 1779.89 & 473.091 & 329.231 & yes \\
+	rand(3,20)&3 & 8000& 0.03  & 4128.45 & 1099.08 & 759.426 & yes \\
+	bannwarth &5 & 284 & 0.27  & 1.027   & 0.364   & 0.220   & yes \\
+	cyclic7   &7 & 924 & 0.02  & 7.038   & 1.954   & 1.448   & yes \\
+	eco12     &12& 1024& 0.13  & 62.294  & 16.427  & 11.539  & yes \\
+	katsura8  &9 & 256 & 0.28  & 1.207   & 0.338   & 0.249   & yes \\
+	katsura9  &10& 512 & 0.26  & 9.210   & 2.453   & 1.865   & yes \\
+	katsura10 &11& 1024& 0.25  & 71.243  & 18.867  & 13.218  & yes \\
+	sot1      &5 & 8694& 0.001 & 762.063 & 208.25  & 143.281 & yes \\
+	vor2      &6 & 574 & 0.24   & 10.238  & 2.749   & 1.972   & yes 
 \end{tabular}
 \end{center}
 
