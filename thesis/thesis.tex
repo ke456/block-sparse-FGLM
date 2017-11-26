@@ -6,20 +6,22 @@
 \usepackage{algorithm, pseudocode}
 \usepackage[shortlabels]{enumitem}% for enumerate / itemize: define reasonable margins
 \setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
-\pagestyle{empty}
 
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
-\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
+
 
 % math and theorem names
 \usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
 \usepackage{amsthm,thmtools}
+
+\declaretheoremstyle[headfont=\normalfont\bfseries,bodyfont=\normalfont]{myremark}
+
+
 \declaretheorem[style=plain,parent=section]{definition}
 \declaretheorem[sibling=definition]{theorem}
 \declaretheorem[sibling=definition]{corollary}
 \declaretheorem[sibling=definition]{proposition}
 \declaretheorem[sibling=definition]{lemma}
-\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{remark}
+\declaretheorem[style=myremark,sibling=definition]{remark}
 \declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{example}
 \usepackage[capitalize]{cleveref}
 
@@ -45,16 +47,16 @@
 \newcommand{\polMatSpaceAux}[1][\storeArg]{\polRing^{\storeArg \times #1}} % not to be used in document
 \newcommand{\psMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\psMatSpaceAux} % polynomial matrix space, 2 opt args
 \newcommand{\psMatSpaceAux}[1][\storeArg]{\psRing^{\storeArg \times #1}} % not to be used in document
-\newcommand{\mat}[1]{\mathbf{\MakeUppercase{#1}}} % for a matrix
-\newcommand{\row}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
-\newcommand{\col}[1]{\mathbf{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\mat}[1]{\bm{\MakeUppercase{#1}}} % for a matrix
+\newcommand{\row}[1]{\bm{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\col}[1]{\bm{\MakeLowercase{#1}}} % for a matrix
 \newcommand{\matCoeff}[1]{\MakeLowercase{#1}} % for a coefficient in a matrix
 \newcommand{\rdim}{m} % row dimension
-\newcommand{\cdim}{n'} % column dimension
+\newcommand{\cdim}{m'} % column dimension
 \newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
-\newcommand{\seqelt}[1]{S_{#1}} % element of sequence of matrices
+\newcommand{\seqelt}[1]{F_{#1}} % element of sequence of matrices
 \newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
-\newcommand{\seq}{\mathcal{S}} % sequence of matrices
+\newcommand{\seq}{\mathcal{F}} % sequence of matrices
 \newcommand{\seqpm}{\mat{Z}} % power series matrix from a sequence
 \newcommand{\rel}{\col{p}} % linear relation
 \newcommand{\relbas}{\mat{P}} % linear relation
@@ -73,6 +75,15 @@
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
 \newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
 \newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
+\newcommand{\basis}{\mathscr{B}}
+\newcommand{\trace}{\mathrm{trace}}
+\newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
+\newcommand{\genseries}{Z}
+
+\def\M {\ensuremath{\mathsf{M}}}
+\def\Deg{D}
 
 \def\C {\ensuremath{\mathbb{C}}}
 \def\Q {\ensuremath{\mathbb{Q}}}
@@ -81,12 +92,14 @@
 \def\Z {\ensuremath{\mathbb{Z}}}
 \def\F {\ensuremath{\mathbb{F}}}
 \def\H {\ensuremath{\mathbb{H}}}
+\def\K{\mathbb{K}}
 \def\K {\ensuremath{\mathbb{K}}}
 \def\Kbar {{\ensuremath{\overline{\mathbb{K}}}}}
 \def\A {\ensuremath{\mathbb{A}}}
 \def\D {\ensuremath{D}}
 \def\m {\ensuremath{\mathfrak{m}}}
 
+\def\scrY{\mathscr{Y}}
 \def\scrM {\ensuremath{\mathscr{M}}}
 \def\calL {\ensuremath{\mathcal{L}}}
 \def\scrP {\ensuremath{\mathscr{P}}}
@@ -97,6 +110,32 @@
 \def\rk {\ensuremath{\mathrm{rk}}}
 
 \DeclareBoldMathCommand{\bell}{\ell}
+\DeclareBoldMathCommand{\be}{e}
+\DeclareBoldMathCommand{\bu}{u}
+\DeclareBoldMathCommand{\bv}{v}
+\DeclareBoldMathCommand{\bX}{X}
+\DeclareBoldMathCommand{\bx}{x}
+\DeclareBoldMathCommand{\balpha}{\alpha}
+\DeclareBoldMathCommand{\bbeta}{\beta}
+\DeclareBoldMathCommand{\mA}{A}
+\DeclareBoldMathCommand{\mB}{B}
+\DeclareBoldMathCommand{\mD}{D}
+\DeclareBoldMathCommand{\mF}{F}
+\DeclareBoldMathCommand{\mG}{G}
+\DeclareBoldMathCommand{\mI}{I}
+\DeclareBoldMathCommand{\mM}{M}
+\DeclareBoldMathCommand{\mNs}{N^*}
+\DeclareBoldMathCommand{\mN}{N}
+\DeclareBoldMathCommand{\mS}{S}
+\DeclareBoldMathCommand{\mT}{T}
+\DeclareBoldMathCommand{\mU}{U}
+\DeclareBoldMathCommand{\mV}{V}
+\DeclareBoldMathCommand{\mW}{W}
+\DeclareBoldMathCommand{\mX}{X}
+\DeclareBoldMathCommand{\mY}{Y}
+\DeclareBoldMathCommand{\mZ}{Z}
+\DeclareBoldMathCommand{\bell}{\ell}
+\DeclareBoldMathCommand{\be}{e}
 \DeclareBoldMathCommand{\bu}{u}
 \DeclareBoldMathCommand{\bv}{v}
 \DeclareBoldMathCommand{\bX}{X}
@@ -104,227 +143,560 @@
 \DeclareBoldMathCommand{\balpha}{\alpha}
 \DeclareBoldMathCommand{\bbeta}{\beta}
 
-\def\K{\mathbb{K}}
-\def\Deg{D}
-\def\scrY{\mathscr{Y}}
-\def\mA{\mathbf{A}}
-\def\mB{\mathbf{B}}
-\def\mD{\mathbf{D}}
-\def\mF{\mathbf{F}}
-\def\mG{\mathbf{G}}
-\def\mI{\mathbf{I}}
-\def\mM{\mathbf{M}}
-\def\mNs{\mathbf{N^*}}
-\def\mN{\mathbf{N}}
-\def\mS{\mathbf{S}}
-\def\mT{\mathbf{T}}
-\def\mU{\mathbf{U}}
-\def\mV{\mathbf{V}}
-\def\mW{\mathbf{W}}
-\def\mX{\mathbf{X}}
-\def\mY{\mathbf{Y}}
-\def\mZ{\mathbf{Z}}
+
 
 \title{Block Sparse-FGLM Algorithm}
 
-\thispagestyle{empty}
+\title{A block version of a sparse-FGLM-like algorithm}
+
+\author{Kevin Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost}
 
 \begin{document}
 
-\tableofcontents
-\pagebreak
+\maketitle
 
-\section{Introduction}
-Computing the Gr\"obner basis of an ideal with respect to a term
-ordering is an essential step in solving systems of polynomials. 
-Certain term orderings, such as the degree reverse lexicographical 
-ordering (\textit{degrevlex}), the computation of the Gr\"obner basis
-faster, while other orderings, such as the lexicographical ordering
-(\textit{lex}), make it easier to find the coordinates of the solutions.
-In particular, for a radical ideal with a finite set of points in its variety
-and in generic position, its lex Gr\"obner basis has the form
-$$ \{  x_1 - R_1(x_n), x_2-R_2(x_n),\dots, x_{n-1}-R_{n-1}(x_n), R_n(x_n)  \}$$
-where $R_i$ is a polynomial in only $x_n$. The points in the variety are
-$$\{ ( R_1(\alpha), R_2(\alpha), \dots, R_n(\alpha)  ) \mid \forall \alpha: R_n(\alpha)=0  \}$$
-Thus, one typically first computes a Gr\"obner basis for the degrevlex ordering,
-and then converts it to a lex Gr\"obner basis, or a related representation, such as 
-Rouillier's Rational Univariate Representation \cite{Rouillier99}. One such algorithm is
-the Sparse-FGLM, which can be seen as an application
-of the Wiedemann algorithm. In this document, we will
-introduce a new algorithm inspired by Sparse-FGLM
-and block Wiedemann algorithm that is easily
-parallelizable.
+Computing the Gr\"obner basis of an ideal with respect to a giving
+term ordering is an essential step in solving systems of polynomials.
+Certain term orderings, such as the degree reverse lexicographical
+ordering (\textit{degrevlex}), tend to make the computation of the
+Gr\"obner basis faster: this has been observed empirically since the
+1980's, and is now supported by theoretical results, at least for some
+``nice'' families of inputs, such as complete intersections or certain
+determinantal systems~\cite{Faugere02,FaSaSp13,BaFaSa15}.  On the
+other hand, other orderings, such as the lexicographical ordering
+(\textit{lex}), make it easier to find the coordinates of the
+solutions, or to perform arithmetic operations in the corresponding
+residue class ring.  For instance, for a zero-dimensional radical
+ideal $I$ in generic coordinates in $\K[X_1,\dots,X_n]$, for some field $\K$,
+the lexicographic Gr\"obner basis of $I$ for the lexicographic order $X_1 > \cdots > X_n$
+has the form
+\begin{equation}\label{eq:shapelemma}
+ \{ X_1 - R_1(X_n),\dots, X_{n-1}-R_{n-1}(X_n),R_n(X_n)\},
+\end{equation}
+where $R_n \in \K[X_n]$ is squarefree and all $R_i$'s are in $\K[X_n]$
+of degree less than $\deg(R_n)$; this is known as the {\em shape
+  lemma}~\cite{GiMo89}. The points in the variety $V(I)$ are then
+$$\{ ( R_1(\alpha), \dots, R_{n-1}(\alpha), \alpha ) \mid \forall
+ \alpha: R_n(\alpha)=0\}.$$ As a result, the standard approach to
+ solve a zero-dimensional system by means of Gr\"obner basis
+ algorithms first computes a Gr\"obner basis for a degree ordering,
+ then converts it to a more readable output, such as a lexicographic
+ basis. As pointed out in~\cite{FaMo17}, the latter step, while of
+ polynomial complexity, can now be a bottleneck in practice. This
+ paper will thus focus on this stage; in order to describe our 
+ contributions, we first discuss previous work on the question.
 
-\subsection{Basic Operations}
-Over a field $\mathbb{K}$,
-recall that we can compute multiplication,
-division with remainder, extended GCD, and square free part
-of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
-field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
-\cite{GaGe13}. 
+ Let $I$ be a zero-dimensional ideal in $\K[X_1,\dots,X_n]$.  As
+ input, we assume that we know a monomial basis $\basis$ of
+ $Q=\K[X_1,\dots,X_n]/I$, together with the multiplication matrices
+ $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this basis; we
+ denote by $D$ the degree of $I$, that is, the vector space dimension
+ of $Q$. We should point out that knowing a degree Gr\"obner basis of
+ $I$, computing the multiplication matrices efficiently is not a
+ straightforward task: Faug\`ere {\it et al.} showed how to do it in
+ time $O(nD^3)$ in~\cite{FaGiLaMo93} and more recently, algorithms have
+ been given with cost bound
+ $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
+ least for some favorable families of inputs. Here, the notation
+ $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
+ exponent for matrix multiplication. While improving these results in
+ an interesting question in itself, we will not address it in this
+ paper.
 
-\subsection{Sparse-FGLM Algorithm}
-The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
-Gr\"obner basis of an ideal with runtime cubic in the dimension
-of the monomial basis. More precisely, given
+Given such an input, the FGLM algorithm~\cite{FaGiLaMo93} computes the
+lexicographic Gr\"obner basis of $I$ in $O(nD^3)$ operations in $\K$.
+While the algorithm has an obvious relation to linear algebra,
+lowering the runtime to $O\tilde{~}(nD^\omega)$ was only recently
+achieved~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}. 
 
-\begin{center}
-\begin{tabular}{c c}
-	$I \subset \mathbb{K}$:& zero dimensional radical ideal
-	in shape position\\
-	$\mathbb{B} \subset \mathbb{K}[X_1,\dots,X_n]/I$:&
-	monomial basis of $\mathbb{K}[X_1,\dots,X_n]/I$\\
-	$D$: & dimension of $\mathbb{B}$\\
-	$\mM_1,\dots,\mM_n$:& multiplication matrices of
-	$X_1,\dots,X_n$ respectively	
-\end{tabular}
-\end{center}
-it produces the lex Gr\"obner basis of $I$ of the form
-$\{ P(X_1), X_2-R_2(X_1),\dots, X_n - R_n(X_1)  \}$.
-The key idea is that $P(X_1)$ is the minimal polynomial
-of the multiplication matrix $\mM_1$, which we can
-find using the Wiedemann algorithm. We generate
-$$ S = (u^{tr} \mM^i_1 e)_{(0 \le i < 2D)}$$
-where $u$ is a random vector and $e$ is the coordinate
-vector for $1$ in $\mathbb{B}$. Then, we find the minimum
-generating polynomial $P$ by
-applying the Berlekamp-Massey algorithm on $S$.
-We compute the numerator $n$ of the generating series
-$Z = \sum_{i=0}^{D-1} u^{tr} \mM^i_1 e/T^{i+1}$ by a product
-$N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we first
-compute the numerator $N_j$ of the generating series
-$Z_j = \sum_{i=0}^{D} u^{tr} \mM_1^i \mM_j e / T^{i+1}$ by a product
-$N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
-More general versions of the Sparse-FGLM algorithm exist to handle
-non-radical ideals using the Berlekamp-Massey-Sakata algorithm \cite{FaMo17}.
+Polynomials as in~\eqref{eq:shapelemma} are a very useful data
+structure, but there is no guarantee that the lexicographic Gr\"obner
+basis of $I$ possesses such a structure; when it does, we will say
+that $I$ is in {\em shape position} (some sufficient conditions are
+in~\cite{BeMoMaTr94}). As an alternative, one may use Rouillier's
+Rational Univariate Representation algorithm \cite{Rouillier99} (see
+also~\cite{AlBeRoWo94,BeWo96} for related considerations). The output
+is a description of the zero-set $V(I)$ by means of rational functions
+\begin{equation}\label{eq:RUR}
+ \{  F(T)=0, \quad X_1 = \frac{G_1(T)}{G(T)}, \dots,X_n = \frac{G_n(T)}{G(T)} \},
+\end{equation}
+where the multiplicities of a root $\tau$ of $F$ equals that of
+$I$ at the corresponding point
+$(G_1(\tau)/G(\tau),\dots,G_n(\tau)/G(\tau)) \in V(I)$; the fact that
+we use rational functions makes it in particular possible to control
+precisely the bit-size of their coefficients, if we work over $\K=\Q$.
 
-\newpage
-\section{Previous Results on Generating Series}
+The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on an
+idea that will be at the core of our algorithms as well: duality.
+Indeed, these algorithms compute sequences of values of the form
+$\tau_i=(\trace(X^i))_{i \ge 0}$ or 
+$\tau_{i,j}=(\trace(X^i X_j))_{i \ge 0}$, where $\trace: Q \to \K$ is the trace 
+form and $X$ is typically of the form $X=t_1 X_1 + \cdots + t_n X_n$.
+From these values, it is then possible to recover the output
+in~\eqref{eq:RUR} by means of some structured linear algebra calculation.
 
-\subsection{Overview}
-In what follows, $\K$ is a field.  Let $I$ be an ideal in
-$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
-residue class ring. Suppose that $V=V(I)$ has dimension zero, and
-write it as $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s
-in $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
-all $i$.  We also let $\D$ be the dimension of $Q$, so that $d \le
-\D$, and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In
-this section, we recall and generalize results from the appendix
-of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
-parametrization of $V$.
+A drawback of this approach is that we need to know the trace of all
+elements of the basis $\basis$; while feasible in polynomial time,
+this is by no means straightforward. In~\cite{BoSaSc03}, Bostan {\it
+  et al.} introduced randomization to alleviate this issue: they show
+that computing values such as $\ell(X^i)$ and $\ell(X^i X_j)$, where $\ell$ is
+a random $\K$-linear form $Q \to \K$, allows one to compute a
+description of $V(I)$ of the form
+\begin{equation}\label{eq:BoSaSc03}
+ \{  P(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
+\end{equation}
+where $P$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
+$\K[T]$ of degree less than $\deg(P)$ for all $i$.  In particular,
+this output will in general differ from the description
+in~\eqref{eq:RUR}, since the latter keeps trace of the multiplicities
+of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
+the {\em nil-indices} of the solutions).
 
-The main novelty in our approach is to avoid generic coordinates as
-much as possible. The algorithm will decompose $V$ into two parts: for
-the first part, we will be able to use $X_1$ as a separating element;
-the remaining points will be dealt with using a random linear
-form. Throughout, we rely only the following operations: evaluations
-of linear forms on successive powers of a given element in $Q$, say
-$1,t,t^2,\dots$, and elementary operations on univariate polynomials.
+The most costly part of such an algorithm is the computation of the
+values $\ell(X^i)$ and $\ell(X^i X_j)$; the rest essentially boils
+down to applying the Berlekamp-Massey algorithm and univariate
+polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re and Mou pointed
+out that the multiplication matrices $\mM_1,\dots,\mM_n$ can be
+expected to be sparse; they give precise estimates on their expected
+sparsity, assuming the validity of a conjecture due to
+Moreno-Soc\'ias~\cite{MorenoSocias91}. 
+On this basis, they designed several forms of {\em sparse FGLM}
+algorithms. For instance, if $I$ is in shape position, the algorithms
+in \cite{FaMo17} recover this basis, also by considering values of
+a linear form $\ell:Q \to \K$. For less favorable inputs, the algorithm
+falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90},
+or plain FGLM.
 
-The main algorithm is as follows. For the moment, we can only describe
-its main structure; the details of the subroutines are given in the
-next paragraphs.
+The ideas at play in these algorithms are essentially Krylov space
+methods, using projections and Berlekamp-Massey techniques; they are
+also widely used in integer factorization or discrete logarithm
+calculations~\cite{xxx,yyy}. It is then natural to adapt to our
+context the block version of such algorithms, as pioneered by
+Coppersmith~\cite{Coppersmith94} in the context of integer
+factorization; this makes it possible to easily parallelize the
+bottleneck of the algorithm. This was already discussed by Steel
+in~\cite{Steel15}, where he showed how to compute the analogue of
+polynomial $P$ in~\eqref{eq:BoSaSc03}. In that reference, one is
+only interested in the solutions in the base field $\K$ ($\K$ being a
+finite field in that context): the algorithm computes the roots of $P$
+in $\K$ and substitutes them in the input system, before computing a
+Gr\"obner basis in $n-1$ variables for each of them.
 
-\begin{algorithm}[H]
-	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
-		Input:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $Q$
-		\item $t=t_1 X_1 + \cdots + t_n X_n$
-	\end{itemize}
-	{\bf Output:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item polynomials $(P,(V_1,\dots,V_n))$
-	\end{itemize}
-	\begin{enumerate}
-		\item let $(F,(G_1,\dots,G_n),X_1)=\mathsf{ParametrizationX}_1(\ell)$
-		\item let $\ell'=\mathsf{Update}(\ell,F,t)$
-		\item let $(Q,(W_1,\dots,W_n),t)=\mathsf{ParametrizationGeneric}(\ell',t)$
-		\item let $(F^*,(G^*_1,\dots,G^*_n),t)=\mathsf{ChangeCoordinate}(F,(G_1,\dots,G_n),t)$
-		\item let  $(P,(V_1,\dots,V_n))=\mathsf{Union}(F^*,(G^*_1,\dots,G^*_n),\, Q,(W_1,\dots,W_n))$
-		\item \textbf{return} $(P,(V_1,\dots,V_n),t)$
-	\end{enumerate}
-\end{algorithm}
+Our first contribution is to give a block version of
+the algorithm in~\cite{BoSaSc03} that extends the approach
+in~\cite{Steel15} to compute all polynomials in~\eqref{eq:BoSaSc03}
+for essentially the same cost as the computation of $P$.
 
-The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
-zero-dimensional parametrization of a subset $V'$ of $V$ for which
-$X_1$ is a separating element, using values of the form
-$(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
-removes from $V$ the points we just found) and apply
-$\mathsf{ParametrizationGeneric}(\ell',t)$, to obtain a
-zero-dimensional parametrization of $V''=V-V'$ using values of the form
-$(\ell'(t^s))_{s \ge 0}$. The last two steps involve changing
-coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
-variable instead), and performing the union of the two components $V'$
-and $V''$.
+%% \subsection{Basic Operations}
+%% Over a field $\mathbb{K}$,
+%% recall that we can compute multiplication,
+%% division with remainder, extended GCD, and square free part
+%% of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
+%% field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
+%% \cite{GaGe13}. 
 
-\subsubsection{Basic facts on linearly recurrent sequences.} 
-\label{section:linseq}
-Consider a sequence $(\ell_s)_{s \ge 0} \in \K^\N$
-and the associated generating series $Z=\sum_{s \ge 0} \ell_s T^s \in
-\K[[T]]$. The sequence $(\ell_s)_{s \ge 0}$ is {\rm linearly recurrent} if and
-only if its generating series is {\em rational} that is, if there
-exist polynomials $A,B$ in $\K[T]$ such that $Z=A/B$; these
-polynomials are unique if we assume $\gcd(A,B)=1$ and $B(0)=1$. 
+%% \subsection{Sparse-FGLM Algorithm}
+%% The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
+%% Gr\"obner basis of an ideal with runtime cubic in the dimension
+%% of the monomial basis. More precisely, given
 
-We say that a degree $m$ polynomial $P\in\K[T]$ {\em cancels} a
-sequence $(\ell_s)_{s \ge 0}$ if $p_0 \ell_s + \cdots + p_m
-\ell_{s+m}=0$ for all $s \ge 0$, where $p_0,\dots,p_m$ are the
-coefficients of $P$; this is equivalent to ${\rm rev}(P) Z$ being a
-polynomial of degree less than $m$, with $Z=\sum_{s \ge 0} \ell_s T^s$
-and ${\rm rev}(P)=T^m P(1/T)$. The {\em minimal polynomial} of
-sequence $(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest degree
-that cancels this sequence. 
+%% \begin{center}
+%% \begin{tabular}{c c}
+%% 	$I \subset \mathbb{K}$:& zero dimensional radical ideal
+%% 	in shape position\\
+%% 	$\mathbb{B} \subset \mathbb{K}[X_1,\dots,X_n]/I$:&
+%% 	monomial basis of $\mathbb{K}[X_1,\dots,X_n]/I$\\
+%% 	$D$: & dimension of $\mathbb{B}$\\
+%% 	$\mM_1,\dots,\mM_n$:& multiplication matrices of
+%% 	$X_1,\dots,X_n$ respectively	
+%% \end{tabular}
+%% \end{center}
+%% it produces the lex Gr\"obner basis of $I$ of the form
+%% $\{ P(X_1), X_2-R_2(X_1),\dots, X_n - R_n(X_1)  \}$.
+%% The key idea is that $P(X_1)$ is the minimal polynomial
+%% of the multiplication matrix $\mM_1$, which we can
+%% find using the Wiedemann algorithm. We generate
+%% $$ S = (u^{tr} \mM^i_1 e)_{(0 \le i < 2D)}$$
+%% where $u$ is a random vector and $e$ is the coordinate
+%% vector for $1$ in $\mathbb{B}$. Then, we find the minimum
+%% generating polynomial $P$ by
+%% applying the Berlekamp-Massey algorithm on $S$.
+%% We compute the numerator $n$ of the generating series
+%% $Z = \sum_{i=0}^{D-1} u^{tr} \mM^i_1 e/T^{i+1}$ by a product
+%% $N = P Z$. To find $R_j(x_1)$, $2 \le j \le n$, we first
+%% compute the numerator $N_j$ of the generating series
+%% $Z_j = \sum_{i=0}^{D} u^{tr} \mM_1^i \mM_j e / T^{i+1}$ by a product
+%% $N_j = P Z_j$. Finally, $R_j(x_1) = \frac{N_j}{N} \mod P$.
+%% More general versions of the Sparse-FGLM algorithm exist to handle
+%% non-radical ideals using the Berlekamp-Massey-Sakata algorithm \cite{FaMo17}.
 
-Given the closed form $Z =  A/B$ as above, we define $\tilde B =
-T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.  By construction, $\tilde B$ lies
-in $\K[T]$, and one can check that it is the minimal polynomial of
-sequence $(\ell_s)_{s \ge 0}$. However, it is often easier to work with a 
-closed form that has the minimal polynomial as the denominator rather than
-its reverse. Let $Z' = \sum_{s\ge0} \ell_s / T^{i+1}$ and $P$ be a polynomial
-that cancels $(\ell_s)_{s\ge0}$, then the sequence 
-$(\ell_s)_{s\ge0}$ is linearly recurrent if and only if $Z'P$ is a polynomial
-of degree less than $deg(P)$. Therefore, if $A' = Z'P$ and $B' = P$, then we
-can write the closed form $Z' = A'/B'$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In both cases, if we are given the series and the denominator, then our 
-choice for the numerator is unique. The next definition captures this idea:
+\section{Basic results on linear recurrent sequences}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Scalar sequences} \label{section:linseq}
+
+Let $\K$ be a field and consider a sequence $\mathcal{L}=(\ell_s)_{s \ge 0} \in
+\K^\N$ and the associated generating series $\genseries=\sum_{s \ge 0}
+\ell_s T^s \in \K[[T]]$. We say that a degree $d$ polynomial
+$P\in\K[T]$ {\em cancels} a sequence $(\ell_s)_{s \ge 0}$ if $p_0
+\ell_s + \cdots + p_d \ell_{s+d}=0$ for all $s \ge 0$, where
+$p_0,\dots,p_d$ are the coefficients of $P$; this is equivalent to
+${\rm rev}(P) \genseries$ being a polynomial of degree less than $d$,
+with $\genseries=\sum_{s \ge 0} \ell_s T^s$ and ${\rm rev}(P)=T^d
+P(1/T)$.
+
+The sequence $(\ell_s)_{s \ge 0}$ is {\em linearly recurrent} if there
+exists a non-zero polynomial that cancels it; this is the case if and
+only if there exist polynomials $A,B$ in $\K[T]$ such that
+$\genseries=A/B$; these polynomials are unique if we assume
+$\gcd(A,B)=1$ and $B(0)=1$.  The {\em minimal polynomial} of a linearly
+recurrent sequence $\mathcal{L}=(\ell_s)_{s \ge 0}$ is the monic polynomial of
+lowest degree that cancels it. Given the closed form $\genseries =
+A/B$ as defined above, its minimal polynomial is $P =
+T^{\max(\deg(A)+1,\deg(B))}B(1/T)$. The {\em order} of $\mathcal{L}$ is the
+degree of this polynomial $P$.
+
+It is often easier to work with a closed form that has the actual
+minimal polynomial as its denominator, rather than its reverse; this
+is done by working with generating series in the variable $1/T$.
+Let indeed $\genseries^* = \sum_{s\ge0} \ell_s / T^{s+1}$ and $P$ be
+any polynomial; then, $P$ cancels the sequence
+$(\ell_s)_{s\ge0}$ if and only if $Q=P \genseries^* $ is a polynomial
+of degree less than $\deg(P)$, so that $\genseries^*=Q/P$, with $\deg(Q)<
+\deg(P)$.  Using generating series in $1/T$, the minimal polynomial of
+$(\ell_s)_{s \ge 0}$ is thus the monic polynomial $P$ of minimal degree for
+which there exists $Q \in \K[T]$ that satisfies $\genseries^*=Q/P$.
+
+In particular, given a sequence $(\ell_s)_{s \ge 0}$ and a polynomial
+that cancels it, there is a well-defined notion of associated
+numerator.  The next definition makes this idea precise:
 \begin{definition}
-	\label{def:omega}
-	Let $S=(S_k)_{k \ge 0}$ be a sequence and $P$ be a polynomial that cancels
-	$S$, then $\Omega(S,P)$ is the numerator for the closed form of $S$ with 
-	respect to $P$ if:
+  \label{def:omega}
+  Let $\mathcal{L}=(\ell_s)_{s \ge 0}$ be a sequence and let $P$ be a
+  polynomial that cancels $\mathcal{L}$. Then, the {\em numerator} of $\mathcal{L}$
+  with respect to $P$ is defined as 
+  $$\Omega(\mathcal{L},P) = P \sum_{s \ge 0} \frac {\ell_s}{T^{s+1}}.$$ In
+  view of the discussion above, we deduce that $\Omega(S,P)$ is a
+  polynomial of degree less than $\deg(P)$.
+\end{definition}
+\begin{remark}~
+  \begin{itemize}
+  \item We may as well write this definition using expressions in
+    variable $T$ instead of $1/T$: given
+    $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
+    $\Omega(\ell,P)$ by considering $\genseries=\sum_{s\ge 0} \ell_s
+    T^s$ and computing $A = {\rm rev}(P) L$, with ${\rm rev}(P)=T^d
+    P(1/T)$, with $d=\deg(P)$; then
+    $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
+\item If $\deg(P)=d$, we only need to know the coefficients
+  $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we 
+  have
+  $$\Omega(\mathcal{L},P) = ( P \sum_{s=0}^{d} \ell_{d - s} T^s ) {\rm ~div~} T^d.$$
+ \end{itemize}
+\end{remark}
+We give an example of this using the Fibonacci sequence $F =
+(1,1,2,3,5,8,\dots)$, which is linearly recurrent, with minimal
+polynomial $P=T^2-T-1$. Define $\genseries= \sum_{s\ge 0} F_{s} T^s$ and
+${\rm rev}(P) = 1-T-T^2$; then, we can write $\genseries$ in closed form as:
+$$\genseries = \frac{A}{{\rm rev}(P)} = \frac{1}{1-T-T^2},$$
+so that $\Omega(F,P)=T^{2-1} \cdot 1=T$. Equivalently, we can define $\genseries^* = \sum_{s\ge0} F_{s}/T^{s+1}$; then, 
+we recover 
+\begin{align*}
+\Omega(F,P) &= (T^2-T-1)\left (\frac 1T +\frac 1{T^2} + \frac 2{T^3} + \frac 3{T^4} + \cdots \right ) \\
+&=T.
+\end{align*}
+In terms of complexity, assuming that $\mathcal{L}$ has order at most $D$,
+given the first $2D$ terms of $\mathcal{L}$, we can recover its minimal
+polynomial $P$ by means of the Berlekamp-Massey algorithm, or of Euclid's
+algorithm applied to rational function reconstruction; this can be done
+in $O(\M(D)\log(D))$ operations in $\K$. Once we know $P$, we can
+deduce $\Omega(\mathcal{L},P)$ for the cost $\M(D)$ of one polynomial multiplication.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Linearly recurrent matrix sequences}\label{section:matrix_seq}
+
+Next, we discuss the analogue of these ideas in terms of matrix
+sequences. We first present the notion of linear recurrence for
+sequences of matrices over a field $\field$, which extends the
+well-known notion for sequences in $\field^\NN$; the definition comes
+from~\cite[Section~3]{KalVil01} and~\cite[Definition~4.2]{Turner02}.
+\begin{definition}
+  
+  \label{dfn:recurrence_relation}
+  Let $\seq = (\seqelt{s})_{s\ge 0} \subset \seqeltSpace$ be a matrix
+  sequence.  Then,
+  \begin{itemize}
+  \item a polynomial $P = p_0 + \cdots + p_\degBd T^\degBd \in \polRing$ is
+    a \emph{scalar relation for $\seq$} if $
+    p_0 \seqelt{s} + \cdots + p_{\degBd} \seqelt{s+\degBd} = 0$ holds for all $s \ge 0$;
+  \item a polynomial vector 
+$\rel = p_0 + \cdots + p_\degBd T^\degBd \in
+    \relSpace$ is  a \emph{(left, vector) relation for $\seq$} if
+$   p_0 \seqelt{s} + \cdots + p_{\degBd} \seqelt{s+\degBd} = 0$ holds for all
+    $s \ge 0$;
+  \item $\seq$ is  \emph{linearly recurrent} if there exists a
+    non-zero scalar relation for $\seq$.
+  \end{itemize}
+\end{definition}
+For designing efficient algorithms, it will be useful to rely on operations on
+polynomials or truncated series; hence the following characterization of vector
+relations.
+
+\begin{lemma}
+  \label{lem:linearly_recurrent}
+  Consider a matrix sequence $\seq = (\seqelt{s})_{s\ge 0} \subset
+  \seqeltSpace$ and its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} /
+  \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, $\rel \in \relSpace$
+  is a vector relation for $\seq$ if and only if the entries of $\num = \rel
+  \seqpm$ are in $\polRing$; furthermore, in this case, $\deg(\num) <
+  \deg(\rel)$.
+\end{lemma}
+\begin{proof}
+	Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
+	coefficient of $\num$ of degree $-\delta-1<0$ is $\sum_{0\le k \le \degBd}
+	p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
+	The degree comparison is clear since $\seqpm$ has only terms of (strictly)
+	negative degree.
+\end{proof}
+
+Concerning the algebraic structure of the set of vector relations, we have the
+following basic result, which can be found for example in
+\cite{Villard97,KalVil01,Turner02}.
+
+\begin{lemma}
+	\label{lem:module_rank}
+	The sequence $\seq$ is linearly recurrent if and only if the set of left
+	vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
+	$\rdim$.
+\end{lemma}
+\begin{proof}
+	The set of vector relations for $\seq$ is a $\polRing$-submodule of
+	$\relSpace$, and hence is free of rank at most $\rdim$
+	\cite[Chapter~12]{DumFoo04}.
+	
+	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
+	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
+	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
+	hence $\seq$ has rank $\rdim$.  Conversely, if $\seq$ has rank $\rdim$, then
+	it has a basis with $\rdim$ vectors, which form a matrix in $\relbasSpace$;
+	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
+\end{proof}
+
+Note however that a matrix sequence may admit nontrivial vector relations and
+have no scalar relation (and therefore not be linearly recurrent with the
+present definition); in this case the module of vector relations has rank less
+than $\rdim$.
+
+\begin{definition}
+	\label{dfn:matrix_generator}
+	Let $\seq \subset \seqeltSpace$ be linearly recurrent.  A \emph{(left) matrix
+		generator} for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
+	of the module of left vector relations for $\seq$. This basis is said to be
 	\begin{itemize}
-		\item $\Omega(S,P)$ is a polynomial of degree less than $deg(P)$
-		\item $\sum_{k\ge0} S_k / T^{k+1} = \Omega(S,P)/P$
+		\item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
+		%\item \emph{ordered weak Popov} if the matrix is in weak Popov form
+		%  \cite{MulSto03} with pivots on the diagonal;
+		\item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
 	\end{itemize}
 \end{definition}
-\noindent 
-Let $A$ and $A'$ be defined as above, then
-$$A' = \Omega((\ell)_{s\ge0},P) = T^{deg(P) - 1} A (1/T)$$ 
-\noindent This makes it possible to avoid computations using a series
-over $1/T$. More precisely, given a sequence $(\ell_s)_{s\ge0}$ and polynomial
-$P$ that cancels it, we compute $\Omega((\ell)_{s\ge0},P)$ by doing the following:
-\begin{align*}
-	Z &= \sum_{s=0}^{deg(P)} \ell_{(deg(P) - s)} T^s\\
-	N &= ZP \\
- 	\Omega((\ell)_{s\ge0},P) &= \sum_{s = 0}^{deg(P)-1} ([T^{s+deg(P)}] N) T^s,
-\end{align*}
-where $[T^{s+deg(P)}] N$ is the coefficient of $[T^{s+deg(P)}]$ in $N$.
 
-We give an example of this using
-the Fibonacci sequence, which is well known to be linearly recurrent. Since 
-the Fibonacci sequence $F = (1,1,2,3,5,8,\dots)$ is defined
-recursively as $F_{s+2} = F_{s} + F_{s+1}$, $F_{0}=F_{1} = 1$, it is
-easy to verify that the minimal polynomial of $F$ is $P = T^2-T-1$.
-Define $Z = \sum_{s\ge 0} F_{s} T^s$ and ${\rm rev}(P) = 1-T-T^2$, then
-we can write $Z$ in its closed form:
-$$Z = \frac{A}{B} = \frac{1}{1-T-T^2}$$
-\noindent Now, define $Z' = \sum_{s\ge0} F_{s}/T^{s+1}$, then we have that
-\begin{align*}
-\Omega(S,P)& = T^{deg(P)-1}A(1/T) = T\\
-\implies Z' &= \frac{T}{T^2-T-1}
-\end{align*}
+Note that the canonical generator is also a minimal generator; furthermore, all
+matrix generators $\relbas \in \relbasSpace$ for $\seq$ have the same
+determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  We
+now show that minimal matrix generators are denominators in some irreducible
+fraction description of the generating series of the sequence.  This is a
+direct consequence of \cref{lem:linearly_recurrent,lem:module_rank} and of
+basic properties of polynomial matrices.
+
+\begin{corollary}
+	A matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ is
+	linearly recurrent if and only if its generating series $\seqpm = \sum_{k\ge
+		0} \seqelt{k} / \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
+	written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
+	\in \relbasSpace$ is nonsingular and $\nummat \in
+	\polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
+	\rdeg{\relbas}$ and $\deg(\det(\relbas)) \ge \degDet$, and $\relbas$ is a
+	matrix generator of $\seq$ if and only if $\deg(\det(\relbas)) = \degDet$ or,
+	equivalently, the fraction $\relbas^{-1} \nummat$ is irreducible (that is,
+	$\mat{U} \relbas + \mat{V} \nummat = \mat{I}$ for some polynomial matrices
+	$\mat{U}$ and $\mat{V}$).
+\end{corollary}
+
+We remark that we may also consider vector relations operating on the right: in
+particular, \cref{lem:linearly_recurrent} shows that if the sequence is
+linearly recurrent then these right relations form a submodule of
+$\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent sequence
+also admits a right canonical generator.
+
+Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
+find a minimal matrix generator.  We assume the availability of bounds
+$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
+which allow us to control the number of terms of the sequence we will access
+during the algorithm.  Since taking the Popov form of a reduced matrix does not
+change the degree, any left minimal matrix generator $\relbas$ has the same
+degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
+a bound on the degree of any left minimal generator. The same remark holds for
+$\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
+the same as $\gamma_1,\gamma_2$ in \cite[Definitions~4.6~and~4.7]{Turner02};
+see also $\delta_l,\delta_r$ in \cite[Section~4.2]{Villard97a}.)
+
+\begin{lemma}
+	\label{lem:finitely_many_terms}
+	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent and
+	let $\degBdr \in \NN$ be such that the right canonical matrix generator of
+	$\seq$ has degree at most $\degBdr$.  Then, $\rel = \sum_{0\le k\le \degBd}
+	p_k \var^k \in \relSpace$ is a left relation for $\seq$ if and only if
+	$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for $\delta
+	\in \{0,\ldots,\degBdr-1\}$.
+\end{lemma}
+\begin{proof}
+	Since the right canonical generator $\relbas \in \polMatSpace[\cdim]$ is in
+	column Popov form, we have $\relbas =
+	\mat{L}\diag{\var^{t_1},\ldots,\var^{t_\cdim}} - \mat{Q}$ where
+	$\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_\cdim)$ componentwise and
+	$\mat{L} \in \matSpace[\cdim]$ is unit upper triangular. We define the matrix
+	$\mat{U} = \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_\cdim}}
+	\mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
+	\deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple $\relbas
+	\mat{U} = \var^{\degBdr} \mat{I}_\cdim - \mat{Q} \mat{U}$ are right relations
+	for $\seq$, and we have $\deg(\mat{Q} \mat{U}) < \degBdr$. As a consequence,
+	writing $\mat{Q} \mat{U} = \sum_{0 \le k < \degBdr} Q_k \var^k$, we have
+	$\seqelt{\degBdr+\delta} = \sum_{0 \le k < \degBdr} \seqelt{k+\delta} Q_k$
+	for all $\delta \ge 0$.
+	
+	Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds
+	for all $\delta \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
+	holds for all $\delta\in\NN$. Let $\delta \ge \degBdr-1$ and assume that this
+	identity holds for all integers up to $\delta$. Then, the identity concluding
+	the previous paragraph implies that
+	\begin{align*}
+	\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1 + k} & =
+	\sum_{0 \le k \le \degBd} p_{k} \left(\sum_{0\le j<\degBdr} \seqelt{\delta+1+k-\degBdr+j} Q_j\right) \\
+	& = \sum_{0\le j<\degBdr} 
+	\underbrace{\left(\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1-\degBdr+j+k}\right)}_{=\, 0 \text{ since } \delta+1-\degBdr+j \le \delta} Q_j = 0,
+	\end{align*}
+	and the proof is complete.
+\end{proof}
+
+(A similar result is in \cite[Theorem~4.5]{Turner02}.)
+
+The fast computation of matrix generators is usually handled via algorithms for
+computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
+next result gives the main idea behind this approach. This result is similar to
+\cite[Theorem~4.6]{Turner02} (see also
+\cite[Theorems~4.7,~4.8,~4.9,~4.10]{Turner02}), but in some sense the reversal
+is on the input sequence rather than on the output matrix generator.
+
+We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
+\polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
+\emph{approximants for $\sys$ at order $d$} is defined as
+\[
+\appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
+\]
+
+Then, the next theorem shows that relations for $\seq$ can be retrieved as
+subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
+involving the first $\degBdl+\degBdr$ entries of $\seq$. 
+
+\begin{theorem}
+	\label{thm:mingen_via_appbas}
+	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
+	sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
+	(resp.~right) canonical matrix generator of $\seq$ has degree
+	$\le\degBdl$ (resp.~$\le \degBdr$).
+	
+	For $\degBd>0$, define
+	\begin{equation}
+	\label{eqn:series_to_approximate}
+	\sys =
+	\begin{bmatrix}
+	\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
+	\end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
+	\end{equation}
+	For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
+	\remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
+	\appMod{\sys}{\degBd}$.  Assuming $\degBd \ge \degBdr+1$, for any vectors
+	$\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\; \rem]
+	\in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
+	then $\rel$ is a relation for $\seq$. %% and $\deg(\rem)<\deg(\rel)$.
+	
+	As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
+	is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
+	\begin{itemize}
+		\item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
+		principal submatrix is the canonical matrix generator for $\seq$;
+		\item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
+		degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
+		\remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
+		matrix generator for $\seq$.
+		%the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$, $\rem \in
+		%\remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBdl$
+	\end{itemize}
+\end{theorem}
+\begin{proof}
+	From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
+	$\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
+	\seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k \ge \degBd}
+	\seqelt{k} \var^{\degBd-k-1})$ has polynomial entries, has degree less than
+	$\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
+	hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
+	
+	Conversely, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ we have $\rel
+	(\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1}) = \rem \bmod
+	\var^\degBd$. Since $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
+	\rem])\le\degBd-\degBdr-1$, this implies that the coefficients of degree
+	$\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le k < \degBd} \seqelt{k}
+	\var^{\degBd-k-1})$ are zero. Then, \cref{lem:finitely_many_terms} shows that
+	$\rel$ is a relation for $\seq$.
+	
+	Finally, the two items are straightforward consequences.
+\end{proof}
+
+Then, using fast approximant basis algorithms, we obtain the next result.
+
+\begin{corollary}
+	Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and let
+	$\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in \NN^2$ are such
+	that the left (resp.~right) canonical matrix generator of $\seq$ has degree
+	$\le\degBdl$ (resp.~$\le \degBdr$).  Then,
+	\begin{itemize}
+		\item using the algorithm of \cite{GiJeVi03}: if $\cdim \in \Omega(\rdim)$,
+		a left minimal matrix generator for $\seq$ can be computed in $O(\cdim^\omega
+		\M(\degBd) \log(\degBd))$ operations in $\field$;
+		\item using the algorithm of \cite{ZhoLab12}: if $\cdim \in O(\rdim)$, a
+		left minimal matrix generator for $\seq$ can be computed in $O(\rdim^\omega
+		\M(\cdim\degBd/\rdim) \log(\cdim\degBd))$ operations in $\field$;
+		\item using the algorithm of \cite{JeNeScVi16}: the left canonical matrix
+		generator for $\seq$ can be computed in $O((\rdim+\cdim)^{\omega-1}
+		\M(\cdim\degBd) \log(\cdim\degBd)^3)$ operations in $\field$.
+	\end{itemize}
+\end{corollary}
+
+In our algorithm, we will always use $\cdim = \rdim$; therefore we can find the
+left canonical matrix generator in $O(\rdim^\omega \M(\degBd) \log(\degBd))$
+operations in $\field$.
+
+
+
+
+\section{Structure of the dual.}
+For $i$ in $\{1,\dots,d\}$, let $Q_i$ be the local algebra at
+$\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
+$\m_{\balpha_i}$-primary component of $I$. By the Chinese Remainder
+Theorem, $Q\otimes_\K \Kbar=\Kbar[X_1,\dots,X_n]/I$ is isomorphic to
+the direct product $Q_1\times \cdots \times Q_d$.  We let $N_i$ be the
+{\em nil-index} of $Q_i$, that is, the maximal integer $N$ such that
+$\m_{\alpha_i}^N$ is not contained in $I_i$; for instance, $N_i=0$ if
+and only if $Q_i$ is a field, if and only if $\balpha_i$ is a
+non-singular root of $I$. We also let
+$\D_i=\dim_\Kbar(Q_i)$, so that we have $D_i \ge N_i$ and $\D=\D_1 + \cdots + \D_d$.
+
 
 The sequences we consider below are of the form $(\ell(t^s))_{s \ge
 	0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $t$ in $Q$. For such
@@ -336,21 +708,6 @@ sequences, the following standard result will be useful.
 		0}$.
 \end{lemma}
 
-
-
-
-
-\subsubsection{Structure of the dual.}
-For $i$ in $\{1,\dots,d\}$, let $Q_i$ be the local algebra at
-$\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
-$\m_{\balpha_i}$-primary component of $I$. By the Chinese Remainder
-Theorem, $Q\otimes_\K \Kbar=\Kbar[X_1,\dots,X_n]/I$ is isomorphic to
-the direct product $Q_1\times \cdots \times Q_d$.  We let $N_i$ be the
-{\em nil-index} of $Q_i$, that is, the maximal integer $N$ such that
-$\m_{\alpha_i}^N$ is not contained in $I_i$; for instance, $N_i=0$ if
-and only if $Q_i$ is a field, if and only if $\balpha_i$ is a
-non-singular root of $I$. We also let
-$\D_i=\dim_\Kbar(Q_i)$, so that we have $D_i \ge N_i$ and $\D=\D_1 + \cdots + \D_d$.
 
 Fix $i$ in $1,\dots,d$.  There exists a basis of the dual ${\rm
 	hom}_\Kbar(Q_i,\Kbar)$ consisting of linear forms
@@ -799,268 +1156,68 @@ Now, $ R_2(1) = 4$ and $R_2(3) = 2$ as needed.
 
 
 
-\subsection{Computing the canonical generator of a linearly recurrent matrix sequence}
-\label{section:matrix_seq}
-We first present the notion of linear recurrence for sequences of matrices over
-a field $\field$, which extends the well-known notion for sequences in
-$\field^\NN$.
-\begin{definition}[{\cite[Section~3]{KalVil01}}]
-	%% also \cite[Definition~4.2]{Turner02}.. any earlier ref?
-	\label{dfn:recurrence_relation}
-	Let $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ be a
-	matrix sequence.  Then,
-	\begin{itemize}
-		\item a polynomial $p = \sum_{0\le k\le \degBd} p_k \var^k \in \polRing$ is
-		said to be a \emph{scalar relation for $\seq$} if $\sum_{0\le k \le
-			\degBd} p_{k} \seqelt{\delta + k} = 0$ holds for all $\delta \ge 0$;
-		\item a polynomial vector $\rel = \sum_{0\le k\le \degBd} p_k \var^k \in
-		\relSpace$ is said to be a \emph{(left, vector) relation for $\seq$} if
-		$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for all
-		$\delta \ge 0$;
-		\item $\seq$ is said to be \emph{linearly recurrent} if there exists a
-		nontrivial scalar relation for $\seq$.
+
+
+In what follows, $\K$ is a field.  Let $I$ be an ideal in
+$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
+residue class ring. Suppose that $V=V(I)$ has dimension zero, and
+write it as $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s
+in $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
+all $i$.  We also let $\D$ be the dimension of $Q$, so that $d \le
+\D$, and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In
+this section, we recall and generalize results from the appendix
+of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
+parametrization of $V$.
+
+The main novelty in our approach is to avoid generic coordinates as
+much as possible. The algorithm will decompose $V$ into two parts: for
+the first part, we will be able to use $X_1$ as a separating element;
+the remaining points will be dealt with using a random linear
+form. Throughout, we rely only the following operations: evaluations
+of linear forms on successive powers of a given element in $Q$, say
+$1,t,t^2,\dots$, and elementary operations on univariate polynomials.
+
+The main algorithm is as follows. For the moment, we can only describe
+its main structure; the details of the subroutines are given in the
+next paragraphs.
+
+\begin{algorithm}[H]
+	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
+		Input:} \vspace{-0.5em}
+	\begin{itemize}\setlength\itemsep{0em}
+		\item a linear form $\ell$ over $Q$
+		\item $t=t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
-\end{definition}
-For designing efficient algorithms it will be useful to rely on operations on
-polynomials or truncated series, hence the following characterization of vector
-relations.
-
-\begin{lemma}
-	\label{lem:linearly_recurrent}
-	Consider a matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset
-	\seqeltSpace$ and its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} /
-	\var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, $\rel \in \relSpace$
-	is a vector relation for $\seq$ if and only if the entries of $\num = \rel
-	\seqpm$ are in $\polRing$; furthermore, in this case, $\deg(\num) <
-	\deg(\rel)$.
-\end{lemma}
-\begin{proof}
-	Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
-	coefficient of $\num$ of degree $-\delta-1<0$ is $\sum_{0\le k \le \degBd}
-	p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
-	The degree comparison is clear since $\seqpm$ has only terms of (strictly)
-	negative degree.
-\end{proof}
-
-Concerning the algebraic structure of the set of vector relations, we have the
-following basic result, which can be found for example in
-\cite{Villard97,KalVil01,Turner02}.
-
-\begin{lemma}
-	\label{lem:module_rank}
-	The sequence $\seq$ is linearly recurrent if and only if the set of left
-	vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
-	$\rdim$.
-\end{lemma}
-\begin{proof}
-	The set of vector relations for $\seq$ is a $\polRing$-submodule of
-	$\relSpace$, and hence is free of rank at most $\rdim$
-	\cite[Chapter~12]{DumFoo04}.
-	
-	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
-	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
-	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
-	hence $\seq$ has rank $\rdim$.  Conversely, if $\seq$ has rank $\rdim$, then
-	it has a basis with $\rdim$ vectors, which form a matrix in $\relbasSpace$;
-	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
-\end{proof}
-
-Note however that a matrix sequence may admit nontrivial vector relations and
-have no scalar relation (and therefore not be linearly recurrent with the
-present definition); in this case the module of vector relations has rank less
-than $\rdim$.
-
-\begin{definition}
-	\label{dfn:matrix_generator}
-	Let $\seq \subset \seqeltSpace$ be linearly recurrent.  A \emph{(left) matrix
-		generator} for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
-	of the module of left vector relations for $\seq$. This basis is said to be
-	\begin{itemize}
-		\item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
-		%\item \emph{ordered weak Popov} if the matrix is in weak Popov form
-		%  \cite{MulSto03} with pivots on the diagonal;
-		\item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
+	{\bf Output:} \vspace{-0.5em}
+	\begin{itemize}\setlength\itemsep{0em}
+		\item polynomials $(P,(V_1,\dots,V_n))$
 	\end{itemize}
-\end{definition}
+	\begin{enumerate}
+		\item let $(F,(G_1,\dots,G_n),X_1)=\mathsf{ParametrizationX}_1(\ell)$
+		\item let $\ell'=\mathsf{Update}(\ell,F,t)$
+		\item let $(Q,(W_1,\dots,W_n),t)=\mathsf{ParametrizationGeneric}(\ell',t)$
+		\item let $(F^*,(G^*_1,\dots,G^*_n),t)=\mathsf{ChangeCoordinate}(F,(G_1,\dots,G_n),t)$
+		\item let  $(P,(V_1,\dots,V_n))=\mathsf{Union}(F^*,(G^*_1,\dots,G^*_n),\, Q,(W_1,\dots,W_n))$
+		\item \textbf{return} $(P,(V_1,\dots,V_n),t)$
+	\end{enumerate}
+\end{algorithm}
 
-Note that the canonical generator is also a minimal generator; furthermore, all
-matrix generators $\relbas \in \relbasSpace$ for $\seq$ have the same
-determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  We
-now show that minimal matrix generators are denominators in some irreducible
-fraction description of the generating series of the sequence.  This is a
-direct consequence of \cref{lem:linearly_recurrent,lem:module_rank} and of
-basic properties of polynomial matrices.
+The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
+zero-dimensional parametrization of a subset $V'$ of $V$ for which
+$X_1$ is a separating element, using values of the form
+$(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
+removes from $V$ the points we just found) and apply
+$\mathsf{ParametrizationGeneric}(\ell',t)$, to obtain a
+zero-dimensional parametrization of $V''=V-V'$ using values of the form
+$(\ell'(t^s))_{s \ge 0}$. The last two steps involve changing
+coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
+variable instead), and performing the union of the two components $V'$
+and $V''$.
 
-\begin{corollary}
-	A matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ is
-	linearly recurrent if and only if its generating series $\seqpm = \sum_{k\ge
-		0} \seqelt{k} / \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
-	written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
-	\in \relbasSpace$ is nonsingular and $\nummat \in
-	\polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
-	\rdeg{\relbas}$ and $\deg(\det(\relbas)) \ge \degDet$, and $\relbas$ is a
-	matrix generator of $\seq$ if and only if $\deg(\det(\relbas)) = \degDet$ or,
-	equivalently, the fraction $\relbas^{-1} \nummat$ is irreducible (that is,
-	$\mat{U} \relbas + \mat{V} \nummat = \mat{I}$ for some polynomial matrices
-	$\mat{U}$ and $\mat{V}$).
-\end{corollary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We remark that we may also consider vector relations operating on the right: in
-particular, \cref{lem:linearly_recurrent} shows that if the sequence is
-linearly recurrent then these right relations form a submodule of
-$\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent sequence
-also admits a right canonical generator.
-
-Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
-find a minimal matrix generator.  We assume the availability of bounds
-$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
-which allow us to control the number of terms of the sequence we will access
-during the algorithm.  Since taking the Popov form of a reduced matrix does not
-change the degree, any left minimal matrix generator $\relbas$ has the same
-degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
-a bound on the degree of any left minimal generator. The same remark holds for
-$\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
-the same as $\gamma_1,\gamma_2$ in \cite[Definitions~4.6~and~4.7]{Turner02};
-see also $\delta_l,\delta_r$ in \cite[Section~4.2]{Villard97a}.)
-
-\begin{lemma}
-	\label{lem:finitely_many_terms}
-	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent and
-	let $\degBdr \in \NN$ be such that the right canonical matrix generator of
-	$\seq$ has degree at most $\degBdr$.  Then, $\rel = \sum_{0\le k\le \degBd}
-	p_k \var^k \in \relSpace$ is a left relation for $\seq$ if and only if
-	$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for $\delta
-	\in \{0,\ldots,\degBdr-1\}$.
-\end{lemma}
-\begin{proof}
-	Since the right canonical generator $\relbas \in \polMatSpace[\cdim]$ is in
-	column Popov form, we have $\relbas =
-	\mat{L}\diag{\var^{t_1},\ldots,\var^{t_\cdim}} - \mat{Q}$ where
-	$\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_\cdim)$ componentwise and
-	$\mat{L} \in \matSpace[\cdim]$ is unit upper triangular. We define the matrix
-	$\mat{U} = \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_\cdim}}
-	\mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
-	\deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple $\relbas
-	\mat{U} = \var^{\degBdr} \mat{I}_\cdim - \mat{Q} \mat{U}$ are right relations
-	for $\seq$, and we have $\deg(\mat{Q} \mat{U}) < \degBdr$. As a consequence,
-	writing $\mat{Q} \mat{U} = \sum_{0 \le k < \degBdr} Q_k \var^k$, we have
-	$\seqelt{\degBdr+\delta} = \sum_{0 \le k < \degBdr} \seqelt{k+\delta} Q_k$
-	for all $\delta \ge 0$.
-	
-	Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds
-	for all $\delta \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
-	holds for all $\delta\in\NN$. Let $\delta \ge \degBdr-1$ and assume that this
-	identity holds for all integers up to $\delta$. Then, the identity concluding
-	the previous paragraph implies that
-	\begin{align*}
-	\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1 + k} & =
-	\sum_{0 \le k \le \degBd} p_{k} \left(\sum_{0\le j<\degBdr} \seqelt{\delta+1+k-\degBdr+j} Q_j\right) \\
-	& = \sum_{0\le j<\degBdr} 
-	\underbrace{\left(\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1-\degBdr+j+k}\right)}_{=\, 0 \text{ since } \delta+1-\degBdr+j \le \delta} Q_j = 0,
-	\end{align*}
-	and the proof is complete.
-\end{proof}
-
-(A similar result is in \cite[Theorem~4.5]{Turner02}.)
-
-The fast computation of matrix generators is usually handled via algorithms for
-computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
-next result gives the main idea behind this approach. This result is similar to
-\cite[Theorem~4.6]{Turner02} (see also
-\cite[Theorems~4.7,~4.8,~4.9,~4.10]{Turner02}), but in some sense the reversal
-is on the input sequence rather than on the output matrix generator.
-
-We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
-\polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
-\emph{approximants for $\sys$ at order $d$} is defined as
-\[
-\appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = 0 \bmod \var^d \}.
-\]
-
-Then, the next theorem shows that relations for $\seq$ can be retrieved as
-subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
-involving the first $\degBdl+\degBdr$ entries of $\seq$. 
-
-\begin{theorem}
-	\label{thm:mingen_via_appbas}
-	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
-	sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
-	(resp.~right) canonical matrix generator of $\seq$ has degree
-	$\le\degBdl$ (resp.~$\le \degBdr$).
-	
-	For $\degBd>0$, define
-	\begin{equation}
-	\label{eqn:series_to_approximate}
-	\sys =
-	\begin{bmatrix}
-	\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
-	\end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
-	\end{equation}
-	For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
-	\remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
-	\appMod{\sys}{\degBd}$.  Assuming $\degBd \ge \degBdr+1$, for any vectors
-	$\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\; \rem]
-	\in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
-	then $\rel$ is a relation for $\seq$. %% and $\deg(\rem)<\deg(\rel)$.
-	
-	As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
-	is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
-	\begin{itemize}
-		\item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
-		principal submatrix is the canonical matrix generator for $\seq$;
-		\item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
-		degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
-		\remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
-		matrix generator for $\seq$.
-		%the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$, $\rem \in
-		%\remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBdl$
-	\end{itemize}
-\end{theorem}
-\begin{proof}
-	From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
-	$\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
-	\seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k \ge \degBd}
-	\seqelt{k} \var^{\degBd-k-1})$ has polynomial entries, has degree less than
-	$\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
-	hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
-	
-	Conversely, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ we have $\rel
-	(\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1}) = \rem \bmod
-	\var^\degBd$. Since $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
-	\rem])\le\degBd-\degBdr-1$, this implies that the coefficients of degree
-	$\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le k < \degBd} \seqelt{k}
-	\var^{\degBd-k-1})$ are zero. Then, \cref{lem:finitely_many_terms} shows that
-	$\rel$ is a relation for $\seq$.
-	
-	Finally, the two items are straightforward consequences.
-\end{proof}
-
-Then, using fast approximant basis algorithms, we obtain the next result.
-
-\begin{corollary}
-	Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and let
-	$\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in \NN^2$ are such
-	that the left (resp.~right) canonical matrix generator of $\seq$ has degree
-	$\le\degBdl$ (resp.~$\le \degBdr$).  Then,
-	\begin{itemize}
-		\item using the algorithm of \cite{GiJeVi03}: if $\cdim \in \Omega(\rdim)$,
-		a left minimal matrix generator for $\seq$ can be computed in $O(\cdim^\omega
-		\mathsf{M}(\degBd) \log(\degBd))$ operations in $\field$;
-		\item using the algorithm of \cite{ZhoLab12}: if $\cdim \in O(\rdim)$, a
-		left minimal matrix generator for $\seq$ can be computed in $O(\rdim^\omega
-		\mathsf{M}(\cdim\degBd/\rdim) \log(\cdim\degBd))$ operations in $\field$;
-		\item using the algorithm of \cite{JeNeScVi16}: the left canonical matrix
-		generator for $\seq$ can be computed in $O((\rdim+\cdim)^{\omega-1}
-		\mathsf{M}(\cdim\degBd) \log(\cdim\degBd)^3)$ operations in $\field$.
-	\end{itemize}
-\end{corollary}
-
-In our algorithm, we will always use $\cdim = \rdim$; therefore we can find the
-left canonical matrix generator in $O(\rdim^\omega \mathsf{M}(\degBd) \log(\degBd))$
-operations in $\field$.
-
-
-\newpage
 \section{Block Sparse-FGLM algorithm}
 In this section, we will show how to extend the Sparse-FGLM
 to using blocking methods. Steel's method also uses the
