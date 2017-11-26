@@ -52,7 +52,7 @@
 \newcommand{\col}[1]{\bm{\MakeLowercase{#1}}} % for a matrix
 \newcommand{\matCoeff}[1]{\MakeLowercase{#1}} % for a coefficient in a matrix
 \newcommand{\rdim}{m} % row dimension
-\newcommand{\cdim}{m'} % column dimension
+\newcommand{\cdim}{{m'}} % column dimension
 \newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
 \newcommand{\seqelt}[1]{F_{#1}} % element of sequence of matrices
 \newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
@@ -78,7 +78,7 @@
 \newcommand{\basis}{\mathscr{B}}
 \newcommand{\trace}{\mathrm{trace}}
 \newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\todo}[1]{\textcolor{red}{{\bf todo:} #1}}
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 
@@ -286,14 +286,14 @@ Our first contribution is to give a block version of
 the algorithm in~\cite{BoSaSc03} that extends the approach
 in~\cite{Steel15} to compute all polynomials in~\eqref{eq:BoSaSc03}
 for essentially the same cost as the computation of $P$.
+\todo{define the output}
 
-%% \subsection{Basic Operations}
-%% Over a field $\mathbb{K}$,
-%% recall that we can compute multiplication,
-%% division with remainder, extended GCD, and square free part
-%% of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
-%% field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
-%% \cite{GaGe13}. 
+\paragraph{Basic algorithms.}
+Over a field $\mathbb{K}$, recall that we can compute
+multiplication, division with remainder, extended GCD, and square
+free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
+field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
+\cite{GaGe13}.
 
 %% \subsection{Sparse-FGLM Algorithm}
 %% The Sparse-FGLM algorithm \cite{FaMo17} computes the lex
@@ -334,21 +334,21 @@ for essentially the same cost as the computation of $P$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Basic results on linear recurrent sequences}
+\section{Basic results on linearly recurrent sequences}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Scalar sequences} \label{section:linseq}
 
-Let $\K$ be a field and consider a sequence $\mathcal{L}=(\ell_s)_{s \ge 0} \in
-\K^\N$ and the associated generating series $\genseries=\sum_{s \ge 0}
-\ell_s T^s \in \K[[T]]$. We say that a degree $d$ polynomial
-$P\in\K[T]$ {\em cancels} a sequence $(\ell_s)_{s \ge 0}$ if $p_0
-\ell_s + \cdots + p_d \ell_{s+d}=0$ for all $s \ge 0$, where
-$p_0,\dots,p_d$ are the coefficients of $P$; this is equivalent to
-${\rm rev}(P) \genseries$ being a polynomial of degree less than $d$,
-with $\genseries=\sum_{s \ge 0} \ell_s T^s$ and ${\rm rev}(P)=T^d
-P(1/T)$.
+Let $\K$ be a field and consider a sequence $\mathcal{L}=(\ell_s)_{s
+  \ge 0} \in \K^\N$ and the associated generating series
+$\genseries=\sum_{s \ge 0} \ell_s T^s \in \K[[T]]$. We say that a
+degree $d$ polynomial $P\in\K[T]$ {\em cancels} a sequence
+$(\ell_s)_{s \ge 0}$ if $p_0 \ell_s + \cdots + p_d \ell_{s+d}=0$ for
+all $s \ge 0$, where $p_0,\dots,p_d$ are the coefficients of $P$; this
+is equivalent to ${\rm rev}(P) \genseries$ being a polynomial of
+degree less than $d$, with $\genseries=\sum_{s \ge 0} \ell_s T^s$ and
+${\rm rev}(P)=T^d P(1/T)$.
 
 The sequence $(\ell_s)_{s \ge 0}$ is {\em linearly recurrent} if there
 exists a non-zero polynomial that cancels it; this is the case if and
@@ -421,10 +421,15 @@ deduce $\Omega(\mathcal{L},P)$ for the cost $\M(D)$ of one polynomial multiplica
 
 \subsection{Linearly recurrent matrix sequences}\label{section:matrix_seq}
 
-Next, we discuss the analogue of these ideas in terms of matrix
-sequences. We first present the notion of linear recurrence for
-sequences of matrices over a field $\field$, which extends the
-well-known notion for sequences in $\field^\NN$; the definition comes
+Next, we discuss the analogue of these ideas for matrix sequences; our
+main goal is to give a cost estimate for the computation of a suitable
+{\em matrix generator} for a matrix sequence $\seq$, obtained by means
+of recent algorithms for approximants bases. A similar discussion
+(without a cost analysis) is in~\cite[Chapter~4]{Turner02}.
+
+We first present the notion of linear recurrence for sequences of
+matrices over a field $\field$, which extends the well-known notion
+for sequences in $\field^\NN$; the definition comes
 from~\cite[Section~3]{KalVil01} and~\cite[Definition~4.2]{Turner02}.
 \begin{definition}
   
@@ -451,18 +456,18 @@ relations.
 \begin{lemma}
   \label{lem:linearly_recurrent}
   Consider a matrix sequence $\seq = (\seqelt{s})_{s\ge 0} \subset
-  \seqeltSpace$ and its generating series $\seqpm = \sum_{k\ge 0} \seqelt{k} /
-  \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, $\rel \in \relSpace$
+  \seqeltSpace$ and its generating series $\seqpm = \sum_{s\ge 0} \seqelt{s} /
+  \var^{s+1} \in \field\Poxi^{\rdim \times \cdim}$.  Then, $\rel \in \relSpace$
   is a vector relation for $\seq$ if and only if the entries of $\num = \rel
   \seqpm$ are in $\polRing$; furthermore, in this case, $\deg(\num) <
   \deg(\rel)$.
 \end{lemma}
 \begin{proof}
-	Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $\delta \ge 0$, the
-	coefficient of $\num$ of degree $-\delta-1<0$ is $\sum_{0\le k \le \degBd}
-	p_k \seqelt{k+\delta}$. Hence the equivalence, by definition of a relation.
-	The degree comparison is clear since $\seqpm$ has only terms of (strictly)
-	negative degree.
+  Let $\rel = \sum_{0 \le k \le \degBd} p_k \var^k$. For $s \ge 0$,
+  the coefficient of $\num$ of degree $-s-1<0$ is $\sum_{0\le k \le
+    \degBd} p_k \seqelt{s+k}$. Hence the equivalence, by definition of
+  a relation.  The degree comparison is clear since $\seqpm$ has only
+  terms of negative degree.
 \end{proof}
 
 Concerning the algebraic structure of the set of vector relations, we have the
@@ -470,23 +475,23 @@ following basic result, which can be found for example in
 \cite{Villard97,KalVil01,Turner02}.
 
 \begin{lemma}
-	\label{lem:module_rank}
-	The sequence $\seq$ is linearly recurrent if and only if the set of left
-	vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
-	$\rdim$.
+  \label{lem:module_rank}
+  The sequence $\seq$ is linearly recurrent if and only if the set of left
+  vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
+  $\rdim$.
 \end{lemma}
-\begin{proof}
-	The set of vector relations for $\seq$ is a $\polRing$-submodule of
-	$\relSpace$, and hence is free of rank at most $\rdim$
-	\cite[Chapter~12]{DumFoo04}.
+%% \begin{proof}
+%% 	The set of vector relations for $\seq$ is a $\polRing$-submodule of
+%% 	$\relSpace$, and hence is free of rank at most $\rdim$
+%% 	\cite[Chapter~12]{DumFoo04}.
 	
-	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
-	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
-	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
-	hence $\seq$ has rank $\rdim$.  Conversely, if $\seq$ has rank $\rdim$, then
-	it has a basis with $\rdim$ vectors, which form a matrix in $\relbasSpace$;
-	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
-\end{proof}
+%% 	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
+%% 	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
+%% 	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
+%% 	hence $\seq$ has rank $\rdim$.  Conversely, if $\seq$ has rank $\rdim$, then
+%% 	it has a basis with $\rdim$ vectors, which form a matrix in $\relbasSpace$;
+%% 	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
+%% \end{proof}
 
 Note however that a matrix sequence may admit nontrivial vector relations and
 have no scalar relation (and therefore not be linearly recurrent with the
@@ -494,97 +499,110 @@ present definition); in this case the module of vector relations has rank less
 than $\rdim$.
 
 \begin{definition}
-	\label{dfn:matrix_generator}
-	Let $\seq \subset \seqeltSpace$ be linearly recurrent.  A \emph{(left) matrix
-		generator} for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
-	of the module of left vector relations for $\seq$. This basis is said to be
-	\begin{itemize}
-		\item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
-		%\item \emph{ordered weak Popov} if the matrix is in weak Popov form
-		%  \cite{MulSto03} with pivots on the diagonal;
-		\item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
-	\end{itemize}
+  \label{dfn:matrix_generator}
+  Let $\seq \subset \seqeltSpace$ be linearly recurrent.  A \emph{(left) matrix
+    generator} $\mat{P}$ for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
+  of the module of left vector relations for $\seq$. This basis is said to be
+  \begin{itemize}
+  \item \emph{minimal} if the matrix is row reduced \cite{Wolovich74,Kailath80};
+  \item \emph{canonical} if the matrix is in Popov form \cite{Popov72,Kailath80}.
+  \end{itemize}
 \end{definition}
 
-Note that the canonical generator is also a minimal generator; furthermore, all
-matrix generators $\relbas \in \relbasSpace$ for $\seq$ have the same
-determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  We
-now show that minimal matrix generators are denominators in some irreducible
-fraction description of the generating series of the sequence.  This is a
-direct consequence of \cref{lem:linearly_recurrent,lem:module_rank} and of
-basic properties of polynomial matrices.
+Note that the canonical generator is also a minimal generator;
+furthermore, all matrix generators $\relbas \in \relbasSpace$ for
+$\seq$ have the same determinantal degree $\deg(\det(\relbas))$, which
+we denote by $\degDet$.  
+
+
+We now show that minimal matrix generators are denominators in some
+irreducible fraction description of the generating series of the
+sequence.  This is a direct consequence of
+\cref{lem:linearly_recurrent,lem:module_rank} and of basic properties
+of polynomial matrices.
+
+In what follows, for an $r \times s$ matrix $\mat{P}$ with entries in
+$\K[T]$, we denote by $\rdeg{\mat{P}}$ and $\cdeg{\mat{P}}$
+respectively its row-degree and column-degrees, that is, the size-$r$
+vector of the degrees of its rows, respectively the size-$s$ vector of
+the degrees of its columns.
 
 \begin{corollary}
-	A matrix sequence $\seq = (\seqelt{k})_{k\in\NN} \subset \seqeltSpace$ is
-	linearly recurrent if and only if its generating series $\seqpm = \sum_{k\ge
-		0} \seqelt{k} / \var^{k+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
-	written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
-	\in \relbasSpace$ is nonsingular and $\nummat \in
-	\polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
-	\rdeg{\relbas}$ and $\deg(\det(\relbas)) \ge \degDet$, and $\relbas$ is a
-	matrix generator of $\seq$ if and only if $\deg(\det(\relbas)) = \degDet$ or,
-	equivalently, the fraction $\relbas^{-1} \nummat$ is irreducible (that is,
-	$\mat{U} \relbas + \mat{V} \nummat = \mat{I}$ for some polynomial matrices
-	$\mat{U}$ and $\mat{V}$).
+  A matrix sequence $\seq = (\seqelt{s})_{s\ge 0}
+  \subset \seqeltSpace$ is linearly recurrent if and only if its
+  generating series $\seqpm = \sum_{s\ge 0} \seqelt{s} / \var^{s+1}
+  \in \field\Poxi^{\rdim \times \cdim}$ can be written as a matrix
+  fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
+  \in \relbasSpace$ is nonsingular and $\nummat \in
+  \polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
+  \rdeg{\relbas}$ and $\deg(\det(\relbas)) \ge \degDet$, and $\relbas$
+  is a matrix generator of $\seq$ if and only if $\deg(\det(\relbas))
+  = \degDet$ or, equivalently, the fraction $\relbas^{-1} \nummat$ is
+  irreducible (that is, $\mat{U} \relbas + \mat{V} \nummat = \mat{I}$
+  for some polynomial matrices $\mat{U}$ and $\mat{V}$).
 \end{corollary}
 
-We remark that we may also consider vector relations operating on the right: in
-particular, \cref{lem:linearly_recurrent} shows that if the sequence is
-linearly recurrent then these right relations form a submodule of
-$\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent sequence
-also admits a right canonical generator.
+We remark that we may also consider vector relations operating on the
+right: in particular, \cref{lem:linearly_recurrent} shows that if the
+sequence is linearly recurrent then these right relations form a
+submodule of $\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a
+linearly recurrent sequence also admits a right canonical generator.
 
-Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
-find a minimal matrix generator.  We assume the availability of bounds
-$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
-which allow us to control the number of terms of the sequence we will access
-during the algorithm.  Since taking the Popov form of a reduced matrix does not
-change the degree, any left minimal matrix generator $\relbas$ has the same
-degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
-a bound on the degree of any left minimal generator. The same remark holds for
-$\degBdr$ and right minimal generators.  (These bounds $\degBdl,\degBdr$ are
-the same as $\gamma_1,\gamma_2$ in \cite[Definitions~4.6~and~4.7]{Turner02};
-see also $\delta_l,\delta_r$ in \cite[Section~4.2]{Villard97a}.)
+Now, we focus on our algorithmic problem: given a linearly recurrent
+sequence, find a minimal matrix generator.  We assume the availability
+of bounds $(\degBdl,\degBdr)$ on the degrees of the left and right
+canonical generators, which allow us to control the number of terms of
+the sequence we will access during the algorithm.  Since taking the
+Popov form of a reduced matrix does not change the degree, any 
+minimal left matrix generator $\relbas$ has the same degree $\deg(\relbas)$
+as the left canonical generator: thus, $\degBdl$ is also a bound on
+the degree of any minimal left generator. The same remark holds for
+$\degBdr$ and right minimal generators.  The bounds $\degBdl,\degBdr$
+are the same as $\gamma_1,\gamma_2$ in
+\cite[Definitions~4.6~and~4.7]{Turner02}; see also $\delta_l,\delta_r$
+in \cite[Section~4.2]{Villard97a}; a result similar to the following
+lemma is in \cite[Theorem~4.5]{Turner02}.
 
 \begin{lemma}
-	\label{lem:finitely_many_terms}
-	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be linearly recurrent and
-	let $\degBdr \in \NN$ be such that the right canonical matrix generator of
-	$\seq$ has degree at most $\degBdr$.  Then, $\rel = \sum_{0\le k\le \degBd}
-	p_k \var^k \in \relSpace$ is a left relation for $\seq$ if and only if
-	$\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds for $\delta
-	\in \{0,\ldots,\degBdr-1\}$.
+  \label{lem:finitely_many_terms}
+  Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be linearly
+  recurrent and let $\degBdr \in \NN$ be such that the right canonical
+  matrix generator of $\seq$ has degree at most $\degBdr$.  Then,
+  $\rel =p_0 + \cdots +p_{\degBd}\var^\degBd \in \relSpace$ is a left
+  relation for $\seq$ if and only if $p_0 \seqelt{s} + \cdots +
+  p_{\degBd} \seqelt{s + \degBd} = 0$ holds for $s \in
+  \{0,\ldots,\degBdr-1\}$.
 \end{lemma}
 \begin{proof}
-	Since the right canonical generator $\relbas \in \polMatSpace[\cdim]$ is in
-	column Popov form, we have $\relbas =
-	\mat{L}\diag{\var^{t_1},\ldots,\var^{t_\cdim}} - \mat{Q}$ where
-	$\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_\cdim)$ componentwise and
-	$\mat{L} \in \matSpace[\cdim]$ is unit upper triangular. We define the matrix
-	$\mat{U} = \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_\cdim}}
-	\mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
-	\deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple $\relbas
-	\mat{U} = \var^{\degBdr} \mat{I}_\cdim - \mat{Q} \mat{U}$ are right relations
-	for $\seq$, and we have $\deg(\mat{Q} \mat{U}) < \degBdr$. As a consequence,
-	writing $\mat{Q} \mat{U} = \sum_{0 \le k < \degBdr} Q_k \var^k$, we have
-	$\seqelt{\degBdr+\delta} = \sum_{0 \le k < \degBdr} \seqelt{k+\delta} Q_k$
-	for all $\delta \ge 0$.
+  Since the right canonical generator $\relbas
+  \in \polMatSpace[\cdim]$ is in column Popov form, we have $\relbas =
+  \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$ where
+  $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\cdim})$
+  componentwise and $\mat{L} \in \matSpace[\cdim]$ is unit upper
+  triangular. We define the matrix $\mat{U} =
+  \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_{\cdim}}}
+  \mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
+  \deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple
+  $\relbas \mat{U} = \var^{\degBdr} \mat{I}_\cdim - \mat{Q} \mat{U}$
+  are right relations for $\seq$, and we have $\deg(\mat{Q} \mat{U}) <
+  \degBdr$. As a consequence, writing $\mat{Q} \mat{U} = \sum_{0 \le k
+    < \degBdr} Q_k \var^k$, we have $\seqelt{s+\degBdr} = \sum_{0
+    \le k < \degBdr} \seqelt{s+k} Q_k$ for all $s \ge 0$.
 	
-	Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta + k} = 0$ holds
-	for all $\delta \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
-	holds for all $\delta\in\NN$. Let $\delta \ge \degBdr-1$ and assume that this
-	identity holds for all integers up to $\delta$. Then, the identity concluding
-	the previous paragraph implies that
-	\begin{align*}
-	\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1 + k} & =
-	\sum_{0 \le k \le \degBd} p_{k} \left(\sum_{0\le j<\degBdr} \seqelt{\delta+1+k-\degBdr+j} Q_j\right) \\
-	& = \sum_{0\le j<\degBdr} 
-	\underbrace{\left(\sum_{0 \le k \le \degBd} p_{k} \seqelt{\delta+1-\degBdr+j+k}\right)}_{=\, 0 \text{ since } \delta+1-\degBdr+j \le \delta} Q_j = 0,
-	\end{align*}
-	and the proof is complete.
+  Assuming that $\sum_{0 \le k \le \degBd} p_{k} \seqelt{s + k} = 0$ holds
+  for all $s \in \{0,\ldots,\degBdr-1\}$, we prove by induction that this
+  holds for all $s\in\NN$. Let $s \ge \degBdr-1$ and assume that this
+  identity holds for all integers up to $s$. Then, the identity concluding
+  the previous paragraph implies that
+  \begin{align*}
+    \sum_{0 \le k \le \degBd} p_{k} \seqelt{s+1 + k} & =
+    \sum_{0 \le k \le \degBd} p_{k} \left(\sum_{0\le j<\degBdr} \seqelt{s+1+k-\degBdr+j} Q_j\right) \\
+    & = \sum_{0\le j<\degBdr} 
+    \underbrace{\left(\sum_{0 \le k \le \degBd} p_{k} \seqelt{s+1-\degBdr+j+k}\right)}_{=\, 0 \text{ since } s+1-\degBdr+j \le s} Q_j = 0,
+  \end{align*}
+  and the proof is complete.
 \end{proof}
 
-(A similar result is in \cite[Theorem~4.5]{Turner02}.)
 
 The fast computation of matrix generators is usually handled via algorithms for
 computing minimal approximant bases \cite{Villard97,Turner02,GioLeb14}. The
@@ -605,87 +623,234 @@ subvectors of approximants at order about $\degBdl+\degBdr$ for a matrix
 involving the first $\degBdl+\degBdr$ entries of $\seq$. 
 
 \begin{theorem}
-	\label{thm:mingen_via_appbas}
-	Let $\seq = (\seqelt{k})_k \subset \seqeltSpace$ be a linearly recurrent
-	sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
-	(resp.~right) canonical matrix generator of $\seq$ has degree
-	$\le\degBdl$ (resp.~$\le \degBdr$).
-	
-	For $\degBd>0$, define
-	\begin{equation}
-	\label{eqn:series_to_approximate}
-	\sys =
-	\begin{bmatrix}
-	\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1} \\ - \mat{I}_{\cdim}
-	\end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
-	\end{equation}
-	For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
-	\remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem] \in
-	\appMod{\sys}{\degBd}$.  Assuming $\degBd \ge \degBdr+1$, for any vectors
-	$\rel \in \relSpace$ and $\rem \in \remSpace$, if $[\rel \;\; \rem]
-	\in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
-	then $\rel$ is a relation for $\seq$. %% and $\deg(\rem)<\deg(\rel)$.
-	
-	As a corollary, if $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
-	is a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$, then
-	\begin{itemize}
-		\item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
-		principal submatrix is the canonical matrix generator for $\seq$;
-		\item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
-		degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
-		\remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
-		matrix generator for $\seq$.
-		%the form $[\rel \;\; \rem]$ with $\rel \in \relSpace$, $\rem \in
-		%\remSpace$, and $\deg(\rem) < \deg(\rel) \le \degBdl$
-	\end{itemize}
+  \label{thm:mingen_via_appbas}
+  Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be a linearly recurrent
+  sequence and let $(\degBdl,\degBdr) \in \NN^2$ be such that the left
+  (resp.~right) canonical matrix generator of $\seq$ has degree
+  $\le\degBdl$ (resp.~$\le \degBdr$).
+    For $\degBd>0$, define
+  \begin{equation}
+    \label{eqn:series_to_approximate}
+    \sys =
+    \begin{bmatrix}
+      \sum_{0\le s < \degBd} \seqelt{s} \var^{\degBd-s-1} \\ - \mat{I}_{\cdim}
+    \end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
+  \end{equation}
+  Suppose that  $\degBd \ge \degBdr+1$ and let $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
+  be a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$. Then,
+  \begin{itemize}
+  \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
+    principal submatrix is the canonical matrix generator for $\seq$;
+  \item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
+    degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
+      \remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
+    matrix generator for~$\seq$.
+  \end{itemize}
 \end{theorem}
 \begin{proof}
-	From \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$ then
-	$\num = \rel \seqpm$ has polynomial entries, where $\seqpm = \sum_{k\ge 0}
-	\seqelt{k} \var^{-k-1}$. Then, the vector $\rem = - \rel (\sum_{k \ge \degBd}
-	\seqelt{k} \var^{\degBd-k-1})$ has polynomial entries, has degree less than
-	$\deg(\rel)$, and is such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$,
-	hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
-	
-	Conversely, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ we have $\rel
-	(\sum_{0\le k < \degBd} \seqelt{k} \var^{\degBd-k-1}) = \rem \bmod
-	\var^\degBd$. Since $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
-	\rem])\le\degBd-\degBdr-1$, this implies that the coefficients of degree
-	$\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le k < \degBd} \seqelt{k}
-	\var^{\degBd-k-1})$ are zero. Then, \cref{lem:finitely_many_terms} shows that
-	$\rel$ is a relation for $\seq$.
-	
-	Finally, the two items are straightforward consequences.
+  For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
+  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem]
+  \in \appMod{\sys}{\degBd}$. Indeed, from
+  \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$
+  then $\num = \rel \seqpm$ has polynomial entries, where $\seqpm =
+  \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then, the vector $\rem = -
+  \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$ has
+  polynomial entries, has degree less than $\deg(\rel)$, and is such
+  that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$, hence $[\rel \;\;
+    \rem] \in \appMod{\sys}{\degBd}$.
+
+  Conversely, for any vectors $\rel \in \relSpace$ and $\rem
+  \in \remSpace$, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ and
+  $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$, then $\rel$ is a
+  relation for $\seq$. Indeed, if $[\rel \;\; \rem]
+  \in\appMod{\sys}{\degBd}$ we have $\rel (\sum_{0\le s< \degBd}
+  \seqelt{s} \var^{\degBd-s-1}) = \rem \bmod \var^\degBd$. Since
+  $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
+    \rem])\le\degBd-\degBdr-1$, this implies that the coefficients of
+  degree $\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le s <
+    \degBd} \seqelt{s} \var^{\degBd-s-1})$ are zero. Then,
+  \cref{lem:finitely_many_terms} shows that $\rel$ is a relation for
+  $\seq$.
+  
+  The two items in the theorem are straightforward consequences.
 \end{proof}
 
-Then, using fast approximant basis algorithms, we obtain the next result.
-
+Using fast approximant basis algorithms, we obtain the main results
+from this section. They are stated in slightly more generality than
+needed, since in our main algorithm, we will always use $\cdim =
+\rdim$.  However, we believe that the more general form stated here
+may find further applications. The proof is a direct consequence of
+the previous theorem, using the algorithms of
+respectively~\cite{GiJeVi03},~\cite{ZhoLab12} and~\cite{JeNeScVi16}.
+\todo{choose $d \ge \dots$}
 \begin{corollary}
-	Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and let
-	$\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in \NN^2$ are such
-	that the left (resp.~right) canonical matrix generator of $\seq$ has degree
-	$\le\degBdl$ (resp.~$\le \degBdr$).  Then,
-	\begin{itemize}
-		\item using the algorithm of \cite{GiJeVi03}: if $\cdim \in \Omega(\rdim)$,
-		a left minimal matrix generator for $\seq$ can be computed in $O(\cdim^\omega
-		\M(\degBd) \log(\degBd))$ operations in $\field$;
-		\item using the algorithm of \cite{ZhoLab12}: if $\cdim \in O(\rdim)$, a
-		left minimal matrix generator for $\seq$ can be computed in $O(\rdim^\omega
-		\M(\cdim\degBd/\rdim) \log(\cdim\degBd))$ operations in $\field$;
-		\item using the algorithm of \cite{JeNeScVi16}: the left canonical matrix
-		generator for $\seq$ can be computed in $O((\rdim+\cdim)^{\omega-1}
-		\M(\cdim\degBd) \log(\cdim\degBd)^3)$ operations in $\field$.
-	\end{itemize}
+  Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and
+  let $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in
+  \NN^2$ are such that the left (resp.~right) canonical matrix
+  generator of $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).
+  Then, given $\seqelt{0},\dots,\seqelt{d-1}$,
+  \begin{itemize}
+  \item if $\cdim \in \Omega(\rdim)$, a  minimal left matrix generator
+    for $\seq$ can be computed in $O(\cdim^\omega \M(\degBd)
+    \log(\degBd))$ operations in $\field$;
+  \item if $\cdim \in O(\rdim)$, a  minimal left matrix generator for
+    $\seq$ can be computed in $O(\rdim^\omega \M(\cdim\degBd/\rdim)
+    \log(\cdim\degBd))$ operations in $\field$;
+  \item the left canonical matrix generator for $\seq$ can be computed
+    in $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
+    \log(\cdim\degBd)^3)$ operations in $\field$.
+  \end{itemize}
 \end{corollary}
+In particular, when $\cdim = \rdim$, we can find the left canonical
+matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
+\log(\degBd))$ operations in $\field$.
 
-In our algorithm, we will always use $\cdim = \rdim$; therefore we can find the
-left canonical matrix generator in $O(\rdim^\omega \M(\degBd) \log(\degBd))$
-operations in $\field$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The block Wiedemann algorithm}
+
+Finally, we apply the results seen above to a particular class of
+matrix sequences, namely the Krylov sequences used in the block
+Wiedemann algorithm. The claim below is not new; it can be found
+in~\cite{Villard97a} and~\cite{KaVi04}; we chose to give a
+close-to-self-contained presentation, that refers to the above
+references for the key properties.
+
+Let $\mM$ be in $\mathbb{K}^{D \times D}$ and $\mU,\mV \in
+\mathbb{K}^{D \times m}$ be two blocking matrices; we can then
+define the Krylov sequence $\seq^{\mU,\mV}=(\seqelt{s}^{\mU,\mV})_{s \ge 0}$ 
+by
+$$F^{\mU,\mV}_s = \mU^{\perp} \mM^s \mV, \quad s \ge 0.$$ This
+sequence is linearly recurrent, since the minimal polynomial of $\mM$
+is a scalar relation for it. The following theorem gives a bound on
+the degree of a minimal left generator of $\seq^{\mU,\mV}$,
+for generic choices of $\mU$ and $\mV$; we also
+state properties of the invariant factors of such a generator.
+\todo{check Turner} \todo{define genericity}
+
+To do so, we let $s_1, \dots, s_r$ be the invariant factors of $T\mI_D
+- \mM$, ordered in such a way that $s_r | s_{r-1}| \dots | s_1$, and
+let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
+with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
+$\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
+\todo{unify subscripts  $\mat{P}^{\mU,\mM,\mV}$ or   $\seq^{\mU,\mV}$}
+
+%% First, we present a proof that one can compute the minimal polynomial
+%% of $\mM$ from the output of Matrix Berlekamp-Massey if we choose the
+%% blocking matrices $\mU$ and $\mV$ generically.
+
+\begin{theorem}
+  \label{randXY}
+  For a generic choice of $\mU$ and $\mV$, the following holds.  Let
+  $\mat{P}^{\mU,\mM,\mV}$ be a minimal left generator for
+  $\seq^{\mU,\mV}$ and denote by $\sigma_1, \dots, \sigma_k$ the
+  invariant factors of $\mat{P}^{\mU,\mM,\mV}$, for some $k \le m$,
+  ordered as above; write $\sigma_i=1$ for $i > k$. Then,
+  \begin{itemize}
+  \item $\mat{P}^{\mU,\mM,\mV}$ has degree $\delta$;
+  \item $s_i = \sigma_i$ for $1 \le i \le m$.
+  \end{itemize}
+\end{theorem}
+\begin{proof}
+  Without loss of generality, we can assume that
+  $\mat{P}^{\mU,\mM,\mV}$ is a canonical left generator. Then, define
+  the matrix sequence $\seq^{\mV} = (\mM^s \mV)_{s \ge 0}$; this
+  sequence is linearly generated as well, and we let
+  $\mat{P}^{\mM,\mV}$ be a canonical left generator for it.
+
+  We denote by $\langle \mV \rangle$ the vector space generated by the
+  columns of $\mV,\mM\mV,\mM^2\mV,\dots$, and we write
+  $D_\mV=\dim(\langle \mV \rangle)$.
+	
+  First, we prove that for any $\mV$ in $\K^{D \times m}$, for a
+  generic $\mU$ in $\K^{D\times m}$,
+  $\mat{P}^{\mM,\mV}=\mat{P}^{\mU,\mM,\mV}$.  Indeed,
+  by~\cite[Lemma~4.2]{Villard97a}, there exists matrices $\mat{Q}_\mV$
+  in $\K^{D\times D_\mV}$ and $\mM_\mV \in \K^{D_\mV \times D_\mV}$, with
+  $\mat{Q}_\mV$ of full rank $D_\mV$, and where $\mM_\mV$ is a matrix of the
+  restriction of $\mM$ to $\langle \mV \rangle$, such that
+  $\mat{P}^{\mU,\mM,\mV}=\mat{P}^{\mM,\mV}$ if and only if the
+  dimension of the span of $[\mZ ~ \mB_\mV \mZ ~\mB_\mV^2 \mZ ~ \cdots]$
+  is equal to $D_\mV$, with $\mB_\mV=\mM_\mV^\perp$ and $\mZ=\mat{P}_\mV^\perp
+  \mU \in \K^{D_\mV \times m}$.
+	
+  By construction, one can find a basis of $\langle \mV \rangle$ in
+  which the matrix of $\mM_\mV$ is block-companion, with $m' \le m$
+  blocks (take the $\mM_\mV$-span of the first column of $\mV$, then of
+  the second column, working modulo the previous vector space, etc.)
+  Thus, $\mB_\mV$ is similar to a block-companion matrix with $m'$
+  blocks as well; since $\mZ$ has $m$ columns, the span of $[\mZ ~
+    \mB_\mV \mZ ~\mB_\mV^2 \mZ ~ \cdots]$ has full dimension $D_\mV$ for a
+  generic $\mZ$ (and for a generic $\mU$, since $P_\mV$ has rank
+  $D_\mV$). Thus, as claimed, for generic choices of $\mU$ and $\mV$,
+  $\mat{P}^{\mU,\mM,\mV}=\mat{P}^{\mM,\mV}$.
+	
+  Let us next introduce a matrix $\scrV$ of indeterminates of size $D
+  \times m$, and let $\mat{P}^{\mM,\scrV}$ be the canonical generating
+  polynomial of the ``generic'' sequence $(\mM^s \scrV)_{s \ge
+    0}$. The notation $\langle \scrV \rangle$ and $D_\scrV$ are
+  defined as above.  In particular,
+  by~\cite[Proposition~6.1]{Villard97a}, the canonical generating
+  polynomial $\mat{P}^{\mM,\scrV}$ has degree $\delta$ and determinantal
+  degree $\nu$.
+  
+%%  Indeed,
+%%   $\langle \scrV\rangle$ is the span of $K_\scrV=[\scrV ~ \mM \scrV ~
+%%     \cdots ~ \mM^{N-1} \scrV]$, whereas $\langle \mV \rangle$ is the
+%%   span of $[\mV ~ \mM \mV ~ \cdots ~\mM^{N-1} \mV]$.
+%% Take a
+%%  maximal non-zero minor $\mu$ of $K_\scrV$; as soon as $\mu(Y)\ne 0$,
+%%  we have equality of the dimensions.
+  Now, for a generic $\mV$ in $\K^{D\times m}$, $D_\mV=D_\scrV$. On the
+  other hand, by~\cite[Lemma~4.3]{Villard97a}, for any $\mV$
+  (including $\scrV$), the degree of $\mat{P}^{\mM,\mV}$ is equal to
+  the first index $d$ such that $\dim({\rm span}([\mV ~ \mM \mV ~
+    \cdots ~\mM^{d-1} \mV]))=D_\mV$. As a result, for generic $\mV$,
+  $\mat{P}^{\mM,\mV}$ and $\mat{P}^{\mM,\scrV}$ have the same degree,
+  that is, $\delta$.  The first item is proved.
+	
+  We conclude by proving that for generic $\mU,\mV$, the invariant
+  factors $\sigma_1,\dots,\sigma_m$ of $\mat{P}^{\mU,\mM,\mV}$ are
+  $s_1,\dots,s_m$.  By~\cite[Theorem~2.12]{KaVi04}, for any $\mU$ and
+  $\mV$ in $\K^{D\times m}$, for $i=1,\dots,m$, the $i$-th invariant
+  factor $\sigma_i$ of $\mat{P}^{\mU,\mM,\mV}$ divides $s_i$, so that
+  $\deg(\det(\mat{P}^{\mU,\mM,\mV}))\le\nu$, with equality if and only
+  if $\sigma_i=s_i$ for all $i \le m$.
+	
+  For $\mV$ as above and any integers $e,d$, we let ${\rm
+    Hk}_{e,d}(\mV)$ be the block Hankel matrix
+  $$ {\rm Hk}_{e,d}(\mV) =
+  \begin{bmatrix}
+    \mI_D \\  \mM \\  \mM^2 \\ \vdots  \\  \mM^{e-1}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mV & \mM\mV & \mM^2\mV &\cdots& \mM^{d-1}\mV
+  \end{bmatrix}
+  $$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}(\mV)) =
+  \deg(\det(\mat{P}^{\mM,\mV}))$ for $d \ge \deg(\mat{P}^{\mM,\mV})$
+  and $e \ge D$.  We take $e=D$, so that ${\rm rank}({\rm
+    Hk}_{D,d}(\mV)) = \deg(\det(\mat{P}^{\mM,\mV}))$ for $d \ge
+  \deg(\mat{P}^{\mM,\mV})$. On the other hand, the sequence ${\rm
+    rank}({\rm Hk}_{N,d}(\mV))$ is constant for $d \ge D$; as a
+  result, ${\rm rank}({\rm Hk}_{D,D}(\mV)) =
+  \deg(\det(\mat{P}^{\mM,\mV}))$. For the same reason, we also have ${\rm
+    rank}({\rm Hk}_{D,D}(\scrV)) = \deg(\det(\mat{P}^{\mM,\scrV}))$, so that
+  for a generic $\mV$, $\mat{P}^{\mM,\mV}$ and $\mat{P}^{\mM,\scrV}$
+  have the same determinantal degree, that is, $\nu$.  As a result,
+  for generic $\mU$ and $\mV$, we also have
+  $\deg(\det(\mat{P}^{\mU,\mM,\mV}))=\nu$, and the conclusion follows.
+\end{proof} 
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Structure of the dual.}
+\section{Structure of the dual}
+
+{\bf this is a mess}
+
 For $i$ in $\{1,\dots,d\}$, let $Q_i$ be the local algebra at
 $\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
 $\m_{\balpha_i}$-primary component of $I$. By the Chinese Remainder
@@ -1258,7 +1423,7 @@ The main idea is to compute the minimal polynomial
 of $\mM$ by using the block Wiedemann algorithm.
 This is done by applying the Matrix Berlekamp-Massey algorithm of
 \cref{section:matrix_seq} on the sequence 
-$S = (\mU^{tr}\mM^i\mV)_{0 \le i < 2 \lceil \frac{D}{m} \rceil}$,
+$S = (\mU^{\perp}\mM^i\mV)_{0 \le i < 2 \lceil \frac{D}{m} \rceil}$,
 for some $m \in \mathbb{N}$ and $U,V \in \mathbb{K}^{D \times m}$,
 and taking the largest invariant factor.
 We find the rest of the polynomials in the output by extracting
@@ -1278,17 +1443,17 @@ as $ (\mN)_{T^{\ge 0}} $
 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
   \begin{enumerate}[{\bf 1.}]
 		\item {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
-		\item {\sf $S= (\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
-		\item {\sf $\mF^{U,M,V} = {\sf MatrixBerlekampMassey}(S)$}
-		\item {\sf $\mN^* = (\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
-		\item {\sf $P=$ largest invariant factor of $\mF^{U,M,V}$}
+		\item {\sf $S= (\mU^{\perp}\mM^i\mV)_{0 \le i < 2d}$, with $d = \frac{D}{m}$}
+		\item {\sf $\mF^{\mU,\mM,\mV} = {\sf MatrixBerlekampMassey}(S)$}
+		\item {\sf $\mN^* = (\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
+		\item {\sf $P=$ largest invariant factor of $\mF^{\mU,\mM,\mV}$}
 		\item {\sf $R={\sf SquareFreePart}(P)$} 
-		\item {\sf $a = [0 ~\cdots~ 0 ~ P] (\mF^{U,M,V})^{-1}$}
+		\item {\sf $a = [0 ~\cdots~ 0 ~ P] (\mF^{\mU,\mM,\mV})^{-1}$}
 		\item {\sf $N=a\mN^*$}
 		\item {\sf for $j = 1 \dots n$:}
     \begin{enumerate}[{\bf 9.1.}]
-			\item {\sf	$\mN_j^* = (\mF^{U,M,V}
-				\sum_{i= 0}^{d-1} {(\mU^{tr}\mM^i \mM_j e)}/{T^{i+1}})_{T^{\ge0}}$}
+			\item {\sf	$\mN_j^* = (\mF^{\mU,\mM,\mV}
+				\sum_{i= 0}^{d-1} {(\mU^{\perp}\mM^i \mM_j e)}/{T^{i+1}})_{T^{\ge0}}$}
 			\item {\sf $N_j=a\mN_j^*$}
 			\item {\sf $R_j=N_j/N$ mod $R$}
 		\end{enumerate}
@@ -1296,33 +1461,33 @@ as $ (\mN)_{T^{\ge 0}} $
 	\label{algo:block-sparse-fglm}
 \end{algorithm}
 
-In lines 2,4, and 9.1 of the above algorithm, we use $(\mU^{tr}\mM^i)_{i\ge 0}$, which we compute once
+In lines 2,4, and 9.1 of the above algorithm, we use $(\mU^{\perp}\mM^i)_{i\ge 0}$, which we compute once
 in line 2 and store. Computing this sequence is the bottleneck of the algorithm, but this can be
 parallelized. Let $\mU \in \mathbb{K}^{D \times m}$, then we can write $\mU$ as $[u_1 u_2 \dots u_m]$ where
 $u_k \in \mathbb{K}^{D \times 1}$, $1 \le k \le m$, is a vector. Now,
-$$ \mU^{tr} \mM^i = [u_1^{tr} \dots u_m^{tr}] \mM^i = [u_1^{tr} \mM^i \dots u_m^{tr} \mM^i],$$
-where each product $u_k^{tr} \mM^i$ is independent of others. Therefore, to generate the
-sequence $(\mU^{tr}\mM^i)_{i\ge0}$, we generate, in parallel, 
-the sequences $(u_k^{tr} \mM^i)_{i\ge0}$, $1 \le k \le m$, and concatenate them together as above.
-Let $c$ be the sparsity of $\mM$, then generating $(u_k^{tr} \mM^i)_{0 \le i < 2d}$ costs 
+$$ \mU^{\perp} \mM^i = [u_1^{\perp} \dots u_m^{\perp}] \mM^i = [u_1^{\perp} \mM^i \dots u_m^{\perp} \mM^i],$$
+where each product $u_k^{\perp} \mM^i$ is independent of others. Therefore, to generate the
+sequence $(\mU^{\perp}\mM^i)_{i\ge0}$, we generate, in parallel, 
+the sequences $(u_k^{\perp} \mM^i)_{i\ge0}$, $1 \le k \le m$, and concatenate them together as above.
+Let $c$ be the sparsity of $\mM$, then generating $(u_k^{\perp} \mM^i)_{0 \le i < 2d}$ costs 
 $O(d cD^2) = O(cD^3/m )$ field operations. If we are able to compute $m$ 
-vector-matrix products in parallel at once, the total cost of generating $(\mU^{tr}\mM^i)_{0 \le i < 2d}$
-is $O(cD^3/m)$. We can then compute $(\mU^{tr}\mM^i\mV)_{0 \le i < 2d}$ by a product
+vector-matrix products in parallel at once, the total cost of generating $(\mU^{\perp}\mM^i)_{0 \le i < 2d}$
+is $O(cD^3/m)$. We can then compute $(\mU^{\perp}\mM^i\mV)_{0 \le i < 2d}$ by a product
 $$
 \begin{bmatrix}
-\mU^{tr}\\
-\mU^{tr} \mM\\
-\mU^{tr} \mM^2\\
+\mU^{\perp}\\
+\mU^{\perp} \mM\\
+\mU^{\perp} \mM^2\\
 \vdots\\
-\mU^{tr} \mM^{2d}\\
+\mU^{\perp} \mM^{2d}\\
 \end{bmatrix} \mV
 = 
 \begin{bmatrix}
-\mU^{tr} \mV\\
-\mU^{tr} \mM \mV\\
-\mU^{tr} \mM^2 \mV\\
+\mU^{\perp} \mV\\
+\mU^{\perp} \mM \mV\\
+\mU^{\perp} \mM^2 \mV\\
 \vdots \\
-\mU^{tr} \mM^{2d} \mV\\
+\mU^{\perp} \mM^{2d} \mV\\
 \end{bmatrix}
 $$
 in cost $O(m^{\omega-2}D^2)$.
@@ -1336,9 +1501,9 @@ By \cite[Corollary~16]{Stor03}, the cost of this is
 Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
 $O(D^2)$ by using the above method.
 Recall, from \cref{section:linseq}, that
-we can compute $\mN_v^* = \mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}/{T^{i+1}}$ by first
-doing a product $\mF^{U,M,V}\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$.
-Since both $\mF^{U,M,V}$ and $\sum_{i=0}^{d-1} {(\mU^{tr}\mM^iv)}T^i$
+we can compute $\mN_v^* = \mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}/{T^{i+1}}$ by first
+doing a product $\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$.
+Since both $\mF^{\mU,\mM,\mV}$ and $\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$
 have degree at most $d$, this product can be done in cost $O(m^2M(D/m))$.
 
 Now, $\mN_v^*$ has degree less than $D/m$ and $a$ has degree at most $D$, so
@@ -1353,119 +1518,16 @@ $$O(cD^3/m + m^{\omega} M(D/m) \log(D/m) \log(m) + nm^2M(D/m)),$$
 
 \subsection{Proof of Correctness}
 
-First, we present a proof that one can compute
-the minimal polynomial of $\mM$ from the
-output of Matrix Berlekamp-Massey if we choose
-the blocking matrices $\mU$ and $\mV$ generically.
-This result had been previously been proven by
-Kaltofen and Villard \cite{KaVi04,Villard97a}.
 
-Let $\mM$ be in $\mathbb{K}^{D \times D}$ and 
-$\mU,\mV \in \mathbb{K}^{D \times m}$ be two blocking matrices. Now, define two matrix sequences
-$S_V = (\mM^i \mV)_{(i \ge 0)}$ and 
-$S_{U,V} = (\mU^{tr} \mM^i \mV)_{(i \ge 0)}$ denote their minimum
-generating matrix polynomial as $\mF^{M,V}$ and $\mF^{U,M,V}$ respectively.
-Let $s_1, \dots, s_r$ be the invariant factors
-of $T\mI - \mM$, ordered in such a way that 
-$s_r | s_{r-1}| \dots | s_1$, and let $d_i = $ deg$(s_i)$ for
-all $i$; for $i > r$, we let $s_i$ = 1, with $d_i = 0$.
-We define $\nu = d_1 + \cdots + d_m \le D$ and
-$\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
-We also denote by $\sigma_1, \cdots, \sigma_k$ the invariant
-factors of $\mF^{U,M,V}$, for some $k \le m$. As above,
-for $i > k$, we let $\sigma_i = 1$.
-
-\begin{theorem}
-	\label{randXY}
-	For a generic choice of $\mU$ and $\mV$, we have:
-	\begin{itemize}
-		\item $\mF^{U,M,V}$ has degree $\delta$;
-		\item $s_i = \sigma_i$ for $1 \le i \le m$.
-	\end{itemize}
-\end{theorem}
-
-\begin{proof}
-	We denote by $\langle \mV \rangle$ the vector
-	space generated by the columns of $\mV,\mM\mV,\mM^2\mV,\dots$. We also write
-	$D_V=\dim(\langle \mV \rangle)$.
-	
-	First, we prove that for any $\mV$ in $\K^{D \times m}$, for a generic
-	$\mU$ in $\K^{D\times m}$, $\mF^{U,M,V}=\mF^{M,V}$.  Indeed,
-	by~\cite[Lemma~4.2]{Villard97a}, there exists matrices $\mathbf{P}_V$ in
-	$\K^{D\times D_V}$ and $\mM_V \in \K^{D_V \times D_V}$, with $\mathbf{P}_V$ of
-	full rank $D_V$, and where $\mM_V$ is a matrix of the restriction of $\mM$
-	to $\langle \mV \rangle$, such that $\mF^{U,M,V}=\mF^{M,V}$ if and only if
-	the dimension of the span of $[\mZ ~ \mB_V \mZ ~\mB_V^2 \mZ ~ \cdots]$ is equal to
-	$D_V$, with $\mB_V=\mM_V^\perp$ and $\mZ=\mathbf{P}_V^\perp \mU \in \K^{D_V \times m}$.
-	
-	We prove that this is the case for a generic $\mU$. By construction, one
-	can find a basis of $\langle \mV \rangle$ in which the matrix of $\mM_V$
-	is block-companion, with $m' \le m$ blocks (take the $\mM_V$-span of the
-	first column of $\mV$, then of the second column, working modulo the
-	previous vector space, etc.) Thus, $\mB_V$ is similar to a
-	block-companion matrix with $m'$ blocks as well; since $\mZ$ has $m$
-	columns, $S$ has full dimension $N_V$ for a generic $\mZ$ (and for a
-	generic $\mU$, since $P_V$ has rank $N_V$). Thus, for generic choices of
-	$\mU$ and $\mV$, $\mF^{U,M,V}=\mF^{M,V}$.
-	
-	Let us next introduce a matrix $\scrV$ of indeterminates of size $D
-	\times m$, and let $\mF^{M,\scrV}$ be the minimal generating polynomial
-	of the ``generic'' sequence $(\mM^i \scrV)_{i \ge 0}$. The notation
-	$\langle \scrV \rangle$ and $D_\scrV$ are defined as above.  In
-	particular, by~\cite[Proposition~6.1]{Villard97a}, the minimal
-	generating polynomial $\mF^{M,\scrV}$ has degree $\delta$ and
-	determinantal degree $\nu$.
-	
-	Now, for a generic $\mV$ in $\K^{D\times m}$, $D_V=D_\scrV$. Indeed,
-	$\langle \scrV\rangle$ is the span of $K_\scrV=[\scrV ~ \mM \scrV ~ \cdots ~
-	\mM^{N-1} \scrV]$, whereas $\langle \mV \rangle$ is the span of $[\mV ~ \mM \mV
-	~ \cdots ~\mM^{N-1} \mV]$. Take a maximal non-zero minor $\mu$ of
-	$K_\scrV$; as soon as $\mu(Y)\ne 0$, we have equality of the
-	dimensions. On the other hand, by~\cite[Lemma~4.3]{Villard97a}, for
-	any $\mV$ (including $\scrV$), the degree of $\mF^{M,V}$ is equal to the
-	first index $d$ such that $\dim({\rm span}([\mV ~ \mM \mV ~ \cdots ~\mM^{d-1}
-	\mV]))=D_V$. As a result, for generic $\mV$, $\mF^{M,V}$ and $\mF^{M,\scrV}$
-	have the same degree, that is, $\delta$.  The first item is proved.
-	
-	We conclude by proving that for generic $\mU,\mV$, the invariant factors
-	$\sigma_1,\dots,\sigma_m$ of $\mF^{U,M,V}$ are $s_1,\dots,s_m$.
-	By~\cite[Theorem~2.12]{KaVi04}, for any $\mU$ and $\mV$ in $\K^{D\times
-		m}$, for $i=1,\dots,m$, the $i^{th}$ invariant factor $\sigma_i$ of
-	$\mF^{U,M,V}$ divides $s_i$, so that $\deg(\det(\mF^{U,M,V}))\le\nu$, with
-	equality if and only if $\sigma_i=s_i$ for all $i \le m$.
-	
-	For $\mV$ as above and any integers $e,d$, we let ${\rm Hk}_{e,d}(\mV)$ be
-	the block Hankel matrix
-	$$ {\rm Hk}_{e,d}(\mV) =
-	\begin{bmatrix}
-	\mI \\  \mM \\  \mM^2 \\ \vdots  \\  \mM^{e-1}
-	\end{bmatrix}
-	\begin{bmatrix}
-	\mV & \mM\mV & \mM^2\mV &\cdots&  \mM^{d-1}\mV
-	\end{bmatrix}
-	$$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{e,d}(\mV)) =
-	\deg(\det(\mF^{M,V}))$ for $d \ge \deg(\mF^{M,V})$ and $e \ge D$.  We take
-	$e=D$, so that ${\rm rank}({\rm Hk}_{D,d}(\mV)) = \deg(\det(\mF^{M,V}))$
-	for $d \ge \deg(\mF^{M,V})$. On the other hand, the sequence ${\rm
-		rank}({\rm Hk}_{N,d}(\mV))$ is constant for $d \ge D$; as a result,
-	${\rm rank}({\rm Hk}_{D,D}(\mV)) = \deg(\det(\mF^{T,V}))$. For the same
-	reason, we also have ${\rm rank}({\rm Hk}_{D,D}(\scrV)) =
-	\deg(\det(F^{M,\scrV}))$, so that for a generic $\mU$, $\mF^{M,V}$ and
-	$\mF^{M,\scrV}$ have the same determinantal degree, that is, $\nu$.  As
-	a result, for generic $\mU$ and $\mV$, we also have
-	$\deg(\det(\mF^{U,M,V}))=\nu$, and the conclusion follows.
-\end{proof} 
-
-It is well known that the largest invariant factor of
-$T\mI - \mM$ is the minimal polynomial of $\mM$. Therefore, the above
-theorem shows that if we choose the entries of $\mU$ and $\mV$
-randomly, we will have that the
-largest invariant factor of $\mF^{U,M,V}$ is the minimal
-polynomial of $\mM	$  with high probability.
+The largest invariant factor of $T\mI - \mM$ is the minimal polynomial
+of $\mM$. Therefore, the above theorem shows that if we choose the
+entries of $\mU$ and $\mV$ randomly, we will have that the largest
+invariant factor of $\mF^{\mU,\mM,\mV}$ is the minimal polynomial of $\mM $
+with high probability.
 
 Next, we prove that one can recover a scalar numerator through a matrix
 numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
-  deserve a statement/proof. The inverse can be written $(\mF^{U,M,V})^{-1} =
+  deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mM,\mV})^{-1} =
   \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
 $\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
 invariant factor $P$. So there's nothing to prove.}
@@ -1476,8 +1538,8 @@ invariant factor $P$. So there's nothing to prove.}
 \end{lemma}
 
 \begin{proof}
-	Let $\mathscr{D} = \mA\mF^{U,M,V}\mB$ be the Smith normal form of $\mF^{U,M,V}$ and $s_1, \cdots s_m$ be
-	invariant factors of $\mF^{U,M,V}$ such that 
+	Let $\mathscr{D} = \mA\mF^{\mU,\mM,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mM,\mV}$ and $s_1, \cdots s_m$ be
+	invariant factors of $\mF^{\mU,\mM,\mV}$ such that 
 	$s_m | s_{m-1} | \cdots | s_1$.
 	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
 	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
@@ -1492,17 +1554,17 @@ invariant factor $P$. So there's nothing to prove.}
 	&= [0,\cdots,0,s_1] \mB
 	\end{align*}
 	Therefore, if $a = w \mA$, we get
-	$ a \mF^{U,M,V} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
+	$ a \mF^{\mU,\mM,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
 	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
 	entries, $a$ must also have polynomial entries.\\
 \end{proof}
 
 \begin{theorem}
 	 Let $U = [u_1,u_2,\dots,u_m]$be in $\K^{D\times m}$,
-	 $\mF^{U,M,V}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
+	 $\mF^{\mU,\mM,\mV}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
 	 and $P$ be the minimal polynomial of $\mM$. For any 
 	 $v \in \K^{D}$, if\\ 
-	 $\mN^* = (\mF^{U,M,V}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1})_{T^{\ge0}}$ 
+	 $\mN^* = (\mF^{\mU,\mM,\mV}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1})_{T^{\ge0}}$ 
 	 and $N = a\mN^*$,
 	 then $N = \Omega((u_m^t \mM^i v)_{i\ge0},P)$.
 	 \label{theorem:anyv}
@@ -1510,11 +1572,11 @@ invariant factor $P$. So there's nothing to prove.}
 
 \begin{proof}
 	Let $Z = \sum_{i=0}^{\infty} (\mU^t\mM^iv)/T^{i+1}$ and
-	$\mN^{*'} = \mF^{U,M,V} Z$.
+	$\mN^{*'} = \mF^{\mU,\mM,\mV} Z$.
 	Since the highest power of the entries in 
 	$Z$ is $T^{-1}$, the 
 	entries of the product $\mN^{*'}$ must have degree less 
-	than $d = deg(\mF^{U,M,V})$. Furthermore, since $\mF^{U,M,V}$ cancels 
+	than $d = deg(\mF^{\mU,\mM,\mV})$. Furthermore, since $\mF^{\mU,\mM,\mV}$ cancels 
 	the sequence $(\mU\mM^i\mV)_{i \ge 0}$, $\mN^{*'}$ is a
 	polynomial matrix and does not have any terms of negative exponents.
 	This means that all terms in $Z$ with degree less than $T^{-d}$ must vanish in the
@@ -1524,42 +1586,42 @@ invariant factor $P$. So there's nothing to prove.}
 	
 	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_m]$, then
 	$$
-	\mN^* = \mF^{U,M,V}
-	\sum_{i=0}^{\infty} \mU^{tr} \mM^i v / T^{i+1} =
+	\mN^* = \mF^{\mU,\mM,\mV}
+	\sum_{i=0}^{\infty} \mU^{\perp} \mM^i v / T^{i+1} =
 	\begin{bmatrix}
-	\sum_{i\ge 0} u_1^{tr}\mM^iv/T^{i+1}\\
+	\sum_{i\ge 0} u_1^{\perp}\mM^iv/T^{i+1}\\
 	\vdots                   \\
-	\sum_{i\ge 0} u_m^{tr}\mM^iv/T^{i+1}
+	\sum_{i\ge 0} u_m^{\perp}\mM^iv/T^{i+1}
 	\end{bmatrix}$$
 	Recall $\Omega$ from \cref{def:omega}.
 	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
-	$$ \mN^* = \mF^{U,M,V}
+	$$ \mN^* = \mF^{\mU,\mM,\mV}
 	\begin{bmatrix}
-	\Omega( (u_1^{tr} \mM^i v)_{i\ge 0},P) / P \\
+	\Omega( (u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
-	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
+	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}
 	$$
 	By \cref{randXY}, the $i^{th}$ invariant factor of
-	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{U,M,V}$ 
+	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{\mU,\mM,\mV}$ 
 	for generic choice of
 	$\mU,\mV$. Thus, $s_1 = P$ and by \cref{utilde}
 	\begin{align*}
-	a \mN^* &= a \mF^{U,M,V}
+	a \mN^* &= a \mF^{\mU,\mM,\mV}
 	\begin{bmatrix}
-	\Omega((u_1^{tr} \mM^i v)_{i\ge 0},P) / P \\
+	\Omega((u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
 	\vdots      \\
-	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
+	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}\\
 	&= [0,\cdots,0,P]
 	\begin{bmatrix}
-	\Omega((u_1^{tr} \mM^i v)_{i \ge 0},P) / P \\
+	\Omega((u_1^{\perp} \mM^i v)_{i \ge 0},P) / P \\
 	\vdots      \\
-	\Omega((u_m^{tr} \mM^i v)_{i\ge 0},P) / P 
+	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
 	\end{bmatrix}\\
-	&= \Omega((u_m^{tr} \mM^i v)_{i\ge 0},P)
+	&= \Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P)
 	\end{align*}
-	Therefore, $N = \Omega(( u_m^{tr} \mM^i v)_{i\ge 0},P)$ as needed.
+	Therefore, $N = \Omega(( u_m^{\perp} \mM^i v)_{i\ge 0},P)$ as needed.
 \end{proof}
 
 % l_{u_m} for linear form of u_m
@@ -1568,21 +1630,21 @@ when we pick specific values for $v$ and applying \cref{theorem:anyv}.
 In line 4 of \cref{algo:block-sparse-fglm}, we have $v = e$, 
 where $e$ is the coordinate vector for $1 \in \mathbb{B}$.
 By applying \cref{theorem:anyv}, we have that
-$$\mN^* = \mF^{U,M,V}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
-$$N = a\mN^* = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P).$$
+$$\mN^* = \mF^{\mU,\mM,\mV}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
+$$N = a\mN^* = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P).$$
 By construction,
 $\mM^i e$ gives the coordinate vector of $t^i$ in $\mathbb{B}$, so
-$$\sum_{i\ge 0} u_m^{tr} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$$ 
+$$\sum_{i\ge 0} u_m^{\perp} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$$ 
 where $\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
-$$N = \Omega((u_m^{tr} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
+$$N = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
 
 Similarly, in line 7.1 of \cref{algo:block-sparse-fglm}, we compute
-$\mN^*_j = \mF^{U,M,V}\sum_{i\ge0} \mU^{tr} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
-$$N_j = a \mN^*_j = \Omega((u_m^{tr} \mM^i \mM_j e)_{i\ge 0},P) $$
+$\mN^*_j = \mF^{\mU,\mM,\mV}\sum_{i\ge0} \mU^{\perp} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
+$$N_j = a \mN^*_j = \Omega((u_m^{\perp} \mM^i \mM_j e)_{i\ge 0},P) $$
 Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
 $\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
 $\mathbb{B}$. Therefore,
-$$ N_j =  \Omega((u_m^{tr} \mM^i \mT_j e)_{i\ge 0},P) =
+$$ N_j =  \Omega((u_m^{\perp} \mM^i \mT_j e)_{i\ge 0},P) =
  \Omega( (\ell_{u_m}(X_jt^i))_{i\ge 0},P)$$
 By the correctness of \cref{algo:para2}, we have the proof
 of correctness for the Block Sparse-FGLM algorithm.
@@ -1614,7 +1676,7 @@ We choose $t = 2X_1 + 53 X_2$, with multiplication matrices:
 \end{align*}
 We choose $m = 2$ and choose $U,V \in GF(101)^{D\times m}$ of random
 entries:
-$$ \mU^{tr} = \begin{bmatrix}
+$$ \mU^{\perp} = \begin{bmatrix}
 84& 38\\
 29& 58\\
 80& 43\\
@@ -1627,7 +1689,7 @@ $$ \mU^{tr} = \begin{bmatrix}
  59&  89
 \end{bmatrix}
 $$
-We compute the matrix sequence $S = (\mU^{tr}\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
+We compute the matrix sequence $S = (\mU^{\perp}\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
 $$ S = (
 \begin{bmatrix}
 92& 75\\  
@@ -1646,13 +1708,13 @@ $$ S = (
 26& 76
 \end{bmatrix}
 )$$
-$$ \mF^{U,M,V} =
+$$ \mF^{\mU,\mM,\mV} =
 \begin{bmatrix}
 T^2 + 76T + 8&       87T + 31\\
     100T + 46& T^2 + 87T + 44
 \end{bmatrix}
 $$
-The biggest invariant factor of $\mF^{U,M,V}$ is 
+The biggest invariant factor of $\mF^{\mU,\mM,\mV}$ is 
 $$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = R$$
 since $P$ is square free. 
 Now, we compute $\mN^*$ and $a$:
@@ -1711,8 +1773,8 @@ In general, experiments show that choosing $1 \le m \le D$ that matches
 the number of cores is optimal in \cref{section:ex}. However,
 when $m=1$, blocking has no effect and there is no parallelization
 to be had. In particular, the minimum generating polynomial matrix
-$\mF^{U,M,V}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
-$a = P (\mF^{U,M,V})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
+$\mF^{\mU,\mM,\mV}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
+$a = P (\mF^{\mU,\mM,\mV})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
 \cref{algo:block-sparse-fglm}.
 
 If the multiplication matrices are dense, then it is
@@ -1743,7 +1805,7 @@ Thus, we get the following algorithm:
 		\item $\mN^{*} = \mU$
 		\item $P =$ largest invariant factor of $\mF^{U,M}$
 		\item $R =$ SquareFreePart$(P)$
-		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{U,M,V})^{-1}$}
+		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mM,\mV})^{-1}$}
 		\item {\sf $N=a\mN^*e$}
 		\item {for j = $1 \dots n$:}
       \begin{enumerate}[{\bf 8.1.}]
