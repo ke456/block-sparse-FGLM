@@ -81,6 +81,7 @@
 \newcommand{\todo}[1]{\textcolor{red}{{\bf todo:} #1}}
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
+\newcommand{\minpoly}{P}
 
 \def\M {\ensuremath{\mathsf{M}}}
 \def\Deg{D}
@@ -862,15 +863,52 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 In particular, combining \cref{coro:cost_approx} and \cref{randXY}, we
 deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
 \rceil$ terms of the sequence $\seq^{\mU,\mV}$, we can recover a
-minimal matrix generator of it using $O(m^\omega \M(D/m) \log(D/m))
+minimal matrix generator  $\mat{P}^{\mU,\mV}$ of it using $O(m^\omega \M(D/m) \log(D/m))
 \subset \softO{m^{\omega-1} D}$ operations in $\K$.
+
+Remark as well that for generic $\mU$ and $\mV$, the largest invariant
+factor of $\mat{P}^{\mU,\mV}$ is the minimal polynomial $P$ of $\mM$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Computing a numerator}
 
 The main advantage of the block Wiedemann algorithm is that it allows
-one to distribute the
+one to distribute the bulk of the computation in a straightforward
+manner: on a platform with $m$ processors (or cores, \dots), one would
+typically compute the $m \times D$ matrices $\mU \mM^s$, for
+$s=0,\dots,2\lceil D/m \rceil$, by having each processor compute a
+sequence $\row{u}_i \mM^s$, where $\row{u}_i$ is the $i$th row of
+$\mU^\perp$. 
+
+However, our main algorithm will need to compute numerators of the
+form $\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)$, where
+$\col{v}_j$ is the $j$th column of $\mV$ and $\minpoly$ is the minimal
+polynomial of $\mM$. Since $\minpoly$ may have degree $D$, the definition we
+gave of $\Omega$ suggests that we may need up to $D$ terms of the
+sequence $\row{u}_i \mM^s \col{v}_j$, which we would of course like to
+avoid. 
+
+Fix $i$ in $1,\dots,m$ and let $\row{a}_i$ be the row vector defined
+by $\row{a}_i = [0~\cdots~0~\minpoly~0~\cdots~0] (\mat{P}^{\mU,\mV})^{-1}$,
+where the minimal polynomial $\minpoly$ appears in the $i$th column of the
+left-hand row vector.
+\begin{lemma}\label{utilde}
+  For generic $\mU,\mV$, the row vector $\row{a}_i$ has polynomial
+  entries of degree at most~$D$.
+  %% Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
+  %% then $\textbf{a}$ has polynomial entries.
+\end{lemma}
+\begin{proof}
+  For generic $\mU,\mV$, we saw that $\minpoly$ is the largest
+  invariant factor of $ (\mat{P}^{\mU,\mV})^{-1}$; thus, the product
+  $\minpoly (\mat{P}^{\mU,\mV})^{-1}$ has polynomial entries. Since
+  $\mat{P}^{\mU,\mV}$ has determinantal degree at most $D$, the bound
+  on the degree of the entries of $\row{a}_i$ follows from Cramer's
+  formulas.
+\end{proof}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1554,39 +1592,39 @@ entries of $\mU$ and $\mV$ randomly, we will have that the largest
 invariant factor of $\mF^{\mU,\mV}$ is the minimal polynomial of $\mM $
 with high probability.
 
-Next, we prove that one can recover a scalar numerator through a matrix
-numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
-  deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mV})^{-1} =
-  \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
-$\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
-invariant factor $P$. So there's nothing to prove.}
+%% Next, we prove that one can recover a scalar numerator through a matrix
+%% numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
+%%   deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mV})^{-1} =
+%%   \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
+%% $\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
+%% invariant factor $P$. So there's nothing to prove.}
 
-\begin{lemma}\label{utilde}
-	Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
-	then $\textbf{a}$ has polynomial entries.
-\end{lemma}
+%% \begin{lemma}\label{utilde}
+%% 	Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
+%% 	then $\textbf{a}$ has polynomial entries.
+%% \end{lemma}
 
-\begin{proof}
-	Let $\mathscr{D} = \mA\mF^{\mU,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mV}$ and $s_1, \cdots s_m$ be
-	invariant factors of $\mF^{\mU,\mV}$ such that 
-	$s_m | s_{m-1} | \cdots | s_1$.
-	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
-	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
-	\begin{align*}
-	(w \mA) \mA^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]
-	\begin{bmatrix}
-	s_m &        & \\
-	& \ddots & \\
-	&        & s_1
-	\end{bmatrix}\\
-	&= [s_1b_1, s_1b_2, \cdots, s_1b_m]\\
-	&= [0,\cdots,0,s_1] \mB
-	\end{align*}
-	Therefore, if $a = w \mA$, we get
-	$ a \mF^{\mU,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
-	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
-	entries, $a$ must also have polynomial entries.\\
-\end{proof}
+%% \begin{proof}
+%% 	Let $\mathscr{D} = \mA\mF^{\mU,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mV}$ and $s_1, \cdots s_m$ be
+%% 	invariant factors of $\mF^{\mU,\mV}$ such that 
+%% 	$s_m | s_{m-1} | \cdots | s_1$.
+%% 	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
+%% 	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
+%% 	\begin{align*}
+%% 	(w \mA) \mA^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]
+%% 	\begin{bmatrix}
+%% 	s_m &        & \\
+%% 	& \ddots & \\
+%% 	&        & s_1
+%% 	\end{bmatrix}\\
+%% 	&= [s_1b_1, s_1b_2, \cdots, s_1b_m]\\
+%% 	&= [0,\cdots,0,s_1] \mB
+%% 	\end{align*}
+%% 	Therefore, if $a = w \mA$, we get
+%% 	$ a \mF^{\mU,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
+%% 	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
+%% 	entries, $a$ must also have polynomial entries.\\
+%% \end{proof}
 
 \begin{theorem}
 	 Let $U = [u_1,u_2,\dots,u_m]$be in $\K^{D\times m}$,
