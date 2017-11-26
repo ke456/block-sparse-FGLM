@@ -1742,27 +1742,41 @@ $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 
 \newpage
 \section{Experimental Results}\label{section:ex}
+In the following table, we give the timings in seconds for different values 
+of $m$ for algorithm \ref{algo:block-sparse-fglm}. 
+Our implemention was based on LinBox \cite{LinBox} dense and 
+sparse polynomials as well Shoup's NTL \cite{NTL} polynomials. All timings
+are measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
+value of $m$, we create and run $m$ threads in parallel.
 \bgroup
-\def\arraystretch{2}
+\def\arraystretch{1.5}
 \setlength\tabcolsep{10pt}
 \begin{center}
+	\textbf{Table 1: Timings (in seconds) for polynomials over $GF(65537)$}
 \begin{tabular}{c|c|c|c|c|c|c|c}
 	\textbf{name}& n& $\mathbf{D}$ & \textbf{Sparsity} & $\mathbf{m = 1}$ & $\mathbf{m = 4}$ & $\mathbf{m = 8}$ & $\mathbf{deg(P) = D}$\\
-	\cline{1-8}
-	rand(3,10)&3 & 1000& 0.06  & 16.550  & 4.45    & 3.305   & yes \\
-	rand(3,12)&3 & 1728& 0.05  & 70.703  & 18.74   & 13.250  & yes \\
-	rand(3,14)&3 & 2744& 0.05  & 240.992 & 64.619  & 44.737  & yes \\
-	rand(3,16)&3 & 4096& 0.04  & 697.91  & 191.327 & 129.598 & yes \\
-	rand(3,18)&3 & 5832& 0.03  & 1779.89 & 473.091 & 329.231 & yes \\
-	rand(3,20)&3 & 8000& 0.03  & 4128.45 & 1099.08 & 759.426 & yes \\
-	bannwarth &5 & 284 & 0.27  & 1.027   & 0.364   & 0.220   & yes \\
-	cyclic7   &7 & 924 & 0.02  & 7.038   & 1.954   & 1.448   & yes \\
-	eco12     &12& 1024& 0.13  & 62.294  & 16.427  & 11.539  & yes \\
-	katsura8  &9 & 256 & 0.28  & 1.207   & 0.338   & 0.249   & yes \\
-	katsura9  &10& 512 & 0.26  & 9.210   & 2.453   & 1.865   & yes \\
-	katsura10 &11& 1024& 0.25  & 71.243  & 18.867  & 13.218  & yes \\
-	sot1      &5 & 8694& 0.001 & 762.063 & 208.25  & 143.281 & yes \\
-	vor2      &6 & 574 & 0.24   & 10.238  & 2.749   & 1.972   & yes 
+	\hline{0-7}
+	3-vars7&3 &343&0.10127&1.0138&0.29157&0.22371&yes\\
+	3-vars8&3 &512&0.087166&2.8615&0.80052&0.5909&yes\\
+	3-vars9&3 &729&0.076978&7.2133&1.9787&1.4595&yes\\
+	3-vars10&3 &1000&0.068609&16.551&4.4504&3.3051&yes\\
+	3-vars12&3 &1728&0.056588&70.704&18.74&13.25&yes\\
+	3-vars14&3 &2744&0.048162&240.99&64.619&44.737&yes\\
+	3-vars16&3 &4096&0.041925&697.91&191.33&129.6&yes\\
+	3-vars18&3 &5832&0.037121&1779.9&473.09&329.23&yes\\
+	3-vars20&3 &8000&0.033307&4128.4&1099.1&759.43&yes\\
+	3-vars22&3 &10648&0.030205&8804.3&2335.9&1625.3&yes\\
+	3-vars24&3 &13824&0.027632&17646&4713.3&3256&yes\\
+	bannwarth3&5 &284&0.0035211&1.0277&0.36427&0.22009&yes\\
+	cyclic7&7 &924&0.021336&7.0386&1.9545&1.449&yes\\
+	eco12&12 &1024&0.13053&62.294&16.427&11.539&yes\\
+	katsura8&9 &256&0.27615&1.2079&0.33827&0.24871&yes\\
+	katsura9&10 &512&0.26546&9.211&2.4531&1.8654&yes\\
+	katsura10&11 &1024&0.25802&71.244&18.868&13.219&yes\\
+	nbody6&7 &378&0.34974&3.029&0.83343&0.6072&yes\\
+	sot1&5 &8694&0.00011502&765.06&208.25&143.28&yes\\
+	vor2&6 &574&0.0017422&10.239&2.7491&1.9726&yes\\
+	
 \end{tabular}
 \end{center}
 
