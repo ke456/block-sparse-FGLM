@@ -156,6 +156,12 @@
 
 \maketitle
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
 Computing the Gr\"obner basis of an ideal with respect to a giving
 term ordering is an essential step in solving systems of polynomials.
 Certain term orderings, such as the degree reverse lexicographical
@@ -925,11 +931,12 @@ the form \sloppy $\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0},
 \minpoly)$, where $\col{v}_j$ is the $j$th column of $\mV$ and
 $\minpoly$ is the minimal polynomial of $\mM$. Since $\minpoly$ may
 have degree $D$, the definition we gave of $\Omega$ suggests that we
-may need up to $D$ terms of the sequence $\row{u}_i \mM^s \col{v}_j$,
-which we would of course like to avoid. We now present an alternative
-solution, that involves the computation of a matrix numerator, but
-only uses the sequence elements $\mU \mM^s$, for $s=0,\dots,\lceil D/m
-\rceil-1$ (which are already known).
+may need to compute up to $D$ terms of the sequence $\row{u}_i \mM^s
+\col{v}_j$, which we would of course like to avoid. We now present an
+alternative solution, that involves solving a polynomial linear system
+and computing a matrix numerator, but only uses the sequence elements
+$\mU \mM^s$, for $s=0,\dots,\lceil D/m \rceil-1$ (which are already
+known).
 
 Fix $i$ in $1,\dots,m$ and let $\row{a}_i$ be the row vector defined
 by $\row{a}_i = [0~\cdots~0~\minpoly~0~\cdots~0] (\mat{P}_{\mU,\mV})^{-1}$,
@@ -957,26 +964,31 @@ as before, the cost is $O(m^{\omega} \M(D/m) \log(D/m) \log(m))
 Once $\row{a}_i$ is known, we can recover the scalar numerator
 $\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)$ as
 the dot product
-$$\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly) = \row{a}_i\, \mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}),$$
-where $(\seq_{\mU,\mV})_{*:j}$ is the sequence consisting 
-of the $j$th column of the matrices in $\seq_{\mU,\mV}$,
-whose $s$th entry is thus $\mat{U} \mM^s \col{v}_j$.
-This equality follows at once from the definitions:
+\begin{align}\label{eq:OmegaOmega}
+\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly) = \row{a}_i\, \mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}),  
+\end{align}
+where $(\seq_{\mU,\mV})_{*:j}$ is the sequence consisting of the $j$th
+column of the matrices in $\seq_{\mU,\mV}$, whose $s$th entry is thus
+$\mat{U} \mM^s \col{v}_j$. Note that we are doing here a slight abuse of
+notation, since we identify the polynomial $ \Omega((\row{u}_i \mM^s
+\col{v}_j)_{s \ge 0}, \minpoly)$ and the $1 \times 1$ matrix $[~
+  \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)~]$.
+
+The equality in~\eqref{eq:OmegaOmega} follows at once from the definitions:
 \begin{align*}
-  \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)  &= \minpoly \sum_{s \ge 0} \frac{\row{u}_i \mM^s \col{v}_j}{T^{s+1}}\\
+[~ \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)~]  &= [~\minpoly~] \sum_{s \ge 0} \frac{\row{u}_i \mM^s \col{v}_j}{T^{s+1}}\\
 &=  [0~\cdots~0~\minpoly~0~\cdots~0] (\mat{P}_{\mU,\mV})^{-1} \mat{P}_{\mU,\mV} \sum_{s \ge 0} \frac{\mat{U} \mM^s \col{v}_j}{T^{s+1}}\\
-&=  \row{a}_i\, \mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}),
+&=  \row{a}_i\, \mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}).
 \end{align*}
-with however a slight abuse of notation, since we identify the polynomial
-$  \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)$ 
-and the $1 \times 1$ matrix $[  \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)]$.
-Applying the cost estimate given in \cref{section:matrix_seq}, we see
-that given $\mat{P}_{\mU,\mV}$ and
-the terms $\mU \mM^s$, for $s=0,\dots,\lceil D/m
-\rceil-1$, we can compute $\mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}) \in \K[T]^{m \times 1}$
-using $O(m^2 \M(D/m))$ operations in $\K$. Then, the
-dot product with $\row{a}_i$ takes $O(m \M(D))$ operations,
-since both vectors have size $m$ and entries of degree at most $D$.
+Assume that we know $\mat{P}_{\mU,\mV}$ and the terms $\mU \mM^s$, for
+$s=0,\dots,\lceil D/m \rceil-1$. Computing the first $\lceil D/m
+\rceil$ values of the sequence $(\mat{U} \mM^s \col{v}_j)_{s\ge 0}$ takes
+$O(D^2)$ base field operations. Then, applying the cost estimate given
+in \cref{section:matrix_seq}, we see that we can compute $\mat{\Omega}(
+(\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}) \in \K[T]^{m \times 1}$
+using $O(m^2 \M(D/m))$ operations in $\K$. Then, the dot product with
+$\row{a}_i$ takes $O(m \M(D))$ operations, since both vectors have
+size $m$ and entries of degree at most $D$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
