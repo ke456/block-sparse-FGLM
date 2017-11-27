@@ -1774,7 +1774,7 @@ $R_1(53) = 54$ and $R_2(53) = 79$ as expected.
 In the following table, we give the timings in seconds for different values 
 of $m$ for algorithm \ref{algo:block-sparse-fglm}. 
 Our implemention was based on LinBox \cite{LinBox} dense and 
-sparse polynomials as well Shoup's NTL \cite{NTL} polynomials. All timings
+sparse matrices as well Shoup's NTL \cite{NTL} polynomials. All timings
 are measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
 value of $m$, we create and run $m$ threads in parallel.
 \bgroup
@@ -1784,7 +1784,7 @@ value of $m$, we create and run $m$ threads in parallel.
 	\textbf{Table 1: Timings (in seconds) for polynomials over $GF(65537)$}
 \begin{tabular}{c|c|c|c|c|c|c|c}
 	\textbf{name}& n& $\mathbf{D}$ & \textbf{Sparsity} & $\mathbf{m = 1}$ & $\mathbf{m = 4}$ & $\mathbf{m = 8}$ & $\mathbf{deg(P) = D}$\\
-	\hline{0-7}
+	\hline
 	3-vars7&3 &343&0.10127&1.0138&0.29157&0.22371&yes\\
 	3-vars8&3 &512&0.087166&2.8615&0.80052&0.5909&yes\\
 	3-vars9&3 &729&0.076978&7.2133&1.9787&1.4595&yes\\
@@ -1808,6 +1808,57 @@ value of $m$, we create and run $m$ threads in parallel.
 	
 \end{tabular}
 \end{center}
+
+On average, the algorithm performs better by a factor of 3.64 for
+$m=4$ and by a factor of 5.16 for $m=8$ compared to $m=1$. We can
+see that the more threads there are, the less beneficial it is
+to have an additional thread. This is because
+increasing $m$ has two effects: it
+decreases the effectiveness of parallel computations and
+also increase the time to compute the output polynomials.
+From the observed speedup and the following table, 
+we can conclude that the bottleneck of the
+algorithm is the computation of $(\mU^{\perp} \mM^i)_{i\ge0}$ and
+the latter effect is minor compared to the former, especially when
+$D \ge 1000$.
+\begin{center}
+	\textbf{Table 2: Proportion of total time to compute $(\mU^{\perp} \mM^i)_{i\ge0}$}
+	\begin{tabular}{c|c|c|c|c|c}
+		\textbf{name} & n & D & $m=1$ & $m=4$ & $m=8$\\
+		\hline
+		3-vars7&3 &343&0.955923&0.879551&0.80941\\
+		3-vars8&3 &512&0.975233&0.922882&0.869444\\
+		3-vars9&3 &729&0.98538&0.955381&0.923343\\
+		3-vars10&3 &1000&0.990689&0.971095&0.944546\\
+		3-vars12&3 &1728&0.995453&0.985816&0.973239\\
+		3-vars14&3 &2744&0.997344&0.992095&0.985019\\
+		3-vars16&3 &4096&0.998398&0.995134&0.990224\\
+		3-vars18&3 &5832&0.998685&0.996652&0.993576\\
+		3-vars20&3 &8000&0.999237&0.997643&0.995374\\
+		3-vars22&3 &10648&0.999423&0.99827&0.996438\\
+		3-vars24&3 &13824&0.999547&0.998632&0.997239\\
+		bannwarth3&5 &284&0.960533&0.924037&0.837585\\
+		cyclic7&7 &924&0.972644&0.92752&0.877611\\
+		eco12&12 &1024&0.995144&0.987338&0.979306\\
+		katsura8&9 &256&0.959209&0.898745&0.848683\\
+		katsura9&10 &512&0.987861&0.96742&0.947636\\
+		katsura10&11 &1024&0.995959&0.989246&0.982343\\
+		nbody6&7 &378&0.977161&0.938614&0.909365\\
+		sot1&5 &8694&0.993542&0.983203&0.968586\\
+		vor2&6 &574&0.990214&0.973454&0.955212\\	
+	\end{tabular}
+\end{center}
+
+We can determined the effectiveness of parallel computations by comparing
+the combined CPU times as this would eliminate any benefit of parallelizing. 
+If the paralleliztion was perfect, this value should be roughly equal
+for all values of $m$. For example, in test ``3-vars20", we get
+$4124, 4350, 6008$ seconds for $m=1,4,8$ respectively. We observed similar
+patterns for other tests. Since computing $(\mU^{\perp} \mM^i)_{i\ge0}$ took
+$> 99$ percent of the total time for all three values of $m$ in this test,
+the increase in combined CPU times must be due to the parallelization.
+
+
 
 \newpage
 \section{Improvements for Special cases}
