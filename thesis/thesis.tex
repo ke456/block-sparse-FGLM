@@ -82,6 +82,7 @@
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
+\newcommand{\lf}{X}
 
 \def\M {\ensuremath{\mathsf{M}}}
 \def\Deg{D}
@@ -183,8 +184,8 @@ has the form
 where $R_n \in \K[X_n]$ is squarefree and all $R_i$'s are in $\K[X_n]$
 of degree less than $\deg(R_n)$; this is known as the {\em shape
   lemma}~\cite{GiMo89}. The points in the variety $V(I)$ are then
-$$\{ ( R_1(\alpha), \dots, R_{n-1}(\alpha), \alpha ) \mid \forall
- \alpha: R_n(\alpha)=0\}.$$ As a result, the standard approach to
+$$\{ ( R_1(\tau), \dots, R_{n-1}(\tau), \tau ) \mid \forall
+ \tau: R_n(\tau)=0\}.$$ As a result, the standard approach to
  solve a zero-dimensional system by means of Gr\"obner basis
  algorithms first computes a Gr\"obner basis for a degree ordering,
  then converts it to a more readable output, such as a lexicographic
@@ -236,9 +237,9 @@ precisely the bit-size of their coefficients, if we work over $\K=\Q$.
 The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on an
 idea that will be at the core of our algorithms as well: duality.
 Indeed, these algorithms compute sequences of values of the form
-$\tau_i=(\trace(X^i))_{i \ge 0}$ or 
-$\tau_{i,j}=(\trace(X^i X_j))_{i \ge 0}$, where $\trace: Q \to \K$ is the trace 
-form and $X$ is typically of the form $X=t_1 X_1 + \cdots + t_n X_n$.
+$\tau_i=(\trace(\lf^i))_{i \ge 0}$ or 
+$\tau_{i,j}=(\trace(\lf^i X_j))_{i \ge 0}$, where $\trace: Q \to \K$ is the trace 
+form and $\lf$ is typically of the form $\lf=t_1 X_1 + \cdots + t_n X_n$.
 From these values, it is then possible to recover the output
 in~\eqref{eq:RUR} by means of some structured linear algebra calculation.
 
@@ -246,16 +247,16 @@ A drawback of this approach is that we need to know the trace of all
 elements of the basis $\basis$; while feasible in polynomial time,
 this is by no means straightforward. In~\cite{BoSaSc03}, Bostan {\it
   et al.} introduced randomization to alleviate this issue. They show
-that computing values such as $\ell(X^i)$ and $\ell(X^i X_j)$, where
-$X$ is as above and 
+that computing values such as $\ell(\lf^i)$ and $\ell(\lf^i X_j)$, where
+$\lf$ is as above and 
 $\ell$ is a random $\K$-linear form $Q \to \K$, allows one to deduce
 a description of $V(I)$ of the form
 \begin{equation}\label{eq:BoSaSc03}
- \{  P(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
+ \{  Q(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
 \end{equation}
-where $P$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
-$\K[T]$ of degree less than $\deg(P)$ for all $i$. Precisely, the
-output of such algorithms is the tuple $((P,V_1,\dots,V_n),X)$; this
+where $Q$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
+$\K[T]$ of degree less than $\deg(Q)$ for all $i$. Precisely, the
+output of such algorithms is the tuple $((Q,V_1,\dots,V_n),\lf)$; this
 will be called a {\em zero-dimensional parametrization} of $V(I)$. In
 particular, this output will in general differ from the description
 in~\eqref{eq:RUR}, since the latter keeps trace of the multiplicities
@@ -263,7 +264,7 @@ of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
 the {\em nil-indices} of the solutions).
 
 The most costly part of such an algorithm is the computation of the
-values $\ell(X^i)$ and $\ell(X^i X_j)$; the rest essentially boils
+values $\ell(\lf^i)$ and $\ell(\lf^i X_j)$; the rest essentially boils
 down to applying the Berlekamp-Massey algorithm and univariate
 polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re and Mou pointed
 out that the multiplication matrices $\mM_1,\dots,\mM_n$ can be
@@ -286,16 +287,16 @@ Coppersmith~\cite{Coppersmith94} in the context of integer
 factorization; this makes it possible to easily parallelize the
 bottleneck of the algorithm. This was already discussed by Steel
 in~\cite{Steel15}, where he showed how to compute the analogue of
-polynomial $P$ in~\eqref{eq:BoSaSc03}. In that reference, one is
+polynomial $Q$ in~\eqref{eq:BoSaSc03}. In that reference, one is
 only interested in the solutions in the base field $\K$ ($\K$ being a
-finite field in that context): the algorithm computes the roots of $P$
+finite field in that context): the algorithm computes the roots of $Q$
 in $\K$ and substitutes them in the input system, before computing a
 Gr\"obner basis in $n-1$ variables for each of them.
 
 Our first contribution is to give a block version of
 the algorithm in~\cite{BoSaSc03} that extends the approach
 in~\cite{Steel15} to compute all polynomials in~\eqref{eq:BoSaSc03}
-for essentially the same cost as the computation of $P$.
+for essentially the same cost as the computation of $Q$.
 
 
 \paragraph{Complexity model.}
@@ -924,7 +925,8 @@ manner: on a platform with $m$ processors (or cores, \dots), one would
 typically compute the $m \times D$ matrices $\mU \mM^s$, for
 $s=0,\dots,2\lceil D/m \rceil$, by having each processor compute a
 sequence $\row{u}_i \mM^s$, where $\row{u}_i$ is the $i$th row of
-$\mU^\perp$. 
+$\mU^\perp$. From these values, we then deduce the matrices $\mU \mM^s
+\mV$, $s=0,\dots,2\lceil D/m \rceil$.
 
 However, our main algorithm will need to compute scalar numerators of
 the form \sloppy $\Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0},
@@ -957,7 +959,7 @@ left-hand row vector.
   on the degree of the entries of $\row{a}_i$ follows from Cramer's
   formulas.
 \end{proof}
-To compute $\row{a}_i$, we use again Storjohann's high order lifting;
+To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
 as before, the cost is $O(m^{\omega} \M(D/m) \log(D/m) \log(m))
 \subset \softO{m^{\omega-1}D}$ operations in $\K$.
 
@@ -973,7 +975,6 @@ $\mat{U} \mM^s \col{v}_j$. Note that we are doing here a slight abuse of
 notation, since we identify the polynomial $ \Omega((\row{u}_i \mM^s
 \col{v}_j)_{s \ge 0}, \minpoly)$ and the $1 \times 1$ matrix $[~
   \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)~]$.
-
 The equality in~\eqref{eq:OmegaOmega} follows at once from the definitions:
 \begin{align*}
 [~ \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)~]  &= [~\minpoly~] \sum_{s \ge 0} \frac{\row{u}_i \mM^s \col{v}_j}{T^{s+1}}\\
@@ -994,9 +995,27 @@ size $m$ and entries of degree at most $D$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Structure of the dual}
+\section{Sequences associated to a zero-dimensional ideal}
 
-{\bf this is a mess}
+We now focus on our main question: computing a zero-dimensional
+parametrization of an algebraic set of the form $V=V(I)$, for some
+zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$. As input, we assume
+that we know a monomial basis $\basis$ of $Q=\K[X_1,\dots,X_n]/I$,
+together with the multiplication matrices $\mM_1,\dots,\mM_n$ of
+respectively $X_1,\dots,X_n$ in this basis; for definiteness, we
+suppose that the first basis element in $\basis$ is $1$.
+
+We write $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s in
+$\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
+$i$.  We also let $\D$ be the dimension of $Q$, so that $d \le \D$,
+and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In this
+section, we recall and generalize results from the appendix
+of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
+parametrization of $V$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The structure of the dual}  
 
 For $i$ in $\{1,\dots,d\}$, let $Q_i$ be the local algebra at
 $\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
@@ -1009,21 +1028,24 @@ and only if $Q_i$ is a field, if and only if $\balpha_i$ is a
 non-singular root of $I$. We also let
 $\D_i=\dim_\Kbar(Q_i)$, so that we have $D_i \ge N_i$ and $\D=\D_1 + \cdots + \D_d$.
 
-
-The sequences we consider below are of the form $(\ell(t^s))_{s \ge
-	0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $t$ in $Q$. For such
-sequences, the following standard result will be useful.
+The sequences we consider below are of the form $(\ell(\lf^s))_{s \ge
+  0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $\lf$ in $Q$
+(we will often write $\ell \in {\rm hom}_\K(Q,\K)$). For
+such sequences, the following standard result will be useful
+(see e.g.~\cite[Proposition~1 \& 2]{BoSaSc03} for a proof).
 \begin{lemma}\label{lemma:minpoly}
-	Let $t$ be in $Q$ and let $P \in \K[T]$ be its minimal
-	polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(Q,\K)$,
-	$P$ is the minimal polynomial of the sequence $(\ell(t^s))_{s \ge
-		0}$.
+  Let $\lf$ be in $Q$ and let $P \in \K[T]$ be its minimal
+  polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(Q,\K)$,
+  $P$ is the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge
+    0}$.
 \end{lemma}
 
-
-Fix $i$ in $1,\dots,d$.  There exists a basis of the dual ${\rm
-	hom}_\Kbar(Q_i,\Kbar)$ consisting of linear forms
-$(\lambda_{i,j})_{1\le j \le \D_i}$ of the form
+The following results are classical; they go back
+to~\cite{Macaulay16}, and have been used in computational algebra
+since the 1990's~\cite{MaMoMo96,Mourrain97}. Fix $i$ in $1,\dots,d$.
+There exists a basis of the dual ${\rm hom}_\Kbar(Q_i,\Kbar)$
+consisting of linear forms $(\lambda_{i,j})_{1\le j \le \D_i}$ of the
+form
 $$\lambda_{i,j}: f \mapsto (\Lambda_{i,j}(f))(\balpha_i),$$
 where $\Lambda_{i,j}$ is the operator
 $$f \mapsto \Lambda_{i,j}(f) = \sum_{\mu=(\mu_1,\dots,\mu_n) \in
@@ -1049,7 +1071,7 @@ $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\lambda$ in ${\rm
 	hom}_\Kbar(Q_i,\Kbar)$, there exist $\bu_i=(u_{i,j}) \in
 \Kbar{}^{D_i}$ such that we have
 \begin{align}\label{ell_param}
-\lambda: f \mapsto \lambda(f)
+\ell: f \mapsto \ell(f)
 &= \sum_{j=1}^{D_i} u_{i,j} \lambda_{i,j}(f)\nonumber\\
 &= \sum_{j=1}^{D_i} u_{i,j} \big(\Lambda_{i,j}(f)\big)(\balpha_i)\nonumber\\
 &= \sum_{j=1}^{D_i} u_{i,j}
@@ -1061,44 +1083,44 @@ $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\lambda$ in ${\rm
 {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}(\balpha_i),
 \end{align}
 where $S_i$ is  the union of $S_{i,1},\dots,S_{i,D_i}$,
-with in particular $P_{i,(0,\dots,0)}=u_{i,1}$ and where $P_{i,\mu}$
-depends only on $(u_{i,j})_{j =2,\dots,D_i}$ for all $\mu$ in $S_i$,
+with in particular $P_{i,(0,\dots,0)}=U_{i,1}$ and where $P_{i,\mu}$
+depends only on $(U_{i,j})_{j =2,\dots,D_i}$ for all $\mu$ in $S_i$,
 $\mu \ne (0,\dots,0)$. Explicily, we can write $P_{i,\mu}=\sum_{j\in
 	\{1,\dots,D_i\} \text{~such that~} \mu \in S_{i,j}} c_{i,j,\mu}
-U_{i,j}$.
+U_{i,j}$. 
 
-Fix $\lambda$ non-zero in ${\rm hom}_\Kbar(Q_i,\Kbar)$. We can then
+Fix $\ell$ non-zero in ${\rm hom}_\Kbar(Q_i,\Kbar)$, written
+as in~\eqref{ell_param}. We can then
 define its {\em order} $w$ and {\em symbol} $\pi$. The former is
 the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
 $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$ such that $P_{i,\mu}(\bu_i)$ is
 non-zero; by~\cite[Lemma~3.3]{Mourrain97} we have $w \le
 N_i-1$. Then, we let
 $$\pi =\sum_{\mu \in S_i,\ |\mu|=w}P_{i,\mu}(\bu_i) X_1^{\mu_1} \cdots
-X_n^{\mu_n}$$ be the {\em symbol} of $\lambda$; by construction,
+X_n^{\mu_n}$$ be the {\em symbol} of $\ell$; by construction,
 this is a non-zero polynomial. In the following paragraphs, we will
 need the next easy lemma.
 
 \begin{lemma}\label{lemma:symbol0}
-	Fix $i$ in $\{1,\dots,d\}$. For a generic choice of $\lambda$ in ${\rm
-		hom}_\Kbar(Q_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
-	$\pi_i(t_1,\dots,t_n)$ is non-zero.
+  Fix $i$ in $\{1,\dots,d\}$. For a generic choice of $\ell$ in
+  ${\rm hom}_\Kbar(Q_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
+  $\pi_i(t_1,\dots,t_n)$ is non-zero.
 \end{lemma}
 \begin{proof}
-	Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
-	$\mu=(\mu_1,\dots,\mu_n)$ in $S_i$, and define 
-	$$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1} \cdots
-	X_n^{\mu_n} \in \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this
-	is by construction a non-zero polynomial.  Thus, for a generic
-	choice of $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, that define a linear form
-	$\lambda$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$ as in \cref{ell_param},
-	and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
-	$\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. As a
-	result, the symbol of such a linear form $\lambda$ is $\pi =\sum_{\mu \in
-		S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1} \cdots X_n^{\mu_n},$
-	and $\pi(t_1,\dots,t_n)$ is then non-zero.
+  Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
+  $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$, and define 
+	$$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1}
+  \cdots X_n^{\mu_n} \in
+  \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
+  construction a non-zero polynomial.  Thus, for a generic choice of
+  $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, that define a linear form
+  $\ell$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$ as in \cref{ell_param},
+  and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
+  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. As a
+  result, the symbol of such a linear form $\ell$ is $\pi
+  =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1}
+  \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then non-zero.
 \end{proof}
-
-
 
 Finally, we say a word about global objects.  Fix a linear form $\ell:
 Q \to \K$. By the Chinese Remainder Theorem, there exist unique
@@ -1115,416 +1137,361 @@ $\mathfrak{S}$.  As a consequence, for all $f$ in $Q$, we have
 For $i$ in $\mathfrak{S}$, we denote by $w_i$ and $\pi_i$ respectively
 the order and the symbol of $\ell_i$. For such a subset
 $\mathfrak{S}$, we also write $Q_\mathfrak{S}=\prod_{i \in
-	\mathfrak{S}} Q_i$ and $V_\mathfrak{S}=\cup_{i \in \mathfrak{S}}
-\{\balpha_i\}$.
+  \mathfrak{S}} Q_i$ and $V_\mathfrak{S}=
+\{\balpha_i \mid i \in \mathfrak{S}\}$.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{A fundamental formula.}  The following lemma 
-gives an explicit form for a generating series of the form $\sum_{\ell
-	\ge 0} \ell(v t^i)T^\ell$, for a linear form $\ell:Q \to \K$. A
-slightly less precise version of it is in~\cite{BoSaSc03}.
+\subsection{A fundamental formula}  
+
+Let $\lf$ be in $Q$ and $\ell$ in ${\rm hom}_\K(Q,\K)$.  The sequences
+$(\ell(\lf^s))_{s\ge 0}$, and more generally $(\ell(v \lf^s))_{s\ge
+  0}$, for $v$ in $Q$, are the main ingredients in our algorithm.  The
+following lemma justifies this by giving an explicit form for a
+generating series of the form $\sum_{s \ge 0} \ell(v
+\lf^s)/T^{s+1}$. A less precise version of it is in~\cite{BoSaSc03};
+the more explicit expression given here will be needed in the last
+section of this paper.
 
 \begin{lemma}\label{lemma:formula}
-	Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, with support $\mathfrak{S}$,
-	and let $\{\pi_i \mid i \in \mathfrak{S}\}$ and $\{w_i \mid i \in
-	\mathfrak{S}\}$ be as above.
+  Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, with support $\mathfrak{S}$,
+  and let $\{\pi_i \mid i \in \mathfrak{S}\}$ and $\{w_i \mid i \in
+  \mathfrak{S}\}$ be the symbols and orders of $\{\ell_i \mid i \in \mathfrak{S}\}$,
+  for $\{\ell_i \mid i \in \mathfrak{S}\}$ as in~\eqref{eq:fui}.
 	
-	Let $t=t_1 X_1 + \cdots +t_n X_n$, for some $t_1,\dots,t_n$ in $\K$
-	and let $v$ be in $\K[X_1,\dots,X_n]$. Then, we have the equality
-	\begin{align}\label{eq:sumgenseries}
-	\sum_{s \ge 0} \ell(v t^s)/T^{s+1} =
-	\sum_{i \in \mathfrak{S}} \frac{
-		v(\balpha_i)\, w_i!\, \pi_{i}(t_1,\dots,t_n)
-		+ (T-t(\balpha_i))A_{v,i}}
-	{(T-t(\balpha_i))^{w_{i}+1}},    
-	\end{align}
-	for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ (that
-	depend on the choice of $v$), with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
-	$\mathfrak{S}$.
+  Let $\lf=t_1 X_1 + \cdots +t_n X_n$, for some $t_1,\dots,t_n$ in $\K$
+  and let $v$ be in $\K[X_1,\dots,X_n]$. Then, we have the equality
+  \begin{align}\label{eq:sumgenseries}
+    \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} = \sum_{i \in \mathfrak{S}}
+    \frac{ v(\balpha_i)\, w_i!\, \pi_{i}(t_1,\dots,t_n) +
+      (T-\lf(\balpha_i))A_{v,i}} {(T-\lf(\balpha_i))^{w_{i}+1}},
+  \end{align}
+  for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ (that
+  depend on the choice of $v$), with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
+  $\mathfrak{S}$.
 \end{lemma}
 \begin{proof}
-	Take $v$ and $t$ as above. Consider first
-	an operator of the form $f \mapsto \frac{ \partial^{|\mu|}  f}
-	{\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}$, where 
-	we write $|\mu|=\mu_1+\cdots+\mu_n$. Then, we have
-	the following generating series identities, with coefficients in 
-	$\K(X_1,\dots,X_n)$:
-	\begin{align*}
-	\sum_{s \ge 0} 
-	\frac{ \partial^{|\mu|} ( v t^s )} {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}
-	\frac{1}{T^{s+1}} 
-	&=  \sum_{s \ge 0} 
-	\frac{ \partial^{|\mu|} (v t^s/T^{s+1})} {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}\\
-	&=  
-	\frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}
-	\left (\sum_{s \ge 0} v t^s/T^{s+1}\right ) \\
-	&= \frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}
-	\left (\frac v{T-t} \right ) \\
-	&= v\, |\mu|!\, \prod_{1 \le k \le n} 
-	\left (\frac{ \partial t} {\partial X_k} \right)^{\mu_k}
-	\frac {1}{(T-t)^{|\mu|+1}} + \frac{P_{|\mu|}(\bX,T)}{(T-t)^{|\mu|}} + \cdots + \frac{P_{1}(\bX,T)}{(T-t)}\\
-	&= v\, |\mu|!\, \prod_{1 \le k \le n} 
-	t_k^{\mu_k}
-	\frac {1}{(T-t)^{|\mu|+1}} + \frac{P(\bX,T)}{(T-t)^{|\mu|}},
-	\end{align*}
-	for some polynomials $P_1,\dots,P_{|\mu|},P$ in $\K[\bX,T]$ that
-	depend on the choices of $\mu$, $v$ and $t$, with $\deg(P_i,T) < i$
-	for all $i$ and thus $\deg(P,T) < |\mu|$.
-	
-	Take now a linear combination of such operators, such as 
-	$f \mapsto \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|}  f } {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}$. The corresponding generating series
-	becomes
-	\begin{align*}
-	\sum_{s \ge 0} 
-	\sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v t^s )} {\partial X_1^{\mu_1} \cdots
-		\partial X_n^{\mu_n}}
-	\frac{1}{T^{s+1}}
-	&=
-	v\,\sum_{\mu \in R} c_\mu
-	|\mu|!\, \prod_{1 \le k \le n} 
-	t_k^{\mu_k}
-	\frac {1}{(T-t )^{|\mu|+1}} +\sum_{\mu \in R} \frac{P_\mu(\bX,T)}{(T-t)^{|\mu|}},
-	\end{align*}
-	where each $P_\mu$ has degree less than $|\mu|$ in $T$.
-	Let $w$ be the maximum of all $|\mu|$ for $\mu$ in $R$. We can rewrite 
-	the above as
-	\begin{align*}
-	v\, w! 
-	\sum_{\mu \in R, |\mu|=w} c_\mu
-	\, \prod_{1 \le k \le n} 
-	t_k^{\mu_k}
-	\frac {1}{(T-t )^{w+1}}
-	+ \frac{A(\bX,T)}{(T-t )^{w}},
-	\end{align*}
-	for some polynomial $A$ of degre less than $w$ in $T$. If we let 
-	$\pi =\sum_{\mu \in R,\ |\mu|=w} c_{\mu} X_1^{\mu_1} \cdots
-	X_n^{\mu_n}$, this becomes
-	\begin{align*}
-	\sum_{s \ge 0} 
-	\sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v t^s )} { X_1^{\mu_1} \cdots
-		X_n^{\mu_n}}
-	\frac{1}{T^{s+1}} 
-	&=
-	v\, w! \,  \pi(t_1,\dots,t_n)
-	\frac {1}{(T-t )^{w+1}}
-	+ \frac{A(\bX,T)}{(T-t )^{w}}.
-	\end{align*}
-	Applying this formula to the sum in \cref{eq:fui}, we obtain the
-	claim in the lemma.
+  Take $v$ and $\lf$ as above. Consider first an operator of the form $f
+  \mapsto \frac{ \partial^{|\mu|} f} {\partial X_1^{\mu_1} \cdots
+    \partial X_n^{\mu_n}}$, where we write
+  $|\mu|=\mu_1+\cdots+\mu_n$. Then, we have the following generating
+  series identities, with coefficients in $\K(X_1,\dots,X_n)$:
+  \begin{align*}
+    \sum_{s \ge 0} 
+    \frac{ \partial^{|\mu|} ( v \lf^s )} {\partial X_1^{\mu_1} \cdots
+      \partial X_n^{\mu_n}}
+    \frac{1}{T^{s+1}} 
+    &=  \sum_{s \ge 0} 
+    \frac{ \partial^{|\mu|} (v \lf^s/T^{s+1})} {\partial X_1^{\mu_1} \cdots
+      \partial X_n^{\mu_n}}\\
+    &=  
+    \frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
+      \partial X_n^{\mu_n}}
+    \left (\sum_{s \ge 0} \frac{v \lf^s}{T^{s+1}}\right ) \\
+    &= \frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
+      \partial X_n^{\mu_n}}
+    \left (\frac v{T-\lf} \right ) \\
+    &= v\, |\mu|!\, \prod_{1 \le k \le n} 
+    \left (\frac{ \partial \lf} {\partial X_k} \right)^{\mu_k}
+    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
+    &= v\, |\mu|!\, \prod_{1 \le k \le n} 
+    t_k^{\mu_k}
+    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{Q}{(T-\lf)^{|\mu|}},
+  \end{align*}
+  for some polynomials $P_1,\dots,P_{|\mu|},Q$ in $\K[X_1,\dots,X_n,T]$ that
+  depend on the choices of $\mu$, $v$ and $X$, with $\deg(P_i,T) < i$
+  for all $i$ and thus $\deg(P,T) < |\mu|$.
+  
+  Take now a $\Kbar$-linear combination of such operators, such as $f \mapsto
+  \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} f } {\partial
+    X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}$. The corresponding
+  generating series becomes
+  \begin{align*}
+    \sum_{s \ge 0} \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v
+      \lf^s )} {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}
+    \frac{1}{T^{s+1}} &= v\,\sum_{\mu \in R} c_\mu |\mu|!\, \prod_{1
+      \le k \le n} t_k^{\mu_k} \frac {1}{(T-\lf )^{|\mu|+1}} +\sum_{\mu
+      \in R} \frac{Q_\mu}{(T-\lf)^{|\mu|}},
+  \end{align*}
+  where each $Q_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
+  $|\mu|$ in $T$.  Let $w$ be the maximum of all $|\mu|$ for $\mu$ in
+  $R$. We can rewrite the above as
+  \begin{align*}
+    v\, w! 
+    \sum_{\mu \in R, |\mu|=w} c_\mu
+    \, \prod_{1 \le k \le n} 
+    t_k^{\mu_k}
+    \frac {1}{(T-\lf )^{w+1}}
+	+ \frac{A}{(T-\lf )^{w}},
+  \end{align*}
+  for some polynomial $A \in \Kbar[X_1,\dots,X_n,T]$ of degre less than $w$ in $T$. If we let 
+  $\pi =\sum_{\mu \in R,\ |\mu|=w} c_{\mu} X_1^{\mu_1} \cdots
+  X_n^{\mu_n}$, this becomes
+  \begin{align*}
+    \sum_{s \ge 0} 
+    \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v \lf^s )} { X_1^{\mu_1} \cdots
+      X_n^{\mu_n}}
+    \frac{1}{T^{s+1}} 
+    &=
+    v\, w! \,  \pi(t_1,\dots,t_n)
+    \frac {1}{(T-\lf )^{w+1}}
+    + \frac{A}{(T-\lf )^{w}}.
+  \end{align*}
+  Applying this formula to the sum $\ell=\sum_{i \in
+    \mathfrak{S}}\ell_i$ from \cref{eq:fui}, and taking into account
+  the expression~\ref{ell_param} for each $\ell_i$, we obtain the
+  claim in the lemma.
 \end{proof}
 
 \noindent 
 The most useful consequence of the previous lemma is the following
-interpolation formula, where we fix a subset $\mathfrak{S}$ of 
-$\{1,\dots,d\}$. The mapping $t:V_\mathfrak{S} \to \Kbar$
-defined by $\balpha_i \mapsto t(\balpha_{i})$ plays a special role in
-the formula in the lemma; this leads us to the following definitions.
+interpolation formula involving the operator $\Omega$, which
+generalizes a brief comment made in \cref{section:linseq}.
+
+Fix a subset $\mathfrak{S}$ of $\{1,\dots,d\}$. The mapping
+$\lf:V_\mathfrak{S} \to \Kbar$ defined by $\balpha_i \mapsto
+\lf(\balpha_{i})$ plays a special role in the formula in the previous
+lemma; this leads us to the following definitions.
 \begin{itemize}
-	\item We consider $\ell$ and $t$ as in \cref{lemma:formula}, such
-	that $\ell$ has support $\mathfrak{S}$.
-	\item $\mathfrak{T}$ is the subset of $\mathfrak{S}$ consisting of
-	all indices $i$ such that 
-	\begin{itemize}
-		\item $\pi_i(t_1,\dots,t_n)$ is non-zero;
-		\item $t(\balpha_{i'}) \ne t(\balpha_i)$ for $i' \ne i$ in $\mathfrak{S}$.
-	\end{itemize}
-	\item $\{r_1,\dots,r_c\}$ are the pairwise distinct values taken by $t$ on
-	$V_\mathfrak{S}$, for some $c \le |\mathfrak{S}|$.
-	\item $\mathfrak{t}$ is the set of all indices $j$ in
-	$\{1,\dots,c\}$ such that
-	\begin{itemize}
-		\item the fiber $t^{-1}(r_j) \subset V_{\mathfrak{S}}$ contains a single
-		point, written $\balpha_{\sigma_j}$;
-		\item the point $\balpha_{\sigma_j}$ is in $\mathfrak{T}$
-		(equivalently,  $\pi_{\sigma_j}(t_1,\dots,t_n)$ is non-zero).
-	\end{itemize}
-	Remark that $j \mapsto \sigma_j$ induces a one-to-one correspondence
-	between  $\mathfrak{t}$ and  $\mathfrak{T}$.
+\item We consider $\ell$ and $\lf$ as in \cref{lemma:formula}, such
+  that $\ell$ has support $\mathfrak{S}$.
+\item $\mathfrak{T}$ is the subset of $\mathfrak{S}$ consisting of
+  all indices $i$ such that 
+  \begin{itemize}
+  \item $\lf(\balpha_{i'}) \ne \lf(\balpha_i)$ for $i' \ne i$ in $\mathfrak{S}$;
+  \item $\pi_i(t_1,\dots,t_n)$ is non-zero.
+  \end{itemize}
+\item $\{r_1,\dots,r_c\}$ are the pairwise distinct values taken by $\lf$ on
+  $V_\mathfrak{S}$, for some $c \le |\mathfrak{S}|$.
+\item $\mathfrak{t}$ is the set of all indices $j$ in
+  $\{1,\dots,c\}$ such that
+  \begin{itemize}
+  \item the fiber $\lf^{-1}(r_j) \subset V_{\mathfrak{S}}$ contains a single
+    point, written $\balpha_{\sigma_j}$;
+  \item   $\pi_{\sigma_j}(t_1,\dots,t_n)$ is non-zero.
+  \end{itemize}
+  Remark that $j \mapsto \sigma_j$ induces a one-to-one correspondence
+  between  $\mathfrak{t}$ and  $\mathfrak{T}$.
 \end{itemize}
 
 \begin{lemma} \label{lemma:anyv}
-	Let $\ell$, $t$ and all other notation be as above. Let further
-	$M$ be the minimal polynomial of $t$ in $Q_\mathfrak{S}$. Suppose that 
-	$M$ is also the minimal polynomial of the sequence $(\ell(t^s))_{s \ge 0}$,
-	then there exist non-zero constants $\{c_j \mid j \in
-	\mathfrak{t}\}$  such that for $v$ in
-	$\K[X_1,\dots,X_n]$,
-	$$\Omega((\ell(v t^s))_{s\ge0},M) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
+  Let $\ell$, $\lf$ and all other notation be as above. Let further
+  $\minpoly$ be the minimal polynomial of $\lf$ in
+  $Q_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
+  polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then, $\minpoly$
+  cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
+there
+  exist non-zero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
+  for $v$ in $\K[X_1,\dots,X_n]$,
+  $$\Omega((\ell(v \lf^s))_{s\ge0},\minpoly) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
 \end{lemma}
 \begin{proof}
-	For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
-	$\mathfrak{S}$ such that $t(\balpha_{i})=r_j$; the sets
-	$T_1,\dots,T_c$ form a partition of $\mathfrak{S}$. When $T_j$ has
-	cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
-	
-	Take an arbitrary $v$ in $\K[X_1,\dots,X_n]$ and let us
-	collect terms in \cref{eq:sumgenseries} as
-	\begin{align*}
-	\sum_{s \ge 0} \ell(v t^s)\frac{1}{T^{s+1}} =&
-	\sum_{j \in \{1,\dots,c\}}
-	\sum_{i \in T_j} \frac{
-		v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
-		+ (T-r_{j} )A_{v,i}}
+  For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
+  $\mathfrak{S}$ such that $t(\balpha_{i})=r_j$; the sets
+  $T_1,\dots,T_c$ form a partition of $\mathfrak{S}$. When $T_j$ has
+  cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
+  
+  Take an arbitrary $v$ in $\K[X_1,\dots,X_n]$ and let us
+  collect terms in \cref{eq:sumgenseries} as
+  \begin{align*}
+    \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
+    \sum_{j \in \{1,\dots,c\}}
+    \sum_{i \in T_j} \frac{
+      v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
+      + (T-r_{j} )A_{v,i}}
 	{(T-r_{j} )^{w_{i}+1}}\\
 	=&
-	\sum_{j \in \mathfrak{s}}
+	\sum_{j \in \mathfrak{t}}
 	\frac{
-		v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
-		+ (T-r_{j}  )A_{v,\sigma_j} }
-	{(T-r_{j} )^{w_{\sigma_j}+1}}\\
-	&+
-	\sum_{j \in \{1,\dots,c\}-\mathfrak{s}}
-	\frac{   \sum_{i \in T_j} \Big( \big[
-		v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
+	  v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
+	  + (T-r_{j}  )A_{v,\sigma_j} }
+	     {(T-r_{j} )^{w_{\sigma_j}+1}}\\
+	     &+
+	     \sum_{j \in \{1,\dots,c\}-\mathfrak{t}}
+	     \frac{   \sum_{i \in T_j} \Big( \big[
+		 v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
 		 + (T-r_{j}  )A_{v,i} \big ]
-		(T-r_{j} )^{y_j-(w_i+1)}\Big)}
-	{(T-r_{j} )^{y_j}},
-	\end{align*}
-	where $y_j$ is the maximum of all $w_i$ for $i$ in $T_j$.  Remark that
-	for $v=1$, our condition that $\pi_i$ is non-zero for $i$ in
-	$\mathfrak{T}$ implies that in the second line, together with our
-	assumption on the characteristic of $\K$, imply that all terms in the
-	first sum are non-zero and in reduced form.  
-	
-	After simplyfing terms in the second sum, we can rewrite the
-	expression above as
-	\begin{align*}
-	\sum_{s \ge 0} \ell(v t^s)\frac{1}{T^{s+1}} =&
-	\sum_{j \in \mathfrak{t}} \frac{
-		v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
-		+ (T-r_{j} )A_{v,\sigma_{j}}}
+	       (T-r_{j} )^{y_j-(w_i+1)}\Big)}
+	          {(T-r_{j} )^{y_j}},
+  \end{align*}
+  where $y_j$ is the maximum of all $w_i$ for $i$ in $T_j$.  Remark
+  that for $v=1$, our condition that $\pi_i(t_1,\dots,t_n)$ is
+  non-zero for $i$ in $\mathfrak{T}$, together with our assumption on
+  the characteristic of $\K$, imply that in the second line, all terms
+  in the first sum are non-zero and in reduced form.
+  
+  After simplyfing terms in the second sum, we can rewrite the
+  expression above as
+  \begin{align*}
+    \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
+    \sum_{j \in \mathfrak{t}} \frac{
+      v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
+      + (T-r_{j} )A_{v,\sigma_{j}}}
 	{(T-r_{j} )^{w_{\sigma_{j}}+1}}  
-	+\sum_{j \in  \{1,\dots,c\}-\mathfrak{s}}
+	+\sum_{j \in  \{1,\dots,c\}-\mathfrak{t}}
 	\frac{D_{v,j}}
-	{(T-r_{j})^{z_{v,j}}},
-	\end{align*}
-	for some positive integers $\{z_{v,j} \mid j\in
-	\{1,\dots,c\}-\mathfrak{s}\}$ and polynomials $\{D_{v,j} \mid j\in
-	\{1,\dots,c\}-\mathfrak{s}\}$ such that for all $j$ in $
-	\{1,\dots,c\}-\mathfrak{s}$, we have $\deg(D_{v,j}) < z_{v,j}$ and
-	$\gcd(D_{v,j}, (T-r_{j} ))=1$; the integers $z_{v,j}$ are uniquely
-	determined by these conditions, except if $r_{j}=0$, in which case we
-	set $z_{v,j}=\deg(D_{v,j})+1$. Some of the polynomials $D_{v,j}$ may
-	vanish, so we let $\mathfrak{u}_v \subset \{1,\dots,c\}-\mathfrak{s}$
-	be the set of all $j$ for which this is not the case. 
-	We then arrive at our final form for this sum, namely
-	\begin{align}\label{eq:sumgenseries_collect1}
-	\sum_{s \ge 0} \ell(v t^s) \frac{1}{T^{s+1}} =&
-	\sum_{j \in \mathfrak{t}} \frac{
-		v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
-		+ (T-r_{j}  )A_{v,\sigma_{j;}}}
+	     {(T-r_{j})^{z_{v,j}}},
+  \end{align*}
+  for some positive integers $\{z_{v,j} \mid j\in
+  \{1,\dots,c\}-\mathfrak{t}\}$ and polynomials $\{D_{v,j} \mid j\in
+  \{1,\dots,c\}-\mathfrak{t}\}$ such that for all $j$ in $
+  \{1,\dots,c\}-\mathfrak{t}$, we have $\deg(D_{v,j}) < z_{v,j}$ and
+  $\gcd(D_{v,j}, T-r_{j} )=1$. Some of the polynomials $D_{v,j}$ may
+  vanish, so we let $\mathfrak{u}_v \subset
+  \{1,\dots,c\}-\mathfrak{t}$ be the set of all $j$ for which this is
+  not the case.  We then arrive at our final form for this sum, namely
+  \begin{align}\label{eq:sumgenseries_collect1}
+    \sum_{s \ge 0}  \frac{\ell(v \lf^s)}{T^{s+1}} =&
+    \sum_{j \in \mathfrak{t}} \frac{
+      v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
+      + (T-r_{j}  )A_{v,\sigma_{j}}}
 	{(T-r_{j} )^{w_{\sigma_{j}}+1}}  
 	+\sum_{j \in  \mathfrak{u}_v}
 	\frac{D_{v,j}}
-	{(T-r_{j} )^{z_{v,j}}},
-	\end{align}
-	where all terms in the second sum are non-zero and in reduced form
-	(and similarly for the first sum, for $v=1$).
-	This implies that the minimal
-	polynomial of the sequence $(\ell(vt^s))_{s \ge 0}$ is 
-	$$M_v=\prod_{j \in \mathfrak{t}} (T-r_{j})^{\zeta_j} \prod_{j
-		\in \mathfrak{u}_v} (T-r_{j})^{z_{v,j}},$$
-	for some integers $\{\zeta_j \le w_{\sigma_{j}}+1 \mid j \in \mathfrak{t}\}$; for $v=1$, 
-	we actually have $\zeta_j = w_{\sigma_{j}}+1$ for all such~$j$.
+	     {(T-r_{j} )^{z_{v,j}}},
+  \end{align}
+  where all terms in the second sum are non-zero and in reduced form
+  (and similarly for the first sum, for $v=1$).
+  This implies that the minimal
+  polynomial of the sequence $(\ell(v\lf^s))_{s \ge 0}$ is 
+  $$\minpoly_v=\prod_{j \in \mathfrak{t}} (T-r_{j})^{\zeta_j} \prod_{j
+    \in \mathfrak{u}_v} (T-r_{j})^{z_{v,j}},$$
+  for some integers $\{\zeta_j \le w_{\sigma_{j}}+1 \mid j \in \mathfrak{t}\}$; for $v=1$, 
+  we actually have $\zeta_j = w_{\sigma_{j}}+1$ for all such~$j$.
 	
-	Now, for $v=1$, we assume that the minimal polynomial of the sequence
-	$(\ell(t^s))_{s \ge 0}$ is the minimal polynomial $M$ of $t$ in
-	$Q_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
-	$z_k=z_{1,k}$ for all $k$ in $\mathfrak{u}$, we can thus write it as
-	$$M=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1} \prod_{j
-		\in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the minimal
-	polynomial of $t$ in $Q_\mathfrak{S}$, it also cancels the sequence
-	$(\ell(v t^s))_{s \ge 0}$ for any $v$, so that for all $v$,
-	$\mathfrak{u}_v$ is contained in $\mathfrak{u}$ and $M_v$ divides $M$.
-	Remark also that the integer $\delta=\deg(M)$ is given by
-	$$\delta=\sum_{j \in \mathfrak{t}} (w_{\sigma_j}+1)
-	+\sum_{j\in\mathfrak{u}} z_{j}.$$ 
-	
-	For $v$ arbitrary in $\K[X_1,\dots,X_n]$, since  $M$ cancels the sequence
-	$(\ell(v t^s))_{s \ge 0}$, $\Omega((\ell(v t^s))_{s \ge 0} ,M)$ in the statement of
-	the lemma is indeed a polynomial of degree less than $\delta$ (this
-	proves our first claim). We can then rewrite the
-	sum in \cref{eq:sumgenseries_collect1} as $ \sum_{s \ge 0} \ell(v
-	t^s)/T^{s+1} =\Omega((\ell(v t^s))_{s \ge 0} ,M)/M$, with
-	\begin{align*}
-	\Omega((\ell(v t^s))_{s \ge 0} ,M)=&\sum_{j \in \mathfrak{t}} \Big(\big[
-	v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
-	+ (T-r_j)\tilde A_{v,\sigma_j}\big]
-	\prod_{\iota \in \mathfrak{t}-\{j\}}(T-r_{\iota} )^{w_{\sigma_{\iota}}+1}
-	\Big)\prod_{j \in \mathfrak{u}}(T-r_j )^{z_j}
-	\\
-	&+
-	\Big(\prod_{j \in \mathfrak{t}}(T-r_{j} )^{w_{\sigma_j}+1}\Big)
-	\sum_{j \in \mathfrak{u}_v} \Big (
-	(T-r_j)^{z_{j}-z_{v,j}} D_{v,j}
-	\prod_{\iota \in \mathfrak{u}-\{j\}}(T-r_{\iota} )^{z_{\iota}}\Big),
-	\end{align*}
-	In particular, 
-	for $k$ in $\mathfrak{t}$,
-	the value $\Omega((\ell(v t^s))_{s \ge 0} ,M)(r_k)$ is 
-	\begin{align*}
-	\Omega((\ell(v t^s))_{s \ge 0} ,M)(r_k)&= v(\balpha_{\sigma_{k}}) w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
-	\prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
-	\prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}\\
-	&= v(\balpha_{\sigma_{k}}) c_{k},
-	\end{align*}
-	with 
-	$$c_{k}=
-	w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
-	\prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
-	\prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}$$
-	for $k$ in $\mathfrak{t}$. This is a non-zero constant, independent 
-	of $v$, which finishes the proof of the lemma.
+  Now, for $v=1$, we assume that the minimal polynomial of the sequence
+  $(\ell(\lf^s))_{s \ge 0}$ is the minimal polynomial $\minpoly$ of $t$ in
+  $Q_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
+  $z_k=z_{1,k}$ for all $k$ in $\mathfrak{u}$, we can thus write it as
+  $$\minpoly=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1}
+  \prod_{j \in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the
+  minimal polynomial of $\lf$ in $Q_\mathfrak{S}$, it also cancels the
+  sequence $(\ell(v \lf^s))_{s \ge 0}$ for any $v$, so that for all
+  $v$, $\minpoly_v$ divides $\minpoly$ (which proves the first point
+  in the lemma), and in particular $\mathfrak{u}_v$ is contained in
+  $\mathfrak{u}$.
+  We can then rewrite the
+  sum in \cref{eq:sumgenseries_collect1} as $$ \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =\frac{\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)}{\minpoly},$$ with
+  \begin{align*}
+    \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)=&\sum_{j \in \mathfrak{t}} \Big(\big[
+      v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
+      + (T-r_j) A_{v,\sigma_j}\big]
+    \prod_{\iota \in \mathfrak{t}-\{j\}}(T-r_{\iota} )^{w_{\sigma_{\iota}}+1}
+    \Big)\prod_{j \in \mathfrak{u}}(T-r_j )^{z_j}
+    \\
+    &+
+    \Big(\prod_{j \in \mathfrak{t}}(T-r_{j} )^{w_{\sigma_j}+1}\Big)
+    \sum_{j \in \mathfrak{u}_v} \Big (
+    (T-r_j)^{z_{j}-z_{v,j}} D_{v,j}
+    \prod_{\iota \in \mathfrak{u}-\{j\}}(T-r_{\iota} )^{z_{\iota}}\Big).
+  \end{align*}
+  In particular, 
+  for $k$ in $\mathfrak{t}$,
+  the value $\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)$ is 
+  \begin{align*}
+    \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)&= v(\balpha_{\sigma_{k}}) w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
+    \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
+    \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}\\
+    &= v(\balpha_{\sigma_{k}}) c_{k},
+  \end{align*}
+  with 
+  $$c_{k}=
+  w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
+  \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
+  \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}$$
+  for $k$ in $\mathfrak{t}$. This is a non-zero constant, independent 
+  of $v$, which finishes the proof of the lemma.
 \end{proof}
 
 As an application, the following algorithm shows how to compute a
-zero-dimensional parametrization of $V_{\mathfrak{S}}$.
+zero-dimensional parametrization of $V_{\mathfrak{S}}$. At this stage,
+we do not discuss data structures, complexity, or what terms in the
+sequences are needed; this is the subject of the following section.
 
 \begin{algorithm}[H]
-	\caption{$\mathsf{ParametrizationGeneric}(\ell,t)$}
-	~\\
-	{\bf Input:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item  a linear form $\ell$ over $Q_\mathfrak{S}$
-		\item $t=t_1 X_1 + \cdots + t_n X_n$
-	\end{itemize}
-	{\bf Output:} polynomials $(P,V_1,\dots,V_n)$
-	\begin{enumerate}\setlength\itemsep{0em}
-		\item let $M$ be the minimal polynomial of the sequence $(\ell(t^s))_{s \ge 0}$ and let $\delta$ be its degree
-		\item let $P$ be the squarefree part of $M$
-		\item let $C_1 = \Omega((\ell(t^s))_{s\ge0} ,M)$
-		\item \textbf{for} $i=1,\dots,n$ \textbf{do}
+  \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
+	  {\bf Input:} \vspace{-0.5em}
+	  \begin{itemize}\setlength\itemsep{0em}
+	  \item  a linear form $\ell$ over $Q_\mathfrak{S}$
+	  \item $\lf=t_1 X_1 + \cdots + t_n X_n$
+	  \end{itemize}
+	      {\bf Output:} polynomials $((Q,V_1,\dots,V_n),\lf)$
+	      \begin{enumerate}\setlength\itemsep{0em}
+	      \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
+	      \item let $Q$ be the squarefree part of $\minpoly$
+	      \item let $C_1 = \Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)$
+	      \item \textbf{for} $i=1,\dots,n$ \textbf{do}
 		\begin{enumerate}
-			\item let $C_{X_i} = \Omega((\ell(X_i t^s))_{s\ge0}, M)$ 
+		\item let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
 		\end{enumerate}
-		\item \textbf{return} $((P, C_{X_1}/ C_1 \bmod P, \dots, C_{X_n}/ C_{1} \bmod P),t)$
-	\end{enumerate}
-	\label{algo:para2}
+	      \item \textbf{return} $((Q, C_{X_1}/ C_1 \bmod Q, \dots, C_{X_n}/ C_{1} \bmod Q),\lf)$
+	      \end{enumerate}
+	      \label{algo:para2}
 \end{algorithm}
 
 \begin{lemma}
-	Suppose that $\ell$ is a generic element of ${\rm
-		hom}_{\Kbar}(Q_\mathfrak{K},\Kbar)$ and that $t$ is a generic
-	linear form. Then the output $((P,V_1,\dots,V_n),t)$ of
-	$\mathsf{Parametrization}(\ell,t)$ is a zero-dimensional
-	parametrization of $V_{\mathfrak{S}}$.
+  Suppose that $\ell$ is a generic element of ${\rm
+    hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$ and that $\lf$ is a generic
+  linear form. Then the output $((Q,V_1,\dots,V_n),\lf)$ of
+  $\mathsf{Parametrization}(\ell,\lf)$ is a zero-dimensional
+  parametrization of $V_{\mathfrak{S}}$.
 \end{lemma}
 \begin{proof}
-	A generic choice of $t$ separates the points of $V_{\mathfrak{S}}$,
-	and we saw in \cref{lemma:symbol0} that for a generic choice of
-	$\ell$, $\pi_i(t_1,\dots,t_n)$ vanishes for no $i$ in
-	$\mathfrak{S}$.  As a result, $\mathfrak{T}=\mathfrak{S}$.  Besides,
-	we recall that for a generic $\ell$ in ${\rm
-		hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$, the minimal polynomials of
-	$(\ell(t^s))_{s \ge 0}$ and of $t$ are the same
-	(\cref{lemma:minpoly}).
-	
-	Thus, the polynomial $M$ we compute at step 1 is indeed the minimal
-	polynomial of $t$, and we can apply the previous lemma, and for 
-	any root $r_j$ of $P$, and $i=1,\dots,n$, we have
-	$$\frac{ C_{X_i}(r_j)}{ C_1(r_j)}  = 
-	\frac{\Omega((\ell(X_i t^s))_{s\ge0}, M)(r_j)}{\Omega((\ell(t^s))_{s\ge0} ,M)(r_j)}=
-	\frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$
-	so that $ C_{X_i}/ C_1 \bmod P$ is the $i$th polynomial in
-	the zero-dimensional parametrization of $V$ corresponding to $t$.
+  A generic choice of $\lf$ separates the points of
+  $V_{\mathfrak{S}}$, and we saw in \cref{lemma:symbol0} that for a
+  generic choice of $\ell$, $\pi_i(t_1,\dots,t_n)$ vanishes for no $i$
+  in $\mathfrak{S}$.  As a result, $\mathfrak{T}=\mathfrak{S}$,
+  and $\mathfrak{t}$ consists of $|\mathfrak{S}|$ pairwise distinct 
+  values.
+
+  Besides, we recall that for a generic $\ell$ in ${\rm
+    hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$, the minimal polynomials of
+  $(\ell(\lf^s))_{s \ge 0}$ and of $\lf$ are the same
+  (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ we compute
+  at step 1 is indeed the minimal polynomial of $\lf$ (with roots
+  $\{r_j \mid j \in \mathfrak{t}\}$), and we can apply the previous
+  lemma; then, for any root $r_j$ of $\minpoly$, and $i=1,\dots,n$, we
+  have
+  $$\frac{ C_{X_i}(r_j)}{ C_1(r_j)} = \frac{\Omega((\ell(X_i
+    \lf^s))_{s\ge0}, \minpoly)(r_j)}{\Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)(r_j)}=
+  \frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$ so that
+  $ C_{X_i}/ C_1 \bmod P$ is the $i$th polynomial in the
+  zero-dimensional parametrization of $V$ corresponding to $\lf$.
 \end{proof}
 
 We demonstrate how this algorithm works through a small example. Let 
-$I = \langle (X_1-1)(X_2-2),(X_1-3)(X_2-4)\rangle \subset
-GF(101)[X_1,X_2]$, then
-clearly $V(I) = \{ (1,4),(3,2) \}$ and $X_1$ separates the
-points of $V$. We choose a random linear form 
-$$\ell: f \in I \mapsto \mathbb{N},\;\ell(f) = 17 f(1,4) + 33 f(3,2)$$
-Then we have
+$$I = \langle (X_1-1)(X_2-2),(X_1-3)(X_2-4)\rangle \subset
+\F_{101}[X_1,X_2].$$ Then, $V(I) = \{ (1,4),(3,2) \}$ and $X_1$ separates the
+points of $V(I)$. We choose a  linear form 
+$$\ell: f \in \F_{101}[X_1,X_2]/I \to \F_{101},\;\ell(f) = 17 f(1,4) + 33 f(3,2).$$
+Then, we have
 \begin{align*}
-\ell(X_1^i) &= 17 \cdot 1^i + 33 \cdot 3^i\\
-\ell(X_2X_1^i) &= 17 \cdot 4 \cdot 1^i + 33 \cdot 2 \cdot 3^i
+\ell(X_1^s) &= 17 \cdot 1^s + 33 \cdot 3^s\\
+\ell(X_2X_1^s) &= 17 \cdot 4 \cdot 1^s + 33 \cdot 2 \cdot 3^s.
 \end{align*} 
-We define an infinite series for each sequence
+We associate a generating series to each sequence,
 \begin{align*}
-Z_1 = \sum_{i = 0}^{\infty} \ell(X^i_1) / T^{i+1}
+Z_1 = \sum_{s = 0}^{\infty} \frac{\ell(X^s_1)}{T^{s+1}}
 &= \frac{17}{T-1} + \frac{33}{T-3}
 = \frac{17(T-3)+33(T-1)}{(T-1)(T-3)} \\
-Z_2 = \sum_{i=0}^{\infty} \ell(X_2X^i_1)/T^{i+1} 
+Z_{X_2} = \sum_{s=0}^{\infty} \frac{\ell(X_2X_1^s)}{T^{s+1} }
 &= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{t-3}
-= \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}
+= \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}.
 \end{align*}
-$Z_1$ and $Z_2$ have a common denominator $P = (t-1)(t-3)$,
-whose roots are the coordinates of $X_1$ in $V(I)$. Now, let
+These generating series $Z_1$ and $Z_2$ have a common denominator $\minpoly = (T-1)(T-3)$,
+whose roots are the coordinates of $X_1$ in $V(I)$;
+their numerators are respectively
+$$C_{1} = \Omega((\ell(X^s_1))_{s\ge 0},\minpoly) = 17 (T-3) + 33(T-1)$$
+and
+$$C_{X_2} = \Omega((\ell(X_2X^s_1))_{s\ge 0},\minpoly) = 17\cdot 4 (T-3) + 33\cdot 2(T-1).$$
+Now, let
 \begin{align*}
-R_2 
-&=\frac{\Omega((\ell(X_2X^i_1))_{i\ge 0},P)}{\Omega((\ell(X^i_1))_{i\ge 0},P)} \mod P\\
-&= 
-\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod P\\
-&=\frac{4 (T-3) + 2(T-1)}{(T-3)+(T-1)} \mod P
+V_2 
+&=\frac{C_{X_2}}{C_1} \mod \minpoly\\
+&=\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod \minpoly.
 \end{align*}
-Now, $ R_2(1) = 4$ and $R_2(3) = 2$ as needed.
+Then, $ V_2(1) = 4$ and $V_2(3) = 2$ as needed.
 
-
-
-
-
-
-In what follows, $\K$ is a field.  Let $I$ be an ideal in
-$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
-residue class ring. Suppose that $V=V(I)$ has dimension zero, and
-write it as $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s
-in $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
-all $i$.  We also let $\D$ be the dimension of $Q$, so that $d \le
-\D$, and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In
-this section, we recall and generalize results from the appendix
-of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
-parametrization of $V$.
-
-The main novelty in our approach is to avoid generic coordinates as
-much as possible. The algorithm will decompose $V$ into two parts: for
-the first part, we will be able to use $X_1$ as a separating element;
-the remaining points will be dealt with using a random linear
-form. Throughout, we rely only the following operations: evaluations
-of linear forms on successive powers of a given element in $Q$, say
-$1,t,t^2,\dots$, and elementary operations on univariate polynomials.
-
-The main algorithm is as follows. For the moment, we can only describe
-its main structure; the details of the subroutines are given in the
-next paragraphs.
-
-\begin{algorithm}[H]
-	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
-		Input:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $Q$
-		\item $t=t_1 X_1 + \cdots + t_n X_n$
-	\end{itemize}
-	{\bf Output:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item polynomials $(P,(V_1,\dots,V_n))$
-	\end{itemize}
-	\begin{enumerate}
-		\item let $(F,(G_1,\dots,G_n),X_1)=\mathsf{ParametrizationX}_1(\ell)$
-		\item let $\ell'=\mathsf{Update}(\ell,F,t)$
-		\item let $(Q,(W_1,\dots,W_n),t)=\mathsf{ParametrizationGeneric}(\ell',t)$
-		\item let $(F^*,(G^*_1,\dots,G^*_n),t)=\mathsf{ChangeCoordinate}(F,(G_1,\dots,G_n),t)$
-		\item let  $(P,(V_1,\dots,V_n))=\mathsf{Union}(F^*,(G^*_1,\dots,G^*_n),\, Q,(W_1,\dots,W_n))$
-		\item \textbf{return} $(P,(V_1,\dots,V_n),t)$
-	\end{enumerate}
-\end{algorithm}
-
-The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
-zero-dimensional parametrization of a subset $V'$ of $V$ for which
-$X_1$ is a separating element, using values of the form
-$(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
-removes from $V$ the points we just found) and apply
-$\mathsf{ParametrizationGeneric}(\ell',t)$, to obtain a
-zero-dimensional parametrization of $V''=V-V'$ using values of the form
-$(\ell'(t^s))_{s \ge 0}$. The last two steps involve changing
-coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
-variable instead), and performing the union of the two components $V'$
-and $V''$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2037,6 +2004,69 @@ By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.}
 Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 \subsection{Decomposition of linear forms.}
+
+
+
+
+
+
+In what follows, $\K$ is a field.  Let $I$ be an ideal in
+$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
+residue class ring. Suppose that $V=V(I)$ has dimension zero, and
+write it as $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s
+in $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
+all $i$.  We also let $\D$ be the dimension of $Q$, so that $d \le
+\D$, and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In
+this section, we recall and generalize results from the appendix
+of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
+parametrization of $V$.
+
+The main novelty in our approach is to avoid generic coordinates as
+much as possible. The algorithm will decompose $V$ into two parts: for
+the first part, we will be able to use $X_1$ as a separating element;
+the remaining points will be dealt with using a random linear
+form. Throughout, we rely only the following operations: evaluations
+of linear forms on successive powers of a given element in $Q$, say
+$1,t,t^2,\dots$, and elementary operations on univariate polynomials.
+
+The main algorithm is as follows. For the moment, we can only describe
+its main structure; the details of the subroutines are given in the
+next paragraphs.
+
+\begin{algorithm}[H]
+	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
+		Input:} \vspace{-0.5em}
+	\begin{itemize}\setlength\itemsep{0em}
+		\item a linear form $\ell$ over $Q$
+		\item $t=t_1 X_1 + \cdots + t_n X_n$
+	\end{itemize}
+	{\bf Output:} \vspace{-0.5em}
+	\begin{itemize}\setlength\itemsep{0em}
+		\item polynomials $(P,(V_1,\dots,V_n))$
+	\end{itemize}
+	\begin{enumerate}
+		\item let $(F,(G_1,\dots,G_n),X_1)=\mathsf{ParametrizationX}_1(\ell)$
+		\item let $\ell'=\mathsf{Update}(\ell,F,t)$
+		\item let $(Q,(W_1,\dots,W_n),t)=\mathsf{ParametrizationGeneric}(\ell',t)$
+		\item let $(F^*,(G^*_1,\dots,G^*_n),t)=\mathsf{ChangeCoordinate}(F,(G_1,\dots,G_n),t)$
+		\item let  $(P,(V_1,\dots,V_n))=\mathsf{Union}(F^*,(G^*_1,\dots,G^*_n),\, Q,(W_1,\dots,W_n))$
+		\item \textbf{return} $(P,(V_1,\dots,V_n),t)$
+	\end{enumerate}
+\end{algorithm}
+
+The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
+zero-dimensional parametrization of a subset $V'$ of $V$ for which
+$X_1$ is a separating element, using values of the form
+$(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
+removes from $V$ the points we just found) and apply
+$\mathsf{ParametrizationGeneric}(\ell',t)$, to obtain a
+zero-dimensional parametrization of $V''=V-V'$ using values of the form
+$(\ell'(t^s))_{s \ge 0}$. The last two steps involve changing
+coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
+variable instead), and performing the union of the two components $V'$
+and $V''$.
+
+
 
 In this paragraph, we work over the whole $V$ (so
 $\mathfrak{S}=\{1,\dots,d\}$).  Specializing our previous discussion
