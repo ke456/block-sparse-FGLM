@@ -1970,8 +1970,8 @@ the total time is written in brackets.
 		
 		eco12&12 &1024&0.131&62 (0.995)&16 (0.987)&12 (0.979)&yes\\
 		katsura10&11 &1024&0.258&71 (0.996)&19 (0.989)&13 (0.982)&yes\\
-		sot1&5 &8694&0.000115&765 (0.994)&208 (0.983)&143 (0.969)&yes\\
-		vor2&6 &574&0.00174&10 (0.99)&3 (0.973)&2 (0.955)&yes\\
+		sot1&5 &8694&0.0002&765 (0.994)&208 (0.983)&143 (0.969)&yes\\
+		vor2&6 &574&0.002&10 (0.99)&3 (0.973)&2 (0.955)&yes\\
 		W1-2-10-4&10 &1344&0.312&164 (0.998)&43 (0.994)&30 (0.99)&yes\\
 		W1-2-11-4&11 &1920&0.319&489 (0.999)&129 (0.997)&90 (0.994)&yes\\
 		W1-3-7-3&7 &6480&0.174&10923 (1)&2900 (0.999)&2014 (0.999)&yes\\
@@ -1979,8 +1979,8 @@ the total time is written in brackets.
 	\end{tabular}
 \end{center}
 
-On average, the algorithm performs better by a factor of 3.64 for
-$m=4$ and by a factor of 5.16 for $m=8$ compared to $m=1$. We can
+On average, the algorithm performs better by a factor of 3.73 for
+$m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. We can
 see that the more threads there are, the less beneficial it is
 to have an additional thread. This is because
 increasing $m$ has two effects: it
@@ -1993,17 +1993,18 @@ the latter effect is minor compared to the former.
 
 We can determined the effectiveness of parallel computations by comparing
 the combined CPU times as this would eliminate any benefit of parallelizing. 
-If the paralleliztion was perfect, this value should be roughly equal
-for all values of $m$. For example, in test ``3-vars20", we get
-$4124, 4350, 6008$ seconds for $m=1,4,8$ respectively. We observed similar
-patterns for other tests. Since computing $(\mU^{\perp} \mM^i)_{i\ge0}$ took
-$> 99$ percent of the total time for all three values of $m$ in this test,
-the increase in combined CPU times must be due to the parallelization.
+For example, in test ``rand1-1", we get
+$4124, 4350, 6008$ seconds for $m=1,4,8$ respectively; we observed similar
+patterns for other tests. If the paralleliztion was perfect, the combined CPU time
+should be roughly equal for all values of $m$
+since computing $(\mU^{\perp} \mM^i)_{i\ge0}$ took
+$> 99$ percent of the total time for all three values of $m$ in this test.
+Thus, the increase in combined CPU times must be due to the parallelization.
 When $m=4$, the additional overhead from parallelization
 is small whereas when $m=8$, additional overhead
-is significant. This makes sense as it is impossible
-to run 8 threads in parallel without switching on
-8 cores. If there were more cores available, we would expect to 
+is significant as it is impossible
+to run 8 threads in parallel on 8 cores without switching. 
+If there were more cores available, we would expect to 
 see a similar combined CPU time for $m=8$. In general, it is optimal 
 to choose $m$ to be the number of cores available.
 
