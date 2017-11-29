@@ -981,7 +981,7 @@ as before, the cost is $O(m^{\omega} \M(D/m) \log(D/m) \log(m))
 Once $\row{a}_i$ is known, we can recover the scalar numerator
 $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)$ as
 a dot product. \todo{define matrix generator}
-\begin{lemma}
+\begin{lemma}\label{lemma:omegaOmega}
   For a generic choice of $\mU$ and $\mV$, and for any $\col{w}$ in $\K^{D \times 1}$, $ \mat{P}_{\mU,\mV}$ is a matrix generator 
   for the sequence $\mat{\mathcal{E}} = (\col{e}_s)_{s\ge0}$, with
   $\col{e}_s=\mat{U}^\perp \mM^s\, \col{w}$ for all $s$,
@@ -1004,15 +1004,7 @@ in~\eqref{eq:OmegaOmega} follows at once from the definitions:
 &=  [~0~\cdots~0~\minpoly~0~\cdots~0~]\ (\mat{P}_{\mU,\mV})^{-1} \mat{P}_{\mU,\mV} \sum_{s \ge 0} \frac{\mat{U}^\perp \mM^s \col{w}}{T^{s+1}}\\
 &=  \row{a}_i\, \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
 \end{align*}
-
 \end{proof}
-%% \begin{align}\label{eq:OmegaOmega}
-%% \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly) = \row{a}_i\, \mat{\Omega}( (\seq_{\mU,\mV})_{*:j}, \mat{P}_{\mU,\mV}),  
-%% \end{align}
-%%  Note that we are doing here a slight abuse of
-%% notation, since we identify the polynomial $ \Omega((\row{u}_i \mM^s
-%% \col{v}_j)_{s \ge 0}, \minpoly)$ and the $1 \times 1$ matrix $[~
-%%   \Omega((\row{u}_i \mM^s \col{v}_j)_{s \ge 0}, \minpoly)~]$.
 
 The algorithm to compute the scalar numerator $\Omega((\row{u}_i \mM^s
 \col{w})_{s \ge 0}, \minpoly)$ follows at once; in the algorithm, we
@@ -1467,6 +1459,10 @@ there
   of $v$, which finishes the proof of the lemma.
 \end{proof}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Computing a zero-dimensional parametrization}  
+
 As an application, the following algorithm shows how to compute a
 zero-dimensional parametrization of $V_{\mathfrak{S}}$. At this stage,
 we do not discuss data structures, complexity, or what terms in the
@@ -1493,7 +1489,7 @@ sequences are needed; this is the subject of the following section.
 	      \label{algo:para2}
 \end{algorithm}
 
-\begin{lemma}
+\begin{lemma}\label{lemma:para2}
   Suppose that $\ell$ is a generic element of ${\rm
     hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$ and that $\lf$ is a generic
   linear form. Then the output $((Q,V_1,\dots,V_n),\lf)$ of
@@ -1556,7 +1552,6 @@ V_2
 \end{align*}
 Then, $ V_2(1) = 4$ and $V_2(3) = 2$ as needed.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1567,20 +1562,26 @@ In this section, we will show how extend the algorithm
 of~\cite{BoSaSc03} to compute a zero-dimensional parametrization of
 $V(I)$, for some zero-dimensional ideal $I$ of $\K[X_1,\dots,X_n]$, by
 using blocking methods. As input, we assume that we know a monomial
-basis $\basis$ of $Q=\K[X_1,\dots,X_n]/I$, together with the
+basis $\basis=(b_1,\dots,b_D)$ of $Q=\K[X_1,\dots,X_n]/I$, together with the
 multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
 $X_1,\dots,X_n$ in this basis; for definiteness, we suppose that the
-first basis element in $\basis$ is~$1$. We do not assume that $I$ is
+first basis element in $\basis$ is~$b_1=1$. We do not assume that $I$ is
 radical or in shape position; however, we assume (as in the previous
 subsection) that the characteristic of $\K$ is greater than $D$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Description, correctness and cost analysis}
 
 We mentioned that Steel's method~\cite{Steel15} already uses the Block
 Wiedemann algorithm to compute the minimal polynomial $\minpoly$ of
 $\lf=t_1 X_1 + \cdots + t_n X_n$; knowing its roots in $\K$, it uses
 an ``evaluation" method for the rest (another Gr\"obner Basis
-computation with one variable less).  Our algorithm computes 
-the whole zero-dimensional parametrization for essentially the same
-cost as the computation of the minimal polynomial.
+computation with one variable less).  Our algorithm computes the whole
+zero-dimensional parametrization for essentially the same cost as the
+computation of the minimal polynomial. In the following pseudo-code,
+$\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
+nonzero entry is a $1$ at the first row.
 
 %% Given:
 %% \begin{center}
@@ -1606,71 +1607,97 @@ cost as the computation of the minimal polynomial.
 %% $(R,R_1,\dots,R_n)$ such that for all $\alpha$ that is a factor of
 %% $R$, $\{ (R_1(\alpha),\dots,R_n(\alpha)) \} = V(I)$
 
-The first step computes the minimal polynomial of the multiplication
-matrix $\mM_\lf=t_1 \mM_1 + \cdots + t_n \mM_n$ by the block Wiedemann
-algorithm.  This is done by applying algorithm of
-\cref{section:matrix_seq} on the sequence $\seq_{\mU,\mV}=
-(\mU^{\perp}\mM^s\mV)_{0 \le i < 2 \lceil D/m \rceil}$, for some $m
-\in \mathbb{N}$ and $\mU,\mV \in \mathbb{K}^{D \times m}$, to compute
-a minimal left matrix generator $\mat{P}_{\mU,\mV}$, and taking its
-largest invariant factor, as in \cref{ssec:appliW}.
-
-We find the rest of the polynomials in the output by following
-\cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
-this algorithm are computed using the method of
-\cref{ssec:scalar_numer}.
-
-\todo{algorithms in sf everywhere or nowhere}
-
-
+\todo{choose subscripts}
 \begin{algorithm}[H]
 	\caption{\mainalgoname($\mM_1,\dots,\mM_n,m$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item $\mM_1,\dots,\mM_n$ defined as above
-		\item dimension of the blocks $m \in \mathbb{N}$
+		\item dimension of the blocks $m \in \{1,\dots,D\}$
 	\end{itemize}
-	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
-  \begin{enumerate}[{\bf 1.}]
-		\item {\sf choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
-                \item {\sf compute $\mat{L}_s = \mU^{\perp}\mM^s$, $s=0,\dots,2d-1$, with $d = \lceil D/d \rceil$}
-		\item {\sf compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$, $=0,\dots, 2d-1$}
-		\item {\sf compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
-		%% \item {\sf $\mN^* = (\mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^ie)}/{T^{i+1}})_{T^{\ge 0}}$} 
-		\item {\sf $\minpoly=$ largest invariant factor of $\mF^{\mU,\mV}$}
-		\item {\sf compute the squarefree part $Q$ of $\minpoly$}
-		\item {\sf let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
-		\item {\sf $N=a\mN^*$}
-		\item {\sf for $j = 1 \dots n$:}
-    \begin{enumerate}[{\bf 9.1.}]
-			\item {\sf	$\mN_j^* = (\mF^{\mU,\mV}
-				\sum_{i= 0}^{d-1} {(\mU^{\perp}\mM^i \mM_j e)}/{T^{i+1}})_{T^{\ge0}}$}
-			\item {\sf $N_j=a\mN_j^*$}
-			\item {\sf $R_j=N_j/N$ mod $R$}
-		\end{enumerate}
-	\end{enumerate}
-	\label{algo:block-sparse-fglm}
+	{\bf Output:} polynomials $((Q,V_1,\dots,V_n),\lf)$
+  \begin{enumerate}
+  \item\label{mainstep1}  choose $t_1,\dots,t_n$ in $\K$ and let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
+  \item\label{mainstep2} { choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
+  \item\label{mainstep3} { compute $\mat{L}_s = \mU^{\perp}\mM^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/d \rceil$}
+  \item\label{mainstep4} { compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$ for $s=0,\dots, 2d-1$}
+  \item\label{mainstep5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
+  \item\label{mainstep6} { let $\minpoly$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
+  \item\label{mainstep7} { let $Q$ be  the squarefree part  of $\minpoly$}
+  \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
+  \item\label{mainstep9}  let $C_1 = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
+    (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
+  \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
+    \begin{enumerate}
+     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, 
+      (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
+    \end{enumerate}
+\item\label{mainstep11}     \textbf{return} $((Q, C_{X_1}/ C_1 \bmod Q, \dots, C_{X_n}/ C_{1} \bmod Q),t_1 X_1 + \cdots + t_n X_n)$
+  \end{enumerate}  \label{algo:block-sparse-fglm}
 \end{algorithm}
 
-In lines 2,4, and 9.1 of the above algorithm, we use $(\mU^{\perp}\mM^i)_{i\ge 0}$, which we compute once
-in line 2 and store. Computing this sequence is the bottleneck of the algorithm, but this can be
-parallelized. Let $\mU \in \mathbb{K}^{D \times m}$, then we can write $\mU$ as $[u_1 u_2 \dots u_m]$ where
-$u_k \in \mathbb{K}^{D \times 1}$, $1 \le k \le m$, is a vector. Now,
-$$ \mU^{\perp} \mM^i = [u_1^{\perp} \dots u_m^{\perp}] \mM^i = [u_1^{\perp} \mM^i \dots u_m^{\perp} \mM^i],$$
-where each product $u_k^{\perp} \mM^i$ is independent of others. Therefore, to generate the
-sequence $(\mU^{\perp}\mM^i)_{i\ge0}$, we generate, in parallel, 
-the sequences $(u_k^{\perp} \mM^i)_{i\ge0}$, $1 \le k \le m$, and concatenate them together as above.
-Let $c$ be the sparsity of $\mM$, then generating $(u_k^{\perp} \mM^i)_{0 \le i < 2d}$ costs 
-$O(d cD^2) = O(cD^3/m )$ field operations. If we are able to compute $m$ 
-vector-matrix products in parallel at once, the total cost of generating $(\mU^{\perp}\mM^i)_{0 \le i < 2d}$
-is $O(cD^3/m)$. We can then compute $(\mU^{\perp}\mM^i\mV)_{0 \le i < 2d}$ by a product
+We first prove correctness of the algorithm, for generic choices of
+$t_1,\dots,t_n$, $\mU$ and $\mV$. The first step computes the
+multiplication matrix $\mM=t_1 \mM_1 + \cdots + t_n \mM_n$ of $\lf=t_1
+X_1 + \cdots + t_n X_n$.
+
+Then, we compute the first $2d$ terms of the sequence $\seq_{\mU,\mV}=
+(\mU^{\perp}\mM^s\mV)_{s\ge 0}$. For generic choices of these two
+matrices, as discussed in \cref{ssec:appliW}, \cref{randXY} shows that
+the matrix polynomial $\mat{P}_{\mU,\mV}$ is indeed a minimal left
+generator of the sequence $\seq_{\mU,\mV}$. Then, $\minpoly$ is the minimal 
+polynomial of $\lf$ and $Q$ its squarefree part.
+
+We find the rest of the polynomials in the output by following
+\cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
+this algorithm are computed using the method of
+\cref{ssec:scalar_numer}. Indeed, \cref{lemma:omegaOmega} shows 
+that for a generic choice of $\mU$ and $\mV$, we have 
+$$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge 0}, \minpoly)
+\quad\text{and}\quad
+C_{X_i} = \Omega((\row{u}_i \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly).$$
+Let then $\ell:Q \to \K$ be the linear form $f = \sum_{i \in \basis} f_i b_i \mapsto 
+\sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
+$(i,1)$ in $\mU$. Then, the two polynomials above can be rewritten
+as 
+$$C_1 = \Omega( (\ell(X^s))_{s \ge 0}, \minpoly) \quad\text{and}\quad
+C_{X_i} = \Omega( (\ell(X_i X^s))_{s \ge 0}, \minpoly),$$ so they
+coincide with the polynomials computed in \cref{algo:para2}.  Then,
+\cref{lemma:para2} shows that for generic $\mU$ and $\lf$, the output
+is indeed a zero-dimensional parametrization of $V(I)$.
+
+For the cost analysis, we will mainly focus on a sparse model for
+matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
+at most $c \in [0,1)$, that is, at most $c D^2$ nonzero entries.  As a
+  result, $\mM$ has density at most $nc$, and a matrix-vector product
+  by $\mM$ can be done in $O(ncD^2)$ operations in $\K$ (we briefly
+  discuss variants of the algorithm using dense linear algebra at the
+  end of this subsection). The cost incurred at Step~\ref{mainstep2}
+  to compute $\mM$ is $O(ncD^2)$.
+
+In this context, the main purpose of Coppersmith's blocking strategy
+is to allow for easy parallelization. Computing the matrices
+$\mat{L}_s=\mU^{\perp}\mM^s$, for $s=0,\dots,2d-1$, is the bottleneck
+of the algorithm, but this can be parallelized. This is done by
+working row-wise, computing independently the sequences
+$(\row{\ell}_{i,s})_{0 \le s < 2d}$ of the $i$th rows of
+$(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,s+1} = \row{u}_{i,s}
+\mM$ for all $i,s$, where $\row{u}_i$ is the $i$ row of $\mU^\perp$.
+For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
+  \le i < 2d}$ costs $O(dn cD^2) = O(ncD^3/m )$ field operations. If
+we are able to compute $m$ vector-matrix products in parallel at once,
+the {\em span} of Step~\ref{mainstep3} is thus $O(ncD^3/m)$, whereas
+the total work is $O(ncD^3)$.
+
+At step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
+product
 $$
 \begin{bmatrix}
 \mU^{\perp}\\
 \mU^{\perp} \mM\\
 \mU^{\perp} \mM^2\\
 \vdots\\
-\mU^{\perp} \mM^{2d}\\
+\mU^{\perp} \mM^{2d-1}\\
 \end{bmatrix} \mV
 = 
 \begin{bmatrix}
@@ -1681,207 +1708,105 @@ $$
 \mU^{\perp} \mM^{2d} \mV\\
 \end{bmatrix}
 $$
-in cost $O(m^{\omega-2}D^2)$.
+of size $O(D) \times D$ by $D \times m$; since $m \le D$, this  costs $O(m^{\omega-2}D^2)$
+base field operations.
 
-Recall, from \cref{section:matrix_seq}, that we can compute
-the minimum generating polynomial matrix in $O(m^{\omega} M(D/m) \log(D/m))$.
-The largest invariant factor $P$ and the quotient $a$ in lines 5 and 6 respectively by using the high-order
-lifting algorithm of \cite[Algorithm~5]{Stor03}. 
-By \cite[Corollary~16]{Stor03}, the cost of this is 
-\todo{$O(m^{\omega} M(D/m) \log(D/m) \log(m))$}.
-Now, for any $v\in\mathbb{K}^{D \times 1}$, computing $(\mU \mM^i v)_{0\le i < d}$ costs
-$O(D^2)$ by using the above method.
-Recall, from \cref{section:linseq}, that
-we can compute $\mN_v^* = \mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}/{T^{i+1}}$ by first
-doing a product $\mF^{\mU,\mV}\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$.
-Since both $\mF^{\mU,\mV}$ and $\sum_{i=0}^{d-1} {(\mU^{\perp}\mM^iv)}T^i$
-have degree at most $d$, this product can be done in cost $O(m^2M(D/m))$.
+Recall from \cref{section:matrix_seq} that we can compute a minimal
+generating polynomial $\mat{P}_{\mU,\mV}$ in time $O(m^{\omega}
+\M(D/m) \log(D/m))$, which is $O(m^{\omega-1} \M(D) \log(D))$.  In
+Section~\ref{ssec:appliW} and~\ref{ssec:scalar_numer}, we saw that the
+largest invariant factor $P$ and the vector $\row{a}_1$ can be
+computed in time $O(m^{\omega} \M(D/m) \log(D/m) \log(m))$, which is
+$O(m^{\omega-1} \M(D) \log(D)\log(m))$.  Computing $Q$ takes time
+$O(\M(D) \log(D))$.
 
-Now, $\mN_v^*$ has degree less than $D/m$ and $a$ has degree at most $D$, so
-computing $a \mN_v^*$ costs $O(m^2M(D/m))$. Therefore, computing $N,N_1,\dots,N_j$ costs $O(n(m^2M(D/m)))$.
-Since $P,R,N,N_j$, $1\le j \le n$
-have degree at most $D$, lines 6 and 9.3 costs $O^{\tilde{~}}(D)$.
-Finally, assuming perfect parallelization and $m << D$, we get the cost 
-$$O(cD^3/m + m^{\omega} M(D/m) \log(D/m) \log(m) + nm^2M(D/m)),$$
+In \cref{ssec:scalar_numer}, we saw that each call to ScalarNumerator
+takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
+m\M(D))$; the final modular inverse takes time $O(n\M(D) + \M(D) \log(D))$.
+Altogether, the total span, assuming perfect parallelization 
+at Step~\ref{mainstep3} is
+$$O\left (nc\frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
+the total work is
+$$O\left (ncD^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+nm\M(D)\right ).$$ Of course, we could parallelize other steps than
+Step~\ref{mainstep3}, but it is simulateously the most costly in
+theory and in practice, and the easiest to parallelize. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-\subsection{Proof of Correctness}
-
-
-The largest invariant factor of $T\mI - \mM$ is the minimal polynomial
-of $\mM$. Therefore, the above theorem shows that if we choose the
-entries of $\mU$ and $\mV$ randomly, we will have that the largest
-invariant factor of $\mF^{\mU,\mV}$ is the minimal polynomial of $\mM $
-with high probability.
-
-%% Next, we prove that one can recover a scalar numerator through a matrix
-%% numerator.  \todo{Vincent: the next lemma is straightforward and doesn't
-%%   deserve a statement/proof. The inverse can be written $(\mF^{\mU,\mV})^{-1} =
-%%   \mA\mat{D}^{-1}\mB$ where $\mA,\mB$ are (unimodular) polynomial matrices, and
-%% $\mat{D}$ is the Smith form which is a diagonal of divisors of the largest
-%% invariant factor $P$. So there's nothing to prove.}
-
-%% \begin{lemma}\label{utilde}
-%% 	Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
-%% 	then $\textbf{a}$ has polynomial entries.
-%% \end{lemma}
-
-%% \begin{proof}
-%% 	Let $\mathscr{D} = \mA\mF^{\mU,\mV}\mB$ be the Smith normal form of $\mF^{\mU,\mV}$ and $s_1, \cdots s_m$ be
-%% 	invariant factors of $\mF^{\mU,\mV}$ such that 
-%% 	$s_m | s_{m-1} | \cdots | s_1$.
-%% 	Let $[b_1,\cdots,b_m]$ be the last row of $\mB$ and 
-%% 	$w = [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]$ (since $s_i | s_1$), then
-%% 	\begin{align*}
-%% 	(w \mA) \mA^{-1} \mathscr{D} &=  [\frac{s_1b_1}{s_m},\frac{s_1b_2}{s_{m-1}},\cdots,\frac{s_1b_{m-1}}{s_2},b_m]
-%% 	\begin{bmatrix}
-%% 	s_m &        & \\
-%% 	& \ddots & \\
-%% 	&        & s_1
-%% 	\end{bmatrix}\\
-%% 	&= [s_1b_1, s_1b_2, \cdots, s_1b_m]\\
-%% 	&= [0,\cdots,0,s_1] \mB
-%% 	\end{align*}
-%% 	Therefore, if $a = w \mA$, we get
-%% 	$ a \mF^{\mU,\mV} = (w \mA) \mA^{-1} \mathscr{D} \mB^{-1} = 
-%% 	[0,\cdots,0,s_1]$ as needed. Since both $w$ and $\mA$ have polynomial
-%% 	entries, $a$ must also have polynomial entries.\\
-%% \end{proof}
-
-\begin{theorem}
-	 Let $U = [u_1,u_2,\dots,u_m]$be in $\K^{D\times m}$,
-	 $\mF^{\mU,\mV}$ be the minimum generator of $(\mU^t \mM^i \mV)_{i\ge0}$,
-	 and $P$ be the minimal polynomial of $\mM$. For any 
-	 $v \in \K^{D}$, if\\ 
-	 $\mN^* = (\mF^{\mU,\mV}\sum_{i=0}^{d-1} (\mU^t \mM^i v)/T^{i+1})_{T^{\ge0}}$ 
-	 and $N = a\mN^*$,
-	 then $N = \Omega((u_m^t \mM^i v)_{i\ge0},P)$.
-	 \label{theorem:anyv}
-\end{theorem}
-
-\begin{proof}
-	Let $Z = \sum_{i=0}^{\infty} (\mU^t\mM^iv)/T^{i+1}$ and
-	$\mN^{*'} = \mF^{\mU,\mV} Z$.
-	Since the highest power of the entries in 
-	$Z$ is $T^{-1}$, the 
-	entries of the product $\mN^{*'}$ must have degree less 
-	than $d = deg(\mF^{\mU,\mV})$. Furthermore, since $\mF^{\mU,\mV}$ cancels 
-	the sequence $(\mU\mM^i\mV)_{i \ge 0}$, $\mN^{*'}$ is a
-	polynomial matrix and does not have any terms of negative exponents.
-	This means that all terms in $Z$ with degree less than $T^{-d}$ must vanish in the
-	product.
-	Therefore,
-	$$ \mN^* = \mN^{*'}$$
-	
-	Now, rewrite $\mU$ as $\mU = [u_1 u_2 \cdots u_m]$, then
-	$$
-	\mN^* = \mF^{\mU,\mV}
-	\sum_{i=0}^{\infty} \mU^{\perp} \mM^i v / T^{i+1} =
-	\begin{bmatrix}
-	\sum_{i\ge 0} u_1^{\perp}\mM^iv/T^{i+1}\\
-	\vdots                   \\
-	\sum_{i\ge 0} u_m^{\perp}\mM^iv/T^{i+1}
-	\end{bmatrix}$$
-	Recall $\Omega$ from \cref{def:omega}.
-	By rewriting each $\sum_{i\ge0} u_j \mM^i v$ in its closed form, we get
-	$$ \mN^* = \mF^{\mU,\mV}
-	\begin{bmatrix}
-	\Omega( (u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
-	\vdots      \\
-	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
-	\end{bmatrix}
-	$$
-	By \cref{randXY}, the $i^{th}$ invariant factor of
-	$T\mI - \mM$ is equal to the $i^{th}$ invariant factor of $\mF^{\mU,\mV}$ 
-	for generic choice of
-	$\mU,\mV$. Thus, $s_1 = P$ and by \cref{utilde}
-	\begin{align*}
-	a \mN^* &= a \mF^{\mU,\mV}
-	\begin{bmatrix}
-	\Omega((u_1^{\perp} \mM^i v)_{i\ge 0},P) / P \\
-	\vdots      \\
-	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
-	\end{bmatrix}\\
-	&= [0,\cdots,0,P]
-	\begin{bmatrix}
-	\Omega((u_1^{\perp} \mM^i v)_{i \ge 0},P) / P \\
-	\vdots      \\
-	\Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P) / P 
-	\end{bmatrix}\\
-	&= \Omega((u_m^{\perp} \mM^i v)_{i\ge 0},P)
-	\end{align*}
-	Therefore, $N = \Omega(( u_m^{\perp} \mM^i v)_{i\ge 0},P)$ as needed.
-\end{proof}
-
-% l_{u_m} for linear form of u_m
-Finally, we conclude by seeing what happens
-when we pick specific values for $v$ and applying \cref{theorem:anyv}.
-In line 4 of \cref{algo:block-sparse-fglm}, we have $v = e$, 
-where $e$ is the coordinate vector for $1 \in \mathbb{B}$.
-By applying \cref{theorem:anyv}, we have that
-$$\mN^* = \mF^{\mU,\mV}\sum_{i\ge0}\mU^t \mM e/T^{i+1},$$  and
-$$N = a\mN^* = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P).$$
-By construction,
-$\mM^i e$ gives the coordinate vector of $t^i$ in $\mathbb{B}$, so
-$$\sum_{i\ge 0} u_m^{\perp} \mM^i e/T^{i+1} = \sum_{i\ge0} \ell_{u_m}(t^i)/T^{i+1}$$ 
-where $\ell_{u_m}$ is the linear form associated with $u_m$. Therefore, 
-$$N = \Omega((u_m^{\perp} \mM^i e)_{i\ge 0},P) = \Omega( (\ell_{u_m}(t^i))_{i\ge 0},P)$$.
-
-Similarly, in line 7.1 of \cref{algo:block-sparse-fglm}, we compute
-$\mN^*_j = \mF^{\mU,\mV}\sum_{i\ge0} \mU^{\perp} \mM \mM_j e / T^{i+1}$. By \cref{theorem:anyv},
-$$N_j = a \mN^*_j = \Omega((u_m^{\perp} \mM^i \mM_j e)_{i\ge 0},P) $$
-Again, by construction, $\mM_j e$ is the coordinate vector for $X_j$ in 
-$\mathbb{B}$ and $\mM^i \mM_j e$ is the coordinate vector for $X_jt^i$ in
-$\mathbb{B}$. Therefore,
-$$ N_j =  \Omega((u_m^{\perp} \mM^i \mT_j e)_{i\ge 0},P) =
- \Omega( (\ell_{u_m}(X_jt^i))_{i\ge 0},P)$$
-By the correctness of \cref{algo:para2}, we have the proof
-of correctness for the Block Sparse-FGLM algorithm.
-
-\newpage
 \subsection{Example}
-First, we give an example in the radical case. Let
-$$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset GF(101)[X_1,X_2]$$
-We choose $t = 2X_1 + 53 X_2$, with multiplication matrices:
+
+We give an example of our algorithm  the case of a radical ideal. Let
+$$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset \F_{101}[X_1,X_2];$$
+the correponding residue class ring $Q=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
+We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices:
 \begin{align*}
 \mM_1 = \begin{bmatrix}
  85&   0&  37&   0\\
  69&  85&  15&   0\\
 100&  91&  19&   1\\
   1&  10&  68&   0
-\end{bmatrix}\,
+\end{bmatrix},\,
 \mM_2 = \begin{bmatrix}
 36&  1&  0&  0\\
 42&  0& 85&  1\\
 51&  0& 91&  0\\
 95&  0& 10&  0
-\end{bmatrix}\,
+\end{bmatrix},\,
 \mM = \begin{bmatrix}
 58& 53& 74&  0\\
 41& 69& 91& 53\\
 75& 81& 13&  2\\
 88& 20& 60&  0
-\end{bmatrix}
+\end{bmatrix}.
 \end{align*}
-We choose $m = 2$ and choose $U,V \in GF(101)^{D\times m}$ of random
-entries:
-$$ \mU^{\perp} = \begin{bmatrix}
+We choose $m = 2$ and take $\mU,\mV \in \F_{101}^{D\times m}$ with 
+entries
+$$ \mU = \begin{bmatrix}
 84& 38\\
 29& 58\\
 80& 43\\
  7& 82
-\end{bmatrix}\,
+\end{bmatrix},\quad
 \mV = \begin{bmatrix}
   6&  97\\
  83&  58\\
 101&  95\\
  59&  89
-\end{bmatrix}
-$$
-We compute the matrix sequence $S = (\mU^{\perp}\mM^i\mV)_{i\ge0}$ and its minimum generating matrix polynomial $\mG$
-$$ S = (
+\end{bmatrix}.
+$$ We compute the first $2d=2\lceil D/m\rceil =4$ terms in the matrix
+sequence $\seq_{\mU,\mV} = (\mU^{\perp}\mM^s\mV)_{s\ge0}$ and its
+minimum generating matrix polynomial $\mat{P}_{\mU,\mV}$. This is done
+by first computing
+\begin{align}\label{exampleproducts}
+\mU^\perp =
+\begin{bmatrix}
+11 & 11 &11 & 11\\
+11 & 11 &11 & 11
+\end{bmatrix},
+& 
+\quad \mU^\perp \mM 
+=
+\begin{bmatrix}
+11 & 11 &11 & 11\\
+11 & 11 &11 & 11
+\end{bmatrix},
+ \\[2mm]
+\mU^\perp \mM^2 
+=
+\begin{bmatrix}
+11 & 11 &11 & 11\\
+11 & 11 &11 & 11
+\end{bmatrix},
+ &\quad \mU^\perp \mM^3 
+=
+\begin{bmatrix}
+11 & 11 &11 & 11\\
+11 & 11 &11 & 11
+\end{bmatrix}, \nonumber
+\end{align}
+from which we get, by right-multiplication by $\mV$,
+$$ \seq_{\mU,\mV} =
 \begin{bmatrix}
 92& 75\\  
 83& 51
@@ -1897,42 +1822,75 @@ $$ S = (
 \begin{bmatrix}
 50& 77\\
 26& 76
-\end{bmatrix}
-)$$
-$$ \mF^{\mU,\mV} =
+\end{bmatrix},\dots
+$$
+and
+$$ \mat{P}_{\mU,\mV} =
 \begin{bmatrix}
 T^2 + 76T + 8&       87T + 31\\
     100T + 46& T^2 + 87T + 44
-\end{bmatrix}
+\end{bmatrix}.
 $$
-The biggest invariant factor of $\mF^{\mU,\mV}$ is 
-$$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = R$$
-since $P$ is square free. 
-Now, we compute $\mN^*$ and $a$:
+The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
+$$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = Q$$
+since $P$ is squarefree. 
+Next, we compute $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
-\mN^* &=[84T + 46, 38T + 65]\\
-a &= [T + 55, T^2 + 76T + 8]
+\row{a}_1 &= [T + 55, T^2 + 76T + 8]\\
+\mat{\Omega}( (\mU^\perp_1 \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
+&=\left [\begin{matrix} 84T + 46 \\ 38T + 65   \end{matrix}\right ].
 \end{align*}
-Finally, we find the scalar numerator $N = a\mN^*$:
-$$ N = 100T^3 + 26T^2 + 33T + 18$$
-To get $R_1(T)$, we compute $\mN_1^*$ and $N_1=a\mN_1^*$:
+The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1};$
+the latter is the product
+$$\mat{P}_{\mU,\mV} 
+\left (
+\begin{bmatrix}
+92\\  
+83
+\end{bmatrix}\cdot \frac 1T+
+\begin{bmatrix}
+57\\  
+23
+\end{bmatrix}\cdot \frac 1{T^2}+
+%% \begin{bmatrix}
+%% 54\\  
+%% 70
+%% \end{bmatrix}\cdot \frac 1{T^3}+
+%% \begin{bmatrix}
+%% 50\\
+%% 26
+%% \end{bmatrix}\cdot \frac 1{T^4}
+ \cdots \right),$$ where the columns are the first columns of the
+ matrices in~\eqref{exampleproducts} (we only need $d=2$
+ terms in the right-hand side).  From this, we find the scalar
+ numerator $C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
+   0}, \minpoly)$ by means of the dot product $C_1 = \row{a}_1
+ \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0},
+ \mat{P}_{\mU,\mV})$; we get
+$$ C_1 = 100T^3 + 26T^2 + 33T + 18.$$
+To find $C_{X_1}$, we proceed similarly: we compute  $\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$,
+and we obtain
 \begin{align*}
-\mN_1^* &= [79T + 8, 100T + 23]\\
-N_1 &= 100T^3 + 26T^2 + 33T + 18
+\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) &=
+\left [\begin{matrix} 79T + 8 \\ 100T + 23
+  \end{matrix} \right  ]\\
+C_{X_1} &= 100T^3 + 26T^2 + 33T + 18.
 \end{align*}
-Lastly,
-\begin{align*}
-R_1(T) &= N_1 / N \mod R \\
-       &= 61T^3 + 75T^2 + 85T + 23
-\end{align*}
-We compute $R_2(t)= 32T^3 + 41T^2 + 94T + 22$ in the same way. 
-As a sanity check,
-we see that $V(I)$ has one point in $GF(101)^2$:
-$(54,79)$ and $P$ has one factor in $GF(101)$: $53$. Now,
-$R_1(53) = 54$ and $R_2(53) = 79$ as expected.
+Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod Q$ is 
+given by $V_1= 61T^3 + 75T^2 + 85T + 23$. 
+We compute $V_2= 32T^3 + 41T^2 + 94T + 22$ in the same way,
+and our output is 
+$$((T^4 + 62T^3 + 85T^2 + 69T + 37, 61T^3 + 75T^2 + 85T + 23, 32T^3 +
+41T^2 + 94T + 22), 2X_1 + 53 X_2).$$ As a sanity check, we see that
+$V(I)$ has one point in $\F_{101}^2$, namely $(54,79)$;
+accordingly, $P$ has one root
+in $\F_{101}$, $53$, and we have $V_1(53) = 54$ and $V_2(53) = 79$, as
+expected.
 
-\newpage
-\section{Experimental Results}\label{section:ex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Experimental results}\label{section:ex}
+
 In the following table, we give the timings in seconds for different values 
 of $m$ for algorithm \ref{algo:block-sparse-fglm}. 
 Our implemention was based on LinBox \cite{LinBox} dense and 
