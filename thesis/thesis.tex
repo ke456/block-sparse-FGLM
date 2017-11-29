@@ -1739,25 +1739,38 @@ theory and in practice, and the easiest to parallelize.
 We give an example of our algorithm  the case of a radical ideal. Let
 $$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset \F_{101}[X_1,X_2];$$
 the correponding residue class ring $Q=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
-We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices:
+We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices
+in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $Q$:
 \begin{align*}
 \mM_1 = \begin{bmatrix}
- 85&   0&  37&   0\\
- 69&  85&  15&   0\\
-100&  91&  19&   1\\
-  1&  10&  68&   0
+  0 & 10 & 68&   1\\
+  0 & 85 & 15&  69\\
+  1 & 91 & 19& 100\\
+  0 &  0 & 37&  85
+%%  85&   0&  37&   0\\
+%%  69&  85&  15&   0\\
+%% 100&  91&  19&   1\\
+%%   1&  10&  68&   0
 \end{bmatrix},\,
 \mM_2 = \begin{bmatrix}
-36&  1&  0&  0\\
-42&  0& 85&  1\\
-51&  0& 91&  0\\
-95&  0& 10&  0
+  0 &  0 & 10 & 95\\
+  1 &  0 & 85 & 42\\
+  0 &  0 & 91 & 51\\
+  0 &  1 &  0 & 36
+%% 36&  1&  0&  0\\
+%% 42&  0& 85&  1\\
+%% 51&  0& 91&  0\\
+%% 95&  0& 10&  0
 \end{bmatrix},\,
 \mM = \begin{bmatrix}
-58& 53& 74&  0\\
-41& 69& 91& 53\\
-75& 81& 13&  2\\
-88& 20& 60&  0
+ 0 & 20&  60&  88\\
+53 & 69&  91&  41\\
+ 2 & 81&  13&  75\\
+ 0 & 53&  74&  58
+%% 58& 53& 74&  0\\
+%% 41& 69& 91& 53\\
+%% 75& 81& 13&  2\\
+%% 88& 20& 60&  0
 \end{bmatrix}.
 \end{align*}
 We choose $m = 2$ and take $\mU,\mV \in \F_{101}^{D\times m}$ with 
@@ -1781,28 +1794,28 @@ by first computing
 \begin{align}\label{exampleproducts}
 \mU^\perp =
 \begin{bmatrix}
-11 & 11 &11 & 11\\
-11 & 11 &11 & 11
+  7&  29&  80&  84\\
+ 82&  58&  43&  38
 \end{bmatrix},
 & 
 \quad \mU^\perp \mM 
 =
 \begin{bmatrix}
-11 & 11 &11 & 11\\
-11 & 11 &11 & 11
+ 81&  44&  13&  52\\
+ 29&  29&  35&  75
 \end{bmatrix},
  \\[2mm]
 \mU^\perp \mM^2 
 =
 \begin{bmatrix}
-11 & 11 &11 & 11\\
-11 & 11 &11 & 11
+35&  82&  54&  96\\
+92&  99&  82&  10
 \end{bmatrix},
  &\quad \mU^\perp \mM^3 
 =
 \begin{bmatrix}
-11 & 11 &11 & 11\\
-11 & 11 &11 & 11
+10&  64&  97&   1\\
+58&  87&  74&  99
 \end{bmatrix}, \nonumber
 \end{align}
 from which we get, by right-multiplication by $\mV$,
@@ -1832,49 +1845,42 @@ T^2 + 76T + 8&       87T + 31\\
 \end{bmatrix}.
 $$
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
-$$P = T^4 + 62T^3 + 85T^2 + 69T + 37 = Q$$
+$$P = T^4 + 62T^3 + 85T^2 + 69T + 37,$$
+and $Q=P$
 since $P$ is squarefree. 
-Next, we compute $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
+Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
-\row{a}_1 &= [T + 55, T^2 + 76T + 8]\\
+\row{a}_1 &= [T + 55, T^2 + 76T+ 8]\\
 \mat{\Omega}( (\mU^\perp_1 \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
-&=\left [\begin{matrix} 84T + 46 \\ 38T + 65   \end{matrix}\right ].
+&=\left [\begin{matrix} 7T + 71 \\ 82 + 86   \end{matrix}\right ].
 \end{align*}
 The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1};$
 the latter is the product
 $$\mat{P}_{\mU,\mV} 
 \left (
 \begin{bmatrix}
-92\\  
-83
+7\\  
+82
 \end{bmatrix}\cdot \frac 1T+
 \begin{bmatrix}
-57\\  
-23
+81\\  
+29
 \end{bmatrix}\cdot \frac 1{T^2}+
-%% \begin{bmatrix}
-%% 54\\  
-%% 70
-%% \end{bmatrix}\cdot \frac 1{T^3}+
-%% \begin{bmatrix}
-%% 50\\
-%% 26
-%% \end{bmatrix}\cdot \frac 1{T^4}
  \cdots \right),$$ where the columns are the first columns of the
  matrices in~\eqref{exampleproducts} (we only need $d=2$
  terms in the right-hand side).  From this, we find the scalar
  numerator $C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
-   0}, \minpoly)$ by means of the dot product $C_1 = \row{a}_1
+   0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1
  \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0},
  \mat{P}_{\mU,\mV})$; we get
-$$ C_1 = 100T^3 + 26T^2 + 33T + 18.$$
+$$ C_1 = 82T^3 + 63T^2 + 73T + 48.$$
 To find $C_{X_1}$, we proceed similarly: we compute  $\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$,
 and we obtain
 \begin{align*}
 \mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) &=
-\left [\begin{matrix} 79T + 8 \\ 100T + 23
+\left [\begin{matrix} 80T + 37 \\ 43T+60
   \end{matrix} \right  ]\\
-C_{X_1} &= 100T^3 + 26T^2 + 33T + 18.
+C_{X_1} &= 43T^3 + 75T^2  + 49T+91.
 \end{align*}
 Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod Q$ is 
 given by $V_1= 61T^3 + 75T^2 + 85T + 23$. 
@@ -1891,22 +1897,48 @@ expected.
 
 \subsection{Experimental results}\label{section:ex}
 
-In the following table, we give the timings in seconds for different values 
-of $m$ for algorithm \ref{algo:block-sparse-fglm}. 
-Our implemention was based on LinBox \cite{LinBox} dense and 
-sparse matrices as well Shoup's NTL \cite{NTL} polynomials. All timings
-are measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
-value of $m$, we create and run $m$ threads in parallel. Beside each timing,
-the ratio of the time it took to compute $(\mU^{\perp} \mM^i)_{i\ge0}$ to
-the total time is written in brackets.
+In the following table, we give the timings in seconds for different
+values of $m$ for algorithm \ref{algo:block-sparse-fglm}.  Our
+implemention was based on LinBox \cite{LinBox} dense and sparse
+matrices as well Shoup's NTL \cite{NTL} polynomials. All timings are
+measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
+value of $m$, we create and run $m$ threads in parallel. Beside each
+timing, the ratio of the time it took to compute $(\mU^{\perp}
+\mM^s)_{s\ge0}$ to the total time is written in brackets.
 
-\bgroup
-\def\arraystretch{1.4}
+In all cases, we start from multiplication matrices computed from a
+{degrevlex} Gr\"obner basis in Magma. The timings reported here do not
+include this precomputation. We refer the reader to~\cite{FaMo17} for
+extensive experiments comparing the runtime two stages of the
+algorithm (in many cases, computing the degree Gr\"obner basis is
+faster). 
+
+All our inputs as well as our source code are available at
+\url{todo}. Some systems are well-known (Katsura or Eco
+from~\cite{Morgan88}, while we also consider several families of
+randomly generated inputs (some are inspired
+from~\cite{FaMo17}). Systems rand1-$i$ have $3$ variables and randomly
+generated equations (of degree depending on $i$), and rand2-$i$ are
+similar, with $4$ variables. These systems are generically radical
+(and in shape position). Systems mixed1-$i$ and mixed2-$i$ have
+similar number of variables, but some of their solutions are multiple,
+so the ideals are not radical (and not in shape position). Systems
+mixed3-$i$ have only one multiple root (the others are simple), in
+increasing numbers of variables; they are not in shape
+position. Systems W1-$d$-$n$-$p$ are determinantal equations that
+describe the computation of critical point for the projection $\pi_1:
+(\alpha_1,\dots,\alpha_n) \mapsto \alpha_1$ on $V(f_1,\dots,f_p)$,
+where $f_1,\dots,f_p$ are $p$ equations of degree $d$ in $n$
+variables.
+
+
+\begin{figure}
+ \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
 \begin{center}
-	\textbf{Table 1: Timings (in seconds) for polynomials over $GF(65537)$}
+	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& n& $\mathbf{D}$ & \textbf{Sparsity} & $\mathbf{m = 1}$ & $\mathbf{m = 4}$ & $\mathbf{m = 8}$ & radical?\\
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Sparsity} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & radical \\
 		\hline
 		rand1-1&3 &5832&0.0371&1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
 		rand1-2&3 &8000&0.0333&4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
@@ -1936,38 +1968,35 @@ the total time is written in brackets.
 		W1-4-6-2&6 &6480&0.141&9096 (1)&2424 (0.999)&1674 (0.998)&yes\\
 	\end{tabular}
 \end{center}
+\end{figure}
+
 
 On average, the algorithm performs better by a factor of 3.73 for
-$m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. We can
-see that the more threads there are, the less beneficial it is
-to have an additional thread. This is because
-increasing $m$ has two effects: it
-decreases the effectiveness of parallel computations and
-also increase the time to compute the output polynomials.
-From the observed speedup and the ratio in the above table, 
-we can conclude that the bottleneck of the
-algorithm is the computation of that sequence and
-the latter effect is minor compared to the former.
+$m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. Increasing
+$m$ has two effects: it (moderately) decreases the effectiveness of
+parallel computations, but also increases the time to compute the
+output polynomials. From the observed speedup and the ratio in the
+above table, we can conclude that the bottleneck of the algorithm is
+the computation of that sequence and the latter effect is minor
+compared to the former.
 
-We can determined the effectiveness of parallel computations by comparing
-the combined CPU times as this would eliminate any benefit of parallelizing. 
-For example, in test ``rand1-1", we get
-$4124, 4350, 6008$ seconds for $m=1,4,8$ respectively; we observed similar
-patterns for other tests. If the paralleliztion was perfect, the combined CPU time
-should be roughly equal for all values of $m$
-since computing $(\mU^{\perp} \mM^i)_{i\ge0}$ took
-$> 99$ percent of the total time for all three values of $m$ in this test.
-Thus, the increase in combined CPU times must be due to the parallelization.
-When $m=4$, the additional overhead from parallelization
-is small whereas when $m=8$, additional overhead
-is significant as it is impossible
-to run 8 threads in parallel on 8 cores without switching. 
-If there were more cores available, we would expect to 
-see a similar combined CPU time for $m=8$. In general, it is optimal 
-to choose $m$ to be the number of cores available.
+We can determine the effectiveness of parallel computations by
+comparing combined CPU times (that is, total work).  For example, in
+test rand1-1 we get $4124, 4350, 6008$ seconds for $m=1,4,8$
+respectively; we observed similar patterns for other tests. If the
+parallelization was perfect, the combined CPU time should be roughly
+equal for all values of $m$ since computing $(\mU^{\perp}
+\mM^s)_{s\ge0}$ took more than $99\%$ of the total time for all three
+values of $m$ in this test. When $m=4$, the overhead from
+parallelization is small whereas when $m=8$, overhead is significant
+as it is impossible to run 8 threads in parallel on 8 cores without
+switching.
 
 
-\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Improvements for Special cases}
 \subsection{Choice of the blocking size}
 In general, experiments show that choosing $1 \le m \le D$ that matches
