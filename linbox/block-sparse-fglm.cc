@@ -6,7 +6,7 @@
 //#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
 //#define NAIVE_ON
 #define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
-//#define SPARSITY_COUNT // shows the sparsity of the matrices
+#define SPARSITY_COUNT // shows the sparsity of the matrices
 // #define TEST_FGLM // testing / timing approximant basis algos
 //#define TEST_APPROX // testing / timing approximant basis algos
 //#define TEST_KERNEL // testing / timing kernel basis algo
@@ -1064,10 +1064,14 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 	for (auto i: sparsity)
 		cout << i << " ";
 	cout << endl;
+  cout << "D: " << D << endl;
 #endif
 #ifdef EXTRA_VERBOSE_ON
 	for (auto &i : mul_mats)
 		i.write(cout << "mul mat", Tag::FileFormat::Maple)<<endl;
+#endif
+#ifdef VERBOSE_ON
+	cout << "D: " << D << endl;
 #endif
 
 	zz_p::init(prime);
@@ -1567,7 +1571,11 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 	for (long i = 0; i <= dp; i++)
 		SetCoeff(B, dp-i, coeff(min_poly, i));
 	zz_pX rest = B / revP;
-	zz_pX inv_revP = InvMod(revP % rest, rest);
+	cout << "revP: " << revP << endl;
+	cout << "rest: " << rest << endl;
+	zz_pX inv_revP = zz_pX(0);
+	if (rest != 1)
+		inv_revP = InvMod(revP % rest, rest);
 	zz_pX inv_rest = InvMod(rest % revP, revP);
 
 	zz_pX T; // the random linear form, written mod min_poly_sqfree
@@ -1874,6 +1882,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 
 #ifdef TIMINGS_ON
 	tm.stop();
+	cout << "###DEGREE## min_poly deg: " << deg(min_poly) << endl;
 	cout << "###TIME### Total Smith / u_tilde / min_poly: " << tm.usertime() << endl;
 #endif
 
