@@ -1565,9 +1565,15 @@ using blocking methods. As input, we assume that we know a monomial
 basis $\basis=(b_1,\dots,b_D)$ of $Q=\K[X_1,\dots,X_n]/I$, together with the
 multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
 $X_1,\dots,X_n$ in this basis; for definiteness, we suppose that the
-first basis element in $\basis$ is~$b_1=1$. We do not assume that $I$ is
-radical or in shape position; however, we assume (as in the previous
-subsection) that the characteristic of $\K$ is greater than $D$.
+first basis element in $\basis$ is~$b_1=1$. 
+
+The main feature of the algorithm is that after we compute the Krylov
+sequence used to find a minimal matrix generator, we recover the
+entries of the output for a minor cost, without computing another
+Krylov sequence. We make no assumption on $I$ (radicality or shape
+position); however, we assume (as in the previous subsection) that the
+characteristic of $\K$ is greater than $D$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
