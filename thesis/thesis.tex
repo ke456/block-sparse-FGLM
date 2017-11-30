@@ -80,7 +80,7 @@
 \newcommand{\basis}{\mathscr{B}}
 \newcommand{\trace}{\mathrm{trace}}
 \newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
-\newcommand{\todo}[1]{\textcolor{red}{{\bf todo:} #1}}
+\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
@@ -987,7 +987,7 @@ a dot product. \todo{define matrix generator}
   $\col{e}_s=\mat{U}^\perp \mM^s\, \col{w}$ for all $s$,
   and we have 
 \begin{align}\label{eq:OmegaOmega}
-[~\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~] = \row{a}_i\, \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
+[~\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~] = \row{a}_i\cdot \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
 \end{align}
 with $\row{a}_i$ in $\K[\var]^{1 \times m}$ and 
 $\mat{\Omega}(\mat{\mathcal{E}} , \mat{P}_{\mU,\mV}) \in \K[\var]^{m \times 1}.$
@@ -1002,7 +1002,7 @@ in~\eqref{eq:OmegaOmega} follows at once from the definitions:
 [~ \Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~]  &= [~\minpoly~]\ \sum_{s \ge 0} \frac{\row{u}_i \mM^s \col{w}}{T^{s+1}}\\
 &=  [~0~\cdots~0~\minpoly~0~\cdots~0~]\  \sum_{s \ge 0} \frac{\mat{U}^\perp \mM^s \col{w}}{T^{s+1}}\\
 &=  [~0~\cdots~0~\minpoly~0~\cdots~0~]\ (\mat{P}_{\mU,\mV})^{-1} \mat{P}_{\mU,\mV} \sum_{s \ge 0} \frac{\mat{U}^\perp \mM^s \col{w}}{T^{s+1}}\\
-&=  \row{a}_i\, \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
+&=  \row{a}_i\cdot \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
 \end{align*}
 \end{proof}
 
@@ -1027,7 +1027,7 @@ $s=0,\dots,\lceil D/m \rceil-1$.
         \begin{enumerate}[{\bf 1.}]
         \item compute $\col{E}_s = \mat{L}_s \col{w}$ for $s=0,\dots,\lceil D/m\rceil-1$
         \item use these values to compute the matrix numerator $ \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
-        \item return the entry of the $1 \times 1$ matrix $\row{a}_i  \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
+        \item return the entry of the $1 \times 1$ matrix $\row{a}_i\cdot  \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
         \end{enumerate}
 	\label{algo:block-sparse-fglm}
 \end{algorithm}
@@ -1468,6 +1468,7 @@ zero-dimensional parametrization of $V_{\mathfrak{S}}$. At this stage,
 we do not discuss data structures, complexity, or what terms in the
 sequences are needed; this is the subject of the following section.
 
+\todo{what is $\mathfrak{S}$ in the following sections?}
 \begin{algorithm}[H]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
 	  {\bf Input:} \vspace{-0.5em}
@@ -1657,12 +1658,19 @@ polynomial of $\lf$ and $Q$ its squarefree part.
 We find the rest of the polynomials in the output by following
 \cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
 this algorithm are computed using the method of
-\cref{ssec:scalar_numer}. Indeed, \cref{lemma:omegaOmega} shows 
-that for a generic choice of $\mU$ and $\mV$, we have 
-$$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge 0}, \minpoly)
+\cref{ssec:scalar_numer}. Algorithm ScalarDenominator
+compute $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge 0}, \minpoly)
 \quad\text{and}\quad
-C_{X_i} = \Omega((\row{u}_i \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly).$$
-Let then $\ell:Q \to \K$ be the linear form $f = \sum_{i \in \basis} f_i b_i \mapsto 
+C_{X_i} = \Omega((\row{u}_1 \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly),\ \ i=1,\dots,n.$$
+The key result supporting this is \cref{lemma:omegaOmega} which shows
+that for a generic choice of $\mU$ and $\mV$, we have 
+$$[~C_1~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$$
+and
+$$[~C_{X_i}~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}),\ \ i=1,\dots,n;
+$$
+Algorithm ScalarDenominator precisely computes these quantities.
+
+Let $\ell:Q \to \K$ be the linear form $f = \sum_{i \in \basis} f_i b_i \mapsto 
 \sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
 $(i,1)$ in $\mU$. Then, the two polynomials above can be rewritten
 as 
@@ -1670,7 +1678,7 @@ $$C_1 = \Omega( (\ell(X^s))_{s \ge 0}, \minpoly) \quad\text{and}\quad
 C_{X_i} = \Omega( (\ell(X_i X^s))_{s \ge 0}, \minpoly),$$ so they
 coincide with the polynomials computed in \cref{algo:para2}.  Then,
 \cref{lemma:para2} shows that for generic $\mU$ and $\lf$, the output
-is indeed a zero-dimensional parametrization of $V(I)$.
+is indeed a zero-dimensional parametrization of $V(I)$.  
 
 For the cost analysis, we will mainly focus on a sparse model for
 matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
@@ -1737,6 +1745,91 @@ $$O\left (ncD^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simulateously the most costly in
 theory and in practice, and the easiest to parallelize. 
+
+\medskip
+
+We conclude this section by a discussion of ``dense'' versions of the
+algorithm (to be used when the density $c$ is close to $1$). In
+general, experiments show that choosing $m \in\{1,\dots, D\}$ that
+matches the number of cores is optimal (see \cref{section:ex});
+however, if we use a dense model for our matrices, our algorithms
+should rely on dense matrix multiplication. We will see two possible
+approaches, which respectively take $m=1$ and $m=D$; we will not
+discuss how they parallelize, simply pointing out that one may just
+parallelize dense matrix multiplications throughout the algorithms.
+
+Let us discuss the modifications in the algorithm to apply when
+$m=1$. In this case, blocking has no effect. We compute the
+row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
+square-and-multiply technique used in Keller-Gehrig's
+algorithm~\cite{Keller85}, for $O(D^\omega \log(D))$ operations in
+$\K$. The minimum generating polynomial matrix $\mat{P}_{\mU,\mV}$ is
+equal to the minimum polynomial $\minpoly$ of $\mM$, for generic
+choices of $\mU$ and $\mV$ (which can be computed by the
+Berlekamp-Massey algorithm, or a fast version of it); besides,
+$\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
+numerators is simply a power series multiplication in degree at most
+$D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, 
+where the second term gives the cost of computing $\mM$.
+
+
+When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
+matrices and $d = D/m = 1$. A minimal generating polynomial of
+$\seq_{\mU,\mV} = (\mU^\perp, \mU^\perp\mM\mV,\dots)$ is
+$\mat{P}_{\mU,\mV} = T \mat{I}_D - \mU^\perp\mM\mU^{-\perp}.$ Its
+largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
+$O(D^\omega \log(D))$ operations in $\K$.  The numerator
+$\mat{\Omega}(\mU^\perp \mM \col{\varepsilon}_1, \mat{P}_{\mU,mV})$ is
+$\mU^\perp \col{\varepsilon}_1$, that is the first column of
+$\mU^\perp$, from which we recover $C_1$ through a dot product with
+$\row{a}_1$. Similarly, the numerator $\mat{\Omega}(\mU^\perp \mM
+\mM_i \col{\varepsilon}_1, \mat{P}_{\mU,mV})$ is $\mU^\perp \mM_i
+\col{\varepsilon}_1$, and gives us $C_{X_i}$. Altogether, 
+the runtime is again  $O(D^{\omega} \log(D) + nD^2)$, 
+where the second term now gives the cost of computing $\mM$,
+as well as $C_1$ and all $C_{X_i}$.
+
+
+
+%% and 
+%% $$((T - \mU\mM\mU^{-1})(\mU/T + \mU\mM/T^2))_{T^{\ge 0}} = \mU. $$
+%% For $\mM_j$, $1 \le j \le n$, we get the sequence $(\mU\mM_j,\mU\mM\mM_j)$ and
+%% $$((T - \mU\mM\mU^{-1})(\mU\mM_j/T + \mU\mM\mM_j/T))_{T^{\ge 0}} = \mU\mM_j.$$
+%% Thus, we get the following algorithm:
+
+%% \begin{algorithm}[H]
+%% 	\caption{Dense Block Sparse-FGLM($\mM,\mM_1,\dots,\mM_n$)}
+%% 	{\bf Input:} \vspace{-0.5em}
+%% 	\begin{itemize}
+%% 		\item $\mM,\mM_1,\dots,\mM_n$ defined as above
+%% 	\end{itemize}
+%% 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
+%%   \begin{enumerate}[{\bf 1.}]
+%% 		\item choose $\mU \in \mathbb{K}^{D\times D}$
+%% 		\item $\mF^{U,M} = T - \mU\mM\mU^{-1}$
+%% 		\item $\mN^{*} = \mU$
+%% 		\item $P =$ largest invariant factor of $\mF^{U,M}$
+%% 		\item $R =$ SquareFreePart$(P)$
+%% 		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mV})^{-1}$}
+%% 		\item {\sf $N=a\mN^*e$}
+%% 		\item {for j = $1 \dots n$:}
+%%       \begin{enumerate}[{\bf 8.1.}]
+%% 			\item $\mN_j^* = \mU\mM_j$
+%% 			\item $N_j = a\mN_j^*e$
+%% 			\item $R_j = N_j/N$ mod $R$
+%% 		\end{enumerate}
+%% 		\item return $((R, R_1,\dots,R_n),t)$
+%% 	\end{enumerate}
+%% 	\label{algo:dense-block-sparse-fglm}
+%% \end{algorithm}
+%% Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
+%% in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
+%% and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. \todo{We can solve for $a$ by
+%% using the high-order lifting algorithm of \cite[Algorithm~5]{Stor03}. 
+%% By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.}
+%% Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1876,7 +1969,7 @@ $$\mat{P}_{\mU,\mV}
  matrices in~\eqref{exampleproducts} (we only need $d=2$
  terms in the right-hand side).  From this, we find the scalar
  numerator $C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
-   0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1
+   0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1\cdot
  \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0},
  \mat{P}_{\mU,\mV})$; we get
 $$ C_1 = 82T^3 + 63T^2 + 73T + 48.$$
@@ -1937,11 +2030,9 @@ describe the computation of critical point for the projection $\pi_1:
 where $f_1,\dots,f_p$ are $p$ equations of degree $d$ in $n$
 variables.
 
-
-\begin{figure}
+\begin{table}
  \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
-\begin{center}
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
 		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Sparsity} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & radical \\
@@ -1971,12 +2062,9 @@ variables.
 		W1-2-10-4&10 &1344&0.312&164 (0.998)&43 (0.994)&30 (0.99)&yes\\
 		W1-2-11-4&11 &1920&0.319&489 (0.999)&129 (0.997)&90 (0.994)&yes\\
 		W1-3-7-3&7 &6480&0.174&10923 (1)&2900 (0.999)&2014 (0.999)&yes\\
-		W1-4-6-2&6 &6480&0.141&9096 (1)&2424 (0.999)&1674 (0.998)&yes\\
+		W1-4-6-2&6 &6480&0.141&9096 (1)&2424 (0.999)&1674 (0.998)&yes
 	\end{tabular}
-\end{center}
-\end{figure}
-
-
+\end{table}
 On average, the algorithm performs better by a factor of 3.73 for
 $m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. Increasing
 $m$ has two effects: it (moderately) decreases the effectiveness of
@@ -1998,116 +2086,56 @@ parallelization is small whereas when $m=8$, overhead is significant
 as it is impossible to run 8 threads in parallel on 8 cores without
 switching.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Improvements for Special cases}
-\subsection{Choice of the blocking size}
-In general, experiments show that choosing $1 \le m \le D$ that matches
-the number of cores is optimal in \cref{section:ex}. However,
-when $m=1$, blocking has no effect and there is no parallelization
-to be had. In particular, the minimum generating polynomial matrix
-$\mF^{\mU,\mV}$ is equal to the minimum polynomial $P$ of $\mM$. Therefore,
-$a = P (\mF^{\mU,\mV})^{-1} = 1$ and we can omit steps 7,8, and 9.2 in
-\cref{algo:block-sparse-fglm}.
+\section{Using the original coordinates}
 
-If the multiplication matrices are dense, then it is
-better to compute the product $\mU \mM^i$ using a single matrix multiplication,
-rather than in parallel.
-When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square matrices
-and we can write $\mU\mM\mV = \mU'\mM$; therefore, we can generate sequences of the
-form $(\mU\mM^i)_{i\ge0}$ rather than $(\mU\mM^iV)_{i\ge0}$. Now, $d = D/m = 1$
-and we generate the sequence $ S = (\mU, \mU\mM)$. The minimum generating polynomial
-matrix of $S$ is 
-$$\mF^{U,M} = T - \mU\mM\mU^{-1},$$ 
-and 
-$$((T - \mU\mM\mU^{-1})(\mU/T + \mU\mM/T^2))_{T^{\ge 0}} = \mU. $$
-For $\mM_j$, $1 \le j \le n$, we get the sequence $(\mU\mM_j,\mU\mM\mM_j)$ and
-$$((T - \mU\mM\mU^{-1})(\mU\mM_j/T + \mU\mM\mM_j/T))_{T^{\ge 0}} = \mU\mM_j.$$
-Thus, we get the following algorithm:
+In this section, we propose a refinment of the algorithm given
+previously; the main new feature is to avoid using a generic linear
+form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.  Indeed,
+such a linear combination is likely to result in a multiplication
+matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$ significantly more dense
+that $\mM_1,\dots,\mM_n$. In all this section, we will work under the
+assumption that $\mM_1$ the sparsest matrix among $\mM_1,\dots,\mM_n$.
+All notation, such as $I$, $Q$, \dots, are as in the previous section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Overview}
+
+The algorithm will decompose $V$ into two parts: for the first part,
+we will be able to use $X_1$ as a separating linear form
+\todo{define}; the remaining points will be dealt with using a random
+linear form $\lf$ as above. Throughout, we rely on the following
+operations: evaluations of linear forms on successive powers of a
+given element in $Q$, say $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$
+(matrix) linear algebra, as before, as well as some operations on
+univariate polynomials related to so-called {\em power
+  projection}~\cite{Shoup94,Shoup99}.
+
+The main algorithm is as follows. For the moment, we only describe its
+main structure; the details of the subroutines are given in the next
+paragraphs. \todo{main algo takes $\ell$, not $\mU$}
 
 \begin{algorithm}[H]
-	\caption{Dense Block Sparse-FGLM($\mM,\mM_1,\dots,\mM_n$)}
-	{\bf Input:} \vspace{-0.5em}
-	\begin{itemize}
-		\item $\mM,\mM_1,\dots,\mM_n$ defined as above
-	\end{itemize}
-	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
-  \begin{enumerate}[{\bf 1.}]
-		\item choose $\mU \in \mathbb{K}^{D\times D}$
-		\item $\mF^{U,M} = T - \mU\mM\mU^{-1}$
-		\item $\mN^{*} = \mU$
-		\item $P =$ largest invariant factor of $\mF^{U,M}$
-		\item $R =$ SquareFreePart$(P)$
-		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mV})^{-1}$}
-		\item {\sf $N=a\mN^*e$}
-		\item {for j = $1 \dots n$:}
-      \begin{enumerate}[{\bf 8.1.}]
-			\item $\mN_j^* = \mU\mM_j$
-			\item $N_j = a\mN_j^*e$
-			\item $R_j = N_j/N$ mod $R$
-		\end{enumerate}
-		\item return $((R, R_1,\dots,R_n),t)$
-	\end{enumerate}
-	\label{algo:dense-block-sparse-fglm}
-\end{algorithm}
-Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
-in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
-and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. \todo{We can solve for $a$ by
-using the high-order lifting algorithm of \cite[Algorithm~5]{Stor03}. 
-By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.}
-Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
-
-\subsection{Decomposition of linear forms.}
-
-
-
-
-
-
-In what follows, $\K$ is a field.  Let $I$ be an ideal in
-$\K[X_1,\dots,X_n]$ and $Q=\K[X_1,\dots,X_n]/I$ be the associated
-residue class ring. Suppose that $V=V(I)$ has dimension zero, and
-write it as $V=\{\balpha_1,\dots,\balpha_d\},$ with all $\balpha_i$'s
-in $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
-all $i$.  We also let $\D$ be the dimension of $Q$, so that $d \le
-\D$, and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In
-this section, we recall and generalize results from the appendix
-of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
-parametrization of $V$.
-
-The main novelty in our approach is to avoid generic coordinates as
-much as possible. The algorithm will decompose $V$ into two parts: for
-the first part, we will be able to use $X_1$ as a separating element;
-the remaining points will be dealt with using a random linear
-form. Throughout, we rely only the following operations: evaluations
-of linear forms on successive powers of a given element in $Q$, say
-$1,t,t^2,\dots$, and elementary operations on univariate polynomials.
-
-The main algorithm is as follows. For the moment, we can only describe
-its main structure; the details of the subroutines are given in the
-next paragraphs.
-
-\begin{algorithm}[H]
-	\caption{$\mathsf{Parametrization}(\ell,t)$} {\bf
+	\caption{$\mathsf{ParametrizationWithSplitting}(\ell,t)$} {\bf
 		Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
 		\item a linear form $\ell$ over $Q$
-		\item $t=t_1 X_1 + \cdots + t_n X_n$
+		\item $\lf=t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
 	{\bf Output:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
-		\item polynomials $(P,(V_1,\dots,V_n))$
+		\item polynomials $((Q,V_1,\dots,V_n),\lf)$
 	\end{itemize}
 	\begin{enumerate}
-		\item let $(F,(G_1,\dots,G_n),X_1)=\mathsf{ParametrizationX}_1(\ell)$
-		\item let $\ell'=\mathsf{Update}(\ell,F,t)$
-		\item let $(Q,(W_1,\dots,W_n),t)=\mathsf{ParametrizationGeneric}(\ell',t)$
-		\item let $(F^*,(G^*_1,\dots,G^*_n),t)=\mathsf{ChangeCoordinate}(F,(G_1,\dots,G_n),t)$
-		\item let  $(P,(V_1,\dots,V_n))=\mathsf{Union}(F^*,(G^*_1,\dots,G^*_n),\, Q,(W_1,\dots,W_n))$
-		\item \textbf{return} $(P,(V_1,\dots,V_n),t)$
+		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\ell)$
+		\item let $\ell'=\mathsf{Update}(\ell,F,\lf)$
+		\item let $(R,W_1,\dots,W_n,\lf)=\mathsf{Parametrization}(\ell',\lf)$
+		\item let $((Q,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
+		\item \textbf{return} $((Q,V_1,\dots,V_n),\lf)$
 	\end{enumerate}
 \end{algorithm}
 
@@ -2116,14 +2144,19 @@ zero-dimensional parametrization of a subset $V'$ of $V$ for which
 $X_1$ is a separating element, using values of the form
 $(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
 removes from $V$ the points we just found) and apply
-$\mathsf{ParametrizationGeneric}(\ell',t)$, to obtain a
-zero-dimensional parametrization of $V''=V-V'$ using values of the form
-$(\ell'(t^s))_{s \ge 0}$. The last two steps involve changing
-coordinates in $(F,(G_1,\dots,G_n)$ (to use $t$ as a separating
-variable instead), and performing the union of the two components $V'$
-and $V''$.
+$\mathsf{ParametrizationGeneric}(\ell',\lf)$, to obtain a
+zero-dimensional parametrization of $V''=V-V'$ using values of the
+form $(\ell'(\lf^s))_{s \ge 0}$; in those ``lucky'' cases where $V'$ is 
+a large subset of $V$, $V''$ may only contain a few points, and
+few values for the latter sequence will be needed. 
+
+The last step involves changing coordinates in
+$((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a separating variable
+instead, and performing the union of the two components $V'$ and
+$V''$.
 
 
+\subsection{Decomposition of linear forms}
 
 In this paragraph, we work over the whole $V$ (so
 $\mathfrak{S}=\{1,\dots,d\}$).  Specializing our previous discussion
