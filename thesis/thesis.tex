@@ -1029,7 +1029,7 @@ $s=0,\dots,\lceil D/m \rceil-1$.
         \item use these values to compute the matrix numerator $ \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
         \item return the entry of the $1 \times 1$ matrix $\row{a}_i\cdot  \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
         \end{enumerate}
-	\label{algo:block-sparse-fglm}
+	\label{algo:scalar_numerator}
 \end{algorithm}
 
 Computing the first $\lceil D/m \rceil$ values of the sequence
@@ -1997,7 +1997,7 @@ expected.
 \subsection{Experimental results}\label{section:ex}
 
 In the following table, we give the timings in seconds for different
-values of $m$ for algorithm \ref{algo:block-sparse-fglm}.  Our
+values of $m$ for \cref{algo:block-sparse-fglm}.  Our
 implemention was based on LinBox \cite{LinBox} dense and sparse
 matrices as well Shoup's NTL \cite{NTL} polynomials. All timings are
 measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
