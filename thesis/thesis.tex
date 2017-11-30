@@ -87,6 +87,8 @@
 \newcommand{\mainalgoname}{{\sf BlockParametrization}}
 \newcommand{\lf}{X}
 
+\newcommand{\density}{\rho}
+
 \def\M {\ensuremath{\mathsf{M}}}
 \def\Deg{D}
 \def\dg{\kappa}
@@ -1657,12 +1659,12 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 
 For the cost analysis, we will mainly focus on a sparse model for
 matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $c \in [0,1)$, that is, at most $c D^2$ nonzero entries.  As a
-  result, $\mM$ has density at most $nc$, and a matrix-vector product
-  by $\mM$ can be done in $O(ncD^2)$ operations in $\K$ (we briefly
-  discuss variants of the algorithm using dense linear algebra at the
-  end of this subsection). The cost incurred at Step~\ref{mainstep2}
-  to compute $\mM$ is $O(ncD^2)$.
+at most $\density \in [0,1)$, that is, at most $\density D^2$ nonzero entries.  
+As a result, $\mM$ has density at most $n\density$, and a matrix-vector product
+by $\mM$ can be done in $O(n\density D^2)$ operations in $\K$ (we briefly
+discuss variants of the algorithm using dense linear algebra at the
+end of this subsection). The cost incurred at Step~\ref{mainstep2}
+to compute $\mM$ is $O(n\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1673,10 +1675,10 @@ $(\row{\ell}_{i,s})_{0 \le s < 2d}$ of the $i$th rows of
 $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,s+1} = \row{u}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$ row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
-  \le i < 2d}$ costs $O(dn cD^2) = O(ncD^3/m )$ field operations. If
+  \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
-the {\em span} of Step~\ref{mainstep3} is thus $O(ncD^3/m)$, whereas
-the total work is $O(ncD^3)$.
+the {\em span} of Step~\ref{mainstep3} is thus $O(n\density D^3/m)$, whereas
+the total work is $O(n\density D^3)$.
 
 At step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
 product
@@ -1714,9 +1716,9 @@ takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular inverse takes time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, the total span, assuming perfect parallelization 
 at Step~\ref{mainstep3} is
-$$O\left (nc\frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
+$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
 the total work is
-$$O\left (ncD^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+$$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simulateously the most costly in
 theory and in practice, and the easiest to parallelize. 
@@ -1724,7 +1726,7 @@ theory and in practice, and the easiest to parallelize.
 \medskip
 
 We conclude this section by a discussion of ``dense'' versions of the
-algorithm (to be used when the density $c$ is close to $1$). In
+algorithm (to be used when the density $\density$ is close to $1$). In
 general, experiments show that choosing $m \in\{1,\dots, D\}$ that
 matches the number of cores is optimal (see \cref{section:ex});
 however, if we use a dense model for our matrices, our algorithms
