@@ -22,6 +22,15 @@
 @String{j-JALG = "Journal of Algorithms"}
 @String{j-IEEE-AT = "IEEE Trans. Automat. Control"}
 
+
+@book{Macaulay16,
+   author    = {F. S. Macaulay},
+   title     = {The Algebraic Theory of Modular Systems},
+   year      = 1916,
+   publisher = {Cambridge University Press},
+   owner     = {LM}
+}
+
 @book{DumFoo04,
    title = "Abstract Algebra",
    author = "Dummit, D. S. and Foote, R. M.",
@@ -112,22 +121,15 @@
 	keywords = {column reduced form, determinant, matrix gcd, matrix polynomial, minimal basis, polynomial matrix multiplication},
 } 
 
-@inproceedings{Villard97,
- author = {Villard, G.},
- title = {Further Analysis of {C}oppersmith's Block {W}iedemann Algorithm for the Solution of Sparse Linear Systems (Extended Abstract)},
- booktitleOPT = {Proceedings of the 1997 International Symposium on Symbolic and Algebraic Computation},
- booktitle = {ISSAC'97},
- year = {1997},
- isbn = {0-89791-875-4},
- location = {Kihei, Maui, Hawaii, USA},
- pages = {32--39},
- numpages = {8},
- url = {http://doi.acm.org/10.1145/258726.258742},
- doi = {10.1145/258726.258742},
- acmid = {258742},
- publisher = {ACM},
- addressOPT = {New York, NY, USA},
-} 
+
+@article{Villard97,
+	author = {Villard, G.},
+	title = {Further analysis of {C}oppersmith's block {W}iedemann algorithm for the solution of sparse linear systems},
+	Journal = {ISSAC'97},
+	pages = {32-39},
+publisher = {ACM},
+	year = {1997}	}
+	
 
 @inproceedings{GioLeb14,
  author = {Giorgi, P. and Lebreton, R.},
@@ -210,17 +212,39 @@
 }
 
 @article{Coppersmith93,
-  title = "Solving linear equations over {GF}(2): block {L}anczos algorithm",
-  journal = j-LAA,
-  author = "Coppersmith, D.",
-  volume = "192",
-  number = "",
-  pages = "33--60",
-  year = "1993",
-  note = "",
-  issn = "0024-3795",
-  doi = "10.1016/0024-3795(93)90235-G",
-}
+title = "Solving linear equations over {GF}(2): block {L}anczos algorithm",
+journal = "Linear Algebra and its Applications",
+volume = "192",
+number = "",
+pages = "33--60",
+year = "1993",
+note = "",
+issn = "0024-3795",
+doi = "http://dx.doi.org/10.1016/0024-3795(93)90235-G",
+url = "http://www.sciencedirect.com/science/article/pii/002437959390235G",
+author = "Don Coppersmith",}
+
+@Article{Coppersmith94,
+  author = 	 {Coppersmith, D.},
+  title = 	 {Solving homogeneous linear equations over {GF}$(2)$ via block {W}iedemann algorithm},
+  journal = 	 {Math. Comp.},
+  year = 	 1994,
+  volume = 	 62,
+  number = 	 205,
+  pages = 	 {333-350}}
+
+@unpublished{FaGaHuRe13,
+	Author = {Faug{\`e}re, J.-C. and Gaudry, P. and Huot, L. and Renault, G.},
+	Hal_Id = {hal-00816724},
+	Hal_Version = {v1},
+	Keywords = {Polynomial systems solving ; Gr{\"o}bner basis ; Change of ordering ; Fast matrix multiplication},
+	Note = {https://hal.archives-ouvertes.fr/hal-00816724},
+	Pdf = {https://hal.archives-ouvertes.fr/hal-00816724/file/FGHR13.pdf},
+	Title = {{Polynomial Systems Solving by Fast Linear Algebra}},
+	Url = {https://hal.archives-ouvertes.fr/hal-00816724},
+	Year = {2013},
+	Bdsk-Url-1 = {https://hal.archives-ouvertes.fr/hal-00816724}}
+
 
 @article{KalYuh13,
  author = {Kaltofen, Erich and Yuhasz, George},
@@ -291,7 +315,8 @@ MRREVIEWER = {Alexander I. Barvinok},
 	Journal = j-JSC,
 	Pages = {538--569},
 	Title = {Sparse {FGLM} algorithms},
-	Volume = {80(3)},
+	Volume = {80},
+number = 8,
 	Year = {2017}}
 
 
@@ -333,18 +358,6 @@ MRREVIEWER = {Alexander I. Barvinok},
 	Title = {{Bases of relations in one or several variables: fast algorithms and applications}},
 	Year = {2016}}
 
-@unpublished{FaGaHuRe13,
-	Author = {Faug{\`e}re, J.-C. and Gaudry, P. and Huot, L. and Renault, G.},
-	Hal_Id = {hal-00816724},
-	Hal_Version = {v1},
-	Keywords = {Polynomial systems solving ; Gr{\"o}bner basis ; Change of ordering ; Fast matrix multiplication},
-	Note = {https://hal.archives-ouvertes.fr/hal-00816724},
-	Pdf = {https://hal.archives-ouvertes.fr/hal-00816724/file/FGHR13.pdf},
-	Title = {{Polynomial Systems Solving by Fast Linear Algebra}},
-	Url = {https://hal.archives-ouvertes.fr/hal-00816724},
-	Year = {2013},
-	Bdsk-Url-1 = {https://hal.archives-ouvertes.fr/hal-00816724},
-}
 
 @article{Wiedemann86,	
 	Author = {Wiedemann, D.},
@@ -352,29 +365,24 @@ MRREVIEWER = {Alexander I. Barvinok},
 	Journal = j-IEEE-IT,
 	volume = {IT-32},
 	Pages = {54--62},
-	Year = {1986}}
+	Year = 1986}
+	
+
+
+@inproceedings{Steel15,
+	author = {Allan Steel},
+	title = {Direct Solution of the (11,9,8)-{M}in{R}ank problem by the Block {W}iedemann algorithm in {M}agma with a {T}esla {GPU}},
+	booktitle = {PASCO'15},
+        publisher = {ACM},
+pages ={2--6},
+	Year = 2015,
+}
 
 @techreport{Villard97a,
     author = {G. Villard},
     title = {A study of {C}oppersmith's block {W}iedemann algorithm using matrix polynomials},
     institution = {LMC-IMAG, Report 975 IM},
     year = {1997}
-}
-
-@inproceedings{Steel15,
-  author = {Steel, A.},
-  title = {Direct Solution of the (11,9,8)-MinRank Problem by the Block {W}iedemann Algorithm in {M}agma with a {T}esla {GPU}},
-  booktitleOPT = {Proceedings of the 2015 International Workshop on Parallel Symbolic Computation},
-  booktitle = {PASCO'15},
-  year = {2015},
-  isbn = {978-1-4503-3599-7},
-  location = {Bath, United Kingdom},
-  pages = {2--6},
-  numpages = {5},
-  doi = {10.1145/2790282.2791392},
-  acmid = {2791392},
-  publisher = {ACM},
-  addressOPT = {New York, NY, USA},
 }
 
 @book {GaGe13,
@@ -392,7 +400,6 @@ MRREVIEWER = {Alexander I. Barvinok},
   year = 1997,
   volume = {117/118},
   pages = {469--493},
-  note = {Algorithms for algebra (Eindhoven, 1996)},
   journal = {Journal of Pure and Applied Algebra},
 }
 
@@ -405,3 +412,164 @@ MRREVIEWER = {Alexander I. Barvinok},
 	issue = {3-4},
 	volume = {36}
 }
+	
+@article{Keller85,
+    AUTHOR = {Keller-Gehrig, W.},
+     TITLE = {Fast algorithms for the characteristic polynomial},
+  JOURNAL =  {Theoret. Comput. Sci.},
+    VOLUME = {36},
+      YEAR = {1985},
+    NUMBER = {2-3},
+     PAGES = {309--317}
+}
+	
+@InProceedings{Faugere02,
+  author = 	 {Faug\`ere, J.-C.},
+  title = 	 {A new efficient algorithm for computing {G}r\"obner bases without reductions to zero ({F}5)},
+  booktitle = {ISSAC'02},
+  year = 	 2002,
+  pages = 	 {75-83},
+  publisher = {ACM}}
+
+@Article{FaSaSp13,
+  author = 	 {Faug\`ere, J.-C. and {Safey El Din}, M. and Spaenlehauer, P.-J.},
+  title = 	 {On the complexity of the generalized {M}in{R}ank problem},
+  journal = 	 {Journal of Symbolic Computation},
+  year = 	 2013,
+  pages = 	 {30-58}}
+
+@article{BaFaSa15,
+  author = {Bardet, M. and Faug{\`e}re, J.-C. and Salvy, B.},
+  journal = {Journal of Symbolic Computation},
+  pages = {49--70},
+  title = {On the Complexity of the {F}5 {G}r{\"o}bner basis Algorithm},
+  volume = {70},
+  year = {2015}
+}
+
+@incollection {GiMo89,
+    AUTHOR = {Gianni, P. and Mora, T.},
+     TITLE = {Algebraic solution of systems of polynomial equations using
+              {G}r\"obner bases},
+ BOOKTITLE = {AAECC'5},
+    SERIES = {Lecture Notes in Comput. Sci.},
+    VOLUME = 356,
+     PAGES = {247--257},
+ PUBLISHER = {Springer},
+      YEAR = 1989,
+}
+
+@inproceedings{FaGaHuRe14,
+	Author = {Faug\`{e}re, J.-C. and Gaudry, P. and Huot, L. and Renault, G.},
+	Booktitle = {ISSAC'14},
+	Pages = {170--177},
+	Publisher = {ACM},
+	Title = {Sub-cubic Change of Ordering for {G}r{\"o}bner Basis: a Probabilistic Approach},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1145/2608628.2608669}}
+
+
+@inproceedings{AlBeRoWo94,
+   author    = {M. E. Alonso and E. Becker and M.-F. Roy and T. W{\"o}rmann},
+   title     = {Zeroes, multiplicities and idempotents for zerodimensional systems},
+   booktitle = {MEGA'94},
+   year      = 1996,
+   publisher = {Birkh{\"a}user},
+   pages     = {1--15},
+   series    = {Progress in Mathematics},
+   volume    = 142
+}
+@inproceedings{BeMoMaTr94,
+	Author = {Becker, E. and Mora, T. and Marinari, M. and Traverso, C.},
+	Booktitle = {ISSAC'94},
+	Pages = {129--133},
+	Publisher = {ACM},
+	Title = {The shape of the {S}hape {L}emma},
+	Year = {1994}}
+
+@article {BeWo96,
+    AUTHOR = {Becker, E. and W{\"o}rmann, T.},
+     TITLE = {Radical computations of zero-dimensional ideals and real root
+              counting},
+   JOURNAL = {Mathematics and Computers in Simulation},
+    VOLUME = {42},
+      YEAR = {1996},
+    NUMBER = {4-6},
+     PAGES = {561--569},
+      ISSN = {0378-4754},
+     CODEN = {MCSIDR},
+   MRCLASS = {68Q40},
+  MRNUMBER = {98a:68103}
+}
+
+@phdthesis{MorenoSocias91,
+	Author = {G. Moreno-Soc{\'\i}as},
+	School = {\'Ecole polytechnique},
+	Title = {Autour de la fonction de {H}ilbert-{S}amuel (escaliers d'id{\'e}aux polynomiaux)},
+	Year = {1991}}
+
+@article{Sakata90,
+	Author = {S. Sakata},
+	Journal = {Information and Computation},
+	Number = {2},
+	Pages = {207--239},
+	Title = {Extension of the {B}erlekamp-{M}assey algorithm to {$N$} dimensions},
+	Volume = {84},
+	Year = {1990}}
+
+@article{MaMoMo96,
+    AUTHOR = {M. G. Marinari   and H.~M. M{\"o}ller   and T. Mora},
+     TITLE = {On multiplicities in polynomial system solving},
+   JOURNAL = {Trans. Amer. Math. Soc.},
+  FJOURNAL = {Transactions of the American Mathematical Society},
+    VOLUME = {348},
+      YEAR = {1996},
+    NUMBER = {8},
+     PAGES = {3283--3321},
+}
+
+@misc{NTL,
+	Author = {Shoup, V.},
+	Howpublished = {\texttt{http://www.shoup.net}},
+	Title = {{NTL}: A Library for doing Number Theory}}	
+
+@misc{LinBox,
+  author = {The LinBox Group},
+  title = {LinBox: Linear algebra over black-box matrices, v1.5.0},
+  year = 2017,
+	Howpublished = {\texttt{http://linalg.org/}},
+}
+
+@INPROCEEDINGS{Shoup99,
+  author = {Shoup, V.},
+  title = {Efficient computation of minimal polynomials in algebraic extensions
+	of finite fields},
+  booktitle = {ISSAC '99},
+  year = {1999},
+  pages = {53--58},
+  publisher = {ACM},
+  doi = {10.1145/309831.309859},
+  mrclass = {12E20 (68W30)},
+  mrnumber = {1802067 (2002b:12004)},
+  url = {http://dx.doi.org/10.1145/309831.309859}
+}
+	
+@article{Shoup94,
+    AUTHOR = {Shoup, V.},
+     TITLE = {Fast construction of irreducible polynomials over finite fields},
+   JOURNAL = {Journal of Symbolic Computation},
+    VOLUME = {17},
+      YEAR = {1994},
+    NUMBER = {5},
+     PAGES = {371--391},
+}
+	
+	
+	
+	
+@Book{Morgan88,
+  author = 	 {Morgan, A.},
+  title = 	 {Solving Polynominal Systems Using Continuation for Engineering and Scientific Problems},
+  publisher = 	 {Prentice-Hall},
+  year = 	 1988}
+
