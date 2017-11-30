@@ -313,13 +313,12 @@ choice of a vector $\gamma \in \K^S$ of field elements, for some $S$
 that depends on the size of our input, and success is guaranteed if
 the vector $\gamma$ avoid a hypersurface of the parameter space
 $\K^S$. Given a zero-dimensional parametrization computed by one of
-these algorithms, one can always evaluate 
+these algorithms, one can always evaluate  \todo{finish}
 
-%% We rely 
-%% Over a field $\mathbb{K}$, recall that we can compute multiplication,
-%% division with remainder, extended GCD, and square free part of
-%% polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$ field
-%% operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
+%% We rely Over a field $\mathbb{K}$, recall that we can compute
+%% multiplication, division with remainder, extended GCD, and square
+%% free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
+%% field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
 %% \cite{GaGe13}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -552,7 +551,7 @@ rows, respectively the size-$s$ vector of the degrees of its columns.
   %% for some polynomial matrices $\mat{U}$ and $\mat{V}$).
 \end{corollary}
 
-Given a matrix of relations $\relbas$ for  $\seq$, we will thus
+Given a nonsingular matrix of relations $\relbas$ for  $\seq$, we will thus
 write $\mat{\Omega}(\seq, \relbas)= \relbas \seqpm  \in
 \polMatSpace[\rdim][\cdim]$, generalizing \cref{def:omega}.  By the
 previous corollary, this is a polynomial matrix, whose $i$th row has
@@ -1441,11 +1440,10 @@ As an application, the following algorithm shows how to compute a
 zero-dimensional parametrization of $V_{\mathfrak{S}}$; our main usage 
 of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$ (so $V_{\mathfrak{S}}=V$),
 but in the last section of the paper, we will also work with 
-strict subset. At this stage,
+strict subsets. At this stage,
 we do not discuss data structures, complexity, or what terms in the
 sequences are needed; this is the subject of the following section.
 
-\todo{what is $\mathfrak{S}$ in the following sections?}
 \begin{algorithm}[H]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
 	  {\bf Input:} \vspace{-0.5em}
@@ -1927,7 +1925,7 @@ since $P$ is squarefree.
 Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
 \row{a}_1 &= [T + 55, T^2 + 76T+ 8]\\
-\mat{\Omega}( (\mU^\perp_1 \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
+\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
 &=\left [\begin{matrix} 7T + 71 \\ 82 + 86   \end{matrix}\right ].
 \end{align*}
 The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1};$
