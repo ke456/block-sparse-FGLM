@@ -2581,11 +2581,22 @@ shows the number of points in the variety separated by $X_1$ compared to the
 total number of points in the variety.
 The inputs and the machine used for timings are the same as section \ref{section:ex}.
 
-For all inputs, with the exception of sot1, $X_1$ separates most of the
+The performance of $\mathsf{ParametrizationX}_1$ depends on the density of $\mM_1$
+and the number of points separated by $X_1$. In the worst case, if the density
+of $\mM_1$ equals the density of $\mM$ and $X_1$ does not separate any points in 
+the variety, then $\mathsf{ParametrizationX}_1$ will take twice as long as
+$\mainalgoname$. However, this was not observed in our experiments.
+For all our inputs, with the exception of sot1, $X_1$ separates most of the points in
+the variety. In this case, $\mathsf{Parametrization}$ performs better by
+a factor of 2 compared to $\mainalgoname$ on average for all values of $m$. Even in
+an unfavourable case like sot1, where $X_1$ only separates $1012$ points out of
+$7682$ points in the variety, the ratio is close to 1.
 
 \begin{center}
+\textbf{Comparison of $\mathsf{ParametrizationX}_1$ to $\mainalgoname$}
 \begin{tabular}{c|c|c|c|c|c|c}
-\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
+\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$\frac{points\,separated\,by\,X_1}{total\,points}$\\
+\hline
 rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
 rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
 rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
