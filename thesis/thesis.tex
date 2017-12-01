@@ -1055,7 +1055,10 @@ $s=0,\dots,\lceil D/m \rceil-1$.
     \item $\row{a}_i =  [0~\cdots~0~\minpoly~0~\cdots~0]  (\mat{P}_{\mU,\mV})^{-1} $
 		\item $\mat{L}_s = \mU^\perp \mM^s$, for $s=0,\dots,\lceil D/m\rceil-1$
 	\end{itemize}
-	{\bf Output:} the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly) \in \K[T]$
+	{\bf Output:}  \vspace{-0.5em}
+        \begin{itemize}
+        \item         the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly) \in \K[T]$
+        \end{itemize}
         \begin{enumerate}[{\bf 1.}]
         \item compute $\col{E}_s = \mat{L}_s \col{w}$ for $s=0,\dots,\lceil D/m\rceil-1$
         \item use these values to compute the matrix numerator $ \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
@@ -1512,7 +1515,10 @@ sequences are needed; this is the subject of the following section.
 	  \item  a linear form $\ell$ over $\residueI_\mathfrak{S}$
 	  \item $\lf=t_1 X_1 + \cdots + t_n X_n$
 	  \end{itemize}
-	      {\bf Output:} polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+	      {\bf Output:}  \vspace{-0.5em}
+              \begin{itemize}
+              \item              polynomials $((\sqfree,V_1,\dots,V_n),\lf)$ 
+              \end{itemize}
 	      \begin{enumerate}\setlength\itemsep{0em}
 	      \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
 	      \item let $\sqfree$ be the squarefree part of $\minpoly$
@@ -1630,16 +1636,19 @@ $\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
 non-zero entry is a $1$ at the first row.
 
 \begin{algorithm}[H]
-	\caption{\mainalgoname($\mM_1,\dots,\mM_n,m$)}
+	\caption{\mainalgoname($\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item $\mM_1,\dots,\mM_n$ defined as above
-		\item dimension of the blocks $m \in \{1,\dots,D\}$
+		\item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
+                \item $\lf =t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
-	{\bf Output:} polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+	{\bf Output:}  \vspace{-0.5em}
+        \begin{itemize}
+        \item         polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+        \end{itemize}
   \begin{enumerate}
-  \item\label{mainstep1}  choose $t_1,\dots,t_n$ in $\K$ and let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
-  \item\label{mainstep2} { choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
+  \item\label{mainstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
   \item\label{mainstep3} { compute $\mat{L}_s = \mU^{\perp}\mM^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/d \rceil$}
   \item\label{mainstep4} { compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$ for $s=0,\dots, 2d-1$}
   \item\label{mainstep5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
@@ -2148,24 +2157,23 @@ some operations on univariate polynomials related to so-called {\em
   power projection}~\cite{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
-main structure; the details of the subroutines are given in the next
-paragraphs. \todo{main algo takes $\ell$, not $\mU$}
+main structure; the subroutines are described in the next sections.
 
 \begin{algorithm}[H]
-	\caption{$\mathsf{ParametrizationWithSplitting}(\ell,\lf)$} {\bf
-		Input:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $\residueI$
-		\item $\lf=t_1 X_1 + \cdots + t_n X_n$
-	\end{itemize}
-	{\bf Output:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
+  \caption{$\mathsf{ParametrizationWithSplitting}(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+          {\bf Input:} \vspace{-0.5em}
+	  \begin{itemize}
+	  \item $\mM_1,\dots,\mM_n$ defined as above
+	  \item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
+          \item $\lf =t_1 X_1 + \cdots + t_n X_n$
+	  \end{itemize}
+	{\bf Output:}  \vspace{-0.5em}
+	\begin{itemize}
 		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{itemize}
 	\begin{enumerate}
-		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\ell)$
-		\item let $\ell'=\mathsf{Update}(\ell,F,G_1,\dots,G_n,\lf)$
-		\item let $(R,W_1,\dots,W_n,\lf)=\mathsf{Parametrization}(\ell',\lf)$
+		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV)$
+		\item let $(R,W_1,\dots,W_n,\lf)=\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$
 		\item let $((\sqfree,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
 		\item \textbf{return} $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{enumerate}
@@ -2425,7 +2433,10 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
 	\begin{itemize}\setlength\itemsep{0em}
 		\item a linear form $\ell$ over $\residueI$
 	\end{itemize}
-	{\bf Output:} polynomials $((P,V_1,\dots,V_n),X_1)$
+	{\bf Output:}  \vspace{-0.5em}
+        \begin{itemize}
+        \item polynomials $((P,V_1,\dots,V_n),X_1)$
+        \end{itemize}
 	\begin{enumerate}\setlength\itemsep{0em}
 		\item let $M$ be the minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge 0}$
 		\item let $P$ be the squarefree part of $M$
