@@ -459,6 +459,7 @@ first $2d$ terms, we can recover its minimal polynomial $P$ by means of the
 Berlekamp-Massey algorithm, or of Euclid's algorithm applied to rational
 function reconstruction; this can be done in $O(\M(d)\log(d))$ operations in
 $\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
+%%TODO \M(d) has not been introduced
 %% TODO V: check citation ok. Is there a simpler approach?
 deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
 multiplication in degree $\deg(P)$.
@@ -467,25 +468,27 @@ multiplication in degree $\deg(P)$.
 
 \subsection{Linearly recurrent matrix sequences}\label{section:matrix_seq}
 
-Next, we discuss the analogue of these ideas for matrix sequences; our
-main goal is to give a cost estimate for the computation of a suitable
-{\em matrix generator} for a matrix sequence $\seq$, obtained by means
-of recent algorithms for approximant bases. A similar discussion
-(without a cost analysis) is in~\cite[Chapter~4]{Turner02}.
+Next, we discuss the analogue of these ideas for matrix sequences; our main
+goal is to give a cost estimate for the computation of a suitable {\em matrix
+generator} for a matrix sequence $\seq$, obtained by means of recent algorithms
+for approximant bases. A similar discussion, but relying on the approximant
+basis algorithm in \cite{BecLab94}, can be found in~\cite[Chapter~4]{Turner02}.
+Note also that the latter reference uses the generating series in $\var$ while
+here we use that in $1/\var$, thus obtaining the sought generator directly as a
+submatrix of the computed approximant basis.
 
-We first present the notion of linear recurrence for sequences of
-matrices over a field $\field$, which extends the notions we
-introduced for scalar sequences; the definition comes
-from~\cite[Section~3]{KalVil01} and~\cite[Definition~4.2]{Turner02}.
+We first define the notion of linear recurrence for matrix sequences over a
+field $\field$ as in~\cite[Section~3]{KalVil01}
+or~\cite[Definition~4.2]{Turner02}, hereby extending the above notions for
+scalar sequences.
 \begin{definition}
-  
   \label{dfn:recurrence_relation}
   Let $\seq = (\seqelt{s})_{s\ge 0} \subset \seqeltSpace$ be a matrix
   sequence.  Then,
   \begin{itemize}
   \item a polynomial $P = p_0 + \cdots + p_\degBd T^\degBd \in \polRing$ is
-    a \emph{scalar relation for $\seq$} if $
-    p_0 \seqelt{s} + \cdots + p_{\degBd} \seqelt{s+\degBd} = \mat{0}$ holds for all $s \ge 0$;
+    a \emph{scalar relation for $\seq$} if the identity $p_0 \seqelt{s} +
+    \cdots + p_{\degBd} \seqelt{s+\degBd} = \mat{0}$ holds for all $s \ge 0$;
   \item a polynomial vector 
 $\rel = \row{p}_0 + \cdots + \row{p}_\degBd T^\degBd \in
     \relSpace$ is  a \emph{(left, vector) relation for $\seq$} if
@@ -509,7 +512,7 @@ following characterization of vector relations.
   \deg(\rel)$.
 \end{lemma}
 \begin{proof}
-  Let $\rel = \sum_{0 \le k \le \degBd} \row{p}_k \var^k$. For $s \ge 0$,
+  Write $\rel = \sum_{0 \le k \le \degBd} \row{p}_k \var^k$. For $s \ge 0$,
   the coefficient of $\num$ of degree $-s-1<0$ is $\sum_{0\le k \le
     \degBd} \row{p}_k \seqelt{s+k}$. Hence the equivalence, by definition of
   a relation.  The degree comparison is clear since $\seqpm$ has only
@@ -526,11 +529,12 @@ following basic result, which can be found for example in
   vector relations for $\seq$ is a $\polRing$-submodule of $\relSpace$ of rank
   $\rdim$.
 \end{lemma}
+%%%% kEEP for reference, thanks.
 %% \begin{proof}
 %% 	The set of vector relations for $\seq$ is a $\polRing$-submodule of
 %% 	$\relSpace$, and hence is free of rank at most $\rdim$
 %% 	\cite[Chapter~12]{DumFoo04}.
-	
+%%
 %% 	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
 %% 	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
 %% 	\; 0]$ with $p$ at index $1 \le i \le \rdim$ is a vector relation for $\seq$,
@@ -539,10 +543,11 @@ following basic result, which can be found for example in
 %% 	the determinant of this matrix is a nontrivial scalar relation for $\seq$.
 %% \end{proof}
 
-Note however that a matrix sequence may admit nontrivial vector relations and
-have no scalar relation (and therefore not be linearly recurrent with the
-present definition); in this case the module of vector relations has rank less
-than $\rdim$.
+\noindent
+(Note however that in general a matrix sequence may admit nontrivial vector
+relations and have no scalar relation, and therefore not be linearly recurrent
+with the present definition; in this case the module of vector relations has
+rank less than $\rdim$.)
 
 \begin{definition}
   \label{dfn:matrix_generator}
@@ -554,36 +559,31 @@ than $\rdim$.
   \item \emph{canonical} if $\mat{P}$ is in Popov form \cite{Popov72,Kailath80}.
   \end{itemize}
 \end{definition}
+\noindent Note that the canonical generator is also a minimal generator.
+Besides, all matrix generators $\relbas \in \relbasSpace$ have the same
+determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  
 
-Note that the canonical generator is also a minimal generator;
-furthermore, all matrix generators $\relbas \in \relbasSpace$ for
-$\seq$ have the same determinantal degree $\deg(\det(\relbas))$, which
-we denote by $\degDet$.  
-
-
-We now point out that matrix generators are denominators in some
-irreducible fraction description of the generating series of the
-sequence; this is a direct consequence of
-\cref{lem:linearly_recurrent,lem:module_rank} and of basic properties
-of polynomial matrices. As suggested in the previous subsection,
-working with generating series in variable $1/T$ turns out to be the
-most convenient choice here.  In what follows, for an $r \times s$
-matrix $\mat{P}$ with entries in $\K[T]$, we denote by
-$\rdeg{\mat{P}}$ and $\cdeg{\mat{P}}$ respectively its row-degree and
-column-degrees, that is, the size-$r$ vector of the degrees of its
-rows, respectively the size-$s$ vector of the degrees of its columns.
+We now point out that matrix generators are denominators in some irreducible
+fraction description of the generating series of the sequence; this is a direct
+consequence of \cref{lem:linearly_recurrent,lem:module_rank} and of basic
+properties of polynomial matrices. As suggested in the previous subsection,
+working with generating series in $1/T$ turns out to be the most convenient
+choice here.  In what follows, for an $r \times s$ matrix $\mat{P}$ with
+entries in $\K[T]$, we denote by $\rdeg{\mat{P}}$ its row degree, that is, the
+size-$r$ vector of the degrees of its rows; similarly, we denote by
+$\cdeg{\mat{P}}$ its column degree, which is a size-$s$ vector.
 
 \begin{corollary}
-  A matrix sequence $\seq = (\seqelt{s})_{s\ge 0}
-  \subset \seqeltSpace$ is linearly recurrent if and only if its
-  generating series $\seqpm = \sum_{s\ge 0} \seqelt{s} / \var^{s+1}
-  \in \field\Poxi^{\rdim \times \cdim}$ can be written as a matrix
-  fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
+  A matrix sequence $\seq = (\seqelt{s})_{s\ge 0} \subset \seqeltSpace$ is
+  linearly recurrent if and only if its generating series $\seqpm = \sum_{s\ge
+  0} \seqelt{s} / \var^{s+1} \in \field\Poxi^{\rdim \times \cdim}$ can be
+  written as a matrix fraction $\seqpm = \relbas^{-1} \nummat$ where $\relbas
   \in \relbasSpace$ is nonsingular and $\nummat \in
   \polMatSpace[\rdim][\cdim]$. In this case, we have $\rdeg{\nummat} <
-  \rdeg{\relbas}$ termwise and $\deg(\det(\relbas)) \ge \degDet$; $\relbas$
-  is a matrix generator of $\seq$ if and only if $\deg(\det(\relbas))
-  = \degDet$.%%  or, equivalently, the fraction $\relbas^{-1} \nummat$ is
+  \rdeg{\relbas}$ termwise and $\deg(\det(\relbas)) \ge \degDet$; furthermore,
+  $\relbas$ is a matrix generator for $\seq$ if and only if
+  $\deg(\det(\relbas)) = \degDet$.
+  %%  or, equivalently, the fraction $\relbas^{-1} \nummat$ is
   %% irreducible (that is, $\relbas \mat{U} + \nummat \mat{V} = \mat{I}$
   %% for some polynomial matrices $\mat{U}$ and $\mat{V}$).
 \end{corollary}
@@ -592,7 +592,7 @@ Given a nonsingular matrix of relations $\relbas$ for  $\seq$, we will thus
 write $\mat{\Omega}(\seq, \relbas)= \relbas \seqpm  \in
 \polMatSpace[\rdim][\cdim]$, generalizing \cref{def:omega}.  By the
 previous corollary, this is a polynomial matrix, whose $i$th row has
-degree less than the $i$th row of $\mat{P}$ for $i=1,\dots,\rdim$.  As
+degree less than the $i$th row of $\mat{P}$ for $1\le i\le\rdim$.  As
 in the scalar case, if $\mat{P}$ has degree $d$, we only need to know
 $\seqelt{0},\dots,\seqelt{d-1}$ to recover $\mat{\Omega}(\seq,
 \relbas)$.  The cost of computing it then depends on the cost of
@@ -600,6 +600,9 @@ rectangular matrix multiplication in sizes $(\rdim,\rdim)$ and
 $(\rdim,\cdim)$. For simplicity, we only give the two most useful
 cases: if $\cdim=\rdim$, this takes $O(\rdim^\omega \M(d))$ operations
 in $\K$; if $\cdim =1$, the cost becomes $O(\rdim^2 \M(d))$.
+%% TODO in fact if $\cdim=1$ and d terms we will have average row degree ~d/m
+%% --> the cost would rather be O(m^w M(d/m))
+%% more generally, average row degree ~nd/m -->  O(m^w M(nd/m))
 
 In all the previous discussion, we remark that we may also consider
 vector relations operating on the right: in particular,
@@ -608,27 +611,25 @@ recurrent then these right relations form a submodule of
 $\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent
 sequence also admits a right canonical generator.
 
-Now, we focus on our algorithmic problem: given a linearly recurrent
-sequence, find a minimal matrix generator.  We assume the availability
-of bounds $(\degBdl,\degBdr)$ on the degrees of the left and right
-canonical generators, which allow us to control the number of terms of
-the sequence we will access during the algorithm.  Since taking the
-Popov form of a reduced matrix does not change the degree, any 
-minimal left matrix generator $\relbas$ has the same degree $\deg(\relbas)$
-as the left canonical generator: thus, $\degBdl$ is also a bound on
-the degree of any minimal left generator. The same remark holds for
-$\degBdr$ and right minimal generators.  The bounds $\degBdl,\degBdr$
-are the same as $\gamma_1,\gamma_2$ in
-\cite[Definitions~4.6~and~4.7]{Turner02}; see also $\delta_l,\delta_r$
-in \cite[Section~4.2]{Villard97a}; a result similar to the following
-lemma is in \cite[Theorem~4.5]{Turner02}.
+Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
+find a minimal matrix generator.  We assume the availability of bounds
+$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
+which allow us to control the number of terms of the sequence we will access
+during the algorithm.  Since taking the Popov form of a reduced matrix does not
+change the degree, any minimal left matrix generator $\relbas$ has the same
+degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
+a bound on the degree of any minimal left generator. The same remark holds for
+$\degBdr$ and right minimal generators.  The bounds $(\degBdl,\degBdr)$
+correspond to $(\gamma_1,\gamma_2)$ in \cite[Definitions~4.6~and~4.7]{Turner02}
+and $(\delta_l,\delta_r)$ in \cite[Section~4.2]{Villard97a}.  The next result
+is similar to \cite[Theorem~4.5]{Turner02}.
 
 \begin{lemma}
   \label{lem:finitely_many_terms}
   Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be linearly
   recurrent and let $\degBdr \in \NN$ be such that the right canonical
   matrix generator of $\seq$ has degree at most $\degBdr$.  Then,
-  $\rel =\row{p}_0 + \cdots +\row{p}_{\degBd}\var^\degBd \in \relSpace$ is a left
+  a vector $\rel =\row{p}_0 + \cdots +\row{p}_{\degBd}\var^\degBd \in \relSpace$ is a left
   relation for $\seq$ if and only if $\row{p}_0 \seqelt{s} + \cdots +
   \row{p}_{\degBd} \seqelt{s + \degBd} = \row{0}$ holds for $s \in
   \{0,\ldots,\degBdr-1\}$.
@@ -664,15 +665,12 @@ lemma is in \cite[Theorem~4.5]{Turner02}.
   and the proof is complete.
 \end{proof}
 
-
-The fast computation of matrix generators is usually handled via
-algorithms for computing minimal approximant bases
-\cite{Villard97,Turner02,GioLeb14}. The next result gives the main
-idea behind this approach. This result is similar to
-\cite[Theorem~4.6]{Turner02} (see also
-\cite[Theorems~4.7 to~4.10]{Turner02}), using however the
-reversal of the input sequence rather than of the output matrix
-generator.
+The fast computation of matrix generators is usually handled via minimal
+approximant bases algorithms \cite{Villard97,Turner02,GioLeb14}; the next
+result gives the main idea behind this approach. This result is similar to
+\cite[Theorem~4.6]{Turner02} (see also \cite[Theorems~4.7 to~4.10]{Turner02}),
+using however the reversal of the input sequence rather than that of the output
+matrix generator.
 
 We recall from \cite{BarBul92,BecLab94} that, given a matrix $\sys \in
 \polMatSpace[\rdim][\cdim]$ and an integer $d \in \NN$, the set of
@@ -686,8 +684,8 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
 
 \begin{theorem}
   \label{thm:mingen_via_appbas}
-  Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be a
-  linearly recurrent sequence and let $(\degBdl,\degBdr) \in \NN^2$ be
+  Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be
+  linearly recurrent and let $(\degBdl,\degBdr) \in \NN^2$ be
   such that the left (resp.~right) canonical matrix generator of
   $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).  For
   $\degBd>0$, define
@@ -704,9 +702,9 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \item if $\mat{B}$ is in Popov form then its $\rdim\times\rdim$ leading
     principal submatrix is the canonical matrix generator for $\seq$;
   \item if $\mat{B}$ is row reduced then it has exactly $\rdim$ rows of
-    degree $\le\degBdl$, and the corresponding submatrix $[\relbas \;\;
-      \remmat]$ of $\mat{B}$ is such that $\relbas\in\relSpace$ is a minimal
-    matrix generator for~$\seq$.
+    degree $\le\degBdl$, and they form a submatrix $[\relbas \;\; \remmat] \in
+    \polMatSpace[\rdim][(\rdim+\cdim)]$ of $\mat{B}$ such that $\relbas$ is a
+    minimal matrix generator for~$\seq$.
   \end{itemize}
 \end{theorem}
 \begin{proof}
@@ -718,8 +716,8 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then, the vector $\rem = -
   \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$ has
   polynomial entries, has degree less than $\deg(\rel)$, and is such
-  that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$, hence $[\rel \;\;
-    \rem] \in \appMod{\sys}{\degBd}$.
+  that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
+  %, hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
 
   Conversely, for any vectors $\rel \in \relSpace$ and $\rem
   \in \remSpace$, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ and
@@ -734,7 +732,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \cref{lem:finitely_many_terms} shows that $\rel$ is a relation for
   $\seq$.
   
-  The two items in the theorem are straightforward consequences.
+  The two items in the theorem follow.
 \end{proof}
 
 Using fast approximant basis algorithms, we obtain the main results
@@ -755,9 +753,8 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     for $\seq$ using $O(\cdim^\omega \M(\degBd)
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
   \item a  minimal left matrix generator for $\seq$ using 
-    %%% TODO Vincent : check the log term
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\cdim\degBd))$
-    %%% TODO
+    %%% TODO Vincent : check the log term
     operations in $\field$ if $\cdim \in O(\rdim)$;
   \item the canonical left matrix generator for $\seq$
     using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
@@ -767,6 +764,8 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
 In particular, when $\cdim = \rdim$, we can find the left canonical
 matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
 \log(\degBd))$ operations in $\field$.
+%%% TODO V: what ? from where ?
+%%% TODO V: rather refer to today's preprint ?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
