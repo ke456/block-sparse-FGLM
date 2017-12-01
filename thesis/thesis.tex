@@ -336,6 +336,14 @@ coincides with the dimension of $\residueI=\K[X_1,\dots,X_n]/I$, we
 can infer that we have all solutions (and that $I$ is radical), so our
 output is correct.
 
+In what follows, we only consider the case $\omega>2$.  We use a time function
+$d \mapsto \M(d)$ for the cost of univariate polynomial multiplication over
+$\K$, for which we assume the super-linearity properties of
+\cite[Section~8.4]{GaGe13}.  We assume that the exponent $\omega$ is also valid
+for multiplication of matrices over $\polRing$: then, two $m\times m$ matrices
+over $\K[T]$ whose degree is less than $d$ can be multiplied using $O(m^\omega
+\M(d))$ operations in $\K$.
+
 %% We rely Over a field $\mathbb{K}$, recall that we can compute
 %% multiplication, division with remainder, extended GCD, and square
 %% free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
@@ -460,7 +468,6 @@ $\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
 deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
 multiplication in degree $\deg(P)$.
 
-\todo{introduce $\M(d)$ somewhere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -753,10 +760,12 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
   \item a minimal left matrix generator
     for $\seq$ using $O(\cdim^\omega \M(\degBd)
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
-  \item a  minimal left matrix generator for $\seq$ using 
-    $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\cdim\degBd))$
+  \item a minimal left matrix generator for $\seq$ using 
+    $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
     %%% TODO Vincent : check the log term
-    operations in $\field$ if $\cdim \in O(\rdim)$;
+    operations in $\field$ if $\cdim \in O(\rdim)$; \footnote{This bound
+      assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
+      particular if $\M(\cdot)$ is quasi-linear and $\omega>2$.}
   \item the canonical left matrix generator for $\seq$
     using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
     \log(\cdim\degBd)^3)$ operations in $\field$.
@@ -2568,8 +2577,14 @@ polynomial.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Experimental results}
+In the following table, we give a ratio of the timing for $\mathsf{ParametrizationX}_1$
+to the timing for $\mainalgoname$ for each input. The last column
+shows the number of points in the variety separated by $X_1$ compared to the 
+total number of points in the variety.
+The inputs and the machine used for timings are the same as section \ref{section:ex}.
 
-\todo{write something}
+For all inputs, with the exception of sot1, $X_1$ separates most of the
+
 \begin{center}
 \begin{tabular}{c|c|c|c|c|c|c}
 \textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
