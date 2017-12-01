@@ -1644,18 +1644,17 @@ non-zero entry is a $1$ at the first row.
         \end{itemize}
   \begin{enumerate}
   \item\label{mainstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
-  \item\label{mainstep3} { compute $\mat{L}_s = \mU^{\perp}\mM^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/d \rceil$}
+  \item\label{mainstep3} { compute $\mat{L}_s = \mU^{\perp}\mM^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/m \rceil$}
   \item\label{mainstep4} { compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$ for $s=0,\dots, 2d-1$}
   \item\label{mainstep5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
   \item\label{mainstep6} { let $\minpoly$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
   \item\label{mainstep7} { let $\sqfree$ be  the squarefree part  of $\minpoly$}
   \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item\label{mainstep9}  let $C_1 = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
-    (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
+    (\mat{L}_s)_{0 \le s < d})$
   \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
     \begin{enumerate}
-     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, 
-      (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
+     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
     \end{enumerate}
 \item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
@@ -2167,24 +2166,26 @@ main structure; the subroutines are described in the next sections.
 		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{itemize}
 	\begin{enumerate}
-		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV)$
+		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV)$
 		\item let $(R,W_1,\dots,W_n,\lf)=\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$
 		\item let $((\sqfree,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
 		\item \textbf{return} $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{enumerate}
 \end{algorithm}
 
-The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
-zero-dimensional parametrization of a subset $V'$ of $V$, with such
-that $X_1$ separates the points of $V'$ (that is, takes pairwise
-distinct values on the points of $V'$); this is done by using values
-of the form $(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in
-effect removes from $V$ the points we just found) and apply Algorithm
-$\mathsf{Parametrization}(\ell',\lf)$ from \cref{ssec:abstractlago},
-to obtain a zero-dimensional parametrization of $V''=V-V'$ using
-values of the form $(\ell'(\lf^s))_{s \ge 0}$; in those ``lucky''
-cases where $V'$ is a large subset of $V$, $V''$ may only contain a
-few points, and few values for the latter sequence will be needed.
+The call to $\mathsf{BlockParametrizationX}_1$ computes a zero-dimensional
+parametrization of a subset $V'$ of $V$, such that $X_1$ separates the
+points of $V'$ (that is, takes pairwise distinct values on the points
+of $V'$); this is done by using sequences of the form $(\mU^\perp
+\mM_1^s \mV)_{s \ge 0}$. We then apply a modified version of Algorithm
+$\mainalgoname$, called $\mainalgoname{\sf Residual}$, which computes
+a zero-dimensional parametrization of $V''=V-V'$ using sequences of
+the form $(\mU^\perp \mM^s \mV)_{s \ge 0} - \mat{\Delta}_s$, where
+$\mM= t_1 \mM_1 + \cdots + t_n \mM_n$. Subtracting the correction
+terms $\mat{\Delta}_s$ has the effect of removing from $V$ the points
+in $V'$; in those ``lucky'' cases where $V'$ is a large subset of $V$,
+$V''=V-V'$ may only contain a few points, and few values for the
+latter sequences will be needed.
 
 The last step involves changing coordinates in
 $((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a linear form instead, and
@@ -2328,8 +2329,8 @@ decomposition of $V$.
 
 \begin{lemma}\label{lemma:acb2}
   Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be
-  a linear form over $\prod_{i \in T_j} \residueI_i$ and let $\mf=t_2
-  X_2 + \cdots + t_n X_n$, for some $t_2,\dots,t_n$. Define constants
+  a linear form over $\prod_{i \in T_j} \residueI_i$ and let $\mf=y_2
+  X_2 + \cdots + y_n X_n$, for some $y_2,\dots,y_n$. Define constants
   $a,b,c$ in $\Kbar$ by
   $$a=\lambda(1),\quad b=\lambda(\mf),\quad c=\lambda(\mf^2).$$
   Then, $j$ is in $\mathfrak{a}$
@@ -2356,17 +2357,17 @@ decomposition of $V$.
   We obtain
   \begin{align*}
     \Lambda_i(1)   &= u_{i,1} \\
-    \Lambda_i(\mf)   &= u_{i,1} \mf +\sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r \\
-    \Lambda_i(\mf^2) &= u_{i,1} \mf^2  +2 \mf \sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r + 
-    2\sum_{2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s,
+    \Lambda_i(\mf)   &= u_{i,1} \mf +\sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r \\
+    \Lambda_i(\mf^2) &= u_{i,1} \mf^2  +2 \mf \sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r + 
+    2\sum_{2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})y_ry_s,
   \end{align*}
   which gives
   \begin{align*}
     a  &= \sum_{i\in T_j}u_{i,1} \\
-    b  &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r \\
-    c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r    
+    b  &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r \\
+    c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r    
    \\ & \phantom{{ }= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2}
-                                                  +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s.
+                                                  +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})y_ry_s.
   \end{align*}
   Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
   have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
@@ -2381,7 +2382,7 @@ decomposition of $V$.
   $\mf$. Now, we suppose that $j$ is not in $\mathfrak{a}$, and we prove
   that for a generic choice of $\lambda$ and $\mf$, $ac-b^2$ is non-zero.
   The quantity $ac-b^2$ is a polynomial in the parameters
-  $(\bu_i)_{i\in T_j}$, and $(t_i)_{i \in \{2,\dots,n\}}$, and we have
+  $(\bu_i)_{i\in T_j}$, and $(y_i)_{i \in \{2,\dots,n\}}$, and we have
   to show that it is not identically zero. We discuss two cases; in both
   of them, we prove that a suitable specialization of $ac-b^2$ is
   non-zero.
@@ -2392,9 +2393,9 @@ decomposition of $V$.
   $P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})$ is not
   identically zero. Let us set all $\bu_{\sigma'}$
   to $0$, for $\sigma'$ in $T_j-\{\sigma\}$, as well as $u_{\sigma,1}$,
-  and all $t_r$ for $r\ne \rho$. Then, under this specialization,
+  and all $y_r$ for $r\ne \rho$. Then, under this specialization,
   $ac-b^2$ becomes
-  $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})t_\rho)^2$,
+  $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})y_\rho)^2$,
   which is non-zero, so that $ac-b^2$ itself must be non-zero.
   
   Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
@@ -2420,6 +2421,38 @@ $\gcd(M,M')$. We split this polynomial further using the previous
 results in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
 conclude using the same kind of calculations as in Algorithm
 $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
+
+
+\begin{algorithm}[H]
+	\caption{$\mainalgoname{\sf X}_1(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+	{\bf Input:} \vspace{-0.5em}
+	\begin{itemize}
+		\item $\mM_1,\dots,\mM_n$ defined as above
+		\item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
+	\end{itemize}
+	{\bf Output:}  \vspace{-0.5em}
+        \begin{itemize}
+        \item polynomials $((F,G_1,\dots,G_n),X_1)$
+        \end{itemize}
+  \begin{enumerate}
+  \item\label{X1step3} { compute $\mat{L}_s = \mU^{\perp}\mM_1^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/m \rceil$}
+  \item\label{X1step4} { compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$ for $s=0,\dots, 2d-1$}
+  \item\label{X1step5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
+  \item\label{X1step6} { let $M$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
+  \item\label{X1step7} { let $F$ be  the squarefree part  of $M$}
+  \item\label{X1step8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
+  \item let $\mf = a_2 X_2 + \cdots + a_n X_n$ be a random linear form in $X_2,\dots,X_n$
+  \item \textbf{for} $i=0,1,2$ \textbf{do}
+    \begin{enumerate}
+    \item\label{X1step9}  let $A_i = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
+    \end{enumerate}
+  \item\label{X1step10} \textbf{for} $i=1,\dots,n$ \textbf{do}
+    \begin{enumerate}
+     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
+    \end{enumerate}
+\item\label{X1step11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
+  \end{enumerate}  \label{algo:X1block-sparse-fglm}
+\end{algorithm}
 
 \begin{algorithm}[H]
 	\caption{$\mathsf{ParametrizationX}_1(\ell)$}
