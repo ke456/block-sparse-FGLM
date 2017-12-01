@@ -2157,7 +2157,7 @@ performing the union of the two components $V'$ and $V''$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Describing a subset of $V$}
+\subsection{Describing the subset $V'$ of $V$}
 
 In this paragraph, we specialize the discussion of
 \cref{ssec:genseries} to the case $\lf=X_1$; we take
@@ -2428,31 +2428,76 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
   $\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
   components of $\ell$. 
   
-	As a result, the value of $ A_0  A_2 -  A_1^2$ at
-	$r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
-	quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
-	generic choice of $\ell$ and $t$, it vanishes if and only if $j$ is
-	in $\mathfrak{a}$. Thus, after Step~\ref{step:updateP}, 
-	$P$ is equal to $\prod_{j \in \mathfrak{a}} (T-r_j)$.
+  As a result, the value of $ A_0  A_2 -  A_1^2$ at
+  $r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
+  quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
+  generic choice of $\ell$ and $\mf$, it vanishes if and only if $j$ is
+  in $\mathfrak{a}$. Thus, after Step~\ref{step:updateP}, 
+  $P$ is equal to $\prod_{j \in \mathfrak{a}} (T-r_j)$.
 	
-	The last step is to compute the zero-dimensional parametrization of
-	$V_{\mathfrak{A}}$. This is done using again
-	\cref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
-	$T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
-	$$ A_1(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
-	A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
-	is in $\mathfrak{a}$, $\residueI_{\sigma_j}$ is reduced, so that there
-	exists a constant $\lambda_{j,1}$ such that for all $f$ in
-	$\Kbar[X_1,\dots,X_n]$, $\lambda_j(f)$ takes the form $\lambda_{j,1}
-	f(\balpha_{\sigma_j})$. This shows that, as claimed,
-	$$\frac{ A_{X_j}(r_j)}{ A_1 (r_j)} = 
-	\frac {\Omega((\ell(X_j X_1^s)_{s\ge0},M)(r_j)}{\Omega((\ell(t X_1^s))_{s\ge0},M)(r_j)}=
-	\frac
-	{M'(r_j) \lambda_{j,1} \alpha_{j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{j,i}.$$
-	For $i=1$, since we use $X_1$ as a separating variable for $V_{\mathfrak{A}}$, 
-	we simply add the polynomial $T$ to our list.
+  The last step is to compute the zero-dimensional parametrization of
+  $V_{\mathfrak{A}}$. This is done using again
+  \cref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
+  $T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
+  $$ A_0(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
+  A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
+  is in $\mathfrak{a}$, $\residueI_{\sigma_j}$ is reduced, so that there
+  exists a constant $\lambda_{j,1}$ such that for all $f$ in
+  $\Kbar[X_1,\dots,X_n]$, $\lambda_j(f)$ takes the form $\lambda_{j,1}
+  f(\balpha_{\sigma_j})$. This shows that, as claimed,
+  $$\frac{ A_{X_j}(r_j)}{ A_0 (r_j)} = 
+  %% \frac {\Omega((\ell(X_j X_1^s)_{s\ge0},M)(r_j)}{\Omega((\ell(X_1^s))_{s\ge0},M)(r_j)}=
+  \frac
+      {M'(r_j) \lambda_{j,1} \alpha_{\sigma_j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{\sigma_j,i}.$$
+      For $i=1$, since we use $X_1$ as a separating variable for $V_{\mathfrak{A}}$, 
+      we simply add the polynomial $T$ to our list.
 \end{proof}
 
+The algorithm as described above does not specify how to compute the
+minimal polynomial $M$ at Step~1 or the scalar numerators $A_0,\dots$
+needed at Steps~5 and~7. One should of course use the same blocking
+methods as in \cref{ssec:mainalgo}, based on the computation of a
+minimal matrix generator and its largest invariant factor (to compute $M$), and
+\cref{lemma:omegaOmega} to compute all $A_i$s.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Completing the description}
+
+\todo{sf or not for algos} The second part of the algorithm computes a
+zero-dimensional parametrization of
+$V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call
+Algorithm {\sf Parametrization}, but with a carefully chosen linear
+form $\ell'$ as input: we build $\ell'$ such that its support is
+$\mathfrak{B}$; this is denoted by $\ell'={\sf Update}(\cdots)$ in
+Algorithm ${\sf ParametrizationWithSplitting}$.
+
+Let $D_{\mathfrak{A}}$ be the number of points in $V_{\mathfrak{A}}$;
+since all $Q_i$, for $i$ in $\mathfrak{A}$, are reduced algebras,
+$D_\mathfrak{A}$ is also the dimension of $\residueI_\mathfrak{A} =
+\prod_{i \in \mathfrak{A}} \residueI_i$. Thus, $\residueI_\mathfrak{B}=\prod_{i \in \mathfrak{B}} \residueI_i$
+has dimension $D_{\mathfrak{B}}=D-D_{\mathfrak{A}}$.
+
+The linear form $\ell$ used in $\mathsf{ParametrizationX}_1$ can be
+decomposed as $\ell= \ell_{\mathfrak{A}} + \ell_{\mathfrak{B}}$, with
+$\ell_\mathfrak{A}: \residueI_\mathfrak{A} \to \Kbar$ and
+$\ell_\mathfrak{B}: \residueI_\mathfrak{B} \to \Kbar$. We will let
+$\ell'=\ell_{\mathfrak{B}}$, so that if $\ell$ is generic, then so is
+$\ell'$, and calling ${\sf Parametrization}(\ell,\lf)$, for a random
+$\lf=t_1 X_1 + \cdots + t_n X_n$, will then return a zero-dimensional
+parametrization of $V_{\mathfrak{B}}$. In that algorithm, we should
+of course use the bound $D_\mathfrak{B}$ on the degree of the minimal
+polynomial.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Experimental results}
+
+\todo{write something}
 \begin{center}
 \begin{tabular}{c|c|c|c|c|c|c}
 \textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
