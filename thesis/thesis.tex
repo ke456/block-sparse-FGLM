@@ -955,32 +955,32 @@ level of logarithmic factors).
 \subsection{Computing a scalar numerator}\label{ssec:scalar_numer}
 
 Let us keep the notation of the previous subsection.  The main
-advantage of the block Wiedemann algorithm is that it allows one to
+advantage of using the block Wiedemann algorithm is that it allows one to
 distribute the bulk of the computation in a straightforward manner: on
 a platform with $m$ processors (or cores, \dots), one would typically
-compute the $D \times m$ matrices $\mat{L}_s=\mU^\perp\mM^s$, for
+compute the $D \times m$ matrices $\mat{L}_s=\mU^\perp\mM^s$ for
 $s=0,\dots,2\lceil D/m \rceil$, by having each processor compute a
 sequence $\row{u}_i \mM^s$, where $\row{u}_i$ is the $i$th row of
 $\mU^\perp$. From these values, we then deduce the matrices
-$\seqelt{s,\mU,\mV}=\mU^\perp \mM^s \mV = \mat{L}_s\mV$, for
+$\seqelt{s,\mU,\mV}=\mU^\perp \mM^s \mV = \mat{L}_s\mV$ for
 $s=0,\dots,2\lceil D/m \rceil$. In the description below, we assume
 for simplicity that memory is not an issue, so we can store all
 elements in the Krylov sequences we are interested in; we discuss this 
 again in \cref{ssec:mainalgo}.
 
-However, our main algorithm will need to compute scalar numerators of
+However, our main algorithm will also need to compute scalar numerators of
 the form \sloppy $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
 \minpoly)$, where $\row{w}$ is a given vector in $\K^{D \times 1}$ and
 $\minpoly$ is the minimal polynomial of $\mM$. Since $\minpoly$ may
-have degree $D$, and $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
+have degree $D$, and then $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
 \minpoly)$ itself may have degree $D-1$,
-the definition we gave of $\Omega$ suggests that we
+the definition of $\Omega$ suggests that we
 may need to compute up to $D$ terms of the sequence $\row{u}_i \mM^s
 \col{w}$, which we would of course like to avoid. We now present an
-alternative solution, that involves solving a polynomial linear system
+alternative solution which involves solving a univariate polynomial linear system
 and computing a matrix numerator, but only uses the sequence elements
-$\mat{L}_s= \mU^\perp \mM^s$, for $s=0,\dots,\lceil D/m \rceil-1$,
-which were previously computed.
+$\mat{L}_s= \mU^\perp \mM^s$ for $s=0,\dots,\lceil D/m \rceil-1$,
+which have already been computed previously.
 
 Fix $i$ in $1,\dots,m$ and let $\row{a}_i$ be the row vector defined
 by $$\row{a}_i =[0~\cdots~0~\minpoly~0~\cdots~0]  (\mat{P}_{\mU,\mV})^{-1} ,$$
@@ -997,7 +997,11 @@ left-hand row vector.
   invariant factor of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product
   $\minpoly\ (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ 
   the $i$th row of this matrix, our first claim follows. Since
-  $\mat{P}_{\mU,\mV}$ has determinantal degree at most $D$~\cite{xxx}, the bound
+  $\mat{P}_{\mU,\mV}$ has determinantal degree
+  %% TODO V:
+  % \deg(\sigma_1) + \cdots + \deg(\sigma_m) = \deg(s_1) + \cdots + \deg(s_m) = D
+  %% deg(a) <= deg(P)
+  at most $D$~\cite{todo}, the bound
   on the degree of the entries of $\row{a}_i$ follows from Cramer's
   formulas.
 \end{proof}
@@ -1014,29 +1018,30 @@ a dot product.
   (\col{e}_s)_{s\ge0}$, with $\col{e}_s=\mat{U}^\perp \mM^s\, \col{w}$
   for all $s$, and we have
 \begin{align}\label{eq:OmegaOmega}
-[~\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~] = \row{a}_i\cdot \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
+[~\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~] = \row{a}_i\cdot \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})
 \end{align}
 with $\row{a}_i$ in $\K[\var]^{1 \times m}$ and 
-$\mat{\Omega}(\mat{\mathcal{E}} , \mat{P}_{\mU,\mV}) \in \K[\var]^{m \times 1}.$
+$\mat{\Omega}(\mat{\mathcal{E}} , \mat{P}_{\mU,\mV}) \in \K[\var]^{m \times 1}$.
 \end{lemma}
 \begin{proof}
 The first item in \cref{randXY} shows that for a generic choice of
 $\mU$ and $\mV$, $\mat{P}_{\mU,\mV}$ cancels the sequence $(\mU^\perp
 \mM^s)_{s \ge 0}$, and thus the sequence $\mat{\mathcal{E}}$ as well;
 this proves the first point. Then, the equality
-in \cref{eq:OmegaOmega} follows at once from the definitions:
+in \cref{eq:OmegaOmega} directly follows from the definitions:
 \begin{align*}
 [~ \Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)~]  &= [~\minpoly~]\ \sum_{s \ge 0} \frac{\row{u}_i \mM^s \col{w}}{T^{s+1}}\\
 &=  [~0~\cdots~0~\minpoly~0~\cdots~0~]\  \sum_{s \ge 0} \frac{\mat{U}^\perp \mM^s \col{w}}{T^{s+1}}\\
 &=  [~0~\cdots~0~\minpoly~0~\cdots~0~]\ (\mat{P}_{\mU,\mV})^{-1} \mat{P}_{\mU,\mV} \sum_{s \ge 0} \frac{\mat{U}^\perp \mM^s \col{w}}{T^{s+1}}\\
 &=  \row{a}_i\cdot \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}).
+\qedhere
 \end{align*}
 \end{proof}
 
 The algorithm to compute the scalar numerator $\Omega((\row{u}_i \mM^s
-\col{w})_{s \ge 0}, \minpoly)$ follows at once; in the algorithm, we
+\col{w})_{s \ge 0}, \minpoly)$ follows; in the algorithm, we
 assume that we know $\mat{P}_{\mU,\mV}$, $P$, $\row{a}_i$, and the
-matrices $\mat{L}_s=\mU^\perp \mM^s \in \K^{m \times D}$, for
+matrices $\mat{L}_s=\mU^\perp \mM^s \in \K^{m \times D}$ for
 $s=0,\dots,\lceil D/m \rceil-1$.
 
 \begin{algorithm}[H]
@@ -1044,10 +1049,10 @@ $s=0,\dots,\lceil D/m \rceil-1$.
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item a minimal generator $\mat{P}_{\mU,\mV}$ of $(\mU^\perp \mM^s \mV)_{s \ge 0}$
-                \item the minimal polynomial $P$ of $\mM$
-                \item $\row{w}$ in $\K^{D \times 1}$
-                \item $i$ in $\{1,\dots,m\}$
-                \item $\row{a}_i =  [0~\cdots~0~\minpoly~0~\cdots~0]  (\mat{P}_{\mU,\mV})^{-1} $
+    \item the minimal polynomial $P$ of $\mM$
+    \item $\row{w}$ in $\K^{D \times 1}$
+    \item $i$ in $\{1,\dots,m\}$
+    \item $\row{a}_i =  [0~\cdots~0~\minpoly~0~\cdots~0]  (\mat{P}_{\mU,\mV})^{-1} $
 		\item $\mat{L}_s = \mU^\perp \mM^s$, for $s=0,\dots,\lceil D/m\rceil-1$
 	\end{itemize}
 	{\bf Output:} the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly) \in \K[T]$
