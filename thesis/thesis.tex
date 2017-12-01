@@ -431,10 +431,10 @@ associated numerator.  The next definition makes this idea precise:
   $$\Omega(\mathcal{L},P) = ( P \sum_{s=0}^{d-1} \ell_{d - s} T^s ) {\rm ~div~} T^d.$$
  \end{itemize}
 \end{remark}
-We give an example of this construction using the Fibonacci sequence $\mathcal{L} =
-(1,1,2,3,5,8,\dots)$, which is linearly recurrent, with minimal
-polynomial $P=T^2-T-1$. Define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
-${\rm rev}(P) = 1-T-T^2$; then, we can write $S$ in closed form as
+Let us now give an example of this construction. Consider the Fibonacci sequence
+$\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
+polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
+${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
 $$S = \frac{A}{{\rm rev}(P)} = \frac{1}{1-T-T^2},$$
 so that $\Omega(\mathcal{L},P)=T^{2-1} \cdot 1=T$. Equivalently, we can define $\genseries = \sum_{s\ge0} \ell_{s}/T^{s+1}$; then, 
 we recover 
@@ -635,7 +635,7 @@ lemma is in \cite[Theorem~4.5]{Turner02}.
   \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$ where
   $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\cdim})$
   componentwise and $\mat{L} \in \matSpace[\cdim]$ is unit upper
-  triangular. We define the matrix $\mat{U} =
+  triangular. Define the matrix $\mat{U} =
   \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_{\cdim}}}
   \mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
   \deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple
@@ -666,7 +666,7 @@ algorithms for computing minimal approximant bases
 \cite{Villard97,Turner02,GioLeb14}. The next result gives the main
 idea behind this approach. This result is similar to
 \cite[Theorem~4.6]{Turner02} (see also
-\cite[Theorems~4.7,~4.8,~4.9,~4.10]{Turner02}), using however the
+\cite[Theorems~4.7 to~4.10]{Turner02}), using however the
 reversal of the input sequence rather than of the output matrix
 generator.
 
@@ -739,22 +739,24 @@ needed, since in our main algorithm, we will always use $\cdim =
 \rdim$.  However, we believe that the more general form stated here
 may find further applications. The proof is a direct consequence of
 the previous theorem, using the algorithms of
-respectively~\cite{GiJeVi03},~\cite{ZhoLab12} and~\cite{JeNeScVi16}.
+respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
 \begin{corollary}\label{coro:cost_approx}
   Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and
   let $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in
   \NN^2$ are such that the left (resp.~right) canonical matrix
   generator of $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).
-  Then, given $\seqelt{0},\dots,\seqelt{d-1}$,
+  Then, given $\seqelt{0},\dots,\seqelt{d-1}$, one can compute
   \begin{itemize}
-  \item if $\cdim \in \Omega(\rdim)$, a  minimal left matrix generator
-    for $\seq$ can be computed in $O(\cdim^\omega \M(\degBd)
-    \log(\degBd))$ operations in $\field$;
-  \item if $\cdim \in O(\rdim)$, a  minimal left matrix generator for
-    $\seq$ can be computed in $O(\rdim^\omega \M(\cdim\degBd/\rdim)
-    \log(\cdim\degBd))$ operations in $\field$;
-  \item the left canonical matrix generator for $\seq$ can be computed
-    in $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
+  \item a minimal left matrix generator
+    for $\seq$ using $O(\cdim^\omega \M(\degBd)
+    \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
+  \item a  minimal left matrix generator for $\seq$ using 
+    %%% TODO Vincent : check the log term
+    $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\cdim\degBd))$
+    %%% TODO
+    operations in $\field$ if $\cdim \in O(\rdim)$;
+  \item the canonical left matrix generator for $\seq$
+    using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
     \log(\cdim\degBd)^3)$ operations in $\field$.
   \end{itemize}
 \end{corollary}
@@ -1244,8 +1246,8 @@ section of this paper.
     \sum_{s \ge 0} 
     \frac{ \partial^{|\mu|} ( v \lf^s )} {\partial X_1^{\mu_1} \cdots
       \partial X_n^{\mu_n}}
-    \frac{1}{T^{s+1}} 
-    &=  \sum_{s \ge 0} 
+    &\frac{1}{T^{s+1}} 
+    =  \sum_{s \ge 0} 
     \frac{ \partial^{|\mu|} (v \lf^s/T^{s+1})} {\partial X_1^{\mu_1} \cdots
       \partial X_n^{\mu_n}}\\
     &=  
@@ -1257,6 +1259,7 @@ section of this paper.
     \left (\frac v{T-\lf} \right ) \\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     \left (\frac{ \partial \lf} {\partial X_k} \right)^{\mu_k}
+    %% TODO Vincent: parentheses maybe to make it more readable?
     \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     t_k^{\mu_k}
@@ -1438,13 +1441,14 @@ there
   We can then rewrite the
   sum in \cref{eq:sumgenseries_collect1} as $$ \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =\frac{\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)}{\minpoly},$$ with
   \begin{align*}
-    \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)=&\sum_{j \in \mathfrak{t}} \Big(\big[
+    & \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)= \\
+    &\;\; \sum_{j \in \mathfrak{t}} \Big(\big[
       v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
       + (T-r_j) A_{v,\sigma_j}\big]
     \prod_{\iota \in \mathfrak{t}-\{j\}}(T-r_{\iota} )^{w_{\sigma_{\iota}}+1}
     \Big)\prod_{j \in \mathfrak{u}}(T-r_j )^{z_j}
     \\
-    &+
+    &\;\; +
     \Big(\prod_{j \in \mathfrak{t}}(T-r_{j} )^{w_{\sigma_j}+1}\Big)
     \sum_{j \in \mathfrak{u}_v} \Big (
     (T-r_j)^{z_{j}-z_{v,j}} D_{v,j}
@@ -2164,7 +2168,7 @@ performing the union of the two components $V'$ and $V''$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Describing the subset $V'$ of $V$}
+\subsection{Describing the subset \texorpdfstring{$V'$}{V'} of \texorpdfstring{$V$}{V}}
 
 In this paragraph, we specialize the discussion of
 \cref{ssec:genseries} to the case $\lf=X_1$; we take
@@ -2337,7 +2341,8 @@ decomposition of $V$.
     a  &= \sum_{i\in T_j}u_{i,1} \\
     b  &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r \\
     c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r    
-    +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s.
+   \\ & \phantom{{ }= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2}
+                                                  +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s.
   \end{align*}
   Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
   have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
