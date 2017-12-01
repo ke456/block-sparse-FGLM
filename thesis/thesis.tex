@@ -215,9 +215,9 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
  $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
  least for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
- exponent for matrix multiplication. While improving these results is
- an interesting question is itself, we will not address it in this
- paper.
+ exponent for matrix multiplication over a ring (commutative, with $1$). While
+ improving these results is an interesting question is itself, we will not
+ address it in this paper.
 
 Given such an input, the FGLM algorithm~\cite{FaGiLaMo93} computes the
 lexicographic Gr\"obner basis of $I$ in $O(nD^3)$ operations in $\K$.
@@ -339,10 +339,9 @@ output is correct.
 In what follows, we only consider the case $\omega>2$.  We use a time function
 $d \mapsto \M(d)$ for the cost of univariate polynomial multiplication over
 $\K$, for which we assume the super-linearity properties of
-\cite[Section~8.4]{GaGe13}.  We assume that the exponent $\omega$ is also valid
-for multiplication of matrices over $\polRing$: then, two $m\times m$ matrices
-over $\K[T]$ whose degree is less than $d$ can be multiplied using $O(m^\omega
-\M(d))$ operations in $\K$.
+\cite[Section~8.4]{GaGe13}.  Then, two $m\times m$ matrices over $\K[T]$ whose
+degree is less than $d$ can be multiplied using $O(m^\omega \M(d))$ operations
+in $\K$.
 
 %% We rely Over a field $\mathbb{K}$, recall that we can compute
 %% multiplication, division with remainder, extended GCD, and square
@@ -762,7 +761,6 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
   \item a minimal left matrix generator for $\seq$ using 
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
-    %%% TODO Vincent : check the log term
     operations in $\field$ if $\cdim \in O(\rdim)$; \footnote{This bound
       assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
       particular if $\M(\cdot)$ is quasi-linear and $\omega>2$.}
@@ -942,12 +940,16 @@ entries of $\col{x}$ is $\minpoly$.  Thus, both $\minpoly$ and $\col{x}$
 can be computed using the
 high-order lifting algorithm of \cite[Algorithm~5]{Stor03} on input
 $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
-\cite[Corollary~16]{Stor03}, the
-cost of this is $O(m^{\omega} \M(D/m)
-\log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-%% FIXME correct cost bound (other locations as well)
-the latter algorithm is randomized, since it chooses a random point in
-$\K$ to compute (parts of) the expansion of the inverse of
+\cite[Corollary~16]{Stor03}, this costs
+\begin{align*}
+  & O\Bigg(m^{\omega} \M(D/m) \log(m) + \sum_{0 \le i \le \log_2(m)} 4^i (2^{-i}m)^\omega \M(D/m) \\
+  & \quad\qquad + m^2 \M(D/m)\log(D/m)\log(m) + m \M(D) \log(D) \Bigg) \\
+  & \subset O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m))  \\
+  & \subset \softO{m^{\omega-1}D}
+\end{align*}
+operations in $\K$.
+The latter algorithm is randomized, since it chooses a random point in $\K$ to
+compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
 %% todo for after submission: think about writing the following deterministic approach:
@@ -2583,11 +2585,22 @@ shows the number of points in the variety separated by $X_1$ compared to the
 total number of points in the variety.
 The inputs and the machine used for timings are the same as section \ref{section:ex}.
 
-For all inputs, with the exception of sot1, $X_1$ separates most of the
+The performance of $\mathsf{ParametrizationX}_1$ depends on the density of $\mM_1$
+and the number of points separated by $X_1$. In the worst case, if the density
+of $\mM_1$ equals the density of $\mM$ and $X_1$ does not separate any points in 
+the variety, then $\mathsf{ParametrizationX}_1$ will take twice as long as
+$\mainalgoname$. However, this was not observed in our experiments.
+For all our inputs, with the exception of sot1, $X_1$ separates most of the points in
+the variety. In this case, $\mathsf{Parametrization}$ performs better by
+a factor of 2 compared to $\mainalgoname$ on average for all values of $m$. Even in
+an unfavourable case like sot1, where $X_1$ only separates $1012$ points out of
+$7682$ points in the variety, the ratio is close to 1.
 
 \begin{center}
+\textbf{Comparison of $\mathsf{ParametrizationX}_1$ to $\mainalgoname$}
 \begin{tabular}{c|c|c|c|c|c|c}
-\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
+\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$\frac{points\,separated\,by\,X_1}{total\,points}$\\
+\hline
 rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
 rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
 rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
