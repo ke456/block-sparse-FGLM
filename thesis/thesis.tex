@@ -86,6 +86,11 @@
 \newcommand{\minpoly}{P}
 \newcommand{\mainalgoname}{{\sf BlockParametrization}}
 \newcommand{\lf}{X}
+\newcommand{\residueI}{\mathscr{Q}}
+\newcommand{\sqfree}{Q}
+
+
+\newcommand{\density}{\rho}
 
 \def\M {\ensuremath{\mathsf{M}}}
 \def\Deg{D}
@@ -200,10 +205,10 @@ $$\{ ( R_1(\tau), \dots, R_{n-1}(\tau), \tau ) \mid \forall
 
  Let $I$ be a zero-dimensional ideal in $\K[X_1,\dots,X_n]$.  As
  input, we assume that we know a monomial basis $\basis$ of
- $Q=\K[X_1,\dots,X_n]/I$, together with the multiplication matrices
+ $\residueI=\K[X_1,\dots,X_n]/I$, together with the multiplication matrices
  $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this basis; we
  denote by $D$ the degree of $I$, that is, the vector space dimension
- of $Q$. We should point out that knowing a degree Gr\"obner basis of
+ of $\residueI$. We should point out that knowing a degree Gr\"obner basis of
  $I$, computing the multiplication matrices efficiently is not a
  straightforward task: Faug\`ere {\it et al.} showed how to do it in
  time $O(nD^3)$ in~\cite{FaGiLaMo93} and more recently, algorithms have
@@ -242,7 +247,7 @@ The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on an
 idea that will be at the core of our algorithms as well: duality.
 Indeed, these algorithms compute sequences of values of the form
 $\tau_i=(\trace(\lf^i))_{i \ge 0}$ or 
-$\tau_{i,j}=(\trace(\lf^i X_j))_{i \ge 0}$, where $\trace: Q \to \K$ is the trace 
+$\tau_{i,j}=(\trace(\lf^i X_j))_{i \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
 form and $\lf$ is typically of the form $\lf=t_1 X_1 + \cdots + t_n X_n$.
 From these values, it is then possible to recover the output
 in~\eqref{eq:RUR} by means of some structured linear algebra calculation.
@@ -253,14 +258,14 @@ this is by no means straightforward. In~\cite{BoSaSc03}, Bostan {\it
   et al.} introduced randomization to alleviate this issue. They show
 that computing values such as $\ell(\lf^i)$ and $\ell(\lf^i X_j)$, where
 $\lf$ is as above and 
-$\ell$ is a random $\K$-linear form $Q \to \K$, allows one to deduce
+$\ell$ is a random $\K$-linear form $\residueI \to \K$, allows one to deduce
 a description of $V(I)$ of the form
 \begin{equation}\label{eq:BoSaSc03}
- \{  Q(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
+ \{  \sqfree(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
 \end{equation}
-where $Q$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
-$\K[T]$ of degree less than $\deg(Q)$ for all $i$. Precisely, the
-output of such algorithms is the tuple $((Q,V_1,\dots,V_n),\lf)$; this
+where $\sqfree$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
+$\K[T]$ of degree less than $\deg(\sqfree)$ for all $i$. Precisely, the
+output of such algorithms is the tuple $((\sqfree,V_1,\dots,V_n),\lf)$; this
 will be called a {\em zero-dimensional parametrization} of $V(I)$. In
 particular, this output will in general differ from the description
 in~\eqref{eq:RUR}, since the latter keeps trace of the multiplicities
@@ -278,7 +283,7 @@ Moreno-Soc\'ias~\cite{MorenoSocias91}.
 On this basis, they designed several forms of {\em sparse FGLM}
 algorithms. For instance, if $I$ is in shape position, the algorithms
 in \cite{FaMo17} recover this basis, also by considering values of
-a linear form $\ell:Q \to \K$. For less favorable inputs, the algorithm
+a linear form $\ell:\residueI \to \K$. For less favorable inputs, the algorithm
 falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90},
 or plain FGLM.
 
@@ -291,19 +296,19 @@ Coppersmith~\cite{Coppersmith94} in the context of integer
 factorization; this makes it possible to easily parallelize the
 bottleneck of the algorithm. This was already discussed by Steel
 in~\cite{Steel15}, where he showed how to compute the analogue of
-polynomial $Q$ in~\eqref{eq:BoSaSc03}. In that reference, one is
+polynomial $\sqfree$ in~\eqref{eq:BoSaSc03}. In that reference, one is
 only interested in the solutions in the base field $\K$ ($\K$ being a
-finite field in that context): the algorithm computes the roots of $Q$
+finite field in that context): the algorithm computes the roots of $\sqfree$
 in $\K$ and substitutes them in the input system, before computing a
 Gr\"obner basis in $n-1$ variables for each of them.
 
 Our first contribution is to give a block version of the algorithm
 in~\cite{BoSaSc03} that extends the approach in~\cite{Steel15} to
 compute all polynomials in~\eqref{eq:BoSaSc03} for essentially the
-same cost as the computation of $Q$. More precisely, the bottleneck
+same cost as the computation of $\sqfree$. More precisely, the bottleneck
 for the algorithm of~\cite{Steel15} is the computation of a
-block-Krylov sequence, and we show that once this sequence has been
-computed, not only $Q$ but also all other polynomials in the
+block-Krylov sequence; we show that once this sequence has been
+computed, not only $\sqfree$ but also all other polynomials in the
 zero-dimensional parametrization can be computed efficiently, while
 not making any assumption on the ideal $I$ such as radicality or shape
 position.
@@ -382,7 +387,7 @@ associated numerator.  The next definition makes this idea precise:
   polynomial that cancels $\mathcal{L}$. Then, the {\em numerator} of $\mathcal{L}$
   with respect to $P$ is defined as 
   $$\Omega(\mathcal{L},P) = P \genseries, \quad\text{with}\quad \genseries=\sum_{s \ge 0} \frac
-  {\ell_s}{T^{s+1}}.$$ In view of the discussion above, $\Omega(S,P)$
+  {\ell_s}{T^{s+1}}.$$ In view of the discussion above, $\Omega(\mathcal{L},P)$
   is a polynomial of degree less than $\deg(P)$.
 \end{definition}
 \begin{remark}~
@@ -390,14 +395,14 @@ associated numerator.  The next definition makes this idea precise:
   \item We may as well write this definition using expressions in
     variable $T$ instead of $1/T$: given
     $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
-    $\Omega(\ell,P)$ by considering $S=\sum_{s\ge 0} \ell_s
+    $\Omega(\mathcal{L},P)$ by considering $S=\sum_{s\ge 0} \ell_s
     T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
     P(1/T)$ and $d=\deg(P)$; then
     $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
 \item If $\deg(P)=d$, we only need to know the coefficients
   $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we 
   have
-  $$\Omega(\mathcal{L},P) = ( P \sum_{s=0}^{d} \ell_{d - s} T^s ) {\rm ~div~} T^d.$$
+  $$\Omega(\mathcal{L},P) = ( P \sum_{s=0}^{d-1} \ell_{d - s} T^s ) {\rm ~div~} T^d.$$
  \end{itemize}
 \end{remark}
 We give an example of this construction using the Fibonacci sequence $\mathcal{L} =
@@ -1033,7 +1038,7 @@ zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$.
 
 We write $V=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s in
 $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
-$i$.  We also let $\D$ be the dimension of $Q$, so that $\dg \le \D$,
+$i$.  We also let $\D$ be the dimension of $\residueI$, so that $\dg \le \D$,
 and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In this
 section, we recall and generalize results from the appendix
 of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
@@ -1047,25 +1052,25 @@ parametrization.
 
 \subsection{The structure of the dual}\label{ssec:dual}
 
-For $i$ in $\{1,\dots,\dg\}$, let $Q_i$ be the local algebra at
-$\balpha_i$, that is $Q_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
+For $i$ in $\{1,\dots,\dg\}$, let $\residueI_i$ be the local algebra at
+$\balpha_i$, that is $\residueI_i=\Kbar[X_1,\dots,X_n]/I_i$, with $I_i$ the
 $\m_{\balpha_i}$-primary component of $I$. By the Chinese Remainder
-Theorem, $Q\otimes_\K \Kbar=\Kbar[X_1,\dots,X_n]/I$ is isomorphic to
-the direct product $Q_1\times \cdots \times Q_\dg$.  We let $N_i$ be the
-{\em nil-index} of $Q_i$, that is, the maximal integer $N$ such that
+Theorem, $\residueI\otimes_\K \Kbar=\Kbar[X_1,\dots,X_n]/I$ is isomorphic to
+the direct product $\residueI_1\times \cdots \times \residueI_\dg$.  We let $N_i$ be the
+{\em nil-index} of $\residueI_i$, that is, the maximal integer $N$ such that
 $\m_{\alpha_i}^N$ is not contained in $I_i$; for instance, $N_i=0$ if
-and only if $Q_i$ is a field, if and only if $\balpha_i$ is a
-non-singular root of $I$. We also let $\D_i=\dim_\Kbar(Q_i)$, so that
+and only if $\residueI_i$ is a field, if and only if $\balpha_i$ is a
+non-singular root of $I$. We also let $\D_i=\dim_\Kbar(\residueI_i)$, so that
 we have $D_i \ge N_i$ and $\D=\D_1 + \cdots + \D_\dg$.
 
 The sequences we consider below are of the form $(\ell(\lf^s))_{s \ge
-  0}$, for $\ell$ a $\K$-linear form $Q \to \K$ and $\lf$ in $Q$
-(we will often write $\ell \in {\rm hom}_\K(Q,\K)$). For
+  0}$, for $\ell$ a $\K$-linear form $\residueI \to \K$ and $\lf$ in $\residueI$
+(we will often write $\ell \in {\rm hom}_\K(\residueI,\K)$). For
 such sequences, the following standard result will be useful
 (see e.g.~\cite[Proposition~1 \& 2]{BoSaSc03} for a proof).
 \begin{lemma}\label{lemma:minpoly}
-  Let $\lf$ be in $Q$ and let $P \in \K[T]$ be its minimal
-  polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(Q,\K)$,
+  Let $\lf$ be in $\residueI$ and let $P \in \K[T]$ be its minimal
+  polynomial. For a generic choice of $\ell$ in ${\rm hom}_\K(\residueI,\K)$,
   $P$ is the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge
     0}$.
 \end{lemma}
@@ -1073,7 +1078,7 @@ such sequences, the following standard result will be useful
 The following results are classical; they go back
 to~\cite{Macaulay16}, and have been used in computational algebra
 since the 1990's~\cite{MaMoMo96,Mourrain97}. Fix $i$ in $1,\dots,\dg$.
-There exists a basis of the dual ${\rm hom}_\Kbar(Q_i,\Kbar)$
+There exists a basis of the dual ${\rm hom}_\Kbar(\residueI_i,\Kbar)$
 consisting of linear forms $(\lambda_{i,j})_{1\le j \le \D_i}$ of the
 form
 $$\lambda_{i,j}: f \mapsto (\Lambda_{i,j}(f))(\balpha_i),$$
@@ -1098,7 +1103,7 @@ in $\Lambda_{i,j}$ have order $1$ or more). Thus, introducing new
 variables $(U_{i,j})_{j =1,\dots,D_i}$, we deduce the existence of
 non-zero homogeneous linear forms $P_{i,\mu}$ in
 $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\lambda$ in ${\rm
-	hom}_\Kbar(Q_i,\Kbar)$, there exist $\bu_i=(u_{i,j}) \in
+	hom}_\Kbar(\residueI_i,\Kbar)$, there exist $\bu_i=(u_{i,j}) \in
 \Kbar{}^{D_i}$ such that we have
 \begin{align}\label{ell_param}
 \ell: f \mapsto \ell(f)
@@ -1119,7 +1124,7 @@ $\mu \ne (0,\dots,0)$. Explicily, we can write $P_{i,\mu}=\sum_{j\in
 	\{1,\dots,D_i\} \text{~such that~} \mu \in S_{i,j}} c_{i,j,\mu}
 U_{i,j}$. 
 
-Fix $\ell$ non-zero in ${\rm hom}_\Kbar(Q_i,\Kbar)$, written
+Fix $\ell$ non-zero in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, written
 as in~\eqref{ell_param}. We can then
 define its {\em order} $w$ and {\em symbol} $\pi$. The former is
 the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
@@ -1133,7 +1138,7 @@ need the next easy lemma.
 
 \begin{lemma}\label{lemma:symbol0}
   Fix $i$ in $\{1,\dots,\dg\}$. For a generic choice of $\ell$ in
-  ${\rm hom}_\Kbar(Q_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
+  ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
   $\pi_i(t_1,\dots,t_n)$ is non-zero.
 \end{lemma}
 \begin{proof}
@@ -1144,7 +1149,7 @@ need the next easy lemma.
   \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
   construction a non-zero polynomial.  Thus, for a generic choice of
   $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, that define a linear form
-  $\ell$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$ as in \cref{ell_param},
+  $\ell$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ as in \cref{ell_param},
   and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
   $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. As a
   result, the symbol of such a linear form $\ell$ is $\pi
@@ -1153,30 +1158,30 @@ need the next easy lemma.
 \end{proof}
 
 Finally, we say a word about global objects.  Fix a linear form $\ell:
-Q \to \K$. By the Chinese Remainder Theorem, there exist unique
-$\ell_1,\dots,\ell_\dg$, with $\ell_i$ in ${\rm hom}_\Kbar(Q_i,\Kbar)$
-for all $i$, such that the extension $\ell_\Kbar: Q\otimes_\K \Kbar
+\residueI \to \K$. By the Chinese Remainder Theorem, there exist unique
+$\ell_1,\dots,\ell_\dg$, with $\ell_i$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$
+for all $i$, such that the extension $\ell_\Kbar: \residueI\otimes_\K \Kbar
 \to \Kbar$ decomposes as $\ell_\Kbar = \ell_1 + \cdots + \ell_\dg$. We
 call {\em support} of $\ell$ the subset $\mathfrak{S}$ of
 $\{1,\dots,\dg\}$ such that $\ell_i$ is non-zero exactly for $i$ in
-$\mathfrak{S}$.  As a consequence, for all $f$ in $Q$, we have
+$\mathfrak{S}$.  As a consequence, for all $f$ in $\residueI$, we have
 \begin{align}\label{eq:fui}
 \ell(f) &= \ell_1(f) + \cdots + \ell_\dg(f)\nonumber\\
 &=  \sum_{i \in \mathfrak{S}} \ell_i(f).
 \end{align}
 For $i$ in $\mathfrak{S}$, we denote by $w_i$ and $\pi_i$ respectively
 the order and the symbol of $\ell_i$. For such a subset
-$\mathfrak{S}$, we also write $Q_\mathfrak{S}=\prod_{i \in
-  \mathfrak{S}} Q_i$ and $V_\mathfrak{S}=
+$\mathfrak{S}$, we also write $\residueI_\mathfrak{S}=\prod_{i \in
+  \mathfrak{S}} \residueI_i$ and $V_\mathfrak{S}=
 \{\balpha_i \mid i \in \mathfrak{S}\}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{A fundamental formula}  \label{ssec:genseries}
 
-Let $\lf$ be in $Q$ and $\ell$ in ${\rm hom}_\K(Q,\K)$.  The sequences
+Let $\lf$ be in $\residueI$ and $\ell$ in ${\rm hom}_\K(\residueI,\K)$.  The sequences
 $(\ell(\lf^s))_{s\ge 0}$, and more generally $(\ell(v \lf^s))_{s\ge
-  0}$, for $v$ in $Q$, are the main ingredients in our algorithm.  The
+  0}$, for $v$ in $\residueI$, are the main ingredients in our algorithm.  The
 following lemma justifies this by giving an explicit form for a
 generating series of the form $\sum_{s \ge 0} \ell(v
 \lf^s)/T^{s+1}$. A less precise version of it is in~\cite{BoSaSc03};
@@ -1184,7 +1189,7 @@ the more explicit expression given here will be needed in the last
 section of this paper.
 
 \begin{lemma}\label{lemma:formula}
-  Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, with support $\mathfrak{S}$,
+  Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$, with support $\mathfrak{S}$,
   and let $\{\pi_i \mid i \in \mathfrak{S}\}$ and $\{w_i \mid i \in
   \mathfrak{S}\}$ be the symbols and orders of $\{\ell_i \mid i \in \mathfrak{S}\}$,
   for $\{\ell_i \mid i \in \mathfrak{S}\}$ as in~\eqref{eq:fui}.
@@ -1226,9 +1231,9 @@ section of this paper.
     \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     t_k^{\mu_k}
-    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{Q}{(T-\lf)^{|\mu|}},
+    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{\sqfree}{(T-\lf)^{|\mu|}},
   \end{align*}
-  for some polynomials $P_1,\dots,P_{|\mu|},Q$ in $\K[X_1,\dots,X_n,T]$ that
+  for some polynomials $P_1,\dots,P_{|\mu|},\sqfree$ in $\K[X_1,\dots,X_n,T]$ that
   depend on the choices of $\mu$, $v$ and $X$, with $\deg(P_i,T) < i$
   for all $i$ and thus $\deg(P,T) < |\mu|$.
   
@@ -1241,9 +1246,9 @@ section of this paper.
       \lf^s )} {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}
     \frac{1}{T^{s+1}} &= v\,\sum_{\mu \in R} c_\mu |\mu|!\, \prod_{1
       \le k \le n} t_k^{\mu_k} \frac {1}{(T-\lf )^{|\mu|+1}} +\sum_{\mu
-      \in R} \frac{Q_\mu}{(T-\lf)^{|\mu|}},
+      \in R} \frac{\sqfree_\mu}{(T-\lf)^{|\mu|}},
   \end{align*}
-  where each $Q_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
+  where each $\sqfree_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
   $|\mu|$ in $T$.  Let $w$ be the maximum of all $|\mu|$ for $\mu$ in
   $R$. We can rewrite the above as
   \begin{align*}
@@ -1308,7 +1313,7 @@ lemma; this leads us to the following definitions.
 \begin{lemma} \label{lemma:anyv}
   Let $\ell$, $\lf$ and all other notation be as above. Let further
   $\minpoly$ be the minimal polynomial of $\lf$ in
-  $Q_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
+  $\residueI_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
   polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then, $\minpoly$
   cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
 there
@@ -1392,11 +1397,11 @@ there
 	
   Now, for $v=1$, we assume that the minimal polynomial of the sequence
   $(\ell(\lf^s))_{s \ge 0}$ is the minimal polynomial $\minpoly$ of $t$ in
-  $Q_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
+  $\residueI_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
   $z_k=z_{1,k}$ for all $k$ in $\mathfrak{u}$, we can thus write it as
   $$\minpoly=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1}
   \prod_{j \in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the
-  minimal polynomial of $\lf$ in $Q_\mathfrak{S}$, it also cancels the
+  minimal polynomial of $\lf$ in $\residueI_\mathfrak{S}$, it also cancels the
   sequence $(\ell(v \lf^s))_{s \ge 0}$ for any $v$, so that for all
   $v$, $\minpoly_v$ divides $\minpoly$ (which proves the first point
   in the lemma), and in particular $\mathfrak{u}_v$ is contained in
@@ -1450,27 +1455,27 @@ sequences are needed; this is the subject of the following section.
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
 	  {\bf Input:} \vspace{-0.5em}
 	  \begin{itemize}\setlength\itemsep{0em}
-	  \item  a linear form $\ell$ over $Q_\mathfrak{S}$
+	  \item  a linear form $\ell$ over $\residueI_\mathfrak{S}$
 	  \item $\lf=t_1 X_1 + \cdots + t_n X_n$
 	  \end{itemize}
-	      {\bf Output:} polynomials $((Q,V_1,\dots,V_n),\lf)$
+	      {\bf Output:} polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
 	      \begin{enumerate}\setlength\itemsep{0em}
 	      \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
-	      \item let $Q$ be the squarefree part of $\minpoly$
+	      \item let $\sqfree$ be the squarefree part of $\minpoly$
 	      \item let $C_1 = \Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)$
 	      \item \textbf{for} $i=1,\dots,n$ \textbf{do}
 		\begin{enumerate}
 		\item let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
 		\end{enumerate}
-	      \item \textbf{return} $((Q, C_{X_1}/ C_1 \bmod Q, \dots, C_{X_n}/ C_{1} \bmod Q),\lf)$
+	      \item \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
 	      \end{enumerate}
 	      \label{algo:para2}
 \end{algorithm}
 
 \begin{lemma}\label{lemma:para2}
   Suppose that $\ell$ is a generic element of ${\rm
-    hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$ and that $\lf$ is a generic
-  linear form. Then the output $((Q,V_1,\dots,V_n),\lf)$ of
+    hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$ and that $\lf$ is a generic
+  linear form. Then the output $((\sqfree,V_1,\dots,V_n),\lf)$ of
   $\mathsf{Parametrization}(\ell,\lf)$ is a zero-dimensional
   parametrization of $V_{\mathfrak{S}}$.
 \end{lemma}
@@ -1483,7 +1488,7 @@ sequences are needed; this is the subject of the following section.
   values.
 
   Besides, we recall that for a generic $\ell$ in ${\rm
-    hom}_{\Kbar}(Q_\mathfrak{S},\Kbar)$, the minimal polynomials of
+    hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$, the minimal polynomials of
   $(\ell(\lf^s))_{s \ge 0}$ and of $\lf$ are the same
   (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ we compute
   at step 1 is indeed the minimal polynomial of $\lf$ (with roots
@@ -1540,7 +1545,7 @@ In this section, we will show how extend the algorithm
 of~\cite{BoSaSc03} to compute a zero-dimensional parametrization of
 $V(I)$, for some zero-dimensional ideal $I$ of $\K[X_1,\dots,X_n]$, by
 using blocking methods. As input, we assume that we know a monomial
-basis $\basis=(b_1,\dots,b_D)$ of $Q=\K[X_1,\dots,X_n]/I$, together with the
+basis $\basis=(b_1,\dots,b_D)$ of $\residueI=\K[X_1,\dots,X_n]/I$, together with the
 multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
 $X_1,\dots,X_n$ in this basis; for definiteness, we suppose that the
 first basis element in $\basis$ is~$b_1=1$. 
@@ -1590,8 +1595,6 @@ nonzero entry is a $1$ at the first row.
 %% larger than $D$. More precisely, we want to find polynomials
 %% $(R,R_1,\dots,R_n)$ such that for all $\alpha$ that is a factor of
 %% $R$, $\{ (R_1(\alpha),\dots,R_n(\alpha)) \} = V(I)$
-
-\todo{choose subscripts}
 \begin{algorithm}[H]
 	\caption{\mainalgoname($\mM_1,\dots,\mM_n,m$)}
 	{\bf Input:} \vspace{-0.5em}
@@ -1599,7 +1602,7 @@ nonzero entry is a $1$ at the first row.
 		\item $\mM_1,\dots,\mM_n$ defined as above
 		\item dimension of the blocks $m \in \{1,\dots,D\}$
 	\end{itemize}
-	{\bf Output:} polynomials $((Q,V_1,\dots,V_n),\lf)$
+	{\bf Output:} polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
   \begin{enumerate}
   \item\label{mainstep1}  choose $t_1,\dots,t_n$ in $\K$ and let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
   \item\label{mainstep2} { choose $\mU,\mV \in \mathbb{K}^{D \times m}$}
@@ -1607,7 +1610,7 @@ nonzero entry is a $1$ at the first row.
   \item\label{mainstep4} { compute $\seqelt{s,\mU,\mV}= \mat{L}_s\mV$ for $s=0,\dots, 2d-1$}
   \item\label{mainstep5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
   \item\label{mainstep6} { let $\minpoly$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
-  \item\label{mainstep7} { let $Q$ be  the squarefree part  of $\minpoly$}
+  \item\label{mainstep7} { let $\sqfree$ be  the squarefree part  of $\minpoly$}
   \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item\label{mainstep9}  let $C_1 = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
     (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
@@ -1616,7 +1619,7 @@ nonzero entry is a $1$ at the first row.
      \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, 
       (\mat{L}_s)_{0 \le s < \lceil D/m \rceil})$
     \end{enumerate}
-\item\label{mainstep11}     \textbf{return} $((Q, C_{X_1}/ C_1 \bmod Q, \dots, C_{X_n}/ C_{1} \bmod Q),t_1 X_1 + \cdots + t_n X_n)$
+\item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
 \end{algorithm}
 
@@ -1630,7 +1633,7 @@ Then, we compute the first $2d$ terms of the sequence $\seq_{\mU,\mV}=
 matrices, as discussed in \cref{ssec:appliW}, \cref{randXY} shows that
 the matrix polynomial $\mat{P}_{\mU,\mV}$ is indeed a minimal left
 generator of the sequence $\seq_{\mU,\mV}$. Then, $\minpoly$ is the minimal 
-polynomial of $\lf$ and $Q$ its squarefree part.
+polynomial of $\lf$ and $\sqfree$ its squarefree part.
 
 We find the rest of the polynomials in the output by following
 \cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
@@ -1647,7 +1650,7 @@ $$[~C_{X_i}~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \mM_i \col{\varepsi
 $$
 Algorithm ScalarDenominator precisely computes these quantities.
 
-Let $\ell:Q \to \K$ be the linear form $f = \sum_{i \in \basis} f_i b_i \mapsto 
+Let $\ell:\residueI \to \K$ be the linear form $f = \sum_{i \in \basis} f_i b_i \mapsto 
 \sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
 $(i,1)$ in $\mU$. Then, the two polynomials above can be rewritten
 as 
@@ -1659,12 +1662,12 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 
 For the cost analysis, we will mainly focus on a sparse model for
 matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $c \in [0,1)$, that is, at most $c D^2$ nonzero entries.  As a
-  result, $\mM$ has density at most $nc$, and a matrix-vector product
-  by $\mM$ can be done in $O(ncD^2)$ operations in $\K$ (we briefly
-  discuss variants of the algorithm using dense linear algebra at the
-  end of this subsection). The cost incurred at Step~\ref{mainstep2}
-  to compute $\mM$ is $O(ncD^2)$.
+at most $\density \in [0,1)$, that is, at most $\density D^2$ nonzero entries.  
+As a result, $\mM$ has density at most $n\density$, and a matrix-vector product
+by $\mM$ can be done in $O(n\density D^2)$ operations in $\K$ (we briefly
+discuss variants of the algorithm using dense linear algebra at the
+end of this subsection). The cost incurred at Step~\ref{mainstep2}
+to compute $\mM$ is $O(n\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1675,10 +1678,10 @@ $(\row{\ell}_{i,s})_{0 \le s < 2d}$ of the $i$th rows of
 $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,s+1} = \row{u}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$ row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
-  \le i < 2d}$ costs $O(dn cD^2) = O(ncD^3/m )$ field operations. If
+  \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
-the {\em span} of Step~\ref{mainstep3} is thus $O(ncD^3/m)$, whereas
-the total work is $O(ncD^3)$.
+the {\em span} of Step~\ref{mainstep3} is thus $O(n\density D^3/m)$, whereas
+the total work is $O(n\density D^3)$.
 
 At step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
 product
@@ -1708,7 +1711,7 @@ generating polynomial $\mat{P}_{\mU,\mV}$ in time $O(m^{\omega}
 Section~\ref{ssec:appliW} and~\ref{ssec:scalar_numer}, we saw that the
 largest invariant factor $P$ and the vector $\row{a}_1$ can be
 computed in time $O(m^{\omega} \M(D/m) \log(D/m) \log(m))$, which is
-$O(m^{\omega-1} \M(D) \log(D)\log(m))$.  Computing $Q$ takes time
+$O(m^{\omega-1} \M(D) \log(D)\log(m))$.  Computing $\sqfree$ takes time
 $O(\M(D) \log(D))$.
 
 In \cref{ssec:scalar_numer}, we saw that each call to ScalarNumerator
@@ -1716,9 +1719,9 @@ takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular inverse takes time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, the total span, assuming perfect parallelization 
 at Step~\ref{mainstep3} is
-$$O\left (nc\frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
+$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
 the total work is
-$$O\left (ncD^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+$$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simulateously the most costly in
 theory and in practice, and the easiest to parallelize. 
@@ -1726,7 +1729,7 @@ theory and in practice, and the easiest to parallelize.
 \medskip
 
 We conclude this section by a discussion of ``dense'' versions of the
-algorithm (to be used when the density $c$ is close to $1$). In
+algorithm (to be used when the density $\density$ is close to $1$). In
 general, experiments show that choosing $m \in\{1,\dots, D\}$ that
 matches the number of cores is optimal (see \cref{section:ex});
 however, if we use a dense model for our matrices, our algorithms
@@ -1814,9 +1817,9 @@ as well as $C_1$ and all $C_{X_i}$.
 
 We give an example of our algorithm  the case of a radical ideal. Let
 $$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset \F_{101}[X_1,X_2];$$
-the correponding residue class ring $Q=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
+the correponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
 We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices
-in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $Q$:
+in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$:
 \begin{align*}
 \mM_1 = \begin{bmatrix}
   0 & 10 & 68&   1\\
@@ -1922,7 +1925,7 @@ T^2 + 76T + 8&       87T + 31\\
 $$
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
 $$P = T^4 + 62T^3 + 85T^2 + 69T + 37,$$
-and $Q=P$
+and $\sqfree=P$
 since $P$ is squarefree. 
 Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
@@ -1958,7 +1961,7 @@ and we obtain
   \end{matrix} \right  ]\\
 C_{X_1} &= 43T^3 + 75T^2  + 49T+91.
 \end{align*}
-Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod Q$ is 
+Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod \sqfree$ is 
 given by $V_1= 61T^3 + 75T^2 + 85T + 23$. 
 We compute $V_2= 32T^3 + 41T^2 + 94T + 22$ in the same way,
 and our output is 
@@ -2019,7 +2022,7 @@ variables.
 		rand1-3&3 &10648&0.0302&8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
 		rand2-1&4 &4096&0.0756&1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
 		rand2-2&4 &6561&0.0667&4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
-		rand2-3&4 &10000&0.0597&14753 (1)&3920 (0.999)&2710 (0.998)&yes\\
+		rand2-3&4 &10000&0.0597&14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
 		
 		mixed1-1&3 &2808&0.0521&275 (0.998)&73 (0.993)&51 (0.986)&no\\
 		mixed1-2&3 &3591&0.0528&532 (0.998)&140 (0.995)&99 (0.99)&no\\
@@ -2038,8 +2041,8 @@ variables.
 		vor2&6 &574&0.002&10 (0.99)&3 (0.973)&2 (0.955)&yes\\
 		W1-2-10-4&10 &1344&0.312&164 (0.998)&43 (0.994)&30 (0.99)&yes\\
 		W1-2-11-4&11 &1920&0.319&489 (0.999)&129 (0.997)&90 (0.994)&yes\\
-		W1-3-7-3&7 &6480&0.174&10923 (1)&2900 (0.999)&2014 (0.999)&yes\\
-		W1-4-6-2&6 &6480&0.141&9096 (1)&2424 (0.999)&1674 (0.998)&yes
+		W1-3-7-3&7 &6480&0.174&10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
+		W1-4-6-2&6 &6480&0.141&9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
 	\end{tabular}
 \end{table}
 On average, the algorithm performs better by a factor of 3.73 for
@@ -2077,8 +2080,7 @@ matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$ significantly more dense
 that $\mM_1,\dots,\mM_n$. In all this section, we will work under the
 assumption that $\mM_1$ the sparsest matrix among $\mM_1,\dots,\mM_n$.
 
-\todo{$Q$ and $Q_j$ clash}
-All notation, such as $I$, $Q$, \dots, are as in the two previous
+All notation, such as $I$, $\residueI$, \dots, are as in the two previous
 sections.  In particular, we write
 $V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s in
 $\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
@@ -2093,7 +2095,7 @@ we will be able to use $X_1$ as a separating linear form
 \todo{define}; the remaining points will be dealt with using a random
 linear form $\lf$ as above. Throughout, we rely on the following
 operations: evaluations of linear forms on successive powers of a
-given element in $Q$, say $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$
+given element in $\residueI$, say $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$
 (matrix) linear algebra, as before, as well as some operations on
 univariate polynomials related to so-called {\em power
   projection}~\cite{Shoup94,Shoup99}.
@@ -2106,19 +2108,19 @@ paragraphs. \todo{main algo takes $\ell$, not $\mU$}
 	\caption{$\mathsf{ParametrizationWithSplitting}(\ell,t)$} {\bf
 		Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $Q$
+		\item a linear form $\ell$ over $\residueI$
 		\item $\lf=t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
 	{\bf Output:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
-		\item polynomials $((Q,V_1,\dots,V_n),\lf)$
+		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{itemize}
 	\begin{enumerate}
 		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\ell)$
 		\item let $\ell'=\mathsf{Update}(\ell,F,\lf)$
 		\item let $(R,W_1,\dots,W_n,\lf)=\mathsf{Parametrization}(\ell',\lf)$
-		\item let $((Q,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
-		\item \textbf{return} $((Q,V_1,\dots,V_n),\lf)$
+		\item let $((\sqfree,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
+		\item \textbf{return} $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{enumerate}
 \end{algorithm}
 
@@ -2155,15 +2157,15 @@ $T_j=\{\sigma_j\}$, for some index $\sigma_j$ in $\{1,\dots,\dg\}$, so
 that $\alpha_{\sigma_j,1}=r_j$.
 
 For $i=1,\dots,\dg$, let us write $\nu_i$ for the degree of the minimal
-polynomial of $X_1$ in $Q_i$; thus, this polynomial is
+polynomial of $X_1$ in $\residueI_i$; thus, this polynomial is
 $(T-\alpha_{i,1})^{\nu_i}$. For $j$ in $\{1,\dots,c\}$, we define
 $\mu_j$ as the maximum of all $\nu_i$, for $i$ in~$T_j$. As a result, the minimal
-polynomial of $X_1$ in $\prod_{j \in T_j} Q_j$ is 
-$(T-r_j)^{\mu_j}$, and the minimal polynomial of $X_1$ in $Q$ is
+polynomial of $X_1$ in $\prod_{j \in T_j} \residueI_j$ is 
+$(T-r_j)^{\mu_j}$, and the minimal polynomial of $X_1$ in $\residueI$ is
 $M=\prod_{j \in \{1,\dots,c\}} (T-r_j)^{\mu_j}$.
 
-Recall that a linear form $\ell: Q \to \Kbar$ can be written uniquely
-as $\ell=\sum_{i\in \{1,\dots,\dg\}} \ell_i$, with $\ell_i:Q_i \to
+Recall that a linear form $\ell: \residueI \to \Kbar$ can be written uniquely
+as $\ell=\sum_{i\in \{1,\dots,\dg\}} \ell_i$, with $\ell_i:\residueI_i \to
 \Kbar$; collecting terms, $\ell$ may also be written as $\ell=\sum_{j
 	\in \{1,\dots,c\}} \lambda_j$, with $\lambda_j=\sum_{i \in T_j}
 \ell_i$.  Given such an $\ell$, we first explain how to compute values
@@ -2173,8 +2175,8 @@ spirit to \cref{lemma:anyv}, but does not assume that the projection
 $X_1: V \to \Kbar$ is one-to-one as in that lemma.
 
 \begin{lemma}\label{lemma:valuelambda}
-  Let $\ell$ be in ${\rm hom}_\K(Q,\K)$, let $M$ be the minimal
-  polynomial of $X_1$ in $Q$. Then, the polynomial
+  Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$, let $M$ be the minimal
+  polynomial of $X_1$ in $\residueI$. Then, the polynomial
   $\Omega((\ell(X_1^s))_{s\ge0},M)$ satisfies
   $$\Omega((\ell(X_1^s))_{s\ge0},M)(r_j) = \lambda_j(1) M'(r_j) \quad \text{for all $j$ in $\{1,\dots,c\}$ such that $\mu_j=1$.}$$
 \end{lemma}
@@ -2264,7 +2266,7 @@ $\{1,\dots,d\}$, $\balpha_i$ is in $V'$ if and only if:
 \begin{itemize}
 	\item for $i'$ in $\{1,\dots,d\}$, with $i'\ne i$, $\alpha_{i',1} \ne
 	\alpha_{i,1}$;
-	\item $Q_i$ is a reduced algebra (equivalently, $I_i$ is radical).
+	\item $\residueI_i$ is a reduced algebra (equivalently, $I_i$ is radical).
 \end{itemize}
 We denote by $\mathfrak{A}\subset \{1,\dots,d\}$ the set of
 corresponding indices $i$, and we let
@@ -2275,14 +2277,14 @@ is a separating element for $V'$.
 Correspondingly, we define $\mathfrak{a}$ as the set of all indices
 $j$ in $\{1,\dots,c\}$ such that $\sigma_j$ is in $\mathfrak{A}$. In
 other words, $j$ is in $\mathfrak{a}$ if and only if $T_j$ has
-cardinality $1$ and $Q_{\sigma_j}$ is reduced.  The algorithm in this
+cardinality $1$ and $\residueI_{\sigma_j}$ is reduced.  The algorithm in this
 paragraph will compute a zero-dimensional parametrization of
 $V_{\mathfrak{A}}$; we use the following lemma to perform this
 decomposition of $V$.
 
 \begin{lemma}\label{lemma:acb2}
 	Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be a
-	linear form over $\prod_{i \in T_j} Q_i$ and let $t=t_2 X_2
+	linear form over $\prod_{i \in T_j} \residueI_i$ and let $t=t_2 X_2
 	+ \cdots + t_n X_n$. Define constants $a,b,c$ in $\Kbar$ by
 	$$a=\lambda(1),\quad b=\lambda(t),\quad c=\lambda(t^2).$$
 	Then, $j$ is in $\mathfrak{a}$
@@ -2292,7 +2294,7 @@ decomposition of $V$.
 	The assumption that $\mu_j=1$ means that for all $i$ in $T_j$,
 	$\nu_i=1$. The linear 
 	form $\lambda$ can be uniquely written as a sum $\lambda=\sum_{i \in T_j}
-	\ell_i$, where each $\ell_i$ is in ${\rm hom}_\Kbar(Q_i,\Kbar)$.
+	\ell_i$, where each $\ell_i$ is in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$.
 	The fact that all $\nu_i$ are equal to $1$ then implies that each $\ell_i$ takes the form 
 	$$\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i),$$
 	where $\Lambda_{i}$ is a differential operator that does not 
@@ -2321,7 +2323,7 @@ decomposition of $V$.
 	+2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}t_rt_s.
 	\end{align*}
 	Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
-	have only one term $\Lambda_{\sigma_j}$ to consider, and $Q_{\sigma_j}$ 
+	have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
 	is reduced, so that all coefficients $P_{\sigma_j,r}$ and
 	$P_{\sigma_j,r,s}$ vanish. Thus, we are left in
 	this case with
@@ -2339,7 +2341,7 @@ decomposition of $V$.
 	non-zero.
 	
 	Suppose first that for at least one index $\sigma$ in $T_j$,
-	$Q_\sigma$ is not reduced. In this case, there exists as least one
+	$\residueI_\sigma$ is not reduced. In this case, there exists as least one
 	index $\rho$ in $\{2,\dots,n\}$ such that
 	$P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})$ is not
 	identically zero \todo{explain better}. Let us set all $\bu_{\sigma'}$
@@ -2350,7 +2352,7 @@ decomposition of $V$.
 	which is non-zero, so that $ac-b^2$ itself must be non-zero.
 	
 	Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
-	has cardinality at least $2$, with $Q_\sigma$ reduced for all $\sigma$
+	has cardinality at least $2$, with $\residueI_\sigma$ reduced for all $\sigma$
 	in $T_j$ (so that $P_{\sigma,r}$ and $P_{\sigma,r,s}$ vanish for 
 	all such $\sigma$ and all $r,s$). Suppose that $\sigma$ and $\sigma'$ are two indices in
 	$T_j$; we set all indices $u_{\sigma'',1}$ to zero, for $\sigma''$
@@ -2376,7 +2378,7 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	~\\
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $Q$
+		\item a linear form $\ell$ over $\residueI$
 		\item a linear form $t=t_2 X_2 + \cdots + t_n X_n$
 	\end{itemize}
 	{\bf Output:} polynomials $((P,V_1,\dots,V_n),X_1)$
@@ -2400,7 +2402,7 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 
 \begin{lemma}
 	Suppose that $\ell$ is a generic element of ${\rm
-		hom}_{\Kbar}(Q,\Kbar)$ and that $t$ is a generic linear form. Then
+		hom}_{\Kbar}(\residueI,\Kbar)$ and that $t$ is a generic linear form. Then
 	the output $((P,V_1,\dots,V_n),X_1)$ of
 	$\mathsf{ParametrizationX}_1(\ell,t)$ is a zero-dimensional
 	parametrization of $V_{\mathfrak{A}}$.
@@ -2427,7 +2429,7 @@ kind of calculations as in $\mathsf{ParametrizationGeneric}$.
 	$T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
 	$$ A_1(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
 	A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
-	is in $\mathfrak{a}$, $Q_{\sigma_j}$ is reduced, so that there
+	is in $\mathfrak{a}$, $\residueI_{\sigma_j}$ is reduced, so that there
 	exists a constant $\lambda_{j,1}$ such that for all $f$ in
 	$\Kbar[X_1,\dots,X_n]$, $\lambda_j(f)$ takes the form $\lambda_{j,1}
 	f(\balpha_{\sigma_j})$. This shows that, as claimed,
