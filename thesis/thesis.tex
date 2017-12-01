@@ -2407,27 +2407,27 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
 		\begin{enumerate}
 			\item let $A_{X_i} = \Omega((\ell(X_i X_1^s))_{s\ge0},M)$
 		\end{enumerate}
-		\item \textbf{return} $((P,T,A_{X_2}/ A_1 \bmod P, \dots,A_{X_n}/A_{1} \bmod P),X_1)$
+		\item \textbf{return} $((P,T,A_{X_2}/ A_0 \bmod P, \dots,A_{X_n}/A_{0} \bmod P),X_1)$
 	\end{enumerate}
 	\label{algo:para}
 \end{algorithm}
 
 \begin{lemma}
 	Suppose that $\ell$ is a generic element of ${\rm
-		hom}_{\Kbar}(\residueI,\Kbar)$ and that $t$ is a generic linear form. Then
+		hom}_{\Kbar}(\residueI,\Kbar)$ and that $\mf$ is a generic linear form. Then
 	the output $((P,V_1,\dots,V_n),X_1)$ of
-	$\mathsf{ParametrizationX}_1(\ell,t)$ is a zero-dimensional
+	$\mathsf{ParametrizationX}_1$ is a zero-dimensional
 	parametrization of $V_{\mathfrak{A}}$.
 \end{lemma}
 \begin{proof}
-	\cref{lemma:minpoly} shows that for a generic choice of $\ell$,
-	$M$ is the minimal polynomial of $X_1$, so that we indeed have
-	$P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$. Let then $r_j$ be
-	one of these roots; by \cref{lemma:valuelambda}, for $i=0,1,2$
-	we have $ A_i(r_j) = M'(r_j) (t^i \cdot \lambda_j)(1)$, where
-	$\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
-	components of $\ell$. 
-	
+  \cref{lemma:minpoly} shows that for a generic choice of $\ell$,
+  $M$ is the minimal polynomial of $X_1$, so that we indeed have
+  $P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$. Let then $r_j$ be
+  one of these roots; by \cref{lemma:valuelambda}, for $i=0,1,2$
+  we have $ A_i(r_j) = M'(r_j) (\mf^i \cdot \lambda_j)(1)$, where
+  $\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
+  components of $\ell$. 
+  
 	As a result, the value of $ A_0  A_2 -  A_1^2$ at
 	$r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
 	quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
@@ -2453,26 +2453,24 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
 	we simply add the polynomial $T$ to our list.
 \end{proof}
 
+\begin{center}
 \begin{tabular}{c|c|c|c|c|c|c}
-3-vars16&3 &4096&0.437&0.433&0.47&4096/4096\\
-3-vars18&3 &5832&0.435&0.439&0.455&5832/5832\\
-3-vars20&3 &8000&0.437&0.439&0.448&8000/8000\\
-3-vars22&3 &10648&0.437&0.444&0.444&10648/10648\\
-4-vars7&4 &2401&0.426&0.475&0.467&2401/2401\\
-4-vars8&4 &4096&0.427&0.429&0.445&4096/4096\\
-4-vars9&4 &6561&0.429&0.425&0.438&6561/6561\\
-4-vars10&4 &10000&0.426&0.426&0.431&10000/10000\\
-
-3-vars-mixed14&3 &2808&0.467&0.576&0.545& 2744/2752\\
-3-vars-mixed15&3 &3591&0.545&0.573&0.601& 3375/3402\\
-3-vars-mixed16&3 &4312&0.521&0.541&0.597& 4096/4123\\
-4-vars-mixed6&4 &1552&0.693&0.743&0.807& 1296/1312\\
-4-vars-mixed7&4 &2657&0.557&0.573&0.607& 2041/2417\\
-4-vars-mixed8&4 &4352&0.485&0.493&0.51& 4096/4112\\
-quadratic-mixed10&10 &1035&0.43&0.449&0.532& 1024/1025\\
-quadratic-mixed11&11 &2060&0.413&0.42&0.445& 2048/2049\\
-quadratic-mixed12&12 &4109&0.428&0.434&0.441& 4096/4097\\
-
+\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
+rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
+rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
+rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
+rand2-1&4 &4096&0.427&0.429&0.445&4096/4096\\
+rand2-2&4 &6561&0.429&0.425&0.438&6561/6561\\
+rand2-3&4 &10000&0.426&0.426&0.431&10000/10000\\
+mixed1-1&3 &2808&0.467&0.576&0.545& 2744/2752\\
+mixed1-2&3 &3591&0.545&0.573&0.601& 3375/3402\\
+mixed1-3&3 &4312&0.521&0.541&0.597& 4096/4123\\
+mixed2-1&4 &1552&0.693&0.743&0.807& 1296/1312\\
+mixed2-2&4 &2657&0.557&0.573&0.607& 2041/2417\\
+mixed2-3&4 &4352&0.485&0.493&0.51& 4096/4112\\
+mixed3-1&10 &1035&0.43&0.449&0.532& 1024/1025\\
+mixed3-2&11 &2060&0.413&0.42&0.445& 2048/2049\\
+mixed3-3&12 &4109&0.428&0.434&0.441& 4096/4097\\
 eco12&12 &1024&0.223&0.245&0.307&1024/1024\\
 katsura10&11 &1024&0.411&0.427&0.483&1024/1024\\
 sot1&5 &8694&1.07&1.09&1.19 & 1012/7682\\
@@ -2480,12 +2478,10 @@ vor2&6 &574&0.49&0.533&0.675&574/574\\
 W1-2-10-4&10 &1344&0.487&0.496&0.527&1344/1344\\
 W1-2-11-4&11 &1920&0.486&0.491&0.505&1920/1920\\
 W1-3-7-3&7 &6480&0.455&0.456&0.468&6480/6480\\
-W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480\\
-
-	
+W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480
 \end{tabular}
+\end{center}
 
-\newpage
 \bibliographystyle{plain}
 \bibliography{thesis}
 \end{document}
