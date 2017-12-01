@@ -1649,11 +1649,11 @@ non-zero entry is a $1$ at the first row.
   \item\label{mainstep6} { let $\minpoly$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
   \item\label{mainstep7} { let $\sqfree$ be  the squarefree part  of $\minpoly$}
   \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
-  \item\label{mainstep9}  let $C_1 = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
+  \item\label{mainstep9}  let $C_1 = \mathsf{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
     (\mat{L}_s)_{0 \le s < d})$
   \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
     \begin{enumerate}
-     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
+     \item let $C_{X_i} = \mathsf{ScalarNumerator}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
     \end{enumerate}
 \item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
@@ -1818,44 +1818,6 @@ where the second term now gives the cost of computing $\mM$,
 as well as $C_1$ and all $C_{X_i}$.
 
 
-
-%% and 
-%% $$((T - \mU\mM\mU^{-1})(\mU/T + \mU\mM/T^2))_{T^{\ge 0}} = \mU. $$
-%% For $\mM_j$, $1 \le j \le n$, we get the sequence $(\mU\mM_j,\mU\mM\mM_j)$ and
-%% $$((T - \mU\mM\mU^{-1})(\mU\mM_j/T + \mU\mM\mM_j/T))_{T^{\ge 0}} = \mU\mM_j.$$
-%% Thus, we get the following algorithm:
-
-%% \begin{algorithm}[H]
-%% 	\caption{Dense Block Sparse-FGLM($\mM,\mM_1,\dots,\mM_n$)}
-%% 	{\bf Input:} \vspace{-0.5em}
-%% 	\begin{itemize}
-%% 		\item $\mM,\mM_1,\dots,\mM_n$ defined as above
-%% 	\end{itemize}
-%% 	{\bf Output:} polynomials $(R,R_1,\dots,R_n)$
-%%   \begin{enumerate}[{\bf 1.}]
-%% 		\item choose $\mU \in \mathbb{K}^{D\times D}$
-%% 		\item $\mF^{U,M} = T - \mU\mM\mU^{-1}$
-%% 		\item $\mN^{*} = \mU$
-%% 		\item $P =$ largest invariant factor of $\mF^{U,M}$
-%% 		\item $R =$ SquareFreePart$(P)$
-%% 		\item {\sf $a = [0 ~\cdots~ 0~ P] (\mF^{\mU,\mV})^{-1}$}
-%% 		\item {\sf $N=a\mN^*e$}
-%% 		\item {for j = $1 \dots n$:}
-%%       \begin{enumerate}[{\bf 8.1.}]
-%% 			\item $\mN_j^* = \mU\mM_j$
-%% 			\item $N_j = a\mN_j^*e$
-%% 			\item $R_j = N_j/N$ mod $R$
-%% 		\end{enumerate}
-%% 		\item return $((R, R_1,\dots,R_n),t)$
-%% 	\end{enumerate}
-%% 	\label{algo:dense-block-sparse-fglm}
-%% \end{algorithm}
-%% Let $\omega$ be an exponent such that matrices of size $n$ can be multiplied
-%% in $O(n^{\omega})$. In this case, computing $\mF^{U,M}$ costs $O(D^\omega)$
-%% and computing $N,N_1,\dots,N_n$ costs $O(nD^2)$ since entries of $a$ has roughly degree $D$. \todo{We can solve for $a$ by
-%% using the high-order lifting algorithm of \cite[Algorithm~5]{Stor03}. 
-%% By \cite[Corollary~16]{Stor03}, the cost of this is $O(D^\omega \log(D))$.}
-%% Putting everything together, we get the final cost of $O(D^\omega\log(D) + nD^2)$.
 
 
 
@@ -2129,11 +2091,11 @@ significantly more dense than $\mM_1,\dots,\mM_n$. In all this
 section, we will work under the assumption that $\mM_1$ the sparsest
 matrix among $\mM_1,\dots,\mM_n$.
 
-All notation, such as $I$, $\residueI$, \dots, are as in the two previous
-sections.  In particular, we write
-$V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s in
-$\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
-$i$.
+All notation, such as $I$, $\residueI$, it basis
+$\basis=(b_1,\dots,b_D)$, \dots, are as in the two previous sections.
+In particular, we write $V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with
+all $\balpha_i$'s in $\Kbar^n$, and
+$\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all $i$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2414,20 +2376,20 @@ decomposition of $V$.
 
 The previous lemmas allow us to write Algorithm
 $\mathsf{ParametrizationX}_1$. After computing $M$, we determine its
-factor $P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$, which is
+factor $F=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$, which is
 obtained by taking the squarefree part of $M$ and dividing it by
 $\gcd(M,M')$. We split this polynomial further using the previous
 results in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
 conclude using the same kind of calculations as in Algorithm
-$\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
-
+$\mainalgoname$.
 
 \begin{algorithm}[H]
-	\caption{$\mainalgoname{\sf X}_1(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+	\caption{$\mainalgoname{\sf X}_1(\mM_1,\dots,\mM_n,\mU,\mV,\mf$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
-		\item $\mM_1,\dots,\mM_n$ defined as above
+		\item multiplication matrices $\mM_1,\dots,\mM_n$ in $\K^{D \times D}$
 		\item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
+                \item $\mf =y_2 X_2 + \cdots + y_n X_n$
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
@@ -2439,72 +2401,56 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
   \item\label{X1step5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
   \item\label{X1step6} { let $M$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
   \item\label{X1step7} { let $F$ be  the squarefree part  of $M$}
+  \item\label{X1step7b} let $F = F /\gcd(M, M')$
   \item\label{X1step8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
-  \item let $\mf = a_2 X_2 + \cdots + a_n X_n$ be a random linear form in $X_2,\dots,X_n$
+  \item let $\mN = y_2 \mM_2 + \cdots+y_n \mM_n$
   \item \textbf{for} $i=0,1,2$ \textbf{do}
     \begin{enumerate}
-    \item\label{X1step9}  let $A_i = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
+    \item\label{X1step9}  let $A_i = \mathsf{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \mN^i \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
     \end{enumerate}
-  \item\label{X1step10} \textbf{for} $i=1,\dots,n$ \textbf{do}
+  \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do}
     \begin{enumerate}
-     \item let $C_{X_i} = \mathrm{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
+     \item let $A_{X_i} = \mathsf{ScalarNumerator}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
     \end{enumerate}
-\item\label{X1step11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
+\item\label{X1step11}   \textbf{return} $((F,T,A_{X_2}/ A_0 \bmod F, \dots,A_{X_n}/A_{0} \bmod F),X_1)$
   \end{enumerate}  \label{algo:X1block-sparse-fglm}
 \end{algorithm}
 
-\begin{algorithm}[H]
-	\caption{$\mathsf{ParametrizationX}_1(\ell)$}
-	~\\
-	{\bf Input:} \vspace{-0.5em}
-	\begin{itemize}\setlength\itemsep{0em}
-		\item a linear form $\ell$ over $\residueI$
-	\end{itemize}
-	{\bf Output:}  \vspace{-0.5em}
-        \begin{itemize}
-        \item polynomials $((P,V_1,\dots,V_n),X_1)$
-        \end{itemize}
-	\begin{enumerate}\setlength\itemsep{0em}
-		\item let $M$ be the minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge 0}$
-		\item let $P$ be the squarefree part of $M$
-                \item let $P = P /\gcd(M, M')$
-		\item let $\mf$ be a random linear form in $X_2,\dots,X_n$
-		\item \textbf{for} $i=0,1,2$ \textbf{do}
-		\begin{enumerate}
-			\item let $A_i = \Omega((\ell(\mf^i X_1^s))_{s\ge0},M)$
-		\end{enumerate}
-		\item\label{step:updateP} let $P = \gcd(P, A_0  A_2- A_1^2)$
-		\item \textbf{for} $i=2,\dots,n$ \textbf{do}
-		\begin{enumerate}
-			\item let $A_{X_i} = \Omega((\ell(X_i X_1^s))_{s\ge0},M)$
-		\end{enumerate}
-		\item \textbf{return} $((P,T,A_{X_2}/ A_0 \bmod P, \dots,A_{X_n}/A_{0} \bmod P),X_1)$
-	\end{enumerate}
-	\label{algo:para}
-\end{algorithm}
 
 \begin{lemma}
-	Suppose that $\ell$ is a generic element of ${\rm
-		hom}_{\Kbar}(\residueI,\Kbar)$ and that $\mf$ is a generic linear form. Then
-	the output $((P,V_1,\dots,V_n),X_1)$ of
-	$\mathsf{ParametrizationX}_1$ is a zero-dimensional
-	parametrization of $V_{\mathfrak{A}}$.
+  For generic choices of $\mU$, $\mV$ and $\mf$, the output
+  $((F,G_1,\dots,G_n),X_1)$ of $\mathsf{ParametrizationX}_1$ is a
+  zero-dimensional parametrization of $V_{\mathfrak{A}}$.
 \end{lemma}
 \begin{proof}
-  \cref{lemma:minpoly} shows that for a generic choice of $\ell$,
-  $M$ is the minimal polynomial of $X_1$, so that we indeed have
-  $P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$. Let then $r_j$ be
-  one of these roots; by \cref{lemma:valuelambda}, for $i=0,1,2$
-  we have $ A_i(r_j) = M'(r_j) (\mf^i \cdot \lambda_j)(1)$, where
-  $\lambda_j =\sum_{i \in T_j} \ell_i$, and the $\ell_i$'s are the
-  components of $\ell$. 
+  As in the case of $\mainalgoname$, for generic choices of $\mU$ and
+  $\mV$, the degree bound $\deg(\mat{P}_{\mU,\mV}) \le d$ holds and
+  $M$ is the minimal polynomial of $X_1$ in $\residueI$; hence, after
+  Step~\ref{X1step7b}, we have $F=\prod_{j \in \{1,\dots,c\}, \mu_j=1}
+  (T-r_j)$. 
+
+  The calculation of $A_0,A_1,A_2$ and $A_{X_2},\dots,A_{X_n}$ is
+  justified as in $\mainalgoname$, by means of
+  \cref{lemma:omegaOmega}. For $i=1,\dots,D$, let $u_{i,1}$ is the entry at position
+  $(i,1)$ in $\mU$, and define the linear 
+form $\ell: \residueI \to \K$ by 
+  $$\ell(f) = \sum_{1 \le i \le D} f_i u_{i,1}, \quad\text{for} f =
+\sum_{i \in \basis} u_i b_i.$$ Then, the above lemma proves that $A_i =
+\Omega((\ell(\mf^i X_1^s))_{s\ge0},M)$ for $i=0,1,2$ and $A_{X_i} =
+\Omega((\ell(X_i X_1^s))_{s\ge0},M)$ for $i=2,\dots,n$.
+
+  Take then $j$ in $\{1,\dots,c\}$ such that $\mu_j=1$, that is, a
+  root of $F$ as computed at Step~\ref{X1step7b}. By
+  \cref{lemma:valuelambda}, for $i=0,1,2$, we have $ A_i(r_j) = M'(r_j)
+  (\mf^i \cdot \lambda_j)(1)$, where $\lambda_j =\sum_{i \in T_j}
+  \ell_i$, and the $\ell_i$'s are the components of $\ell$.
   
   As a result, the value of $ A_0  A_2 -  A_1^2$ at
   $r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
   quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
-  generic choice of $\ell$ and $\mf$, it vanishes if and only if $j$ is
-  in $\mathfrak{a}$. Thus, after Step~\ref{step:updateP}, 
-  $P$ is equal to $\prod_{j \in \mathfrak{a}} (T-r_j)$.
+  generic choice of $\ell$ (that is, of $\mU$) and $\mf$, it vanishes if and only if $j$ is
+  in $\mathfrak{a}$. Thus, after Step~\ref{X1step7b}, 
+  $F$ is equal to $\prod_{j \in \mathfrak{a}} (T-r_j)$.
 	
   The last step is to compute the zero-dimensional parametrization of
   $V_{\mathfrak{A}}$. This is done using again
@@ -2524,13 +2470,9 @@ $\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
       we simply add the polynomial $T$ to our list.
 \end{proof}
 
-The algorithm as described above does not specify how to compute the
-minimal polynomial $M$ at Step~1 or the scalar numerators $A_0,\dots$
-needed at Steps~5 and~7. One should of course use the same blocking
-methods as in \cref{ssec:mainalgo}, based on the computation of a
-minimal matrix generator and its largest invariant factor (to compute $M$), and
-\cref{lemma:omegaOmega} to compute all $A_i$s.
-
+The cost analysis is the same as that of algorithm $\mainalgoname$, the
+only difference being that the density $\rho_1$ of $\mM_1$ plays the 
+role of the density $\rho$ of $\mM$ used in that algorithm.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
