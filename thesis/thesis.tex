@@ -82,7 +82,7 @@
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
-\newcommand{\mainalgoname}{{\sf BlockParametrization}}
+\newcommand{\mainalgoname}{\mathsf{ BlockParametrization}}
 \newcommand{\lf}{X}
 \newcommand{\mf}{Y}
 \newcommand{\residueI}{\mathscr{Q}}
@@ -284,9 +284,8 @@ sparsity, assuming the validity of a conjecture by
 Moreno-Soc\'ias~\cite{MorenoSocias91}. 
 On this basis, they designed several forms of {\em sparse FGLM}
 algorithms. For instance, if $I$ is in shape position, the algorithms
-%%%%%%%% TODO
 in \cite{FaMo17} recover this basis
-%%%%%%%% TODO --> Vincent: this basis is unclear to me
+%%%%%%%% TODO --> "this basis" is unclear
 by also considering values of
 a linear form $\ell:\residueI \to \K$. For less favorable inputs, the algorithm
 falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90}
@@ -357,10 +356,10 @@ The main results we will need from the first three subsections are
 \cref{coro:cost_approx} and \cref{randXY}, which give cost estimates for the
 computation of a {\em minimal matrix generator} of a linearly recurrent matrix
 sequence obtained from Krylov sequences, as well as a degree bound for such
-generators. These results are for the most part not new
+generators. These results are, for the most part, not new
 (see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost analysis we
 give uses results not available when those references were first written.  The
-fourth and last subsection presents a useful result for our main algorithm,
+fourth and last subsection presents a useful result for our main algorithm
 that allows us to compute a ``numerator'' for a scalar sequence from a similar
 object obtained for a matrix sequence.
 
@@ -392,7 +391,7 @@ $\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.
 It is often easier to work with a closed form that has the actual
 minimal polynomial as its denominator, rather than its reverse; this
 is done by working with generating series in the variable $1/T$.  Let
-indeed $\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
+$\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
 be any polynomial; then, $\minpoly$ cancels the sequence $\mathcal{L}$
 if and only if $Q=\minpoly \genseries $ is a polynomial, in which case $Q$
 must have degree less than $\deg(\minpoly)$.  Using generating series in
@@ -417,8 +416,8 @@ associated numerator.  This is formalized in the next definition:
 \end{definition}
 \begin{remark} ~
   \begin{itemize}
-  \item We may as well write this definition using expressions in
-    variable $T$ instead of $1/T$: given
+  \item We may write this definition using expressions in
+    variable $T$ instead of $1/T$ as well: given
     $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
     $\Omega(\mathcal{L},P)$ by considering $S=\sum_{s\ge 0} \ell_s
     T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
@@ -450,7 +449,6 @@ algorithm. Explicitly, suppose that $\mathcal{L} = (a_1^s + \cdots + a_n^s)_{s
 \ge 0}$ for some pairwise distinct elements $a_1,\dots,a_n \in \K$. Then, its
 minimal polynomial is $\minpoly=\prod_{i=1}^n (T-a_i)$, and the numerator
 is $\Omega(\mathcal{L}, P) = \sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
-%% TODO V: check variable n is ok
 
 Let us go back to the general case of a sequence $\mathcal{L}
 =(\ell_s)_{s\ge0}\in\K^\N$.  In terms of complexity, assuming that
@@ -459,10 +457,10 @@ first $2d$ terms, we can recover its minimal polynomial $P$ by means of the
 Berlekamp-Massey algorithm, or of Euclid's algorithm applied to rational
 function reconstruction; this can be done in $O(\M(d)\log(d))$ operations in
 $\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
-%%TODO \M(d) has not been introduced
-%% TODO V: check citation ok. Is there a simpler approach?
 deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
 multiplication in degree $\deg(P)$.
+
+\todo{introduce $\M(d)$ somewhere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -600,8 +598,11 @@ rectangular matrix multiplication in sizes $(\rdim,\rdim)$ and
 $(\rdim,\cdim)$. For simplicity, we only give the two most useful
 cases: if $\cdim=\rdim$, this takes $O(\rdim^\omega \M(d))$ operations
 in $\K$; if $\cdim =1$, the cost becomes $O(\rdim^2 \M(d))$.
-%% TODO in fact if $\cdim=1$ and d terms we will have average row degree ~d/m
-%% --> the cost would rather be O(m^w M(d/m))
+
+%%% Remark to keep in comment for now:
+%%% (not so important here, and not clear what to cite to say it concisely)
+%% in fact if $\cdim=1$ and d terms we will have average row degree ~d/m
+%% --> the cost would be better, O(m^w M(d/m))
 %% more generally, average row degree ~nd/m -->  O(m^w M(nd/m))
 
 In all the previous discussion, we remark that we may also consider
@@ -761,11 +762,12 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\cdim\degBd)^3)$ operations in $\field$.
   \end{itemize}
 \end{corollary}
-In particular, when $\cdim = \rdim$, we can find the canonical
+In particular, when $\cdim = \rdim$, we can find a minimal
 left matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
 \log(\degBd))$ operations in $\field$.
-%%% TODO V: what ? from where ?
-%%% TODO V: rather refer to today's preprint ?
+
+%% Note (Vincent): if fastpab submission is accepted, update this corollary
+%% --> items 1 and 2 : we get the canonical generator for the same cost
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -776,7 +778,8 @@ matrix sequences, namely the Krylov sequences used in the block
 Wiedemann algorithm. 
 
 Let $\mM$ be in $\mathbb{K}^{D \times D}$ and $\mU,\mV \in
-\mathbb{K}^{D \times m}$ be two blocking matrices; we can then define
+\mathbb{K}^{D \times m}$ be two blocking matrices for some $m\le D$. We can
+then define
 the Krylov sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0} \subset
 \matSpace[m]$ by
 $$\seqelt{s,\mU,\mV} = \mU^{\perp} \mM^s \mV, \quad s \ge 0.$$ This
@@ -795,7 +798,6 @@ We let $s_1, \dots, s_r$ be the invariant factors of $T\mI_D
 let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
 with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
-%%% TODO V: equality ???
 
 %% \todo{unify subscripts  $\mat{P}^{\mU,\mV}$ or   $\seq^{\mU,\mV}$}
 
@@ -832,14 +834,14 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   generic $\mV$ in $\K^{D\times m}$,
   $\mat{P}_{\mU}=\mat{P}_{\mU,\mV}$.  Indeed,
   by~\cite[Lemma~4.2]{Villard97a} (which considers right-generators),
-  there exist matrices $\mat{Q}_\mU$ in $\K^{D\times D_\mU}$ and
-  $\mN_\mU \in \K^{D_\mU \times D_\mU}$, with $\mat{Q}_\mU$ of full
+  there exist matrices $\mat{J}_\mU$ in $\K^{D\times D_\mU}$ and
+  $\mN_\mU \in \K^{D_\mU \times D_\mU}$, with $\mat{J}_\mU$ of full
   rank $D_\mU$, and where $\mN_\mU$ is a matrix of the restriction of
   $\mM^\perp$ to $\langle \mU \rangle$, such that
   $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$ if and only if the dimension of
   the vector space generated by the rows of the span of
-  $\mV^\perp\mat{Q}_\mU, \mV^\perp \mat{Q}_\mU \mN_\mU, \mV^\perp
-  \mat{Q}_\mU \mN_\mU^2,\dots$ is equal to $D_\mU$.
+  $\mV^\perp\mat{J}_\mU, \mV^\perp \mat{J}_\mU \mN_\mU, \mV^\perp
+  \mat{J}_\mU \mN_\mU^2,\dots$ is equal to $D_\mU$.
 %% , with $\mB_\mV=\mM^\perp_\mV$
   %% and $\mZ=\mat{P}_\mV^\perp \mU \in \K^{D_\mV \times m}$.
 	
@@ -848,11 +850,11 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   blocks (take the $\mN_\mU$-span of the first column of $\mU$, then of
   the second column, working modulo the previous vector space, etc.)
   Thus, $\mN^\perp_\mU$ is similar to a block-companion matrix with $\mu$
-  blocks as well; since $\mat{Q}_\mU^\perp \mV$ has $m$ columns, the span of
+  blocks as well; since $\mat{J}_\mU^\perp \mV$ has $m$ columns, the span of
   the columns of
-  $\mat{Q}_\mU^\perp \mV,  \mN^\perp_\mU\mat{Q}_\mU^\perp \mV,\dots$
+  $\mat{J}_\mU^\perp \mV,  \mN^\perp_\mU\mat{J}_\mU^\perp \mV,\dots$
  has full dimension $D_\mU$ for a
-  generic $\mat{Q}_\mU^\perp \mV$, and thus for a generic $\mV$, since $\mat{Q}_\mU$ has rank
+  generic $\mat{J}_\mU^\perp \mV$, and thus for a generic $\mV$, since $\mat{J}_\mU$ has rank
   $D_\mU$. As a result, as claimed, for generic choices of $\mU$ and $\mV$,
   $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$.
 	
@@ -919,7 +921,6 @@ deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
 \rceil$ terms of the sequence $\seq_{\mU,\mV}$, we can recover a
 minimal matrix generator  $\mat{P}_{\mU,\mV}$ of it using $O(m^\omega \M(D/m) \log(D/m))
 \subset \softO{m^{\omega-1} D}$ operations in $\K$.
-%% TODO require m <= D ?
 
 Besides, the theorem shows that for generic $\mU$ and $\mV$, the
 largest invariant factor $\sigma_1$ of $\mat{P}_{\mU,\mV}$ is the
@@ -935,15 +936,14 @@ $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
 \cite[Corollary~16]{Stor03}, the
 cost of this is $O(m^{\omega} \M(D/m)
 \log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-%% TODO V: two logs: this is strange
+%% FIXME correct cost bound (other locations as well)
 the latter algorithm is randomized, since it chooses a random point in
 $\K$ to compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
-% todo for after submission: rework this cost bound.
-% --> Only one logarithmic factor with kernel basis, no?
-% --> and/or, since $\mat{P}_{\mU,\mV}$ is reduced, couldn't use reversals if
-%  we'd like to avoid randomization in high-order lifting?
+%% todo for after submission: think about writing the following deterministic approach:
+%% (unless this means spending too much space on something not so central?)
+%% since $\mat{P}_{\mU,\mV}$ is reduced, we could use the expansion of the reversal
 
 An alternative solution would be to compute the Smith form of
 $\mat{P}_{\mU,\mV}$, but using an algorithm such as
@@ -989,20 +989,14 @@ left-hand row vector.
 \begin{lemma}\label{utilde}
   For generic $\mU,\mV$, the row vector $\row{a}_i$ has polynomial
   entries of degree at most~$D$.
-  %% Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
-  %% then $\textbf{a}$ has polynomial entries.
+  %TODO V
 \end{lemma}
 \begin{proof}
-  For generic $\mU,\mV$, we saw that $\minpoly$ is the largest
-  invariant factor of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product
-  $\minpoly\ (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ 
-  the $i$th row of this matrix, our first claim follows. Since
-  $\mat{P}_{\mU,\mV}$ has determinantal degree
-  %% TODO V:
-  % \deg(\sigma_1) + \cdots + \deg(\sigma_m) = \deg(s_1) + \cdots + \deg(s_m) = D
-  %% deg(a) <= deg(P)
-  at most $D$~\cite{todo}, the bound
-  on the degree of the entries of $\row{a}_i$ follows from Cramer's
+  For generic $\mU,\mV$, we saw that $\minpoly$ is the largest invariant factor
+  of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product $\minpoly\
+  (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ the $i$th
+  row of this matrix, our first claim follows. Furthermore, the bound on the
+  degree of the entries of $\row{a}_i$ is a direct consequence of Cramer's
   formulas.
 \end{proof}
 To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
@@ -1078,7 +1072,7 @@ $\K$. Then, the dot product with $\row{a}_i$ takes $O(m \M(D))$
 operations, since both vectors have size $m$ and entries of degree at
 most $D$. Thus, the runtime is 
 $$O(D^2 + m \M(D)) \subset \softO{D^2}$$
-operations in $\K$. \todo{$m \le D$}
+operations in $\K$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1283,11 +1277,11 @@ section of this paper.
     \left (\frac v{T-\lf} \right ) \\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     \left (\frac{ \partial \lf} {\partial X_k} \right)^{\mu_k}
-    %% TODO Vincent: parentheses maybe to make it more readable?
+    %% TODO parentheses maybe to make it more readable?
     \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     t_k^{\mu_k}
-    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{\sqfree}{(T-\lf)^{|\mu|}},
+    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{H}{(T-\lf)^{|\mu|}},
   \end{align*}
   for some polynomials $P_1,\dots,P_{|\mu|},\sqfree$ in $\K[X_1,\dots,X_n,T]$ that
   depend on the choices of $\mu$, $v$ and $X$, with $\deg(P_i,T) < i$
@@ -1302,7 +1296,7 @@ section of this paper.
       \lf^s )} {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}
     \frac{1}{T^{s+1}} &= v\,\sum_{\mu \in R} c_\mu |\mu|!\, \prod_{1
       \le k \le n} t_k^{\mu_k} \frac {1}{(T-\lf )^{|\mu|+1}} +\sum_{\mu
-      \in R} \frac{\sqfree_\mu}{(T-\lf)^{|\mu|}},
+      \in R} \frac{H_\mu}{(T-\lf)^{|\mu|}},
   \end{align*}
   where each $\sqfree_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
   $|\mu|$ in $T$.  Let $w$ be the maximum of all $|\mu|$ for $\mu$ in
@@ -1636,7 +1630,7 @@ $\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
 non-zero entry is a $1$ at the first row.
 
 \begin{algorithm}[H]
-	\caption{\mainalgoname($\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item $\mM_1,\dots,\mM_n$ defined as above
@@ -1809,7 +1803,7 @@ where the second term gives the cost of computing $\mM$.
 
 When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
 matrices and $d = D/m = 1$. A minimal generating polynomial of
-$\seq_{\mU,\mV} = (\mU^\perp, \mU^\perp\mM\mV,\dots)$ is
+$\seq_{\mU,\mV} = (\mU^\perp\mV, \mU^\perp\mM\mV,\dots)$ is
 $\mat{P}_{\mU,\mV} = T \mat{I}_D - \mU^\perp\mM\mU^{-\perp}.$ Its
 largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
 $O(D^\omega \log(D))$ operations in $\K$.  The numerator
@@ -2542,13 +2536,13 @@ minimal matrix generator and its largest invariant factor (to compute $M$), and
 
 \subsection{Completing the description}
 
-\todo{sf or not for algos} The second part of the algorithm computes a
+The second part of the algorithm computes a
 zero-dimensional parametrization of
 $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call
-Algorithm {\sf Parametrization}, but with a carefully chosen linear
+Algorithm $\mathsf{ Parametrization}$, but with a carefully chosen linear
 form $\ell'$ as input: we build $\ell'$ such that its support is
 $\mathfrak{B}$; this is denoted by $\ell'={\sf Update}(\cdots)$ in
-Algorithm ${\sf ParametrizationWithSplitting}$.
+Algorithm $\mathsf{ParametrizationWithSplitting}$.
 
 Let $D_{\mathfrak{A}}$ be the number of points in $V_{\mathfrak{A}}$;
 since all $Q_i$, for $i$ in $\mathfrak{A}$, are reduced algebras,
