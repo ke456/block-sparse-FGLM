@@ -357,10 +357,10 @@ The main results we will need from the first three subsections are
 \cref{coro:cost_approx} and \cref{randXY}, which give cost estimates for the
 computation of a {\em minimal matrix generator} of a linearly recurrent matrix
 sequence obtained from Krylov sequences, as well as a degree bound for such
-generators. These results are for the most part not new
+generators. These results are, for the most part, not new
 (see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost analysis we
 give uses results not available when those references were first written.  The
-fourth and last subsection presents a useful result for our main algorithm,
+fourth and last subsection presents a useful result for our main algorithm
 that allows us to compute a ``numerator'' for a scalar sequence from a similar
 object obtained for a matrix sequence.
 
@@ -392,7 +392,7 @@ $\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.
 It is often easier to work with a closed form that has the actual
 minimal polynomial as its denominator, rather than its reverse; this
 is done by working with generating series in the variable $1/T$.  Let
-indeed $\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
+$\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
 be any polynomial; then, $\minpoly$ cancels the sequence $\mathcal{L}$
 if and only if $Q=\minpoly \genseries $ is a polynomial, in which case $Q$
 must have degree less than $\deg(\minpoly)$.  Using generating series in
@@ -417,8 +417,8 @@ associated numerator.  This is formalized in the next definition:
 \end{definition}
 \begin{remark} ~
   \begin{itemize}
-  \item We may as well write this definition using expressions in
-    variable $T$ instead of $1/T$: given
+  \item We may write this definition using expressions in
+    variable $T$ instead of $1/T$ as well: given
     $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
     $\Omega(\mathcal{L},P)$ by considering $S=\sum_{s\ge 0} \ell_s
     T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
