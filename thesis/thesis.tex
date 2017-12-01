@@ -609,17 +609,17 @@ vector relations operating on the right: in particular,
 \cref{lem:linearly_recurrent} shows that if the sequence is linearly
 recurrent then these right relations form a submodule of
 $\polMatSpace[\cdim][1]$ of rank $\cdim$. Thus, a linearly recurrent
-sequence also admits a right canonical generator.
+sequence also admits a canonical right generator.
 
 Now, we focus on our algorithmic problem: given a linearly recurrent sequence,
 find a minimal matrix generator.  We assume the availability of bounds
-$(\degBdl,\degBdr)$ on the degrees of the left and right canonical generators,
+$(\degBdl,\degBdr)$ on the degrees of the canonical left and right generators,
 which allow us to control the number of terms of the sequence we will access
 during the algorithm.  Since taking the Popov form of a reduced matrix does not
 change the degree, any minimal left matrix generator $\relbas$ has the same
-degree $\deg(\relbas)$ as the left canonical generator: thus, $\degBdl$ is also
+degree $\deg(\relbas)$ as the canonical left generator: thus, $\degBdl$ is also
 a bound on the degree of any minimal left generator. The same remark holds for
-$\degBdr$ and right minimal generators.  The bounds $(\degBdl,\degBdr)$
+$\degBdr$ and minimal right generators.  The bounds $(\degBdl,\degBdr)$
 correspond to $(\gamma_1,\gamma_2)$ in \cite[Definitions~4.6~and~4.7]{Turner02}
 and $(\delta_l,\delta_r)$ in \cite[Section~4.2]{Villard97a}.  The next result
 is similar to \cite[Theorem~4.5]{Turner02}.
@@ -627,15 +627,15 @@ is similar to \cite[Theorem~4.5]{Turner02}.
 \begin{lemma}
   \label{lem:finitely_many_terms}
   Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be linearly
-  recurrent and let $\degBdr \in \NN$ be such that the right canonical
-  matrix generator of $\seq$ has degree at most $\degBdr$.  Then,
+  recurrent and let $\degBdr \in \NN$ be such that the canonical
+  right matrix generator of $\seq$ has degree at most $\degBdr$.  Then,
   a vector $\rel =\row{p}_0 + \cdots +\row{p}_{\degBd}\var^\degBd \in \relSpace$ is a left
   relation for $\seq$ if and only if $\row{p}_0 \seqelt{s} + \cdots +
   \row{p}_{\degBd} \seqelt{s + \degBd} = \row{0}$ holds for $s \in
   \{0,\ldots,\degBdr-1\}$.
 \end{lemma}
 \begin{proof}
-  Since the right canonical generator $\relbas
+  Since the canonical right generator $\relbas
   \in \polMatSpace[\cdim]$ is in column Popov form, we have $\relbas =
   \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$ where
   $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\cdim})$
@@ -686,7 +686,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \label{thm:mingen_via_appbas}
   Let $\seq = (\seqelt{s})_{s \ge 0} \subset \seqeltSpace$ be
   linearly recurrent and let $(\degBdl,\degBdr) \in \NN^2$ be
-  such that the left (resp.~right) canonical matrix generator of
+  such that the canonical left (resp.~right) matrix generator of
   $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).  For
   $\degBd>0$, define
   \begin{equation}
@@ -745,7 +745,7 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
 \begin{corollary}\label{coro:cost_approx}
   Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and
   let $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in
-  \NN^2$ are such that the left (resp.~right) canonical matrix
+  \NN^2$ are such that the canonical left (resp.~right) matrix
   generator of $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).
   Then, given $\seqelt{0},\dots,\seqelt{d-1}$, one can compute
   \begin{itemize}
@@ -761,8 +761,8 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\cdim\degBd)^3)$ operations in $\field$.
   \end{itemize}
 \end{corollary}
-In particular, when $\cdim = \rdim$, we can find the left canonical
-matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
+In particular, when $\cdim = \rdim$, we can find the canonical
+left matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
 \log(\degBd))$ operations in $\field$.
 %%% TODO V: what ? from where ?
 %%% TODO V: rather refer to today's preprint ?
@@ -777,23 +777,25 @@ Wiedemann algorithm.
 
 Let $\mM$ be in $\mathbb{K}^{D \times D}$ and $\mU,\mV \in
 \mathbb{K}^{D \times m}$ be two blocking matrices; we can then define
-the Krylov sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0}$ by
+the Krylov sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0} \subset
+\matSpace[m]$ by
 $$\seqelt{s,\mU,\mV} = \mU^{\perp} \mM^s \mV, \quad s \ge 0.$$ This
 sequence is linearly recurrent, since the minimal polynomial of $\mM$
 is a scalar relation for it. The following theorem states some useful
-properties of a minimal left generator of $\seq_{\mU,\mV}$, with in
+properties of any minimal left generator of $\seq_{\mU,\mV}$, with in
 particular a bound on its degree, for generic choices of $\mU$ and
 $\mV$; we also state properties of the invariant factors of such a
 generator.  These results are not new, as these statements can all be
-found between~\cite{Villard97a} and~\cite{KaVi04}; we chose to give a
-close-to-self-contained presentation, that refers to the above
-references for the key properties.
+found in~\cite{Villard97a} or~\cite{KaVi04}; we chose to give a
+close-to-self-contained presentation, that relies on these
+two references for the key properties.
 
 We let $s_1, \dots, s_r$ be the invariant factors of $T\mI_D
-- \mM$, ordered in such a way that $s_r | s_{r-1}| \dots | s_1$, and
+- \mM$, ordered in such a way that $s_r | s_{r-1}| \cdots | s_1$, and
 let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
 with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
+%%% TODO V: equality ???
 
 %% \todo{unify subscripts  $\mat{P}^{\mU,\mV}$ or   $\seq^{\mU,\mV}$}
 
@@ -807,7 +809,8 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   following holds.  Let $\mat{P}_{\mU,\mV}$ be a minimal left
   generator for $\seq_{\mU,\mV}$ and denote by $\sigma_1, \dots,
   \sigma_k$ the invariant factors of $\mat{P}_{\mU,\mV}$, for some $k
-  \le m$, ordered as above; write $\sigma_i=1$ for $i > k$. Then,
+  \le m$, ordered as above, and write $\sigma_{k+1}=\cdots=\sigma_m=1$.
+  Then,
   \begin{itemize}
   \item $\mat{P}_{\mU,\mV}$ is a minimal left generator for the
     sequence $\seqL_{\mU} = (\mU^\perp \mM^s)_{s \ge 0}$;
@@ -916,6 +919,7 @@ deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
 \rceil$ terms of the sequence $\seq_{\mU,\mV}$, we can recover a
 minimal matrix generator  $\mat{P}_{\mU,\mV}$ of it using $O(m^\omega \M(D/m) \log(D/m))
 \subset \softO{m^{\omega-1} D}$ operations in $\K$.
+%% TODO require m <= D ?
 
 Besides, the theorem shows that for generic $\mU$ and $\mV$, the
 largest invariant factor $\sigma_1$ of $\mat{P}_{\mU,\mV}$ is the
@@ -924,18 +928,27 @@ $\minpoly$ can thus be computed by solving a linear system
 $\mat{P}_{\mU,\mV} \col{x} = \col{y}$, where $\col{y}$ is a vector of
 $m$ randomly chosen elements in $\K$: for a generic choice of
 $\col{y}$, the least common multiple of the denominators of the
-entries of $\col{x}$ is $\minpoly$.  It can thus be computed using the
-high-order lifting algorithm of \cite[Algorithm~5]{Stor03}; by
-\cite[Corollary~16]{Stor03}, the cost of this is $O(m^{\omega} \M(D/m)
+entries of $\col{x}$ is $\minpoly$.  Thus, both $\minpoly$ and $\col{x}$
+can be computed using the
+high-order lifting algorithm of \cite[Algorithm~5]{Stor03} on input
+$\mat{P}_{\mU,\mV}$ and $\col{y}$. By
+\cite[Corollary~16]{Stor03}, the
+cost of this is $O(m^{\omega} \M(D/m)
 \log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-the latter algorithm is randomized, since we chose a random point in
+%% TODO V: two logs: this is strange
+the latter algorithm is randomized, since it chooses a random point in
 $\K$ to compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
-An alternative would be to compute the Smith form of
+% todo for after submission: rework this cost bound.
+% --> Only one logarithmic factor with kernel basis, no?
+% --> and/or, since $\mat{P}_{\mU,\mV}$ is reduced, couldn't use reversals if
+%  we'd like to avoid randomization in high-order lifting?
+
+An alternative solution would be to compute the Smith form of
 $\mat{P}_{\mU,\mV}$, but using an algorithm such as
-Storjohann's~\cite{Stor03}, the cost is slightly higher (by a
-logarithmic factor).
+Storjohann's~\cite[Section~17]{Stor03}, the cost is slightly higher (on the
+level of logarithmic factors).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
