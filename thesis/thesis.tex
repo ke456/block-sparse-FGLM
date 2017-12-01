@@ -940,12 +940,16 @@ entries of $\col{x}$ is $\minpoly$.  Thus, both $\minpoly$ and $\col{x}$
 can be computed using the
 high-order lifting algorithm of \cite[Algorithm~5]{Stor03} on input
 $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
-\cite[Corollary~16]{Stor03}, the
-cost of this is $O(m^{\omega} \M(D/m)
-\log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-%% FIXME correct cost bound (other locations as well)
-the latter algorithm is randomized, since it chooses a random point in
-$\K$ to compute (parts of) the expansion of the inverse of
+\cite[Corollary~16]{Stor03}, this costs
+\begin{align*}
+  & O\Bigg(m^{\omega} \M(D/m) \log(m) + \sum_{0 \le i \le \log_2(m)} 4^i (2^{-i}m)^\omega \M(D/m) \\
+  & \quad\qquad + m^2 \M(D/m)\log(D/m)\log(m) + m \M(D) \log(D) \Bigg) \\
+  & \subset O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m))  \\
+  & \subset \softO{m^{\omega-1}D}
+\end{align*}
+operations in $\K$.
+The latter algorithm is randomized, since it chooses a random point in $\K$ to
+compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
 %% todo for after submission: think about writing the following deterministic approach:
