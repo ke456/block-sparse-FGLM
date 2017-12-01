@@ -14,8 +14,6 @@
 \usepackage{amsthm,thmtools}
 
 \declaretheoremstyle[headfont=\normalfont\bfseries,bodyfont=\normalfont]{myremark}
-
-
 \declaretheorem[style=plain,parent=section]{definition}
 \declaretheorem[sibling=definition]{theorem}
 \declaretheorem[sibling=definition]{corollary}
@@ -352,20 +350,19 @@ output is correct.
 \section{Linearly recurrent sequences}
 
 This section starts with a review of known facts on linearly recurrent
-sequences; we first discuss the scalar case, then show how the ideas
+sequences; we first discuss the scalar case, and then we show how the ideas
 carry over to matrix sequences. 
 
-The main results we will need from the first subsections are
-\cref{coro:cost_approx} and \cref{randXY}, which give cost estimates
-on the cost of computing a {\em minimal matrix generator} of a
-linearly recurrent matrix sequence and a degree bound for such
-generators, for matrices obtained from Krylov sequences. These results
-are for the most part not new
-(see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost
-analysis we give uses results not available when those references were
-first written.  The last subsection presents a useful result for our
-main algorithm, that allows us to compute a ``numerator'' for a scalar
-sequence from a similar object obtained from a matrix sequence.
+The main results we will need from the first three subsections are
+\cref{coro:cost_approx} and \cref{randXY}, which give cost estimates for the
+computation of a {\em minimal matrix generator} of a linearly recurrent matrix
+sequence obtained from Krylov sequences, as well as a degree bound for such
+generators. These results are for the most part not new
+(see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost analysis we
+give uses results not available when those references were first written.  The
+fourth and last subsection presents a useful result for our main algorithm,
+that allows us to compute a ``numerator'' for a scalar sequence from a similar
+object obtained for a matrix sequence.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -382,15 +379,14 @@ $\mathcal{L}=(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest
 degree that cancels it; the {\em order} of $\mathcal{L}$ is the degree
 of this polynomial~$\minpoly$.
 
-One can rephrase these properties in term of the associated generating
-series $S=\sum_{s \ge 0} \ell_s T^s \in \K[[T]]$.  Then, $\minpoly$
-cancels $\mathcal{L}$ if and only if ${\rm rev}(\minpoly) S$ is a
-polynomial (in which case it must have degree less than $d$), with
-${\rm rev}(\minpoly)=T^d \minpoly(1/T)$.  The sequence $\mathcal{L}$ 
-is linearly recurrent if and only if there
-exist polynomials $A,B$ in $\K[T]$ such that $S=A/B$; these
-polynomials are unique if we assume $\gcd(A,B)=1$ and $B(0)=1$.  Given
-these $A$ and $B$, the minimal polynomial of $\mathcal{L}$ is
+One can rephrase these properties in terms of the generating series $S=\sum_{s
+\ge 0} \ell_s T^s \in \K[[T]]$ associated to $\mathcal{L}$.  Then, $\minpoly$
+cancels $\mathcal{L}$ if and only if ${\rm rev}(\minpoly) S$ is a polynomial,
+where ${\rm rev}(\minpoly)=T^d \minpoly(1/T)$; in this case, ${\rm
+rev}(\minpoly) S$ must have degree less than $d$.  The sequence $\mathcal{L}$
+is linearly recurrent if and only if there exist polynomials $A,B$ in $\K[T]$
+such that $S=A/B$; these polynomials are unique if we assume $\gcd(A,B)=1$ and
+$B(0)=1$.  Given these $A$ and $B$, the minimal polynomial of $\mathcal{L}$ is
 $\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$. 
 
 It is often easier to work with a closed form that has the actual
@@ -398,25 +394,28 @@ minimal polynomial as its denominator, rather than its reverse; this
 is done by working with generating series in the variable $1/T$.  Let
 indeed $\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
 be any polynomial; then, $\minpoly$ cancels the sequence $\mathcal{L}$
-if and only if $Q=\minpoly \genseries $ is a polynomial, in which case it
+if and only if $Q=\minpoly \genseries $ is a polynomial, in which case $Q$
 must have degree less than $\deg(\minpoly)$.  Using generating series in
 $1/T$, the minimal polynomial of $\mathcal{L}$ is thus the
-monic polynomial $\minpoly$ of minimal degree for which there exists $Q \in
-\K[T]$ that satisfies $\genseries=Q/\minpoly$.
+monic polynomial $\minpoly$ of lowest degree for which there exists $Q \in
+\K[T]$ such that $\genseries=Q/\minpoly$.
 
 In particular, given a sequence $\mathcal{L}=(\ell_s)_{s \ge 0}$ and a
 polynomial that cancels it, there is a well-defined notion of
-associated numerator.  The next definition makes this idea precise:
+associated numerator.  This is formalized in the next definition:
 \begin{definition}
   \label{def:omega}
-  Let $\mathcal{L}=(\ell_s)_{s \ge 0}$ be a sequence and let $P$ be a
+  Let $\mathcal{L}=(\ell_s)_{s \ge 0}\in \K^\N$ be a sequence and $P$ be a
   polynomial that cancels $\mathcal{L}$. Then, the {\em numerator} of $\mathcal{L}$
-  with respect to $P$ is defined as 
-  $$\Omega(\mathcal{L},P) = P \genseries, \quad\text{with}\quad \genseries=\sum_{s \ge 0} \frac
-  {\ell_s}{T^{s+1}}.$$ In view of the discussion above, $\Omega(\mathcal{L},P)$
-  is a polynomial of degree less than $\deg(P)$.
+  with respect to $P$ is denoted by $\Omega(\mathcal{L},P)$ and defined as 
+  \[
+    \Omega(\mathcal{L},P) = P \genseries, \quad\text{where}\quad
+    \genseries=\sum_{s \ge 0} \frac {\ell_s}{T^{s+1}}.
+  \]
+  In view of the discussion above, $\Omega(\mathcal{L},P)$ is a polynomial of
+  degree less than $\deg(P)$.
 \end{definition}
-\begin{remark}~
+\begin{remark} ~
   \begin{itemize}
   \item We may as well write this definition using expressions in
     variable $T$ instead of $1/T$: given
@@ -425,10 +424,13 @@ associated numerator.  The next definition makes this idea precise:
     T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
     P(1/T)$ and $d=\deg(P)$; then
     $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
-\item If $\deg(P)=d$, we only need to know the coefficients
-  $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we 
+\item We only need to know the first $d=\deg(P)$ coefficients
+  $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
   have
-  $$\Omega(\mathcal{L},P) = ( P \sum_{s=0}^{d-1} \ell_{d - s} T^s ) {\rm ~div~} T^d.$$
+  \[
+    \Omega(\mathcal{L},P) = T^{-d} \left( P \sum_{s=0}^{d-1} \ell_{d - s} T^s \right).
+    \qedhere
+  \]
  \end{itemize}
 \end{remark}
 Let us now give an example of this construction. Consider the Fibonacci sequence
@@ -436,28 +438,30 @@ $\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
 polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
 ${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
 $$S = \frac{A}{{\rm rev}(P)} = \frac{1}{1-T-T^2},$$
-so that $\Omega(\mathcal{L},P)=T^{2-1} \cdot 1=T$. Equivalently, we can define $\genseries = \sum_{s\ge0} \ell_{s}/T^{s+1}$; then, 
-we recover 
-\begin{align*}
-\Omega(\mathcal{L},P) &= (T^2-T-1)\left (\frac 1T +\frac 1{T^2} + \frac 2{T^3} + \frac 3{T^4} + \cdots \right ) \\
-&=T.
-\end{align*}
+so that $\Omega(\mathcal{L},P)=T^{2-1} \cdot 1=T$. Equivalently, defining
+$\genseries = \sum_{s\ge0} \ell_{s}/T^{s+1}$, we recover 
+\[
+  \Omega(\mathcal{L},P) = (T^2-T-1)\left (\frac 1T +\frac 1{T^2} + \frac
+  2{T^3} + \frac 3{T^4} + \cdots \right ) =T.
+\]
 The numerators thus defined are related to the Lagrange interpolation
-polynomials; this will explain why they play a useful role in our main
-algorithm. Explicitly, suppose that $\mathcal{L}$ is given by $\ell_s
-= a_1^s + \cdots + a_d^s$ for $s \ge 0$, for some pairwise distinct
-elements $(a_1,\dots,a_d)$ of $\K$. Then, its minimal polynomial is
-$\minpoly=(T-a_1) \cdots (T-a_s)$, and the numerator
-$\Omega(\mathcal{L}, P)$ is $\sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
+polynomials; this will explain why they play an important role in our main
+algorithm. Explicitly, suppose that $\mathcal{L} = (a_1^s + \cdots + a_n^s)_{s
+\ge 0}$ for some pairwise distinct elements $a_1,\dots,a_n \in \K$. Then, its
+minimal polynomial is $\minpoly=\prod_{i=1}^n (T-a_i)$, and the numerator
+is $\Omega(\mathcal{L}, P) = \sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
+%% TODO V: check variable n is ok
 
-In terms of complexity, assuming that $\mathcal{L}$ is known to have
-order at most $d$, given the first $2d$ terms of $\mathcal{L}$, we can
-recover its minimal polynomial $P$ by means of the Berlekamp-Massey
-algorithm, or of Euclid's algorithm applied to rational function
-reconstruction; this can be done in $O(\M(d)\log(d))$ operations in
-$\K$. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we
-can deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one
-polynomial multiplication in degree $\deg(P)$.
+Let us go back to the general case of a sequence $\mathcal{L}
+=(\ell_s)_{s\ge0}\in\K^\N$.  In terms of complexity, assuming that
+$\mathcal{L}$ is known to have order at most $d$ and that we are given its
+first $2d$ terms, we can recover its minimal polynomial $P$ by means of the
+Berlekamp-Massey algorithm, or of Euclid's algorithm applied to rational
+function reconstruction; this can be done in $O(\M(d)\log(d))$ operations in
+$\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
+%% TODO V: check citation ok. Is there a simpler approach?
+deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
+multiplication in degree $\deg(P)$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1606,7 +1610,7 @@ computation with one variable less).  Our algorithm computes the whole
 zero-dimensional parametrization for essentially the same cost as the
 computation of the minimal polynomial. In the following,
 $\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
-nonzero entry is a $1$ at the first row.
+non-zero entry is a $1$ at the first row.
 
 \begin{algorithm}[H]
 	\caption{\mainalgoname($\mM_1,\dots,\mM_n,m$)}
@@ -1687,7 +1691,7 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 
 For the cost analysis, we will mainly focus on a sparse model for
 matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $\density \in [0,1)$, that is, at most $\density D^2$ nonzero entries.  
+at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero entries.  
 As a result, $\mM$ has density at most $n\density$, and a matrix-vector product
 by $\mM$ can be done in $O(n\density D^2)$ operations in $\K$ (we briefly
 discuss variants of the algorithm using dense linear algebra at the
