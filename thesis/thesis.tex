@@ -175,8 +175,8 @@ Computing the Gr\"obner basis of an ideal with respect to a given
 term ordering is an essential step in solving systems of polynomials.
 Certain term orderings, such as the degree reverse lexicographical
 ordering (\textit{degrevlex}), tend to make the computation of the
-Gr\"obner basis faster: this has been observed empirically since the
-1980's, and is now supported by theoretical results, at least for some
+Gr\"obner basis faster. This has been observed empirically since the
+1980's and is now supported by theoretical results, at least for some
 ``nice'' families of inputs, such as complete intersections or certain
 determinantal systems~\cite{Faugere02,FaSaSp13,BaFaSa15}.  On the
 other hand, other orderings, such as the lexicographical ordering
@@ -195,8 +195,8 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
   $$\{ ( R_1(\tau), \dots, R_{n-1}(\tau), \tau ) \mid \tau \in \K
   \;\,\text{is a root of}\;\, R_n\}.$$ As a result, the standard approach to
  solve a zero-dimensional system by means of Gr\"obner basis
- algorithms is to first compute a Gr\"obner basis for a degree ordering,
- and then to convert it to a more readable output, such as a lexicographic
+ algorithms is to first compute a Gr\"obner basis for a degree ordering
+ and then convert it to a more readable output, such as a lexicographic
  basis. As pointed out in~\cite{FaMo17}, the latter step, while of
  polynomial complexity, can now be a bottleneck in practice. This
  paper will thus focus on this step; in order to describe our 
@@ -205,18 +205,18 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
  Let $I$ be a zero-dimensional ideal in $\K[X_1,\dots,X_n]$.  As
  input, we assume that we know a monomial basis $\basis$ of
  $\residueI=\K[X_1,\dots,X_n]/I$, together with the multiplication matrices
- $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this basis; we
- denote by $D$ the degree of $I$, that is, the vector space dimension
+ $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this basis. We
+ denote by $D$ the degree of $I$, which is the vector space dimension
  of $\residueI$. We should stress that knowing a degree Gr\"obner basis of
  $I$, computing the multiplication matrices efficiently is not a
- straightforward task: Faug\`ere {\it et al.} showed how to do it in
+ straightforward task, Faug\`ere {\it et al.} showed how to do it in
  time $O(nD^3)$ in~\cite{FaGiLaMo93} and more recently, algorithms have
  been given with cost bound
  $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
  least for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
  exponent for matrix multiplication. While improving these results is
- an interesting question in itself, we will not address it in this
+ an interesting question is itself, we will not address it in this
  paper.
 
 Given such an input, the FGLM algorithm~\cite{FaGiLaMo93} computes the
@@ -228,9 +228,9 @@ achieved~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}.
 Polynomials as in~\cref{eq:shapelemma} form a very useful data
 structure, but there is no guarantee that the lexicographic Gr\"obner
 basis of $I$ possesses such a structure; when it does, we will say
-that $I$ is in {\em shape position}; some sufficient conditions for being in
-shape position are detailed
-in~\cite{BeMoMaTr94}. As an alternative, one may use Rouillier's
+that $I$ is in {\em shape position}. Some sufficient conditions for being in
+shape position are detailed in~\cite{BeMoMaTr94}. 
+As an alternative, one may use Rouillier's
 Rational Univariate Representation algorithm \cite{Rouillier99} (see
 also~\cite{AlBeRoWo94,BeWo96} for related considerations). The output
 is a description of the zero-set $V(I)$ by means of univariate rational
@@ -240,8 +240,8 @@ functions
 \end{equation}
 where the multiplicity of a root $\tau$ of $F$ coincides with that of
 $I$ at the corresponding point
-$(G_1(\tau)/G(\tau),\dots,G_n(\tau)/G(\tau)) \in V(I)$; the fact that
-we use rational functions makes it in particular possible to control
+$(G_1(\tau)/G(\tau),\dots,G_n(\tau)/G(\tau)) \in V(I)$. The fact that
+we use rational functions makes it possible to control
 precisely the bit-size of their coefficients, if working over $\K=\Q$.
 
 The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on
@@ -275,21 +275,21 @@ of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
 the {\em nil-indices} of the solutions).
 
 The most costly part of such an algorithm is the computation of the
-values $\ell(\lf^i)$ and $\ell(\lf^i X_j)$; the rest essentially boils
-down to applying the Berlekamp-Massey algorithm and univariate
+values $\ell(\lf^i)$ and $\ell(\lf^i X_j)$; the rest is essentially 
+applying the Berlekamp-Massey algorithm and univariate
 polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re and Mou pointed
 out that the multiplication matrices $\mM_1,\dots,\mM_n$ can be
 expected to be sparse; they give precise estimates on their expected
-sparsity, assuming the validity of a conjecture due to
+sparsity, assuming the validity of a conjecture by
 Moreno-Soc\'ias~\cite{MorenoSocias91}. 
 On this basis, they designed several forms of {\em sparse FGLM}
 algorithms. For instance, if $I$ is in shape position, the algorithms
 %%%%%%%% TODO
-in \cite{FaMo17} recover this basis,
+in \cite{FaMo17} recover this basis
 %%%%%%%% TODO --> Vincent: this basis is unclear to me
-also by considering values of
+by also considering values of
 a linear form $\ell:\residueI \to \K$. For less favorable inputs, the algorithm
-falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90},
+falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90}
 or plain FGLM.
 
 The ideas at play in these algorithms are essentially based on Krylov subspace
