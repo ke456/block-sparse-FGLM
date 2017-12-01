@@ -284,9 +284,8 @@ sparsity, assuming the validity of a conjecture by
 Moreno-Soc\'ias~\cite{MorenoSocias91}. 
 On this basis, they designed several forms of {\em sparse FGLM}
 algorithms. For instance, if $I$ is in shape position, the algorithms
-%%%%%%%% TODO
 in \cite{FaMo17} recover this basis
-%%%%%%%% TODO --> Vincent: this basis is unclear to me
+%%%%%%%% TODO --> "this basis" is unclear
 by also considering values of
 a linear form $\ell:\residueI \to \K$. For less favorable inputs, the algorithm
 falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90}
@@ -450,7 +449,6 @@ algorithm. Explicitly, suppose that $\mathcal{L} = (a_1^s + \cdots + a_n^s)_{s
 \ge 0}$ for some pairwise distinct elements $a_1,\dots,a_n \in \K$. Then, its
 minimal polynomial is $\minpoly=\prod_{i=1}^n (T-a_i)$, and the numerator
 is $\Omega(\mathcal{L}, P) = \sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
-%% TODO V: check variable n is ok
 
 Let us go back to the general case of a sequence $\mathcal{L}
 =(\ell_s)_{s\ge0}\in\K^\N$.  In terms of complexity, assuming that
@@ -459,10 +457,10 @@ first $2d$ terms, we can recover its minimal polynomial $P$ by means of the
 Berlekamp-Massey algorithm, or of Euclid's algorithm applied to rational
 function reconstruction; this can be done in $O(\M(d)\log(d))$ operations in
 $\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
-%%TODO \M(d) has not been introduced
-%% TODO V: check citation ok. Is there a simpler approach?
 deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
 multiplication in degree $\deg(P)$.
+
+\todo{introduce $\M(d)$ somewhere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -600,8 +598,11 @@ rectangular matrix multiplication in sizes $(\rdim,\rdim)$ and
 $(\rdim,\cdim)$. For simplicity, we only give the two most useful
 cases: if $\cdim=\rdim$, this takes $O(\rdim^\omega \M(d))$ operations
 in $\K$; if $\cdim =1$, the cost becomes $O(\rdim^2 \M(d))$.
-%% TODO in fact if $\cdim=1$ and d terms we will have average row degree ~d/m
-%% --> the cost would rather be O(m^w M(d/m))
+
+%%% Remark to keep in comment for now:
+%%% (not so important here, and not clear what to cite to say it concisely)
+%% in fact if $\cdim=1$ and d terms we will have average row degree ~d/m
+%% --> the cost would be better, O(m^w M(d/m))
 %% more generally, average row degree ~nd/m -->  O(m^w M(nd/m))
 
 In all the previous discussion, we remark that we may also consider
@@ -761,11 +762,12 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\cdim\degBd)^3)$ operations in $\field$.
   \end{itemize}
 \end{corollary}
-In particular, when $\cdim = \rdim$, we can find the canonical
+In particular, when $\cdim = \rdim$, we can find a minimal
 left matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
 \log(\degBd))$ operations in $\field$.
-%%% TODO V: what ? from where ?
-%%% TODO V: rather refer to today's preprint ?
+
+%% Note (Vincent): if fastpab submission is accepted, update this corollary
+%% --> items 1 and 2 : we get the canonical generator for the same cost
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -776,7 +778,8 @@ matrix sequences, namely the Krylov sequences used in the block
 Wiedemann algorithm. 
 
 Let $\mM$ be in $\mathbb{K}^{D \times D}$ and $\mU,\mV \in
-\mathbb{K}^{D \times m}$ be two blocking matrices; we can then define
+\mathbb{K}^{D \times m}$ be two blocking matrices for some $m\le D$. We can
+then define
 the Krylov sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0} \subset
 \matSpace[m]$ by
 $$\seqelt{s,\mU,\mV} = \mU^{\perp} \mM^s \mV, \quad s \ge 0.$$ This
@@ -795,7 +798,6 @@ We let $s_1, \dots, s_r$ be the invariant factors of $T\mI_D
 let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
 with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
-%%% TODO V: equality ???
 
 %% \todo{unify subscripts  $\mat{P}^{\mU,\mV}$ or   $\seq^{\mU,\mV}$}
 
@@ -919,7 +921,6 @@ deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
 \rceil$ terms of the sequence $\seq_{\mU,\mV}$, we can recover a
 minimal matrix generator  $\mat{P}_{\mU,\mV}$ of it using $O(m^\omega \M(D/m) \log(D/m))
 \subset \softO{m^{\omega-1} D}$ operations in $\K$.
-%% TODO require m <= D ?
 
 Besides, the theorem shows that for generic $\mU$ and $\mV$, the
 largest invariant factor $\sigma_1$ of $\mat{P}_{\mU,\mV}$ is the
@@ -935,15 +936,14 @@ $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
 \cite[Corollary~16]{Stor03}, the
 cost of this is $O(m^{\omega} \M(D/m)
 \log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-%% TODO V: two logs: this is strange
+%% FIXME correct cost bound (other locations as well)
 the latter algorithm is randomized, since it chooses a random point in
 $\K$ to compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
-% todo for after submission: rework this cost bound.
-% --> Only one logarithmic factor with kernel basis, no?
-% --> and/or, since $\mat{P}_{\mU,\mV}$ is reduced, couldn't use reversals if
-%  we'd like to avoid randomization in high-order lifting?
+%% todo for after submission: think about writing the following deterministic approach:
+%% (unless this means spending too much space on something not so central?)
+%% since $\mat{P}_{\mU,\mV}$ is reduced, we could use the expansion of the reversal
 
 An alternative solution would be to compute the Smith form of
 $\mat{P}_{\mU,\mV}$, but using an algorithm such as
@@ -989,20 +989,14 @@ left-hand row vector.
 \begin{lemma}\label{utilde}
   For generic $\mU,\mV$, the row vector $\row{a}_i$ has polynomial
   entries of degree at most~$D$.
-  %% Let $\textbf{a}$ be defined as line 7 of \cref{algo:block-sparse-fglm}, 
-  %% then $\textbf{a}$ has polynomial entries.
+  %TODO V
 \end{lemma}
 \begin{proof}
-  For generic $\mU,\mV$, we saw that $\minpoly$ is the largest
-  invariant factor of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product
-  $\minpoly\ (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ 
-  the $i$th row of this matrix, our first claim follows. Since
-  $\mat{P}_{\mU,\mV}$ has determinantal degree
-  %% TODO V:
-  % \deg(\sigma_1) + \cdots + \deg(\sigma_m) = \deg(s_1) + \cdots + \deg(s_m) = D
-  %% deg(a) <= deg(P)
-  at most $D$~\cite{todo}, the bound
-  on the degree of the entries of $\row{a}_i$ follows from Cramer's
+  For generic $\mU,\mV$, we saw that $\minpoly$ is the largest invariant factor
+  of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product $\minpoly\
+  (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ the $i$th
+  row of this matrix, our first claim follows. Furthermore, the bound on the
+  degree of the entries of $\row{a}_i$ is a direct consequence of Cramer's
   formulas.
 \end{proof}
 To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
@@ -1078,7 +1072,7 @@ $\K$. Then, the dot product with $\row{a}_i$ takes $O(m \M(D))$
 operations, since both vectors have size $m$ and entries of degree at
 most $D$. Thus, the runtime is 
 $$O(D^2 + m \M(D)) \subset \softO{D^2}$$
-operations in $\K$. \todo{$m \le D$}
+operations in $\K$.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1283,7 +1277,7 @@ section of this paper.
     \left (\frac v{T-\lf} \right ) \\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     \left (\frac{ \partial \lf} {\partial X_k} \right)^{\mu_k}
-    %% TODO Vincent: parentheses maybe to make it more readable?
+    %% TODO parentheses maybe to make it more readable?
     \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
     &= v\, |\mu|!\, \prod_{1 \le k \le n} 
     t_k^{\mu_k}
