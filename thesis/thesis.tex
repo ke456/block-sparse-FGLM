@@ -300,11 +300,13 @@ Gr\"obner basis in $n-1$ variables for each of them.
 Our first contribution is to give a block version of the algorithm
 in~\cite{BoSaSc03} that extends the approach in~\cite{Steel15} to
 compute all polynomials in~\eqref{eq:BoSaSc03} for essentially the
-same cost as the computation of $Q$. More precisely, the bottleneck for
-the algorithm of~\cite{Steel15} is the computation of a block-Krylov
-sequence, and we show that once this sequence has been computed, 
-not only $Q$ but also all other polynomials in the zero-dimensional 
-parametrization can be computed efficiently.
+same cost as the computation of $Q$. More precisely, the bottleneck
+for the algorithm of~\cite{Steel15} is the computation of a
+block-Krylov sequence, and we show that once this sequence has been
+computed, not only $Q$ but also all other polynomials in the
+zero-dimensional parametrization can be computed efficiently, while
+not making any assumption on the ideal $I$ such as radicality or shape
+position.
 
 \paragraph{Complexity model.}
 We measure the cost of our algorithms by counting all operations in
