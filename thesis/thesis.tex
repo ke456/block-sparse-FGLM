@@ -760,10 +760,12 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
   \item a minimal left matrix generator
     for $\seq$ using $O(\cdim^\omega \M(\degBd)
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
-  \item a  minimal left matrix generator for $\seq$ using 
-    $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\cdim\degBd))$
+  \item a minimal left matrix generator for $\seq$ using 
+    $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
     %%% TODO Vincent : check the log term
-    operations in $\field$ if $\cdim \in O(\rdim)$;
+    operations in $\field$ if $\cdim \in O(\rdim)$; \footnote{This bound
+      assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
+      particular if $\M(\cdot)$ is quasi-linear and $\omega>2$.}
   \item the canonical left matrix generator for $\seq$
     using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
     \log(\cdim\degBd)^3)$ operations in $\field$.
