@@ -82,7 +82,7 @@
 \newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
-\newcommand{\mainalgoname}{{\sf BlockParametrization}}
+\newcommand{\mainalgoname}{\mathsf{ BlockParametrization}}
 \newcommand{\lf}{X}
 \newcommand{\mf}{Y}
 \newcommand{\residueI}{\mathscr{Q}}
@@ -1636,7 +1636,7 @@ $\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
 non-zero entry is a $1$ at the first row.
 
 \begin{algorithm}[H]
-	\caption{\mainalgoname($\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item $\mM_1,\dots,\mM_n$ defined as above
@@ -1810,7 +1810,7 @@ where the second term gives the cost of computing $\mM$.
 
 When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
 matrices and $d = D/m = 1$. A minimal generating polynomial of
-$\seq_{\mU,\mV} = (\mU^\perp, \mU^\perp\mM\mV,\dots)$ is
+$\seq_{\mU,\mV} = (\mU^\perp\mV, \mU^\perp\mM\mV,\dots)$ is
 $\mat{P}_{\mU,\mV} = T \mat{I}_D - \mU^\perp\mM\mU^{-\perp}.$ Its
 largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
 $O(D^\omega \log(D))$ operations in $\K$.  The numerator
@@ -2509,13 +2509,13 @@ minimal matrix generator and its largest invariant factor (to compute $M$), and
 
 \subsection{Completing the description}
 
-\todo{sf or not for algos} The second part of the algorithm computes a
+The second part of the algorithm computes a
 zero-dimensional parametrization of
 $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call
-Algorithm {\sf Parametrization}, but with a carefully chosen linear
+Algorithm $\mathsf{ Parametrization}$, but with a carefully chosen linear
 form $\ell'$ as input: we build $\ell'$ such that its support is
 $\mathfrak{B}$; this is denoted by $\ell'={\sf Update}(\cdots)$ in
-Algorithm ${\sf ParametrizationWithSplitting}$.
+Algorithm $\mathsf{ParametrizationWithSplitting}$.
 
 Let $D_{\mathfrak{A}}$ be the number of points in $V_{\mathfrak{A}}$;
 since all $Q_i$, for $i$ in $\mathfrak{A}$, are reduced algebras,
