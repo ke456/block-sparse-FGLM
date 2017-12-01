@@ -215,9 +215,9 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
  $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
  least for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
- exponent for matrix multiplication. While improving these results is
- an interesting question is itself, we will not address it in this
- paper.
+ exponent for matrix multiplication over a ring (commutative, with $1$). While
+ improving these results is an interesting question is itself, we will not
+ address it in this paper.
 
 Given such an input, the FGLM algorithm~\cite{FaGiLaMo93} computes the
 lexicographic Gr\"obner basis of $I$ in $O(nD^3)$ operations in $\K$.
@@ -339,10 +339,9 @@ output is correct.
 In what follows, we only consider the case $\omega>2$.  We use a time function
 $d \mapsto \M(d)$ for the cost of univariate polynomial multiplication over
 $\K$, for which we assume the super-linearity properties of
-\cite[Section~8.4]{GaGe13}.  We assume that the exponent $\omega$ is also valid
-for multiplication of matrices over $\polRing$: then, two $m\times m$ matrices
-over $\K[T]$ whose degree is less than $d$ can be multiplied using $O(m^\omega
-\M(d))$ operations in $\K$.
+\cite[Section~8.4]{GaGe13}.  Then, two $m\times m$ matrices over $\K[T]$ whose
+degree is less than $d$ can be multiplied using $O(m^\omega \M(d))$ operations
+in $\K$.
 
 %% We rely Over a field $\mathbb{K}$, recall that we can compute
 %% multiplication, division with remainder, extended GCD, and square
@@ -762,7 +761,6 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
   \item a minimal left matrix generator for $\seq$ using 
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
-    %%% TODO Vincent : check the log term
     operations in $\field$ if $\cdim \in O(\rdim)$; \footnote{This bound
       assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
       particular if $\M(\cdot)$ is quasi-linear and $\omega>2$.}
