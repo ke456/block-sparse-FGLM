@@ -86,6 +86,7 @@
 \newcommand{\minpoly}{P}
 \newcommand{\mainalgoname}{{\sf BlockParametrization}}
 \newcommand{\lf}{X}
+\newcommand{\mf}{Y}
 \newcommand{\residueI}{\mathscr{Q}}
 \newcommand{\sqfree}{Q}
 
@@ -1462,7 +1463,7 @@ there
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Computing a zero-dimensional parametrization}  
+\subsection{Computing a zero-dimensional parametrization}  \label{ssec:abstractlago}
 
 As an application, the following algorithm shows how to compute a
 zero-dimensional parametrization of $V_{\mathfrak{S}}$; our main usage 
@@ -2086,12 +2087,13 @@ switching.
 \section{Using the original coordinates}
 
 In this section, we propose a refinment of the algorithm given
-previously; the main new feature is to avoid using a generic linear
-form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.  Indeed,
-such a linear combination is likely to result in a multiplication
-matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$ significantly more dense
-that $\mM_1,\dots,\mM_n$. In all this section, we will work under the
-assumption that $\mM_1$ the sparsest matrix among $\mM_1,\dots,\mM_n$.
+previously; the main new feature is that we avoid using a generic
+linear form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.
+Indeed, such a linear combination is likely to result in a
+multiplication matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
+significantly more dense than $\mM_1,\dots,\mM_n$. In all this
+section, we will work under the assumption that $\mM_1$ the sparsest
+matrix among $\mM_1,\dots,\mM_n$.
 
 All notation, such as $I$, $\residueI$, \dots, are as in the two previous
 sections.  In particular, we write
@@ -2104,21 +2106,21 @@ $i$.
 \subsection{Overview}
 
 The algorithm will decompose $V$ into two parts: for the first part,
-we will be able to use $X_1$ as a separating linear form
-\todo{define}; the remaining points will be dealt with using a random
-linear form $\lf$ as above. Throughout, we rely on the following
-operations: evaluations of linear forms on successive powers of a
-given element in $\residueI$, say $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$
-(matrix) linear algebra, as before, as well as some operations on
-univariate polynomials related to so-called {\em power
-  projection}~\cite{Shoup94,Shoup99}.
+we will be able to use $X_1$ as a linear form in our zero-dimensional
+parametrization; the remaining points will be dealt with using a
+random linear form $\lf$ as above. Throughout, we rely on the
+following operations: evaluations of linear forms on successive powers
+of a given element in $\residueI$, say $1,X_1,X_2^2,\dots$ or
+$1,\lf,\lf^2,\dots$ and (polynomial) linear algebra, as before, as well as
+some operations on univariate polynomials related to so-called {\em
+  power projection}~\cite{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
 main structure; the details of the subroutines are given in the next
 paragraphs. \todo{main algo takes $\ell$, not $\mU$}
 
 \begin{algorithm}[H]
-	\caption{$\mathsf{ParametrizationWithSplitting}(\ell,t)$} {\bf
+	\caption{$\mathsf{ParametrizationWithSplitting}(\ell,\lf)$} {\bf
 		Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
 		\item a linear form $\ell$ over $\residueI$
@@ -2130,7 +2132,7 @@ paragraphs. \todo{main algo takes $\ell$, not $\mU$}
 	\end{itemize}
 	\begin{enumerate}
 		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{ParametrizationX}_1(\ell)$
-		\item let $\ell'=\mathsf{Update}(\ell,F,\lf)$
+		\item let $\ell'=\mathsf{Update}(\ell,F,G_1,\dots,G_n,\lf)$
 		\item let $(R,W_1,\dots,W_n,\lf)=\mathsf{Parametrization}(\ell',\lf)$
 		\item let $((\sqfree,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
 		\item \textbf{return} $((\sqfree,V_1,\dots,V_n),\lf)$
@@ -2138,26 +2140,25 @@ paragraphs. \todo{main algo takes $\ell$, not $\mU$}
 \end{algorithm}
 
 The call to $\mathsf{ParametrizationX}_1(\ell)$ computes a
-zero-dimensional parametrization of a subset $V'$ of $V$ for which
-$X_1$ is a separating element, using values of the form
-$(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in effect
-removes from $V$ the points we just found) and apply
-$\mathsf{ParametrizationGeneric}(\ell',\lf)$, to obtain a
-zero-dimensional parametrization of $V''=V-V'$ using values of the
-form $(\ell'(\lf^s))_{s \ge 0}$; in those ``lucky'' cases where $V'$ is 
-a large subset of $V$, $V''$ may only contain a few points, and
-few values for the latter sequence will be needed. 
+zero-dimensional parametrization of a subset $V'$ of $V$, with such
+that $X_1$ separates the points of $V'$ (that is, takes pairwise
+distinct values on the points of $V'$); this is done by using values
+of the form $(\ell(X_1^s))_{s \ge 0}$. We then modify $\ell$ (which in
+effect removes from $V$ the points we just found) and apply Algorithm
+$\mathsf{Parametrization}(\ell',\lf)$ from \cref{ssec:abstractlago},
+to obtain a zero-dimensional parametrization of $V''=V-V'$ using
+values of the form $(\ell'(\lf^s))_{s \ge 0}$; in those ``lucky''
+cases where $V'$ is a large subset of $V$, $V''$ may only contain a
+few points, and few values for the latter sequence will be needed.
 
 The last step involves changing coordinates in
-$((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a separating variable
-instead, and performing the union of the two components $V'$ and
-$V''$.
+$((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a linear form instead, and
+performing the union of the two components $V'$ and $V''$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Decomposition of linear forms}
+\subsection{Describing a subset of $V$}
 
-\todo{find a new letter for the density}
 In this paragraph, we specialize the discussion of
 \cref{ssec:genseries} to the case $\lf=X_1$; we take
 $\mathfrak{S}=\{1,\dots,\dg\}$, that is, $V_{\mathfrak{S}}=V$, and we
@@ -2185,30 +2186,32 @@ as $\ell=\sum_{i\in \{1,\dots,\dg\}} \ell_i$, with $\ell_i:\residueI_i \to
 of the form $\lambda_j(1)$. We will do this for some values of $j$
 only, namely those $j$ for which $\mu_j=1$. This result is close in 
 spirit to \cref{lemma:anyv}, but does not assume that the projection
-$X_1: V \to \Kbar$ is one-to-one as in that lemma.
+$X_1: V \to \Kbar$ is one-to-one (that lemma makes such an 
+assumption for a more general linear mapping  $\lf:V\to \Kbar$).
 
 \begin{lemma}\label{lemma:valuelambda}
-  Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$, let $M$ be the minimal
+  Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$ and let $M$ be the minimal
   polynomial of $X_1$ in $\residueI$. Then, the polynomial
-  $\Omega((\ell(X_1^s))_{s\ge0},M)$ satisfies
+  $\Omega((\ell(X_1^s))_{s\ge0},M)$ is well-defined and satisfies
   $$\Omega((\ell(X_1^s))_{s\ge0},M)(r_j) = \lambda_j(1) M'(r_j) \quad \text{for all $j$ in $\{1,\dots,c\}$ such that $\mu_j=1$.}$$
 \end{lemma}
 \begin{proof}
 	Let $\mathfrak{e}$ be the set of all indices $j$ in $\{1,\dots,c\}$
 	such that $\mu_j=1$, and let $\mathfrak{f}=\{1,\dots,c\}-\mathfrak{e}$;
-	this definition allows us to split the sum as
+	this definition allows us to split the generating series
+        of sequence $(\ell(X_1^s))_{s\ge 0}$ as
 	\begin{align*}
-	\sum_{s \ge 0} \ell(X_1^s)/T^{s+1}  
+	\sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}  }
 	&= \sum_{j \in \{1,\dots,c\}}\sum_{i\in T_j} 
-	\sum_{s \ge 0}\ell_i(X_1^s)/T^{s+1}  \\
-	&=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1} +
-	\sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \ell_i(X_1^s)/T^{s+1}.
+	\sum_{s \ge 0} \frac{\ell_i(X_1^s)}{T^{s+1}}  \\
+	&=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \frac{\ell_i(X_1^s)}{T^{s+1}} +
+	\sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \frac{\ell_i(X_1^s)}{T^{s+1}}.
 	\end{align*}
-	Using \cref{lemma:formula} with $t=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \lambda_j(X_1^s)/T^{s+1}$ 
+	Using \cref{lemma:formula} with $\lf=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \ell_i(X_1^s)/T^{s+1}$ 
 	in the second summand
 	can be rewritten as 
-	$$\frac{C_j}{(T-r_j)^{v_j}},$$
-	for some integer $v_j$, and for some polynomial $C_j$ of degree less than
+	$$\frac{E_i}{(T-r_j)^{v_i}},$$
+	for some integer $v_i$, and for some polynomial $E_i \in \Kbar[T]$ of degree less than
 	$v_j$. Next, take $j$ in $\mathfrak{e}$. Since $\mu_j=1$, $\nu_i=1$ for all $i$ in $T_j$,
 	so that
 	each such $\ell_i$ takes the form 
@@ -2223,7 +2226,7 @@ $X_1: V \to \Kbar$ is one-to-one as in that lemma.
 	Remarking  that we can write $\ell_{i,1}=\ell_i(1)$,
 	altogether, the sum in question can be written
 	\begin{align*}
-	\sum_{s \ge 0} \ell(X_1^s)/ T^{s+1}  
+	\sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}  }
 	&=\sum_{j \in \mathfrak{e}} 
 	\frac{ \sum_{i\in T_j}  \ell_{i}(1) }{T-r_j }
 	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}\\
@@ -2231,29 +2234,30 @@ $X_1: V \to \Kbar$ is one-to-one as in that lemma.
 	\frac{ \lambda_j(1) }{T-r_j }
 	+ \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}
 	\end{align*}
-	for some integers $\{x_j \mid j \in b\}$ such that $\deg(D_j) < x_j$
-	holds, and with $D_j$ and $T-r_j $ coprime; if $r_j=0$, we take
-	$x_j=\deg(D_j)+1$. In particular, the minimal polynomial of
-	$(\ell(X_1^s))_{s\ge 0}$ is $N=\prod_{j\in \mathfrak{e}}(T-r_j)
-	\prod_{j \in \mathfrak{f}}(T-r_j)^{x_j}$.
+	for some integers $\{x_j \mid j \in \mathfrak{f}\}$ and
+        polynomials $\{D_j \mid j \in \mathfrak{f}\}$ such that
+        $\deg(D_j) < x_j$ holds, and with $D_j$ and $T-r_j $
+        coprime. In particular, the minimal polynomial of  $(\ell(X_1^s))_{s\ge 0}$ is $N=\prod_{j\in
+          \mathfrak{e}}(T-r_j) \prod_{j \in  \mathfrak{f}}(T-r_j)^{x_j}$.
 	
-	On the other hand, the minimal polynomial $M$ of $X_1$ can be rewritten as $M=\prod_{j\in
-		\mathfrak{e}}(T-r_j) \prod_{j \in \mathfrak{f}}(T-r_j)^{\mu_j}$, so
-	that $\delta=\sum_{j \in \mathfrak{e}} 1 + \sum_{j\in \mathfrak{f}}
-	\mu_j$. The minimal polynomial
-	of the sequence $\ell(X_1^s)$ divides $M$, so that $x_j \le \mu_j$ holds for all $j$ in
-	$\mathfrak{f}$.
-	As a result, $\Omega((\ell(X_1^s))_{s\ge0},M)$ exists and is given by
+	%% On the other hand, the minimal polynomial $M$ of $X_1$ can be
+        %% rewritten as $M=\prod_{j\in \mathfrak{e}}(T-r_j) \prod_{j \in
+        %% \mathfrak{f}}(T-r_j)^{\mu_j}$.  
+
+        The minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge
+          0}$ divides $M$, so that $x_j \le \mu_j$ holds for all $j$
+        in $\mathfrak{f}$.  As a result,
+        $\Omega((\ell(X_1^s))_{s\ge0},M)$ is well-defined and is given by
 	\begin{align*}
 	\Omega((\ell(X_1^s))_{s\ge0},M)=&
 	\sum_{j \in \mathfrak{e}}
 	\Big(
 	\lambda_j(1) \prod_{\iota \in \mathfrak{e}-\{j\}}(T-r_\iota)\Big)
-	\Big(\prod_{j \in \mathfrak{f}}(T-r_j)^{m_j} \Big)\\
+	\Big(\prod_{j \in \mathfrak{f}}(T-r_j)^{\mu_j} \Big)\\
 	&+
 	\sum_{j\in \mathfrak{f}}
-	\Big(  (T-r_j)^{m_j-x_j} D_j
-	\prod_{\iota \in \mathfrak{f}-\{j\}}(T-r_j)^{m_\iota}\Big)
+	\Big(  (T-r_j)^{\mu_j-x_j} D_j
+	\prod_{\iota \in \mathfrak{f}-\{j\}}(T-r_j)^{\mu_\iota}\Big)
 	\Big(\prod_{j\in \mathfrak{e}} (T-r_j) \Big).
 	\end{align*}
 	This implies that $$\Omega((\ell(X_1^s))_{s\ge0},M)(r_k) =\lambda_k(1) 
@@ -2262,146 +2266,141 @@ $X_1: V \to \Kbar$ is one-to-one as in that lemma.
 	holds for all $k$ in $\mathfrak{e}$.
 \end{proof}
 
-We then show how to use this result to avoid (as much as possible)
-using a generic linear form $t=t_1 X_1 + \cdots + t_n X_n$, and how to
-use (say) $X_1$ instead to compute a zero-dimensional parametrization
-of a subset of $V$; this is motivated by the fact that the
-multiplication matrix by $X_1$ is expected to be sparser than that of
-$t$ (since the matrix of $t$ is a combination of those of
-$X_1,\dots,X_n$), sometimes by a substantial amount. Of course, there
-is no guarantee that $X_1$ is a separating element for $V$. As a
-result, we will compute a decomposition of $V$ into two components
-$V'$ and $V''$; $X_1$ will be a separating element for $V'$, whereas
-we will use a generic linear form to describe $V''$.
-
-More precisely, we characterize the set $V'$ mentioned above as follows: for $i$ in
-$\{1,\dots,d\}$, $\balpha_i$ is in $V'$ if and only if:
+We now show how to use this result to use sequences of the form
+$(\ell(X_1^s))_{s \ge 0}$ to compute a zero-dimensional
+parametrization of a subset $V'$ of $V$. Precisely, we characterize
+the set $V'$ as follows: for $i$ in $\{1,\dots,\dg\}$, $\balpha_i$ is in
+$V'$ if and only if:
 \begin{itemize}
-	\item for $i'$ in $\{1,\dots,d\}$, with $i'\ne i$, $\alpha_{i',1} \ne
+	\item for $i'$ in $\{1,\dots,\dg\}$, with $i'\ne i$, $\alpha_{i',1} \ne
 	\alpha_{i,1}$;
-	\item $\residueI_i$ is a reduced algebra (equivalently, $I_i$ is radical).
+	\item $\residueI_i$ is a reduced algebra, or equivalently, $I_i$ is radical (see \cref{ssec:dual} 
+          for the notation used here).
 \end{itemize}
-We denote by $\mathfrak{A}\subset \{1,\dots,d\}$ the set of
+We denote by $\mathfrak{A}\subset \{1,\dots,\dg\}$ the set of
 corresponding indices $i$, and we let
-$\mathfrak{B}=\{1,\dots,d\}-\mathfrak{a}$, so that we have
+$\mathfrak{B}=\{1,\dots,\dg\}-\mathfrak{A}$, so that we have
 $V'=V_{\mathfrak{A}}$ and $V''=V_{\mathfrak{B}}$.  Remark that $X_1$
-is a separating element for $V'$.
+separates the points of $V'$.
 
 Correspondingly, we define $\mathfrak{a}$ as the set of all indices
 $j$ in $\{1,\dots,c\}$ such that $\sigma_j$ is in $\mathfrak{A}$. In
 other words, $j$ is in $\mathfrak{a}$ if and only if $T_j$ has
-cardinality $1$ and $\residueI_{\sigma_j}$ is reduced.  The algorithm in this
+cardinality $1$, so that $T_j=\{\sigma_j\}$, and $\residueI_{\sigma_j}$ is reduced.  The algorithm in this
 paragraph will compute a zero-dimensional parametrization of
 $V_{\mathfrak{A}}$; we use the following lemma to perform this
 decomposition of $V$.
 
 \begin{lemma}\label{lemma:acb2}
-	Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be a
-	linear form over $\prod_{i \in T_j} \residueI_i$ and let $t=t_2 X_2
-	+ \cdots + t_n X_n$. Define constants $a,b,c$ in $\Kbar$ by
-	$$a=\lambda(1),\quad b=\lambda(t),\quad c=\lambda(t^2).$$
-	Then, $j$ is in $\mathfrak{a}$
-	if and only if, for a generic choice of $\lambda$ and $t$, $ac=b^2$.
+  Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be
+  a linear form over $\prod_{i \in T_j} \residueI_i$ and let $\mf=t_2
+  X_2 + \cdots + t_n X_n$, for some $t_2,\dots,t_n$. Define constants
+  $a,b,c$ in $\Kbar$ by
+  $$a=\lambda(1),\quad b=\lambda(\mf),\quad c=\lambda(\mf^2).$$
+  Then, $j$ is in $\mathfrak{a}$
+  if and only if, for a generic choice of $\lambda$ and $\mf$, $ac=b^2$.
 \end{lemma}
 \begin{proof}
-	The assumption that $\mu_j=1$ means that for all $i$ in $T_j$,
-	$\nu_i=1$. The linear 
-	form $\lambda$ can be uniquely written as a sum $\lambda=\sum_{i \in T_j}
-	\ell_i$, where each $\ell_i$ is in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$.
-	The fact that all $\nu_i$ are equal to $1$ then implies that each $\ell_i$ takes the form 
-	$$\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i),$$
-	where $\Lambda_{i}$ is a differential operator that does not 
-	involve $\partial/\partial X_1$. Thus, as in \cref{ell_param}, we can write a general
-	$\Lambda_i$ of this form as
-	$$\Lambda_i: f \mapsto u_{i,1} f + \sum_{2 \le r \le n}
-	P_{i,r}(u_{i,2},\dots,u_{i,D_i}) \frac{\partial}{\partial X_j} f +
-	\sum_{2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})
-	\frac{\partial^2}{\partial X_j\partial X_k} f +
-	\tilde\Lambda_i(f),$$ where all terms in $\tilde \Lambda_i$ have
-	order at least $3$, $\bu_i=(u_{i,1},\dots,u_{i,D_i})$ are parameters and
-	$(P_{i,r})_{2 \le r \le n}$ and $(P_{i,r,s})_{2 \le r \le s \le n}$
-	are linear forms in $u_{i,2},\dots,u_{i,D_i}$.
-	We obtain
-	\begin{align*}
-	\Lambda_i(1)   &= u_{i,1} \\
-	\Lambda_i(t)   &= u_{i,1} t +\sum_{2 \le r \le n}P_{i,r}t_r \\
-	\Lambda_i(t^2) &= u_{i,1} t^2  +2 t \sum_{2 \le r \le n}P_{i,r}t_r   
-	+ 2\sum_{2 \le r \le s \le n} P_{i,r,s}t_rt_s,
-	\end{align*}
-	which gives
-	\begin{align*}
-	a  &= \sum_{i\in T_j}u_{i,1} \\
-	b  &= \sum_{i\in T_j}u_{i,1} t(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}t_r \\
-	c &= \sum_{i\in T_j}u_{i,1} t(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}t(\balpha_i) P_{i,r}t_r    
-	+2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}t_rt_s.
-	\end{align*}
-	Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
-	have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
-	is reduced, so that all coefficients $P_{\sigma_j,r}$ and
-	$P_{\sigma_j,r,s}$ vanish. Thus, we are left in
-	this case with
-	$$
-	a = u_{\sigma_j,1}, \quad
-	b = u_{\sigma_j,1} t(\balpha_{\sigma_j}), \quad
-	c = u_{\sigma_j,1} t(\balpha_{\sigma_j})^2,
-	$$ so that we have $ac=b^2$, for {\em any} choice of $\lambda$ and
-	$t$. Now, we suppose that $j$ is not in $\mathfrak{a}$, and we prove
-	that for a generic choice of $\lambda$ and $t$, $ac-b^2$ is non-zero.
-	The quantity $ac-b^2$ is a polynomial in the coefficients
-	$(\bu_i)_{i\in T_j}$, and $(t_i)_{i \in \{2,\dots,n\}}$, and we have
-	to show that it is not identically zero. We discuss two cases; in both
-	of them, we prove that a suitable specialization of $ac-b^2$ is
-	non-zero.
-	
-	Suppose first that for at least one index $\sigma$ in $T_j$,
-	$\residueI_\sigma$ is not reduced. In this case, there exists as least one
-	index $\rho$ in $\{2,\dots,n\}$ such that
-	$P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})$ is not
-	identically zero \todo{explain better}. Let us set all $\bu_{\sigma'}$
-	to $0$, for $\sigma'$ in $T_j-\{\sigma\}$, as well as $u_{\sigma,1}$,
-	and all $t_r$ for $r\ne \rho$. Then, under this specialization,
-	$ac-b^2$ becomes
-	$-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})t_\rho)^2$,
-	which is non-zero, so that $ac-b^2$ itself must be non-zero.
-	
-	Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
-	has cardinality at least $2$, with $\residueI_\sigma$ reduced for all $\sigma$
-	in $T_j$ (so that $P_{\sigma,r}$ and $P_{\sigma,r,s}$ vanish for 
-	all such $\sigma$ and all $r,s$). Suppose that $\sigma$ and $\sigma'$ are two indices in
-	$T_j$; we set all indices $u_{\sigma'',1}$ to zero, for $\sigma''$
-	in $T_j-\{\sigma,\sigma'\}$. We are left with
-	$$
-	a=u_{\sigma,1}+u_{\sigma',1},\quad
-	b=u_{\sigma,1}t(\balpha_{\sigma})+u_{\sigma',1}t(\balpha_{\sigma'}),\quad
-	c=u_{\sigma,1}t(\balpha_{\sigma})^2+u_{\sigma',1}t(\balpha_{\sigma'})^2.
-	$$
-	Then, $ac-b^2$ is equal to $2u_{\sigma,1}u_{\sigma',1}(t(\balpha_{\sigma})-t(\balpha_{\sigma'}))^2$,
-	which is non-zero, since $\balpha_\sigma \ne \balpha_{\sigma'}$.
+  The assumption that $\mu_j=1$ means that for all $i$ in $T_j$,
+  $\nu_i=1$. The linear 
+  form $\lambda$ can be uniquely written as a sum $\lambda=\sum_{i \in T_j}
+  \ell_i$, where each $\ell_i$ is in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$.
+  The fact that all $\nu_i$ are equal to $1$ then implies that each $\ell_i$ takes the form 
+  $$\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i),$$
+  where $\Lambda_{i}$ is a differential operator that does not 
+  involve $\partial/\partial X_1$. Thus, as in \cref{ell_param}, we can write a general
+  $\Lambda_i$ of this form as
+  $$\Lambda_i: f \mapsto u_{i,1} f + \sum_{2 \le r \le n}
+  P_{i,r}(u_{i,2},\dots,u_{i,D_i}) \frac{\partial}{\partial X_j} f +
+  \sum_{2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})
+  \frac{\partial^2}{\partial X_j\partial X_k} f +
+  \tilde\Lambda_i(f),$$ where all terms in $\tilde \Lambda_i$ have
+  order at least $3$, $\bu_i=(u_{i,1},\dots,u_{i,D_i})$ are parameters and
+  $(P_{i,r})_{2 \le r \le n}$ and $(P_{i,r,s})_{2 \le r \le s \le n}$
+  are linear forms in $u_{i,2},\dots,u_{i,D_i}$.
+  We obtain
+  \begin{align*}
+    \Lambda_i(1)   &= u_{i,1} \\
+    \Lambda_i(\mf)   &= u_{i,1} \mf +\sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r \\
+    \Lambda_i(\mf^2) &= u_{i,1} \mf^2  +2 \mf \sum_{2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r + 
+    2\sum_{2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s,
+  \end{align*}
+  which gives
+  \begin{align*}
+    a  &= \sum_{i\in T_j}u_{i,1} \\
+    b  &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r \\
+    c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})t_r    
+    +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})t_rt_s.
+  \end{align*}
+  Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
+  have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
+  is reduced, so that all coefficients $P_{\sigma_j,r}$ and
+  $P_{\sigma_j,r,s}$ vanish. Thus, we are left in
+  this case with
+  $$
+  a = u_{\sigma_j,1}, \quad
+  b = u_{\sigma_j,1} \mf(\balpha_{\sigma_j}), \quad
+  c = u_{\sigma_j,1} \mf(\balpha_{\sigma_j})^2,
+  $$ so that we have $ac=b^2$, for {\em any} choice of $\lambda$ and
+  $\mf$. Now, we suppose that $j$ is not in $\mathfrak{a}$, and we prove
+  that for a generic choice of $\lambda$ and $\mf$, $ac-b^2$ is non-zero.
+  The quantity $ac-b^2$ is a polynomial in the parameters
+  $(\bu_i)_{i\in T_j}$, and $(t_i)_{i \in \{2,\dots,n\}}$, and we have
+  to show that it is not identically zero. We discuss two cases; in both
+  of them, we prove that a suitable specialization of $ac-b^2$ is
+  non-zero.
+  
+  Suppose first that for at least one index $\sigma$ in $T_j$,
+  $\residueI_\sigma$ is not reduced. In this case, there exists as least one
+  index $\rho$ in $\{2,\dots,n\}$ such that
+  $P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})$ is not
+  identically zero. Let us set all $\bu_{\sigma'}$
+  to $0$, for $\sigma'$ in $T_j-\{\sigma\}$, as well as $u_{\sigma,1}$,
+  and all $t_r$ for $r\ne \rho$. Then, under this specialization,
+  $ac-b^2$ becomes
+  $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})t_\rho)^2$,
+  which is non-zero, so that $ac-b^2$ itself must be non-zero.
+  
+  Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
+  has cardinality at least $2$, with $\residueI_\sigma$ reduced for all $\sigma$
+  in $T_j$ (so that $P_{\sigma,r}$ and $P_{\sigma,r,s}$ vanish for 
+  all such $\sigma$ and all $r,s$). Suppose that $\sigma$ and $\sigma'$ are two indices in
+  $T_j$; we set all indices $u_{\sigma'',1}$ to zero, for $\sigma''$
+  in $T_j-\{\sigma,\sigma'\}$. We are left with
+  $$
+  a=u_{\sigma,1}+u_{\sigma',1},\quad
+  b=u_{\sigma,1}\mf(\balpha_{\sigma})+u_{\sigma',1}\mf(\balpha_{\sigma'}),\quad
+  c=u_{\sigma,1}\mf(\balpha_{\sigma})^2+u_{\sigma',1}\mf(\balpha_{\sigma'})^2.
+  $$
+  Then, $ac-b^2$ is equal to $2u_{\sigma,1}u_{\sigma',1}(\mf(\balpha_{\sigma})-\mf(\balpha_{\sigma'}))^2$,
+  which is non-zero, since $\balpha_\sigma \ne \balpha_{\sigma'}$.
 \end{proof}
 
 The previous lemmas allow us to write Algorithm
 $\mathsf{ParametrizationX}_1$. After computing $M$, we determine its
-factor $P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$. We split this
-polynomial further using the previous results in order to find
-$\prod_{j \in \mathfrak{a}} (T-r_j)$, and we conclude using the same
-kind of calculations as in $\mathsf{ParametrizationGeneric}$.
+factor $P=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$, which is
+obtained by taking the squarefree part of $M$ and dividing it by
+$\gcd(M,M')$. We split this polynomial further using the previous
+results in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
+conclude using the same kind of calculations as in Algorithm
+$\mathsf{Parametrization}$ of \cref{ssec:abstractlago}.
 
 \begin{algorithm}[H]
-	\caption{$\mathsf{ParametrizationX}_1(\ell,t)$}
+	\caption{$\mathsf{ParametrizationX}_1(\ell)$}
 	~\\
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}\setlength\itemsep{0em}
 		\item a linear form $\ell$ over $\residueI$
-		\item a linear form $t=t_2 X_2 + \cdots + t_n X_n$
 	\end{itemize}
 	{\bf Output:} polynomials $((P,V_1,\dots,V_n),X_1)$
 	\begin{enumerate}\setlength\itemsep{0em}
-		\item let $M$ be the minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge 0}$ and let $\delta$ be its degree
-		\item let $P = \prod_{r \text{~root of $M$ of multiplicity 1}}(T-r)$
-		\item let $t$ be a random linear form in $X_2,\dots,X_n$
+		\item let $M$ be the minimal polynomial of the sequence $(\ell(X_1^s))_{s \ge 0}$
+		\item let $P$ be the squarefree part of $M$
+                \item let $P = P /\gcd(M, M')$
+		\item let $\mf$ be a random linear form in $X_2,\dots,X_n$
 		\item \textbf{for} $i=0,1,2$ \textbf{do}
 		\begin{enumerate}
-			\item let $A_i = \Omega((\ell(t^i X_1^s))_{s\ge0},M)$
+			\item let $A_i = \Omega((\ell(\mf^i X_1^s))_{s\ge0},M)$
 		\end{enumerate}
 		\item\label{step:updateP} let $P = \gcd(P, A_0  A_2- A_1^2)$
 		\item \textbf{for} $i=2,\dots,n$ \textbf{do}
