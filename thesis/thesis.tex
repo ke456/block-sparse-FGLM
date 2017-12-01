@@ -988,16 +988,17 @@ where the minimal polynomial $\minpoly$ appears at the $i$th entry  of the
 left-hand row vector. 
 \begin{lemma}\label{utilde}
   For generic $\mU,\mV$, the row vector $\row{a}_i$ has polynomial
-  entries of degree at most~$D$.
-  %TODO V
+  entries of degree at most~$\deg(P)$.
 \end{lemma}
 \begin{proof}
   For generic $\mU,\mV$, we saw that $\minpoly$ is the largest invariant factor
   of $ (\mat{P}_{\mU,\mV})^{-1}$; thus, the product $\minpoly\
   (\mat{P}_{\mU,\mV})^{-1}$ has polynomial entries. Since $\row{a}_i$ the $i$th
-  row of this matrix, our first claim follows. Furthermore, the bound on the
-  degree of the entries of $\row{a}_i$ is a direct consequence of Cramer's
-  formulas.
+  row of this matrix, $\row{a}_i$ has polynomial entries.  Now, since
+  $\mat{P}_{\mU,\mV}$ is reduced, the predictable degree property
+  \cite[Theorem~6.3-13]{Kailath80} holds; it implies that each entry of
+  $\row{a}_i$ has degree at most the maximum of the degrees of the entries of
+  $\row{a}_i\mat{P}_{\mU,\mV}$. This maximum is $\deg(\minpoly)$.
 \end{proof}
 To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
 as before, the cost is $O(m^{\omega} \M(D/m) \log(D/m) \log(m))
