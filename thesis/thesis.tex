@@ -337,10 +337,19 @@ these algorithms, one can always evaluate  \todo{finish}
 
 This section starts with a review of known facts on linearly recurrent
 sequences; we first discuss the scalar case, then show how the ideas
-carry over to matrix sequences. The main results we will need from the
-first subsections are \cref{coro:cost_approx} and \cref{randXY}, which
-give cost estimates on bla bla
+carry over to matrix sequences. 
 
+The main results we will need from the first subsections are
+\cref{coro:cost_approx} and \cref{randXY}, which give cost estimates
+on the cost of computing a {\em minimal matrix generator} of a
+linearly recurrent matrix sequence and a degree bound for such
+generators, for matrices obtained from Krylov sequences. These results
+are for the most part not new
+(see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost
+analysis we give uses results not available when those references were
+first written.  The last subsection presents a useful result for our
+main algorithm, that allows us to compute a ``numerator'' for a scalar
+sequence from a similar object obtained from a matrix sequence.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
