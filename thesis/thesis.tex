@@ -336,6 +336,14 @@ coincides with the dimension of $\residueI=\K[X_1,\dots,X_n]/I$, we
 can infer that we have all solutions (and that $I$ is radical), so our
 output is correct.
 
+In what follows, we only consider the case $\omega>2$.  We use a time function
+$d \mapsto \M(d)$ for the cost of univariate polynomial multiplication over
+$\K$, for which we assume the super-linearity properties of
+\cite[Section~8.4]{GaGe13}.  We assume that the exponent $\omega$ is also valid
+for multiplication of matrices over $\polRing$: then, two $m\times m$ matrices
+over $\K[T]$ whose degree is less than $d$ can be multiplied using $O(m^\omega
+\M(d))$ operations in $\K$.
+
 %% We rely Over a field $\mathbb{K}$, recall that we can compute
 %% multiplication, division with remainder, extended GCD, and square
 %% free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
@@ -460,7 +468,6 @@ $\K$ \cite{BrGuYu80}. Given $P$ and $\ell_0,\dots,\ell_{\deg(P)-1}$, we can
 deduce $\Omega(\mathcal{L},P)$ for the cost $\M(\deg(P))$ of one polynomial
 multiplication in degree $\deg(P)$.
 
-\todo{introduce $\M(d)$ somewhere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
