@@ -7,8 +7,6 @@
 \usepackage[shortlabels]{enumitem}% for enumerate / itemize: define reasonable margins
 \setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
 
-
-
 % math and theorem names
 \usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
 \usepackage{amsthm,thmtools}
@@ -2023,8 +2021,9 @@ expected.
 
 In the following table, we give the timings in seconds for different
 values of $m$ for \cref{algo:block-sparse-fglm}.  Our
-implemention was based on LinBox \cite{LinBox} dense and sparse
-matrices as well Shoup's NTL \cite{NTL} polynomials. All timings are
+implemention was based on Shoup's NTL \cite{NTL} polynomials
+as well as LinBox \cite{LinBox} dense and sparse
+matrices and polynomial matrix multiplication. All timings are
 measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
 value of $m$, we create and run $m$ threads in parallel. Beside each
 timing, the ratio of the time it took to compute $(\mU^{\perp}
