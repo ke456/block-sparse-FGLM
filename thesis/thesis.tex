@@ -159,7 +159,7 @@
 
 \title{A block version of a sparse-FGLM-like algorithm}
 
-\author{Kevin Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost}
+\author{Seung Gyu Hyun, Vincent Neiger, Hamid Rahkooy, \'Eric Schost}
 
 \begin{document}
 
@@ -215,9 +215,9 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
  $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
  least for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
- exponent for matrix multiplication. While improving these results is
- an interesting question is itself, we will not address it in this
- paper.
+ exponent for matrix multiplication over a ring (commutative, with $1$). While
+ improving these results is an interesting question is itself, we will not
+ address it in this paper.
 
 Given such an input, the FGLM algorithm~\cite{FaGiLaMo93} computes the
 lexicographic Gr\"obner basis of $I$ in $O(nD^3)$ operations in $\K$.
@@ -339,10 +339,9 @@ output is correct.
 In what follows, we only consider the case $\omega>2$.  We use a time function
 $d \mapsto \M(d)$ for the cost of univariate polynomial multiplication over
 $\K$, for which we assume the super-linearity properties of
-\cite[Section~8.4]{GaGe13}.  We assume that the exponent $\omega$ is also valid
-for multiplication of matrices over $\polRing$: then, two $m\times m$ matrices
-over $\K[T]$ whose degree is less than $d$ can be multiplied using $O(m^\omega
-\M(d))$ operations in $\K$.
+\cite[Section~8.4]{GaGe13}.  Then, two $m\times m$ matrices over $\K[T]$ whose
+degree is less than $d$ can be multiplied using $O(m^\omega \M(d))$ operations
+in $\K$.
 
 %% We rely Over a field $\mathbb{K}$, recall that we can compute
 %% multiplication, division with remainder, extended GCD, and square
@@ -762,7 +761,6 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     \log(\degBd))$ operations in $\field$ if $\cdim \in \Omega(\rdim)$;
   \item a minimal left matrix generator for $\seq$ using 
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
-    %%% TODO Vincent : check the log term
     operations in $\field$ if $\cdim \in O(\rdim)$; \footnote{This bound
       assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
       particular if $\M(\cdot)$ is quasi-linear and $\omega>2$.}
@@ -942,12 +940,16 @@ entries of $\col{x}$ is $\minpoly$.  Thus, both $\minpoly$ and $\col{x}$
 can be computed using the
 high-order lifting algorithm of \cite[Algorithm~5]{Stor03} on input
 $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
-\cite[Corollary~16]{Stor03}, the
-cost of this is $O(m^{\omega} \M(D/m)
-\log(D/m) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$;
-%% FIXME correct cost bound (other locations as well)
-the latter algorithm is randomized, since it chooses a random point in
-$\K$ to compute (parts of) the expansion of the inverse of
+\cite[Corollary~16]{Stor03}, this costs
+\begin{align*}
+  & O\Bigg(m^{\omega} \M(D/m) \log(m) + \sum_{0 \le i \le \log_2(m)} 4^i (2^{-i}m)^\omega \M(D/m) \\
+  & \quad\qquad + m^2 \M(D/m)\log(D/m)\log(m) + m \M(D) \log(D) \Bigg) \\
+  & \subset O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m))  \\
+  & \subset \softO{m^{\omega-1}D}
+\end{align*}
+operations in $\K$.
+The latter algorithm is randomized, since it chooses a random point in $\K$ to
+compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
 %% todo for after submission: think about writing the following deterministic approach:
@@ -1640,7 +1642,7 @@ $\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
 non-zero entry is a $1$ at the first row.
 
 \begin{algorithm}[H]
-	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
 		\item $\mM_1,\dots,\mM_n$ defined as above
@@ -1724,7 +1726,7 @@ at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero entries.
 As a result, $\mM$ has density at most $n\density$, and a matrix-vector product
 by $\mM$ can be done in $O(n\density D^2)$ operations in $\K$ (we briefly
 discuss variants of the algorithm using dense linear algebra at the
-end of this subsection). The cost incurred at Step~\ref{mainstep2}
+end of this subsection). The cost incurred at Step~\ref{mainstep1}
 to compute $\mM$ is $O(n\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
@@ -1835,41 +1837,43 @@ as well as $C_1$ and all $C_{X_i}$.
 
 \subsection{Example}
 
-We give an example of our algorithm  the case of a radical ideal. Let
-$$I = \langle -16X_1^2 - 15X_1X_2 - 14X_2^2 - 48X_1 + 26, 35X_1X_2 + 47X_1 - 46X_2 - 47 \rangle \subset \F_{101}[X_1,X_2];$$
+We give an example of our algorithm with a non-radical system as input. Let
+$$
+I = 
+\sbox0{$\begin{array}{c}
+X_1^3 + 88X_1^2 + 56X_1 + 21,\\
+X_1^2X_2 + 91X_1^2 + 92X_1X_2 + 90X_1 + 20X_2 + 2,\\
+X_1X_2^2 + 81X_1X_2 + 100X_1 + 96X_2^2 + 100X_2 + 5,\\
+X_1^2X_2 + 81X_1^2 + 93X_1X_2 + 59X_1 + 16X_2 + 84,\\
+X_1X_2^2 + 71X_1X_2 + 99X_1 + 97X_2^2 + 19X_2 + 8,\\
+X_2^3 + 61X_2^2 + 96X_2 + 20
+\end{array}$}
+\mathopen{\resizebox{1.2\width}{\ht0}{$\Bigg\langle$}}
+\usebox{0}
+\mathclose{\resizebox{1.2\width}{\ht0}{$\Bigg\rangle$}}
+\subset \F_{101}[X_1,X_2];
+$$
 the correponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
 We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices
 in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$:
 \begin{align*}
 \mM_1 = \begin{bmatrix}
-  0 & 10 & 68&   1\\
-  0 & 85 & 15&  69\\
-  1 & 91 & 19& 100\\
-  0 &  0 & 37&  85
-%%  85&   0&  37&   0\\
-%%  69&  85&  15&   0\\
-%% 100&  91&  19&   1\\
-%%   1&  10&  68&   0
+  7   & 91 & 100& 0\\
+  41  & 2  & 20 & 0\\
+  100 & 10 & 8  & 1\\
+  1   & 71 & 86 & 0
 \end{bmatrix},\,
 \mM_2 = \begin{bmatrix}
-  0 &  0 & 10 & 95\\
-  1 &  0 & 85 & 42\\
-  0 &  0 & 91 & 51\\
-  0 &  1 &  0 & 36
-%% 36&  1&  0&  0\\
-%% 42&  0& 85&  1\\
-%% 51&  0& 91&  0\\
-%% 95&  0& 10&  0
+  40&  1 & 91 & 0\\
+  5 &  0 &  2 & 1\\
+  0 &  0 & 10 & 0\\
+  81&  0 & 71 & 0
 \end{bmatrix},\,
 \mM = \begin{bmatrix}
- 0 & 20&  60&  88\\
-53 & 69&  91&  41\\
- 2 & 81&  13&  75\\
- 0 & 53&  74&  58
-%% 58& 53& 74&  0\\
-%% 41& 69& 91& 53\\
-%% 75& 81& 13&  2\\
-%% 88& 20& 60&  0
+13 & 33&  74&  0\\
+44 &  4&  45&  53\\
+99 & 20&  41&  2\\
+53 & 41&  97&  0
 \end{bmatrix}.
 \end{align*}
 We choose $m = 2$ and take $\mU,\mV \in \F_{101}^{D\times m}$ with 
@@ -1883,7 +1887,7 @@ $$ \mU = \begin{bmatrix}
 \mV = \begin{bmatrix}
   6&  97\\
  83&  58\\
-101&  95\\
+  0&  95\\
  59&  89
 \end{bmatrix}.
 $$ We compute the first $2d=2\lceil D/m\rceil =4$ terms in the matrix
@@ -1893,28 +1897,28 @@ by first computing
 \begin{align}\label{exampleproducts}
 \mU^\perp =
 \begin{bmatrix}
-  7&  29&  80&  84\\
- 82&  58&  43&  38
+ 84&  29&  80&   7\\
+ 38&  58&  43&  82
 \end{bmatrix},
 & 
 \quad \mU^\perp \mM 
 =
 \begin{bmatrix}
- 81&  44&  13&  52\\
- 29&  29&  35&  75
+ 54&  28&  67&  81\\
+ 34&  52&  90&  29
 \end{bmatrix},
  \\[2mm]
 \mU^\perp \mM^2 
 =
 \begin{bmatrix}
-35&  82&  54&  96\\
-92&  99&  82&  10
+33&  91&   3&  2\\
+47&  77&  47&  7
 \end{bmatrix},
  &\quad \mU^\perp \mM^3 
 =
 \begin{bmatrix}
-10&  64&  97&   1\\
-58&  87&  74&  99
+89&  80&  87&  82\\
+34&  56&  55&  34
 \end{bmatrix}, \nonumber
 \end{align}
 from which we get, by right-multiplication by $\mV$,
@@ -1924,46 +1928,45 @@ $$ \seq_{\mU,\mV} =
 83& 51
 \end{bmatrix},
 \begin{bmatrix}
-57& 82\\  
-23& 16
+54& 34\\  
+70& 73
 \end{bmatrix},
 \begin{bmatrix}
-54& 93\\  
-70& 66
+92& 54\\  
+16& 74
 \end{bmatrix},
 \begin{bmatrix}
-50& 77\\
-26& 76
+94& 51\\
+91& 51
 \end{bmatrix},\dots
 $$
 and
 $$ \mat{P}_{\mU,\mV} =
 \begin{bmatrix}
-T^2 + 76T + 8&       87T + 31\\
-    100T + 46& T^2 + 87T + 44
+T^2 + 60T + 62 &       88T + 25\\
+     100T + 33 & T^2 + 84T + 78
 \end{bmatrix}.
 $$
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
-$$P = T^4 + 62T^3 + 85T^2 + 69T + 37,$$
-and $\sqfree=P$
-since $P$ is squarefree. 
+$$P = T^3 + 76T^2 + 100T + 7,$$
+and $\sqfree=T^2+8X+61$
 Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
-\row{a}_1 &= [T + 55, T^2 + 76T+ 8]\\
+\row{a}_1 &= [T+16,13]\\
 \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
-&=\left [\begin{matrix} 7T + 71 \\ 82 + 86   \end{matrix}\right ].
+&=\left [\begin{matrix} 84T + 55 \\ 38T + 11   \end{matrix}\right ].
 \end{align*}
 The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1};$
 the latter is the product
 $$\mat{P}_{\mU,\mV} 
 \left (
 \begin{bmatrix}
-7\\  
-82
+84\\  
+38
 \end{bmatrix}\cdot \frac 1T+
 \begin{bmatrix}
-81\\  
-29
+54\\  
+34
 \end{bmatrix}\cdot \frac 1{T^2}+
  \cdots \right),$$ where the columns are the first columns of the
  matrices in \cref{exampleproducts} (we only need $d=2$
@@ -1972,24 +1975,25 @@ $$\mat{P}_{\mU,\mV}
    0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1\cdot
  \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0},
  \mat{P}_{\mU,\mV})$; we get
-$$ C_1 = 82T^3 + 63T^2 + 73T + 48.$$
+$$ C_1 = 84T^2 + 75T + 13.$$
 To find $C_{X_1}$, we proceed similarly: we compute  $\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$,
 and we obtain
 \begin{align*}
 \mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) &=
-\left [\begin{matrix} 80T + 37 \\ 43T+60
+\left [\begin{matrix} 88T + 19 \\ 57T+40
   \end{matrix} \right  ]\\
-C_{X_1} &= 43T^3 + 75T^2  + 49T+91.
+C_{X_1} &= 88T^2 + 47T  + 16.
 \end{align*}
 Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod \sqfree$ is 
-given by $V_1= 61T^3 + 75T^2 + 85T + 23$. 
-We compute $V_2= 32T^3 + 41T^2 + 94T + 22$ in the same way,
+given by $V_1= 15T+14$. 
+We compute $V_2= 49T+9$ in the same way,
 and our output is 
-$$((T^4 + 62T^3 + 85T^2 + 69T + 37, 61T^3 + 75T^2 + 85T + 23, 32T^3 +
-41T^2 + 94T + 22), 2X_1 + 53 X_2).$$ As a sanity check, we see that
-$V(I)$ has one point in $\F_{101}^2$, namely $(54,79)$;
-accordingly, $P$ has one root
-in $\F_{101}$, $53$, and we have $V_1(53) = 54$ and $V_2(53) = 79$, as
+$$((T^2+8T+61, 15T+14, 49T+9), 2X_1 + 53 X_2).$$ 
+As a sanity check, we see that
+$V(I)$ has two points in $\F_{101}^2$, namely $(4,10),(5,20)$;
+accordingly, $Q$ has two roots
+in $\F_{101}$: $33,60$, and we have $(V_1(33) = 4, V_2(33) = 10)$
+and $(V_1(60) = 5, V_2(60) = 20)$, as
 expected.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2537,17 +2541,31 @@ $Q_\mathfrak{A} \simeq \K[T]/F.$ The generating series
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Experimental results}
-In the following table, we give a ratio of the timing for $\mathsf{ParametrizationX}_1$
+In the following table, we give the ratio of the timing for $\mathsf{ParametrizationX}_1$
 to the timing for $\mainalgoname$ for each input. The last column
 shows the number of points in the variety separated by $X_1$ compared to the 
 total number of points in the variety.
 The inputs and the machine used for timings are the same as section \ref{section:ex}.
 
-For all inputs, with the exception of sot1, $X_1$ separates most of the
+The performance of $\mathsf{ParametrizationX}_1$ depends on the density of $\mM_1$
+and the number of points separated by $X_1$. 
+In the worst case, if the density
+of $\mM_1$ equals the density of $\mM$ and $X_1$ does not separate any points in 
+the variety, then $\mathsf{ParametrizationX}_1$ will take twice as long as
+$\mainalgoname$. However, this case was not seen in our experiments.
+For all our inputs except sot1, 
+$X_1$ separates most of the points in the variety. 
+In this case, $\mathsf{Parametrization}$ performs better by
+a factor of 2 compared to $\mainalgoname$ on average for all values of $m$.
+Even in an unfavourable case like sot1, where $X_1$ only separates $1012$ points out of
+$7682$ points in the variety, the ratio is close to 1.
+
 
 \begin{center}
+Table 2: Comparison of $\mathsf{ParametrizationX}_1$ and $\mainalgoname$
 \begin{tabular}{c|c|c|c|c|c|c}
-\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&\\
+\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$\frac{points\,separated\,by\,X_1}{total\,points}$\\
+\hline
 rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
 rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
 rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
