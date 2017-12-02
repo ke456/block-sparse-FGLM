@@ -2486,32 +2486,50 @@ role of the density $\rho$ of $\mM$ used in that algorithm.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Completing the description}
+\subsection{Describing the residual set}
 
-The second part of the algorithm computes a
-zero-dimensional parametrization of
-$V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call
-Algorithm $\mathsf{ Parametrization}$, but with a carefully chosen linear
-form $\ell'$ as input: we build $\ell'$ such that its support is
-$\mathfrak{B}$; this is denoted by $\ell'={\sf Update}(\cdots)$ in
-Algorithm $\mathsf{ParametrizationWithSplitting}$.
+Let $\mathfrak{A}$ and $\mathfrak{B}$ be as in the previous section.
+The second part of the algorithm computes a zero-dimensional
+parametrization of $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are
+going to call a modified version Algorithm
+$\mathsf{BlockParametrization}$, where we update the values of our
+matrix sequences before computing the minimal matrix generator.
 
+We first describe an operation of decomposition for linear forms $\residueI
+\to \K$; this is essentially a form of the Chinese Remainder Theorem.
 Let $D_{\mathfrak{A}}$ be the number of points in $V_{\mathfrak{A}}$;
 since all $Q_i$, for $i$ in $\mathfrak{A}$, are reduced algebras,
 $D_\mathfrak{A}$ is also the dimension of $\residueI_\mathfrak{A} =
 \prod_{i \in \mathfrak{A}} \residueI_i$. Thus, $\residueI_\mathfrak{B}=\prod_{i \in \mathfrak{B}} \residueI_i$
 has dimension $D_{\mathfrak{B}}=D-D_{\mathfrak{A}}$.
 
-The linear form $\ell$ used in $\mathsf{ParametrizationX}_1$ can be
-decomposed as $\ell= \ell_{\mathfrak{A}} + \ell_{\mathfrak{B}}$, with
-$\ell_\mathfrak{A}: \residueI_\mathfrak{A} \to \Kbar$ and
-$\ell_\mathfrak{B}: \residueI_\mathfrak{B} \to \Kbar$. We will let
-$\ell'=\ell_{\mathfrak{B}}$, so that if $\ell$ is generic, then so is
-$\ell'$, and calling ${\sf Parametrization}(\ell,\lf)$, for a random
-$\lf=t_1 X_1 + \cdots + t_n X_n$, will then return a zero-dimensional
-parametrization of $V_{\mathfrak{B}}$. In that algorithm, we should
-of course use the bound $D_\mathfrak{B}$ on the degree of the minimal
-polynomial.
+Consider a linear form $\ell: \residueI \to \K$; we still denote
+$\ell$ for its extension $\residueI \otimes_\K \Kbar \to \Kbar$.  It
+can then be decomposed as $\ell= \ell_{\mathfrak{A}} +
+\ell_{\mathfrak{B}}$, with $\ell_\mathfrak{A}: \residueI_\mathfrak{A}
+\to \Kbar$ and $\ell_\mathfrak{B}: \residueI_\mathfrak{B} \to
+\Kbar$ \todo{implicit modulo reduction}. Remark that the support of $\ell_\mathfrak{B}$ is contained in 
+$\mathfrak{B}$, and actually equal to $\mathfrak{B}$ for a generic $\ell$.
+
+%% We will let $\ell'=\ell_{\mathfrak{B}}$, so that if $\ell$ is
+%% generic, then so is $\ell'$, and calling ${\sf
+%%   Parametrization}(\ell,\lf)$, for a random $\lf=t_1 X_1 + \cdots +
+%% t_n X_n$, will then return a zero-dimensional parametrization of
+%% $V_{\mathfrak{B}}$. In that algorithm, we should of course use the
+%% bound $D_\mathfrak{B}$ on the degree of the minimal polynomial.
+
+Suppose that we know $C=\Omega( (\ell(X_1^s))_{s \ge 0}, M)$.
+
+Let $M$ be the minimal polynomial of $X_1$ in $\residueI$ and let 
+$F=\prod_{j \in \mathfrak{a}} (T-r_j)$; remark that $F$ divides $M$ 
+and is coprime with $M/F$. Since $Q_\mathfrak{A}$ 
+is reduced, and since $X_1$ is a separating linear form for 
+$V_\mathfrak{A}$, we have
+$Q_\mathfrak{A} \simeq \K[T]/F.$ The generating series
+\begin{align*}
+\sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}}  = \sum_{s \ge 0}\frac{\ell_\mathfrak{A}(X_1^s)}{T^{s+1}}  
++\sum_{s \ge 0} \frac{\ell_\mathfrak{B}(X_1^s)}{T^{s+1}}
+\end{align*}
 
 
 
