@@ -667,7 +667,7 @@ is similar to \cite[Theorem~4.5]{Turner02}.
   \in \polMatSpace[\cdim]$ is in column Popov form, we have $\relbas =
   \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$, where
   $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\cdim})$
-  componentwise and $\mat{L} \in \matSpace[\cdim]$ is unit upper
+  termwise and $\mat{L} \in \matSpace[\cdim]$ is unit upper
   triangular. Define the matrix $\mat{U} =
   \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_{\cdim}}}
   \mat{L}^{-1}$, which is in $\polMatSpace[\cdim]$ since $\degBdr \ge
@@ -741,7 +741,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \in \appMod{\sys}{\degBd}$. Indeed, from
   \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$
   then $\num = \rel \seqpm$ has polynomial entries, where $\seqpm =
-  \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then, the vector $\rem = -
+  \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then the vector $\rem = -
   \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$ has
   polynomial entries, has degree less than $\deg(\rel)$, and is such
   that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
@@ -947,7 +947,7 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 In particular, combining \cref{coro:cost_approx} and \cref{randXY}, we
 deduce that for generic $\mU,\mV$, given the first $2 \lceil D/m
 \rceil$ terms of the sequence $\seq_{\mU,\mV}$, we can recover a
-minimal matrix generator  $\mat{P}_{\mU,\mV}$ of it using $O(m^\omega \M(D/m) \log(D/m))
+minimal matrix generator  $\mat{P}_{\mU,\mV}$ of it using $O(m^{\omega-1} \M(D) \log(D))
 \subset \softO{m^{\omega-1} D}$ operations in $\K$.
 
 Besides, the theorem shows that for generic $\mU$ and $\mV$, the
@@ -958,16 +958,17 @@ $\mat{P}_{\mU,\mV} \col{x} = \col{y}$, where $\col{y}$ is a vector of
 $m$ randomly chosen elements in $\K$: for a generic choice of
 $\col{y}$, the least common multiple of the denominators of the
 entries of $\col{x}$ is $\minpoly$.  Thus, both $\minpoly$ and $\col{x}$
-can be computed using the
-high-order lifting algorithm of \cite[Algorithm~5]{Stor03} on input
+can be computed using
+high-order lifting \cite[Algorithm~5]{Stor03} on input
 $\mat{P}_{\mU,\mV}$ and $\col{y}$. By
 \cite[Corollary~16]{Stor03}, this costs
-\begin{align*}
-  & O\Bigg(m^{\omega} \M(D/m) \log(m) + \sum_{0 \le i \le \log_2(m)} 4^i (2^{-i}m)^\omega \M(D/m) \\
-  & \quad\qquad + m^2 \M(D/m)\log(D/m)\log(m) + m \M(D) \log(D) \Bigg) \\
-  & \subset O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m))  \\
-  & \subset \softO{m^{\omega-1}D}
-\end{align*}
+\begin{align}
+  & O\Bigg(m^{\omega} \M(D/m) \log(m) + \sum_{0 \le i \le \log_2(m)} 4^i (2^{-i}m)^\omega \M(D/m) \nonumber \\
+  & \quad\qquad + m^2 \M(D/m)\log(D/m)\log(m) + m \M(D) \log(D) \Bigg) \nonumber \\
+  & \subset O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m))  \nonumber \\
+  & \subset O(m^{\omega-1} \M(D) \log(D)\log(m)) \subset \softO{m^{\omega-1}D}
+  \label{eqn:hol_cost}
+\end{align}
 operations in $\K$.
 The latter algorithm is randomized, since it chooses a random point in $\K$ to
 compute (parts of) the expansion of the inverse of
@@ -1033,8 +1034,8 @@ left-hand row vector.
   $\row{a}_i\mat{P}_{\mU,\mV}$. This maximum is $\deg(\minpoly)$.
 \end{proof}
 To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
-as before, the cost is
-$ O(m^\omega \M(D/m) \log(m) + m \M(D)\log(D)\log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$.
+according to \cref{eqn:hol_cost}, the cost is
+$ O(m^{\omega-1} \M(D) \log(D) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$.
 Once $\row{a}_i$ is known, we can recover the scalar numerator
 $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)$ as
 a dot product. 
@@ -1100,7 +1101,7 @@ equality $\col{E}_s = \mat{L}_s \col{w}$ and takes $O(D^2)$ base field
 operations. Then, applying the cost estimate given in
 \cref{section:matrix_seq}, we see that we have enough terms to compute
 $\mat{\Omega}( (\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}) \in \K[T]^{m
-  \times 1}$ and that it takes $O(m^2 \M(D/m))$ operations in
+\times 1}$ and that it takes $O(m^2 \M(D/m)) \subset O(m \M(D))$ operations in
 $\K$. Then, the dot product with $\row{a}_i$ takes $O(m \M(D))$
 operations, since both vectors have size $m$ and entries of degree at
 most $D$. Thus, the runtime is 
@@ -1788,20 +1789,19 @@ base field operations.
 
 Recall from \cref{section:matrix_seq} that we can compute a minimal
 generating polynomial $\mat{P}_{\mU,\mV}$ in time $O(m^{\omega}
-\M(D/m) \log(D/m))$, which is $O(m^{\omega-1} \M(D) \log(D))$.  In
+\M(D/m) \log(D/m))$, which is in $O(m^{\omega-1} \M(D) \log(D))$.  In
 \cref{ssec:appliW,ssec:scalar_numer}, we saw that the
 largest invariant factor $P$ and the vector $\row{a}_1$ can be
-computed in time $O(m^{\omega} \M(D/m) \log(D/m) \log(m))$, which is
-$O(m^{\omega-1} \M(D) \log(D)\log(m))$.  Computing $\sqfree$ takes time
-$O(\M(D) \log(D))$.
+computed in time $O(m^{\omega-1} \M(D) \log(D) \log(m))$.  Computing $\sqfree$
+takes time $O(\M(D) \log(D))$.
 
 In \cref{ssec:scalar_numer}, we saw that each call to {\sf ScalarNumerator}
 takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular inverse takes time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, the total span, assuming perfect parallelization 
 at Step~\ref{mainstep3} is
-$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right );$$
-the total work is
+$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
+and the total work is
 $$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simulateously the most costly in
@@ -2119,7 +2119,7 @@ switching.
 
 \section{Using the original coordinates}
 
-In this section, we propose a refinment of the algorithm given
+In this section, we propose a refinement of the algorithm given
 previously; the main new feature is that we avoid using a generic
 linear form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.
 Indeed, such a linear combination is likely to result in a
@@ -2167,7 +2167,8 @@ main structure; the subroutines are described in the next sections.
 		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV)$
                 \item let $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s)$ be correction matrices associated
                   to the previous calculation
-		\item let $(R,W_1,\dots,W_n,\lf)=\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s),\lf)$
+		\item let $(R,W_1,\dots,W_n,\lf)=\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,$ \\
+      \phantom{bla} \hfill $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s),\lf)$
 		\item let $((\sqfree,V_1,\dots,V_n),\lf)=\mathsf{Union}(((F,G_1,\dots,G_n),X_1), ((R,W_1,\dots,W_n),\lf))$
 		\item \textbf{return} $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{enumerate}
@@ -2181,8 +2182,8 @@ of $V'$); this is done by using sequences of the form $(\mU^\perp
 sequences of correction matrices, using objects that were computed 
 in the call to  $\mathsf{BlockParametrizationX}_1$.
 
-We then apply a modified version of Algorithm $\mainalgoname$, called
-$\mainalgoname{\sf Residual}$, which computes a zero-dimensional
+We then apply a modified version of Algorithm $\mainalgoname$, which we call
+$\mainalgoname{\sf Residual}$, and which computes a zero-dimensional
 parametrization of $V''=V-V'$ using sequences such as $(\mU^\perp
 \mM^s \mV)_{s \ge 0} - \mat{\Delta}_s$, where $\mM= t_1 \mM_1 + \cdots
 + t_n \mM_n$. Subtracting the correction terms $\mat{\Delta}_s$ has
@@ -2198,7 +2199,7 @@ performing the union of the two components $V'$ and $V''$.
 
 \subsection{Describing the subset \texorpdfstring{$V'$}{V'} of \texorpdfstring{$V$}{V}}
 
-In this paragraph, we give the details of algorithm
+In this paragraph, we give the details of Algorithm
 $\mathsf{BlockParametrizationX}_1$. This is done by specializing the
 discussion of \cref{ssec:genseries} to the case $\lf=X_1$:
 in the notation of that section, we take
@@ -2515,7 +2516,7 @@ form $\ell: \residueI \to \K$ by
       we simply add the polynomial $T$ to our list.
 \end{proof}
 
-The cost analysis is the same as that of algorithm $\mainalgoname$, the
+The cost analysis is the same as that of Algorithm $\mainalgoname$, the
 only difference being that the density $\rho_1$ of $\mM_1$ plays the 
 role of the density $\rho$ of $\mM$ used in that algorithm.
 
@@ -2527,7 +2528,7 @@ Next, we describe an operation of decomposition for linear forms
 $\residueI \to \K$; this is essentially akin to the Chinese Remainder
 Theorem. We then use it to compute the sequences of correction
 matrices $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s)$
-defined in algorithm $\mathsf{ParametrizationWithSplitting}$.
+defined in Algorithm $\mathsf{ParametrizationWithSplitting}$.
 
 As a preamble, we introduce the notation $\PP(r,t)$ for the cost of a
 {\em power projection} operation, as defined
@@ -2624,7 +2625,7 @@ the $O(nD_\mathfrak{A})$ describes the cost of computing $G$ as defined above.
 \end{algorithm}
 
 We will use this algorithm to compute the correction matrices to be
-used in algorithm $\mainalgoname{\sf Residual}$. Let $\mU$ and $\mV$
+used in Algorithm $\mainalgoname{\sf Residual}$. Let $\mU$ and $\mV$
 be the blocking matrices used in $\mainalgoname{\sf X}_1$. In what
 follows, for $i=1,\dots,m$, we let $\ell_i: \residueI \to \K$ be the
 linear form whose values on the basis $\basis=(b_1,\dots,b_D)$ are
@@ -2649,10 +2650,10 @@ in analogy with the definition of $d$ used in the previous section.
   For all such $(i,j)$, since we know the minimal polynomial $M$ of
   $X_1$, we can compute the scalar numerator $C_{i,j} \in \K[T]$
   associated to $\ell_{i,j}$ and $M$. This is done by applying
-  algorithm $\mathsf{{\sf ScalarNumerator}}$ of
+  Algorithm $\mathsf{{\sf ScalarNumerator}}$ of
   \cref{ssec:scalar_numer}, using the row vector $\row{a}_i$ defined
   in that section, together with the sequence of matrices
-  $\seqelt{s,\mU,\mV}$ defined in algorithm $\mainalgoname{\sf X}_1$
+  $\seqelt{s,\mU,\mV}$ defined in Algorithm $\mainalgoname{\sf X}_1$
   and the corresponding matrix generator $\mat{P}_{\mU,\mV}$.
 
 \smallskip
@@ -2696,9 +2697,9 @@ to be $\ell_{i,j,\mathfrak{A}}(\lf^s)$.
 \end{itemize}
 
 In terms of cost, we need to compute all vectors $\row{a}_i$, for
-$i=1,\dots,m$; this takes $ O(m^{\omega+1} \M(D/m) \log(m) + m^2
+$i=1,\dots,m$; this takes $ O(m^{\omega} \M(D) \log(m) + m^2
 \M(D)\log(D)\log(m))$ operations in $\K$, using the analysis of
-\cref{ssec:scalar_numer}. Then, the total time spent in {\sf
+\cref{eqn:hol_cost}. Then, the total time spent in {\sf
   ScalarNumerator} is $m(m+n+1)$ times the cost reported in
 \cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the
 total cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of
@@ -2708,7 +2709,7 @@ a single call, which was reported above.
 
 \subsection{Describing the residual set}
  
-We finally describe algorithm $\mainalgoname{\sf Residual}$.  Let
+We finally describe Algorithm $\mainalgoname{\sf Residual}$.  Let
 $\mathfrak{A}$ and $\mathfrak{B}$ be as in the previous section.  This
 part of the main algorithm computes a zero-dimensional parametrization
 of $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call a
@@ -2727,7 +2728,7 @@ $\lceil D_\mathfrak{B}/m\rceil$. Hence, if $D_\mathfrak{B} \ll D$
 multiplicities), this last stage of the algorithm will be fast.
 
 The algorithm uses a subroutine called {\sf ScalarNumeratorCorrected}
-at Steps~8 and~9.  It is similar to algorithm {\sf ScalarNumerator} of
+at Steps~8 and~9.  It is similar to Algorithm {\sf ScalarNumerator} of
 \cref{ssec:scalar_numer}, with a minor difference: instead of computing the
 vectors $\mat{D}_s \col{\varepsilon}_1$, resp.\ $\mat{D}_s\mM_i
 \col{\varepsilon}_1$, it computes $\mat{D}_s
@@ -2756,10 +2757,8 @@ is the $i$th column of $\mat{\Delta}'_{s,i}$.
   \item\label{residualstep7} { let $R$ be  the squarefree part  of $S$}
   \item\label{residualstep8} { let $\row{a}_1 = [S~0 ~\cdots~ 0] (\mat{S}_{\mU,\mV})^{-1}$}
   \item\label{residualstep9}  let $C_1 = \mathsf{{\sf ScalarNumeratorCorrected}}(\mat{S}_{\mU,\mV}, S, \col{\varepsilon}_1, 1, \row{a}_1,  (\mat{D}_s)_{0 \le s < d_\mathfrak{B}}, (\mat{\Delta}''_s)_{0 \le s < d_\mathfrak{B}})$
-  \item\label{residualstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
-    \begin{enumerate}
-     \item let $C_{X_i} = \mathsf{{\sf ScalarNumeratorCorrected}}(\mat{S}_{\mU,\mV},S, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{D}_s)_{0 \le s < d_\mathfrak{B}}, (\mat{\Delta}'_s)_{0 \le s < d_\mathfrak{B}})$
-    \end{enumerate}
+  \item\label{residualstep10} \textbf{for} $i=1,\dots,n$ \textbf{do} \\
+    \phantom{for}let $C_{X_i} = \mathsf{{\sf ScalarNumeratorCorrected}}(\mat{S}_{\mU,\mV},S, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{D}_s)_{0 \le s < d_\mathfrak{B}}, (\mat{\Delta}'_s)_{0 \le s < d_\mathfrak{B}})$
 \item\label{residualstep11}     \textbf{return} $((R, C_{X_1}/ C_1 \bmod R, \dots, C_{X_n}/ C_{1} \bmod R),\lf)$
   \end{enumerate}  \label{algo:block-sparse-fglm-residual}
 \end{algorithm}
@@ -2788,7 +2787,7 @@ Krylov matrices we would obtain if we were working with a basis of
 $\residueI_\mathfrak{B}$. The same phenomenon justifies the 
 computation of $C_1$ and $C_{X_1},\dots,C_{X_n}$.
 
-The cost analysis is similar to that of algorithm $\mainalgoname$,
+The cost analysis is similar to that of Algorithm $\mainalgoname$,
 with the exception that the degree $D$ can then be replaced by the
 hopefully much smaller $D_\mathfrak{B}$.
 
@@ -2805,7 +2804,7 @@ $\mathsf{BlockParametrizationSplitting}$ to the timing for
 $\mainalgoname$ for each input.  The last column shows the number of
 points in $V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the
 total degree of $I$, $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs and
-the machine used for timings are the same as section \ref{section:ex}.
+the machine used for timings are the same as \cref{section:ex}.
 
 The performance of $\mathsf{BlockParametrizationSplitting}$ depends on
 the density of $\mM_1$ and the number of points $D_\mathfrak{A}$.  For
