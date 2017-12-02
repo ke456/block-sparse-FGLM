@@ -165,20 +165,22 @@
 
 \begin{abstract}
   Consider a zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$.
-  Inspired by Faug\`ere and Mou's Sparse FGLM algorithm, we use Krylov
-  sequences based on multiplication matrices of $I$, in order to compute a
-  description its zero set by means of univariate polynomials.
+  Inspired by Faug\`ere and Mou's Sparse FGLM algorithm [{\em
+      J. Symbolic Comput.}, 80(8):538-569, 2017], we use Krylov
+  sequences based on multiplication matrices of $I$, in order to
+  compute a description its zero set by means of univariate
+  polynomials.
 
-  Steel recently showed how to use Coppersmith's block-Wiedemann
-  algorithm in this context; he describes an algorithm that can be
-  easily parallelized, but only computes parts of the output in this
-  manner. Using generating series expressions going back to work of
-  Bostan {\it et al.}, we show how to compute the entire output for a
-  small overhead, without making any assumption on the ideal $I$. We
-  then propose a refinment of this idea that partially avoids the
-  introduction of a generic linear form.  We describe experimental
-  results obtained by an implementation based on the C++ libraries
-  LinBox and NTL.
+  In [{\em PASCO'15}, pages 2-6, 2015], Steel recently showed how to use
+  Coppersmith's block-Wiedemann algorithm in this context; he
+  describes an algorithm that can be easily parallelized, but only
+  computes parts of the output in this manner. Using generating series
+  expressions going back to work of Bostan {\it et al.}, we show how
+  to compute the entire output for a small overhead, without making
+  any assumption on the ideal $I$. We then propose a refinment of this
+  idea that partially avoids the introduction of a generic linear
+  form.  We describe experimental results obtained by an
+  implementation based on the C++ libraries LinBox and NTL.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,8 +189,8 @@
 
 \section{Introduction}
 
-Computing the Gr\"obner basis of an ideal with respect to a given
-term ordering is an essential step in solving systems of polynomials.
+Computing the Gr\"obner basis of an ideal with respect to a given term
+ordering is an essential step in solving systems of polynomials.
 Certain term orderings, such as the degree reverse lexicographical
 ordering (\textit{degrevlex}), tend to make the computation of the
 Gr\"obner basis faster. This has been observed empirically since the
@@ -199,16 +201,17 @@ other hand, other orderings, such as the lexicographical ordering
 (\textit{lex}), make it easier to find the coordinates of the
 solutions, or to perform arithmetic operations in the corresponding
 residue class ring.  For instance, for a zero-dimensional radical
-ideal $I$ in generic coordinates in $\K[X_1,\dots,X_n]$, for some field $\K$,
-the Gr\"obner basis of $I$ for the lexicographic order with $X_1 > \cdots > X_n$
-has the form
+ideal $I$ in generic coordinates in $\K[X_1,\dots,X_n]$, for some
+field $\K$, the Gr\"obner basis of $I$ for the lexicographic order
+with $X_1 > \cdots > X_n$ has the form
 \begin{equation}\label{eq:shapelemma}
  \{ X_1 - R_1(X_n),\dots, X_{n-1}-R_{n-1}(X_n),R_n(X_n)\},
 \end{equation}
-where $R_n \in \K[X_n]$ is squarefree and all $R_i$'s are in $\K[X_n]$
-of degree less than $\deg(R_n)$; this is known as the {\em shape
-  lemma}~\cite{GiMo89}. The points in the variety $V(I)$ are then
-  $$\{ ( R_1(\tau), \dots, R_{n-1}(\tau), \tau ) \mid \tau \in \K
+with all $R_i$'s, for $i =1,\dots,n-1$, of degree less than
+$\deg(R_n)$ (and $R_n$ squarefree); this is known as the {\em
+  shape lemma}~\cite{GiMo89}. The points in the variety $V(I) \subset
+\Kbar{}^n$ are then
+  $$\{ ( R_1(\tau), \dots, R_{n-1}(\tau), \tau ) \mid \tau \in \Kbar
   \;\,\text{is a root of}\;\, R_n\}.$$ As a result, the standard approach to
  solve a zero-dimensional system by means of Gr\"obner basis
  algorithms is to first compute a Gr\"obner basis for a degree ordering
@@ -220,20 +223,20 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
 
  Let $I$ be a zero-dimensional ideal in $\K[X_1,\dots,X_n]$.  As
  input, we assume that we know a monomial basis $\basis$ of
- $\residueI=\K[X_1,\dots,X_n]/I$, together with the multiplication matrices
- $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this basis. We
- denote by $D$ the degree of $I$, which is the vector space dimension
- of $\residueI$. We should stress that knowing a degree Gr\"obner basis of
- $I$, computing the multiplication matrices efficiently is not a
- straightforward task, Faug\`ere {\it et al.} showed how to do it in
- time $O(nD^3)$ in~\cite{FaGiLaMo93} and more recently, algorithms have
- been given with cost bound
- $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at
- least for some favorable families of inputs. Here, the notation
+ $\residueI=\K[X_1,\dots,X_n]/I$, together with the multiplication
+ matrices $\mM_1,\dots,\mM_n$ of respectively $X_1,\dots,X_n$ in this
+ basis. We denote by $D$ the degree of $I$, which is the vector space
+ dimension of $\residueI$. We should stress that starting from a
+ degree Gr\"obner basis of $I$, computing the multiplication matrices
+ efficiently is not a straightforward task. Faug\`ere {\it et al.}
+ showed how to do it in time $O(nD^3)$ in~\cite{FaGiLaMo93}; more
+ recently, algorithms have been given with cost bound
+ $\softO{nD^\omega}$~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}, at least
+ for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
- exponent for matrix multiplication over a ring (commutative, with $1$). While
- improving these results is an interesting question in itself, we will not
- address it in this paper.
+ exponent for matrix multiplication over a ring (commutative, with
+ $1$). While improving these results is an interesting question in
+ itself, we will not address it in this paper.
 
 Given such an input, including the multiplication matrices, the FGLM
 algorithm~\cite{FaGiLaMo93} computes the lexicographic Gr\"obner basis
@@ -244,14 +247,13 @@ achieved~\cite{FaGaHuRe13,FaGaHuRe14,Neiger16}.
 
 Polynomials as in~\cref{eq:shapelemma} form a very useful data
 structure, but there is no guarantee that the lexicographic Gr\"obner
-basis of $I$ possesses such a structure; when it does, we will say
-that $I$ is in {\em shape position}. Some sufficient conditions for being in
-shape position are detailed in~\cite{BeMoMaTr94}. 
-As an alternative, one may use Rouillier's
-Rational Univariate Representation algorithm \cite{Rouillier99} (see
-also~\cite{AlBeRoWo94,BeWo96} for related considerations). The output
-is a description of the zero-set $V(I)$ by means of univariate rational
-functions
+basis of $I$ has such a shape. When it does, we will say that $I$ is
+in {\em shape position}; some sufficient conditions for being in shape
+position are detailed in~\cite{BeMoMaTr94}.  As an alternative, one
+may use Rouillier's Rational Univariate Representation algorithm
+\cite{Rouillier99} (see also~\cite{AlBeRoWo94,BeWo96} for related
+considerations). The output is a description of the zero-set $V(I)$ by
+means of univariate rational functions
 \begin{equation}\label{eq:RUR}
  \left\{  F(T)=0, \quad X_1 = \frac{G_1(T)}{G(T)}, \dots,X_n = \frac{G_n(T)}{G(T)} \right\},
 \end{equation}
@@ -264,10 +266,9 @@ precisely the bit-size of their coefficients, if working over $\K=\Q$.
 The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on
 \emph{duality}, which will be at the core of our algorithms as well.
 Indeed, these algorithms compute sequences of values of the form
-$\tau_i=(\trace(\lf^i))_{i \ge 0}$ and 
-$\tau_{i,j}=(\trace(\lf^i X_j))_{i \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
-form and $\lf$ is typically a $\K$-linear combination of the variables,
-$\lf=t_1 X_1 + \cdots + t_n X_n$.
+$v_s=(\trace(\lf^s))_{s \ge 0}$ and 
+$v_{s,i}=(\trace(\lf^s X_i))_{s \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
+form and $\lf=t_1 X_1 + \cdots + t_n X_n$ is  a $\K$-linear combination of the variables.
 From these values, one may then recover the output in~\cref{eq:RUR} by means
 of structured linear algebra calculations.
 
@@ -275,7 +276,7 @@ A drawback of this approach is that we need to know the trace of all
 elements of the basis $\basis$; while feasible in polynomial time,
 this is by no means straightforward. In~\cite{BoSaSc03}, Bostan {\it
   et al.} introduced randomization to alleviate this issue. They show
-that computing values such as $\ell(\lf^i)$ and $\ell(\lf^i X_j)$, where
+that computing values such as $\ell(\lf^s)$ and $\ell(\lf^s X_i)$, where
 $\lf$ is as above and 
 $\ell$ is a random $\K$-linear form $\residueI \to \K$, allows one to deduce
 a description of $V(I)$ of the form
@@ -283,45 +284,44 @@ a description of $V(I)$ of the form
  \{  \sqfree(T)=0, \quad X_1 = V_1(T), \dots,X_n = V_n(T) \},
 \end{equation}
 where $\sqfree$ is a monic squarefree polynomial in $\K[T]$ and $V_i$ is in
-$\K[T]$ of degree less than $\deg(\sqfree)$ for all $i$. Precisely, the
-output of such algorithms is the tuple $((\sqfree,V_1,\dots,V_n),\lf)$; this
+$\K[T]$ of degree less than $\deg(\sqfree)$ for all $i$. The tuple
+ $((\sqfree,V_1,\dots,V_n),\lf)$ computed by  such algorithms
 will be called a {\em zero-dimensional parametrization} of $V(I)$. In
-particular, this output generally differs from the description
+particular, it generally differs from the description
 in~\cref{eq:RUR}, since the latter keeps trace of the multiplicities
 of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
 the {\em nil-indices} of the solutions).
 
 The most costly part of such an algorithm is the computation of the
-values $\ell(\lf^i)$ and $\ell(\lf^i X_j)$; the rest is essentially 
-applying the Berlekamp-Massey algorithm and univariate
+values $\ell(\lf^s)$ and $\ell(\lf^s X_i)$; the rest essentially boils
+down to applying the Berlekamp-Massey algorithm and univariate
 polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re and Mou pointed
 out that the multiplication matrices $\mM_1,\dots,\mM_n$ can be
-expected to be sparse; they give precise estimates on their expected
-sparsity, assuming the validity of a conjecture by
-Moreno-Soc\'ias~\cite{MorenoSocias91}. 
-On this basis, they designed several forms of {\em sparse FGLM}
-algorithms. For instance, if $I$ is in shape position, the algorithms
-in \cite{FaMo17} recover this basis
-%%%%%%%% TODO --> "this basis" is unclear
-by also considering values of
-a linear form $\ell:\residueI \to \K$. For less favorable inputs, the algorithm
-falls back on the Berlekamp-Massey-Sakata algorithm~\cite{Sakata90}
-or plain FGLM.
+expected to be sparse; for generic inputs, they give precise estimates
+on the sparsity of these matrices, assuming the validity of a
+conjecture by Moreno-Soc\'ias~\cite{MorenoSocias91}.  On this basis,
+they designed several forms of {\em sparse FGLM} algorithms. For
+instance, if $I$ is in shape position, the algorithms in \cite{FaMo17}
+recover its lexicographic basis, which is as in~\eqref{eq:shapelemma},
+by also considering values of a linear form $\ell:\residueI \to
+\K$. For less favorable inputs, the algorithm falls back on the
+Berlekamp-Massey-Sakata algorithm~\cite{Sakata90} or plain FGLM.
 
-The ideas at play in these algorithms are essentially based on Krylov subspace
-methods, using projections and Berlekamp-Massey techniques; they are
-also widely used in integer factorization or discrete logarithm
-calculations~\cite{xxx,yyy}. It is then natural to adapt to our
-context the block version of such algorithms, as pioneered by
-Coppersmith~\cite{Coppersmith94} in the context of integer
-factorization; this makes it possible to easily parallelize the
-bottleneck of the algorithm. This was already discussed by Steel
-in~\cite{Steel15}, where he showed how to compute the analogue of
-the polynomial $\sqfree$ in \cref{eq:BoSaSc03}. In that reference, one is
-only interested in the solutions in the base field $\K$ ($\K$ being a
-finite field in that context): the algorithm computes the roots of $\sqfree$
-in $\K$ and substitutes them in the input system, before computing a
-Gr\"obner basis in $n-1$ variables for each of them.
+The ideas at play in these algorithms are essentially based on Krylov
+subspace methods, using projections and Berlekamp-Massey techniques.
+These techniques have also been widely used in integer factorization
+or discrete logarithm calculations, going back to~\cite{LaOd90}. It is
+then natural to adapt to our context the block version of such
+algorithms, as pioneered by Coppersmith~\cite{Coppersmith94} in the
+context of integer factorization; this makes it possible to easily
+parallelize the bottleneck of the algorithm. This was already
+discussed by Steel in~\cite{Steel15}, where he showed how to compute
+the analogue of the polynomial $\sqfree$ in \cref{eq:BoSaSc03}. In
+that reference, one is only interested in the solutions in the base
+field $\K$ ($\K$ being a finite field in that context): the algorithm
+computes the roots of $\sqfree$ in $\K$ and substitutes them in the
+input system, before computing a Gr\"obner basis in $n-1$ variables
+for each of them.
 
 Our first contribution is to give a block version of the algorithm
 in~\cite{BoSaSc03} that extends the approach in~\cite{Steel15} to
