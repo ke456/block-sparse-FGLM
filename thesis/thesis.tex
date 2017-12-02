@@ -234,7 +234,7 @@ of degree less than $\deg(R_n)$; this is known as the {\em shape
  least for some favorable families of inputs. Here, the notation
  $O\tilde{~}$ hides polylogarithmic factors and $\omega$ is a feasible
  exponent for matrix multiplication over a ring (commutative, with $1$). While
- improving these results is an interesting question is itself, we will not
+ improving these results is an interesting question in itself, we will not
  address it in this paper.
 
 Given such an input, including the multiplication matrices, the FGLM
@@ -266,7 +266,7 @@ precisely the bit-size of their coefficients, if working over $\K=\Q$.
 The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on
 \emph{duality}, which will be at the core of our algorithms as well.
 Indeed, these algorithms compute sequences of values of the form
-$\tau_i=(\trace(\lf^i))_{i \ge 0}$ or 
+$\tau_i=(\trace(\lf^i))_{i \ge 0}$ and 
 $\tau_{i,j}=(\trace(\lf^i X_j))_{i \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
 form and $\lf$ is typically a $\K$-linear combination of the variables,
 $\lf=t_1 X_1 + \cdots + t_n X_n$.
@@ -665,7 +665,7 @@ is similar to \cite[Theorem~4.5]{Turner02}.
 \begin{proof}
   Since the canonical right generator $\relbas
   \in \polMatSpace[\cdim]$ is in column Popov form, we have $\relbas =
-  \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$ where
+  \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\cdim}}} - \mat{Q}$, where
   $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\cdim})$
   componentwise and $\mat{L} \in \matSpace[\cdim]$ is unit upper
   triangular. Define the matrix $\mat{U} =
@@ -876,7 +876,7 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   By construction, one can find a basis of $\langle \mU \rangle$ in
   which the matrix of $\mN_\mU$ is block-companion, with $\mu \le m$
   blocks (take the $\mN_\mU$-span of the first column of $\mU$, then of
-  the second column, working modulo the previous vector space, etc.)
+  the second column, working modulo the previous vector space, etc.). 
   Thus, $\mN^\perp_\mU$ is similar to a block-companion matrix with $\mu$
   blocks as well; since $\mat{J}_\mU^\perp \mV$ has $m$ columns, the span of
   the columns of
@@ -928,7 +928,7 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   \end{bmatrix}
   \begin{bmatrix}
     \mI_D & \mM & \mM^2 &\cdots& \mM^{e-1}
-  \end{bmatrix}
+  \end{bmatrix}.
   $$ By~\cite[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{d,e}(\mU)) =
   \deg(\det(\mat{P}_{\mU}))$ for $d \ge \deg(\mat{P}_{\mU})$
   and $e \ge D$.  We take $e=D$, so that ${\rm rank}({\rm
