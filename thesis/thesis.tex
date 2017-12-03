@@ -1734,7 +1734,7 @@ polynomial of $\lf$ and $\sqfree$ its squarefree part.
 We find the rest of the polynomials in the output by following
 \cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
 this algorithm are computed using the method of
-\cref{ssec:scalar_numer}. Algorithm ScalarDenominator
+\cref{ssec:scalar_numer}. Algorithm $\mathsf{ ScalarNumerator}$
 compute $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge 0}, \minpoly)
 \quad\text{and}\quad
 C_{X_i} = \Omega((\row{u}_1 \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly),\ \ i=1,\dots,n.$$
@@ -1744,7 +1744,7 @@ $$[~C_1~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \col{\varepsilon}_1)_{s
 and
 $$[~C_{X_i}~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}),\ \ i=1,\dots,n;
 $$
-Algorithm ScalarDenominator precisely computes these quantities.
+Algorithm $\mathsf{\sf{ScalarNumerator}}$ precisely computes these quantities.
 
 Let $\ell:\residueI \to \K$ be the linear form $f = \sum_{i=1}^D f_i b_i \mapsto 
 \sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
