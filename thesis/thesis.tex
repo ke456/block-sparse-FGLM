@@ -1016,20 +1016,20 @@ level of logarithmic factors).
 \subsection{Computing a scalar numerator}\label{ssec:scalar_numer}
 
 Let us keep the notation of the previous subsection.  The main
-advantage of using the block Wiedemann algorithm is that it allows one to
-distribute the bulk of the computation in a straightforward manner: on
-a platform with $m$ processors (or cores, \dots), one would typically
-compute the $D \times m$ matrices $\mat{L}_s=\mU^\perp\mM^s$ for
-$s=0,\dots,2\lceil D/m \rceil$ by having each processor compute a
+advantage of using the block Wiedemann algorithm is that it allows one
+to distribute the bulk of the computation in a straightforward manner:
+on a platform with $m$ processors (or cores, \dots), one would
+typically compute the $D \times m$ matrices $\mat{L}_s=\mU^\perp\mM^s$
+for $s=0,\dots,2\lceil D/m \rceil$ by having each processor compute a
 sequence $\row{u}_i \mM^s$, where $\row{u}_i$ is the $i$th row of
 $\mU^\perp$. From these values, we then deduce the matrices
 $\seqelt{s,\mU,\mV}=\mU^\perp \mM^s \mV = \mat{L}_s\mV$ for
-$s=0,\dots,2\lceil D/m \rceil$. In the description below, we assume
-for simplicity that memory is not an issue, so we can store all
-elements in the Krylov sequences we are interested in; we discuss this 
+$s=0,\dots,2\lceil D/m \rceil$. Note that in our description, we
+assume for simplicity that memory is not an issue, so we can store all
+elements in the Krylov sequences we are interested in; we discuss this
 again in \cref{ssec:mainalgo}.
 
-However, our main algorithm will also need to compute scalar numerators of
+Our main algorithm will also need to compute scalar numerators of
 the form \sloppy $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
 \minpoly)$, where $\row{w}$ is a given vector in $\K^{D \times 1}$ and
 $\minpoly$ is the minimal polynomial of $\mM$. Since $\minpoly$ may
@@ -1062,11 +1062,11 @@ left-hand row vector.
   $\row{a}_i\mat{P}_{\mU,\mV}$. This maximum is $\deg(\minpoly)$.
 \end{proof}
 To compute $\row{a}_i$, we use again Storjohann's high-order lifting;
-according to \cref{eqn:hol_cost}, the cost is
-$ O(m^{\omega-1} \M(D) \log(D) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$.
-Once $\row{a}_i$ is known, we can recover the scalar numerator
-$\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly)$ as
-a dot product. 
+according to \cref{eqn:hol_cost}, the cost is $ O(m^{\omega-1} \M(D)
+\log(D) \log(m)) \subset \softO{m^{\omega-1}D}$ operations in $\K$.
+Once $\row{a}_i$ is known, the following lemma shows that we can
+recover the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge
+  0}, \minpoly)$ as a dot product.
 \begin{lemma}\label{lemma:omegaOmega}
   For a generic choice of $\mU$ and $\mV$, and for any $\col{w}$ in
   $\K^{D \times 1}$, $ \mat{P}_{\mU,\mV}$ is a nonsingular matrix of
@@ -1147,17 +1147,22 @@ We now focus on our main question: computing a zero-dimensional
 parametrization of an algebraic set of the form $V=V(I)$, for some
 zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$. 
 
-We write $V=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s in
-$\Kbar^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all
-$i$.  We also let $\D$ be the dimension of $\residueI$, so that $\dg \le \D$,
-and {\em we assume that ${\rm char}(\K)$ is greater than $D$}. In this
-section, we recall and generalize results from the appendix
+We write $V=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s
+in $\Kbar{}^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
+all $i$.  We also let $\D$ be the dimension of
+$\residueI=\K[X_1,\dots,X_n]/I$, so that $\dg \le \D$, and {\em we
+  assume that ${\rm char}(\K)$ is greater than $D$}.
+
+In this section, we recall and slightly expand on results from the appendix
 of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
-parametrization of $V$. At this stage, we do not discuss data
-structures or complexity (this is the subject of the following
-section); the algorithm in this section simply describes what 
-polynomial should be computed in order to obtain a zero-dimensional
-parametrization.
+parametrization of $V$. These results were themselves inspired by 
+those in~\cite{Rouillier99}, which were devoted to computations
+with the trace linear form $\residueI\to\K$.
+
+At this stage, we do not discuss data structures or complexity (this
+is the subject of the following section); the algorithm in this
+section simply describes what polynomial should be computed in order
+to obtain a zero-dimensional parametrization.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1204,7 +1209,7 @@ $\Kbar$.
 %% By~\cite[Lemma~3.3]{Mourrain97}, we have that $\max_j w_{i,j} =N_i$
 %% for all $i$.
 For instance, when $\balpha_i$ is non-singular, we have $D_i=1$, so
-there is only one function $\lambda_{i,j}$, namely $\lambda_{i,1}$, we
+there is only one function $\lambda_{i,j}$, namely $\lambda_{i,1}$; we
 write it $\lambda_{i,1}(f) = f(\balpha_i)$.
 
 More generally, we can always take $\lambda_{i,1}$ of the form
@@ -1213,7 +1218,7 @@ that $S_{i,j}$ does not contain $\mu=(0,\dots,0)$ (that is, all terms
 in $\Lambda_{i,j}$ have order $1$ or more). Thus, introducing new
 variables $(U_{i,j})_{j =1,\dots,D_i}$, we deduce the existence of
 non-zero homogeneous linear forms $P_{i,\mu}$ in
-$(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\lambda$ in ${\rm
+$(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\ell$ in ${\rm
 	hom}_\Kbar(\residueI_i,\Kbar)$, there exist $\bu_i=(u_{i,j}) \in
 \Kbar{}^{D_i}$ such that we have
 \begin{align}\label{ell_param}
@@ -1272,7 +1277,13 @@ Finally, we say a word about global objects.  Fix a linear form $\ell:
 \residueI \to \K$. By the Chinese Remainder Theorem, there exist unique
 $\ell_1,\dots,\ell_\dg$, with $\ell_i$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$
 for all $i$, such that the extension $\ell_\Kbar: \residueI\otimes_\K \Kbar
-\to \Kbar$ decomposes as $\ell_\Kbar = \ell_1 + \cdots + \ell_\dg$. We
+\to \Kbar$ decomposes as $\ell_\Kbar = \ell_1 + \cdots + \ell_\dg$.
+Note that formally, we should write 
+$\ell_\Kbar = \ell_1 \circ \phi_1 + \cdots + \ell_\dg \circ \phi_\dg$,
+where for all $i$, $\phi_i$ is the canonical projection $\residueI \to \residueI_i$;
+we will however omit the projection operators for simplicity.
+
+We
 call {\em support} of $\ell$ the subset $\mathfrak{S}$ of
 $\{1,\dots,\dg\}$ such that $\ell_i$ is non-zero exactly for $i$ in
 $\mathfrak{S}$.  As a consequence, for all $f$ in $\residueI$, we have
@@ -1281,10 +1292,10 @@ $\mathfrak{S}$.  As a consequence, for all $f$ in $\residueI$, we have
 &=  \sum_{i \in \mathfrak{S}} \ell_i(f).
 \end{align}
 For $i$ in $\mathfrak{S}$, we denote by $w_i$ and $\pi_i$ respectively
-the order and the symbol of $\ell_i$. For such a subset
-$\mathfrak{S}$, we also write $\residueI_\mathfrak{S}=\prod_{i \in
-  \mathfrak{S}} \residueI_i$ and $V_\mathfrak{S}=
-\{\balpha_i \mid i \in \mathfrak{S}\}$.
+the order and the symbol of $\ell_i$. For such a subset $\mathfrak{S}$
+of $\{1,\dots,\dg\}$, we also write $\residueI_\mathfrak{S}=\prod_{i
+  \in \mathfrak{S}} \residueI_i$ and $V_\mathfrak{S}= \{\balpha_i \mid
+i \in \mathfrak{S}\}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1295,7 +1306,7 @@ $(\ell(\lf^s))_{s\ge 0}$, and more generally $(\ell(v \lf^s))_{s\ge
   0}$, for $v$ in $\residueI$, are the main ingredients in our algorithm.  The
 following lemma justifies this by giving an explicit form for a
 generating series of the form $\sum_{s \ge 0} \ell(v
-\lf^s)/T^{s+1}$. A less precise version of it is in~\cite{BoSaSc03};
+\lf^s)/T^{s+1}$. A slightly less precise version of it is in~\cite{BoSaSc03};
 the more explicit expression given here will be needed in the last
 section of this paper.
 
@@ -1312,8 +1323,8 @@ section of this paper.
     \frac{ v(\balpha_i)\, w_i!\, \pi_{i}(t_1,\dots,t_n) +
       (T-\lf(\balpha_i))A_{v,i}} {(T-\lf(\balpha_i))^{w_{i}+1}},
   \end{align}
-  for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ (that
-  depend on the choice of $v$), with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
+  for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ that
+  depend on the choice of $v$, with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
   $\mathfrak{S}$.
 \end{lemma}
 \begin{proof}
@@ -1337,17 +1348,16 @@ section of this paper.
     &= \frac{ \partial^{|\mu|} } {\partial X_1^{\mu_1} \cdots
       \partial X_n^{\mu_n}}
     \left (\frac v{T-\lf} \right ) \\
-    &= v\, |\mu|!\, \prod_{1 \le k \le n} 
+    &= \left (v\, |\mu|!\,    \frac {1}{(T-\lf)^{|\mu|+1}} \prod_{1 \le k \le n} 
     \left (\frac{ \partial \lf} {\partial X_k} \right)^{\mu_k}
-    %% TODO parentheses maybe to make it more readable?
-    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
-    &= v\, |\mu|!\, \prod_{1 \le k \le n} 
+\right ) + \frac{P_{|\mu|}}{(T-\lf)^{|\mu|}} + \cdots + \frac{P_{1}}{(T-\lf)}\\
+    &=\left ( v\, |\mu|!\,    \frac {1}{(T-\lf)^{|\mu|+1}} \prod_{1 \le k \le n} 
     t_k^{\mu_k}
-    \frac {1}{(T-\lf)^{|\mu|+1}} + \frac{H}{(T-\lf)^{|\mu|}},
+\right ) + \frac{H}{(T-\lf)^{|\mu|}},
   \end{align*}
-  for some polynomials $P_1,\dots,P_{|\mu|},\sqfree$ in $\K[X_1,\dots,X_n,T]$ that
+  for some polynomials $P_1,\dots,P_{|\mu|},H$ in $\K[X_1,\dots,X_n,T]$ that
   depend on the choices of $\mu$, $v$ and $X$, with $\deg(P_i,T) < i$
-  for all $i$ and thus $\deg(P,T) < |\mu|$.
+  for all $i$ and thus $\deg(H,T) < |\mu|$.
   
   Take now a $\Kbar$-linear combination of such operators, such as $f \mapsto
   \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} f } {\partial
@@ -1356,19 +1366,18 @@ section of this paper.
   \begin{align*}
     \sum_{s \ge 0} \sum_{\mu \in R} c_\mu \frac{ \partial^{|\mu|} ( v
       \lf^s )} {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}}
-    \frac{1}{T^{s+1}} &= v\,\sum_{\mu \in R} c_\mu |\mu|!\, \prod_{1
-      \le k \le n} t_k^{\mu_k} \frac {1}{(T-\lf )^{|\mu|+1}} +\sum_{\mu
+    \frac{1}{T^{s+1}} &= v\,\sum_{\mu \in R} \left( c_\mu |\mu|!\,  \frac {1}{(T-\lf )^{|\mu|+1}} \prod_{1
+      \le k \le n} t_k^{\mu_k} \right )+\sum_{\mu
       \in R} \frac{H_\mu}{(T-\lf)^{|\mu|}},
   \end{align*}
-  where each $\sqfree_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
+  where each $H_\mu \in \Kbar[X_1,\dots,X_n,T]$ has degree less than
   $|\mu|$ in $T$.  Let $w$ be the maximum of all $|\mu|$ for $\mu$ in
   $R$. We can rewrite the above as
   \begin{align*}
     v\, w! 
-    \sum_{\mu \in R, |\mu|=w} c_\mu
-    \, \prod_{1 \le k \le n} 
-    t_k^{\mu_k}
-    \frac {1}{(T-\lf )^{w+1}}
+    \sum_{\mu \in R, |\mu|=w}\left ( c_\mu
+    \,    \frac {1}{(T-\lf )^{w+1}} \prod_{1 \le k \le n} 
+    t_k^{\mu_k}\right )
 	+ \frac{A}{(T-\lf )^{w}},
   \end{align*}
   for some polynomial $A \in \Kbar[X_1,\dots,X_n,T]$ of degre less than $w$ in $T$. If we let 
@@ -1392,10 +1401,11 @@ section of this paper.
 
 \noindent 
 The most useful consequence of the previous lemma is the following
-interpolation formula involving the operator $\Omega$, which
-generalizes a brief comment made in \cref{section:linseq}.
+interpolation formula involving the operator $\Omega$ of the previous
+section, which generalizes a comment we made in \cref{section:linseq}.
 
-Fix a subset $\mathfrak{S}$ of $\{1,\dots,\dg\}$. The mapping
+Fix a subset $\mathfrak{S}$ of $\{1,\dots,\dg\}$, and let $\lf$
+be as in the previous lemma. The mapping
 $\lf:V_\mathfrak{S} \to \Kbar$ defined by $\balpha_i \mapsto
 \lf(\balpha_{i})$ plays a special role in the formula in the previous
 lemma; this leads us to the following definitions.
@@ -1426,7 +1436,8 @@ lemma; this leads us to the following definitions.
   Let $\ell$, $\lf$ and all other notation be as above. Let further
   $\minpoly$ be the minimal polynomial of $\lf$ in
   $\residueI_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
-  polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then, $\minpoly$
+  polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then,
+ for $v$ in $\K[X_1,\dots,X_n]$, $\minpoly$
   cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
 there
   exist non-zero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
@@ -1435,7 +1446,7 @@ there
 \end{lemma}
 \begin{proof}
   For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
-  $\mathfrak{S}$ such that $t(\balpha_{i})=r_j$; the sets
+  $\mathfrak{S}$ such that $\lf(\balpha_{i})=r_j$; the sets
   $T_1,\dots,T_c$ form a partition of $\mathfrak{S}$. When $T_j$ has
   cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
   
@@ -1468,7 +1479,7 @@ there
   the characteristic of $\K$, imply that in the second line, all terms
   in the first sum are non-zero and in reduced form.
   
-  After simplyfing terms in the second sum, we can rewrite the
+  After simplifying terms in the second sum, we can rewrite the
   expression above as
   \begin{align*}
     \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
@@ -1510,7 +1521,7 @@ there
   Now, for $v=1$, we assume that the minimal polynomial of the sequence
   $(\ell(\lf^s))_{s \ge 0}$ is the minimal polynomial $\minpoly$ of $t$ in
   $\residueI_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
-  $z_k=z_{1,k}$ for all $k$ in $\mathfrak{u}$, we can thus write it as
+  $z_j=z_{1,j}$ for all $j$ in $\mathfrak{u}$, we can thus write it as
   $$\minpoly=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1}
   \prod_{j \in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the
   minimal polynomial of $\lf$ in $\residueI_\mathfrak{S}$, it also cancels the
@@ -1556,13 +1567,18 @@ there
 
 \subsection{Computing a zero-dimensional parametrization}  \label{ssec:abstractlago}
 
-As an application, the following algorithm shows how to compute a
-zero-dimensional parametrization of $V_{\mathfrak{S}}$; our main usage 
-of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$ (so $V_{\mathfrak{S}}=V$),
-but in the last section of the paper, we will also work with 
-strict subsets. At this stage,
-we do not discuss data structures, complexity, or what terms in the
-sequences are needed; this is the subject of the following section.
+As a first application, the following algorithm shows how to compute a
+zero-dimensional parametrization of $V_{\mathfrak{S}}$. Our main usage
+of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$, in which case
+$V_{\mathfrak{S}}=V$, but in the last section of the paper, we will
+also work with strict subsets. At this stage, we do not discuss data
+structures, complexity, or what terms in the sequences are needed;
+this is the subject of the following section.
+
+This algorithm is from~\cite{BoSaSc03}; we point out that a precursor
+of this kind of result is in~\cite{Rouillier99}, for a particular
+choice of a linear form $\residueI\to \K$, namely the trace.
+
 
 \begin{algorithm}[H]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
@@ -1598,10 +1614,11 @@ sequences are needed; this is the subject of the following section.
 \begin{proof}
   A generic choice of $\lf$ separates the points of
   $V_{\mathfrak{S}}$, and we saw in \cref{lemma:symbol0} that for a
-  generic choice of $\ell$, $\pi_i(t_1,\dots,t_n)$ vanishes for no $i$
-  in $\mathfrak{S}$.  As a result, $\mathfrak{T}=\mathfrak{S}$,
-  and $\mathfrak{t}$ consists of $|\mathfrak{S}|$ pairwise distinct 
-  values.
+  generic choice of $\ell$ and $\lf$, $\pi_i(t_1,\dots,t_n)$ vanishes
+  for no index $i$ in $\mathfrak{S}$.  As a result, with the notation
+  introduced prior to \cref{lemma:anyv}, we have
+  $\mathfrak{T}=\mathfrak{S}$ and $\mathfrak{t}$ consists of
+  $|\mathfrak{S}|$ pairwise distinct values.
 
   Besides, we recall that for a generic $\ell$ in ${\rm
     hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$, the minimal polynomials of
@@ -1618,26 +1635,29 @@ sequences are needed; this is the subject of the following section.
   zero-dimensional parametrization of $V$ corresponding to $\lf$.
 \end{proof}
 
-We demonstrate how this algorithm works through a small example. Let 
+We demonstrate how this algorithm works through a small example, in 
+which we already know the coordinates of the solutions. Let 
 $$I = \langle (X_1-1)(X_2-2),(X_1-3)(X_2-4)\rangle \subset
-\F_{101}[X_1,X_2].$$ Then, $V(I) = \{ (1,4),(3,2) \}$ and $X_1$ separates the
-points of $V(I)$. We choose a  linear form 
-$$\ell: f \in \F_{101}[X_1,X_2]/I \to \F_{101},\;\ell(f) = 17 f(1,4) + 33 f(3,2).$$
-Then, we have
+\F_{101}[X_1,X_2].$$ Then, $V(I) = \{\balpha_1,\balpha_2\}$,
+with $\balpha_1= (1,4)$ and $\balpha_2=(3,2)$; we take
+$\lf=X_1$, which separates the points of $V(I)$.  We choose the linear form
+$$\ell: f \in \F_{101}[X_1,X_2]/I \to \F_{101},\;\ell(f) = 17 f(\balpha_1) + 33 f(\balpha_2);$$
+then, $\mathfrak{S}=\{1,2\}$, and the symbols $\pi_1$ and $\pi_2$ 
+are respectively the constants 17 and 33. We have
 \begin{align*}
 \ell(X_1^s) &= 17 \cdot 1^s + 33 \cdot 3^s\\
 \ell(X_2X_1^s) &= 17 \cdot 4 \cdot 1^s + 33 \cdot 2 \cdot 3^s.
 \end{align*} 
-We associate a generating series to each sequence,
+We associate a generating series to each sequence:
 \begin{align*}
-Z_1 = \sum_{s = 0}^{\infty} \frac{\ell(X^s_1)}{T^{s+1}}
+Z_1 = \sum_{s \ge 0} \frac{\ell(X^s_1)}{T^{s+1}}
 &= \frac{17}{T-1} + \frac{33}{T-3}
 = \frac{17(T-3)+33(T-1)}{(T-1)(T-3)} \\
-Z_{X_2} = \sum_{s=0}^{\infty} \frac{\ell(X_2X_1^s)}{T^{s+1} }
+Z_{X_2} = \sum_{s\ge0} \frac{\ell(X_2X_1^s)}{T^{s+1} }
 &= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{t-3}
 = \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}.
 \end{align*}
-These generating series $Z_1$ and $Z_2$ have a common denominator $\minpoly = (T-1)(T-3)$,
+These generating series have for common denominator $\minpoly = (T-1)(T-3)$,
 whose roots are the coordinates of $X_1$ in $V(I)$;
 their numerators are respectively
 $$C_{1} = \Omega((\ell(X^s_1))_{s\ge 0},\minpoly) = 17 (T-3) + 33(T-1)$$
@@ -1647,9 +1667,10 @@ Now, let
 \begin{align*}
 V_2 
 &=\frac{C_{X_2}}{C_1} \mod \minpoly\\
-&=\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod \minpoly.
+&=\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod \minpoly\\
+&=100 T +5.
 \end{align*}
-Then, $ V_2(1) = 4$ and $V_2(3) = 2$ as needed.
+Then, $ V_2(1) = 4$ and $V_2(3) = 2$, as needed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1657,23 +1678,25 @@ Then, $ V_2(1) = 4$ and $V_2(3) = 2$ as needed.
 
 \section{The main algorithm}\label{sec:main}
 
-In this section, we will show how extend the algorithm
-of~\cite{BoSaSc03} to compute a zero-dimensional parametrization of
-$V(I)$, for some zero-dimensional ideal $I$ of $\K[X_1,\dots,X_n]$, by
-using blocking methods. As input, we assume that we know a monomial
-basis $\basis=(b_1,\dots,b_D)$ of $\residueI=\K[X_1,\dots,X_n]/I$, together with the
-multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
+In this section, we extend the algorithm of~\cite{BoSaSc03} to compute
+a zero-dimensional parametrization of $V(I)$, for some
+zero-dimensional ideal $I$ of $\K[X_1,\dots,X_n]$, by using blocking
+methods. As input, we assume that we know a monomial basis
+$\basis=(b_1,\dots,b_D)$ of $\residueI=\K[X_1,\dots,X_n]/I$, together
+with the multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
 $X_1,\dots,X_n$ in this basis; for definiteness, we suppose that the
-first basis element in $\basis$ is~$b_1=1$. We let $D$ denote the 
+first basis element in $\basis$ is~$b_1=1$. We let $D$ denote the
 dimension of $\residueI$.
 
 The first subsection presents the main algorithm. Its main feature is
 that after we compute the Krylov sequence used to find a minimal
-matrix generator, we recover the entries of the output for a minor
+matrix generator, we recover all entries of the output for a minor
 cost, without computing another Krylov sequence. We make no assumption
 on $I$ (radicality, shape position, \dots), except of course that it
 has dimension zero; however, we assume (as in the previous subsection)
-that the characteristic of $\K$ is greater than $D$. Then, we present a 
+that the characteristic of $\K$ is greater than $D$. 
+
+Then, we present a 
 simple example, and experimental results of an implementation based on 
 the C++ libraries LinBox~\cite{LinBox} and NTL~\cite{NTL}.
 
@@ -1681,15 +1704,16 @@ the C++ libraries LinBox~\cite{LinBox} and NTL~\cite{NTL}.
 
 \subsection{Description, correctness and cost analysis}\label{ssec:mainalgo}
 
-We mentioned that Steel's method~\cite{Steel15} already uses the Block
+We mentioned that Steel's method~\cite{Steel15} already uses the block
 Wiedemann algorithm to compute the minimal polynomial $\minpoly$ of
 $\lf=t_1 X_1 + \cdots + t_n X_n$; knowing its roots in $\K$, it uses
-an ``evaluation" method for the rest (another Gr\"obner Basis
-computation with one variable less).  Our algorithm computes the whole
-zero-dimensional parametrization for essentially the same cost as the
-computation of the minimal polynomial. In the following,
-$\col{\varepsilon}_1$ denotes the size-$D$ column vector whose only
-non-zero entry is a $1$ at the first row.
+an ``evaluation'' method for the rest (several Gr\"obner basis
+computations, all with one variable less).  Our algorithm computes the
+whole zero-dimensional parametrization of $V(I)$ for essentially the
+same cost as the computation of the minimal polynomial. In the
+following, $\col{\varepsilon}_1$ denotes the size-$D$ column vector
+whose only non-zero entry is a $1$ at the first row:
+$\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 
 \begin{algorithm}[H]
 	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$}
@@ -1717,7 +1741,7 @@ non-zero entry is a $1$ at the first row.
     \begin{enumerate}
      \item let $C_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
     \end{enumerate}
-\item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),t_1 X_1 + \cdots + t_n X_n)$
+\item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
 \end{algorithm}
 
@@ -1725,37 +1749,40 @@ We first prove correctness of the algorithm, for generic choices of
 $t_1,\dots,t_n$, $\mU$ and $\mV$. The first step computes the
 multiplication matrix $\mM=t_1 \mM_1 + \cdots + t_n \mM_n$ of $\lf=t_1
 X_1 + \cdots + t_n X_n$.
-
 Then, we compute the first $2d$ terms of the sequence $\seq_{\mU,\mV}=
 (\mU^{\perp}\mM^s\mV)_{s\ge 0}$. For generic choices of these two
 matrices, as discussed in \cref{ssec:appliW}, \cref{randXY} shows that
 the matrix polynomial $\mat{P}_{\mU,\mV}$ is indeed a minimal left
-generator of the sequence $\seq_{\mU,\mV}$. Then, $\minpoly$ is the minimal 
+generator of the sequence $\seq_{\mU,\mV}$, that $\minpoly$ is the minimal 
 polynomial of $\lf$ and $\sqfree$ its squarefree part.
 
 We find the rest of the polynomials in the output by following
-\cref{algo:para2}. The scalar numerators $\Omega(\cdots)$ needed in
-this algorithm are computed using the method of
-\cref{ssec:scalar_numer}. Algorithm $\mathsf{ ScalarNumerator}$
-compute $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge 0}, \minpoly)
-\quad\text{and}\quad
-C_{X_i} = \Omega((\row{u}_1 \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly),\ \ i=1,\dots,n.$$
-The key result supporting this is \cref{lemma:omegaOmega} which shows
-that for a generic choice of $\mU$ and $\mV$, we have 
-$$[~C_1~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$$
-and
-$$[~C_{X_i}~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}),\ \ i=1,\dots,n;
-$$
-Algorithm $\mathsf{\sf{ScalarNumerator}}$ precisely computes these quantities.
+\cref{algo:para2}. Crucially, the scalar numerators $\Omega(\cdots)$
+needed in this algorithm are computed using the method of
+\cref{ssec:scalar_numer}. Indeed, applying  \cref{lemma:omegaOmega},
+we see that calling  Algorithm $\mathsf{ ScalarNumerator}$
+at Steps~\ref{mainstep9} and~\ref{mainstep10}
+computes $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge
+  0}, \minpoly) \quad\text{and}\quad C_{X_i} = \Omega((\row{u}_1 \mM^s
+\mM_i \col{\varepsilon}_1)_{s \ge 0}, \minpoly),\ \ i=1,\dots,n.$$ 
+%% The
+%% key result supporting this is \cref{lemma:omegaOmega} which shows that
+%% for a generic choice of $\mU$ and $\mV$, we have
+%% $$[~C_1~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$$
+%% and
+%% $$[~C_{X_i}~] = \row{a}_1\cdot \mat{\Omega}((\mU^\perp \mM^s \mM_i \col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}),\ \ i=1,\dots,n;
+%% $$
+%% Algorithm $\mathsf{\sf{ScalarNumerator}}$ precisely computes these quantities.
 
 Let $\ell:\residueI \to \K$ be the linear form $f = \sum_{i=1}^D f_i b_i \mapsto 
 \sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
-$(i,1)$ in $\mU$. Then, the two polynomials above can be rewritten
+$(i,1)$ in $\mU$. The two polynomials above can be rewritten
 as 
 $$C_1 = \Omega( (\ell(X^s))_{s \ge 0}, \minpoly) \quad\text{and}\quad
 C_{X_i} = \Omega( (\ell(X_i X^s))_{s \ge 0}, \minpoly),$$ so they
 coincide with the polynomials computed in \cref{algo:para2}.  Then,
 \cref{lemma:para2} shows that for generic $\mU$ and $\lf$, the output
+of $\mainalgoname$
 is indeed a zero-dimensional parametrization of $V(I)$.  
 
 \begin{remark}
@@ -1772,12 +1799,13 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 
 For the cost analysis, we will mainly focus on a sparse model for
 matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero entries.  
-As a result, $\mM$ has density at most $n\density$, and a matrix-vector product
-by $\mM$ can be done in $O(n\density D^2)$ operations in $\K$ (we briefly
-discuss variants of the algorithm using dense linear algebra at the
-end of this subsection). The cost incurred at Step~\ref{mainstep1}
-to compute $\mM$ is $O(n\density D^2)$.
+at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero
+  entries.  As a result, $\mM$ has density at most $n\density$, and a
+  matrix-vector product by $\mM$ can be done in $O(n\density D^2)$
+  operations in $\K$ (we briefly discuss variants of the algorithm
+  using dense linear algebra at the end of this subsection). In
+  particular, the cost incurred at Step~\ref{mainstep1} to compute
+  $\mM$ is $O(n\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1785,8 +1813,9 @@ $\mat{L}_s=\mU^{\perp}\mM^s$, for $s=0,\dots,2d-1$, is the bottleneck
 of the algorithm, but this can be parallelized. This is done by
 working row-wise, computing independently the sequences
 $(\row{\ell}_{i,s})_{0 \le s < 2d}$ of the $i$th rows of
-$(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,s+1} = \row{u}_{i,s}
-\mM$ for all $i,s$, where $\row{u}_i$ is the $i$ row of $\mU^\perp$.
+$(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,0}=\row{u}_i$ and
+ $\row{\ell}_{i,s+1} = \row{\ell}_{i,s}
+\mM$ for all $i,s$, where $\row{u}_i$ is the $i$th row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
   \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
@@ -1825,9 +1854,9 @@ takes time $O(\M(D) \log(D))$.
 
 In \cref{ssec:scalar_numer}, we saw that each call to {\sf ScalarNumerator}
 takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
-m\M(D))$; the final modular inverse takes time $O(n\M(D) + \M(D) \log(D))$.
-Altogether, the total span, assuming perfect parallelization 
-at Step~\ref{mainstep3} is
+m\M(D))$; the final modular calculations modulo $\sqfree$ take time $O(n\M(D) + \M(D) \log(D))$.
+Altogether, assuming perfect parallelization 
+at Step~\ref{mainstep3}, the total span is
 $$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
 $$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
@@ -1844,43 +1873,40 @@ matches the number of cores is optimal (see \cref{section:ex});
 however, if we use a dense model for our matrices, our algorithms
 should rely on dense matrix multiplication. We will see two possible
 approaches, which respectively take $m=1$ and $m=D$; we will not
-discuss how they parallelize, simply pointing out that one may just
+discuss how they parallelize, simply pointing out that one may simply
 parallelize dense matrix multiplications throughout the algorithms.
 
-Let us discuss the modifications in the algorithm to apply when
+Let us first discuss the modifications in the algorithm to apply when
 $m=1$. In this case, blocking has no effect. We compute the
 row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
 square-and-multiply technique used in Keller-Gehrig's
 algorithm~\cite{Keller85}, for $O(D^\omega \log(D))$ operations in
-$\K$. The minimum generating polynomial matrix $\mat{P}_{\mU,\mV}$ is
-equal to the minimum polynomial $\minpoly$ of $\mM$, for generic
-choices of $\mU$ and $\mV$ (which can be computed by the
-Berlekamp-Massey algorithm, or a fast version of it); besides,
+$\K$. For generic choices of $\mU$ and $\mV$, the minimum generating
+polynomial matrix $\mat{P}_{\mU,\mV}$ is equal to the minimum
+polynomial $\minpoly$ of $\mM$, and can be computed by the
+Berlekamp-Massey algorithm, or a fast version of it; besides,
 $\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
 numerators is simply a power series multiplication in degree at most
-$D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, 
-where the second term gives the cost of computing $\mM$.
+$D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, where
+the second term gives the cost of computing $\mM$.
 
 
 When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
 matrices and $d = D/m = 1$. A minimal generating polynomial of
 $\seq_{\mU,\mV} = (\mU^\perp\mV, \mU^\perp\mM\mV,\dots)$ is
-$\mat{P}_{\mU,\mV} = T \mat{I}_D - \mU^\perp\mM\mU^{-\perp}.$ Its
+$\mat{P}_{\mU,\mV} = T \mat{I}_D - \mU^\perp\mM\mU^{-\perp}$ and its
 largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
-$O(D^\omega \log(D))$ operations in $\K$.  The numerator
-$\mat{\Omega}(\mU^\perp \mM \col{\varepsilon}_1, \mat{P}_{\mU,mV})$ is
-$\mU^\perp \col{\varepsilon}_1$, that is the first column of
-$\mU^\perp$, from which we recover $C_1$ through a dot product with
-$\row{a}_1$. Similarly, the numerator $\mat{\Omega}(\mU^\perp \mM
-\mM_i \col{\varepsilon}_1, \mat{P}_{\mU,mV})$ is $\mU^\perp \mM_i
-\col{\varepsilon}_1$, and gives us $C_{X_i}$. Altogether, 
-the runtime is again  $O(D^{\omega} \log(D) + nD^2)$, 
-where the second term now gives the cost of computing $\mM$,
+$O(D^\omega \log(D))$ operations in $\K$ using high-order lifting.
+
+The numerator $\mat{\Omega}(\mU^\perp \mM \col{\varepsilon}_1,
+\mat{P}_{\mU,mV})$ is seen to be $\mU^\perp \col{\varepsilon}_1$, that is, the
+first column of $\mU^\perp$; we recover $C_1$ from it through a dot
+product with $\row{a}_1$. Similarly, the numerator
+$\mat{\Omega}(\mU^\perp \mM \mM_i \col{\varepsilon}_1,
+\mat{P}_{\mU,mV})$ is $\mU^\perp \mM_i \col{\varepsilon}_1$, and gives
+us $C_{X_i}$. Altogether, the runtime is again $O(D^{\omega} \log(D) +
+nD^2)$, where the second term now gives the cost of computing $\mM$,
 as well as $C_1$ and all $C_{X_i}$.
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1901,10 +1927,14 @@ X_2^3 + 61X_2^2 + 96X_2 + 20
 \usebox{0}
 \mathclose{\resizebox{1.2\width}{\ht0}{$\Bigg\rangle$}}
 \subset \F_{101}[X_1,X_2];
-$$
-the correponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$ has dimension $D=4$.
+$$ the correponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$
+has dimension $D=4$.  Although it does not appear on the generators,
+the ideal $I$ is simply $\mathfrak{m}_1^2 \mathfrak{m}_2$, where
+$\mathfrak{m}_1 =\langle X_1-4,X_2-10\rangle$ and $\mathfrak{m}_2
+=\langle X_1-5,X_2-20\rangle$ (this immediately implies that $D=3+1=4$).
+
 We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices
-in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$:
+in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$ given by
 \begin{align*}
 \mM_1 = \begin{bmatrix}
   7   & 91 & 100& 0\\
@@ -1998,7 +2028,7 @@ T^2 + 60T + 62 &       88T + 25\\
 $$
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
 $$P = T^3 + 76T^2 + 100T + 7,$$
-and $\sqfree=T^2+8X+61$
+with squarefree part $\sqfree=T^2+8X+61$.
 Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
 \row{a}_1 &= [T+16,13]\\
@@ -2037,13 +2067,11 @@ Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod \sqfree$ is
 given by $V_1= 15T+14$. 
 We compute $V_2= 49T+9$ in the same way,
 and our output is 
-$$((T^2+8T+61, 15T+14, 49T+9), 2X_1 + 53 X_2).$$ 
-As a sanity check, we see that
-$V( I)$ has two points in $\F_{101}^2$, namely $(4,10),(5,20)$;
-accordingly, $Q$ has two roots
-in $\F_{101}$: $33,60$, and we have $(V_1(33) = 4, V_2(33) = 10)$
-and $(V_1(60) = 5, V_2(60) = 20)$, as
-expected.
+$$((T^2+8T+61, 15T+14, 49T+9), 2X_1 + 53 X_2).$$ As a sanity check, we
+recall that $V( I)$ has two points in $\F_{101}^2$, namely
+$(4,10)$ and $(5,20)$; accordingly, $Q$ has two roots in $\F_{101}$,
+$33$ and $60$, and we have $(V_1(33) = 4, V_2(33) = 10)$ and $(V_1(60) = 5,
+V_2(60) = 20)$, as expected.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2060,11 +2088,14 @@ timing, the ratio of the time it took to compute $(\mU^{\perp}
 \mM^s)_{s\ge0}$ to the total time is written in brackets.
 
 In all cases, we start from multiplication matrices computed from a
-{degrevlex} Gr\"obner basis in Magma. The timings reported here do not
-include this precomputation. We refer the reader to~\cite{FaMo17} for
-extensive experiments comparing the runtime two stages of the
-algorithm (in many cases, computing the degree Gr\"obner basis is
-faster). 
+{degrevlex} Gr\"obner basis in Magma~\cite{BoCaPl97}. The timings
+reported here do not include this precomputation; instead, we refer
+the reader to~\cite{FaMo17} for extensive experiments comparing the
+runtime of two similar stages (degree basis computation and conversion
+to a lex order) in their algorithm.  Rather than optimizing our
+implementation, our main focus here was to demonstrate the effects of
+parallelization, and how the Krylov sequence computation dominates the
+runtime in these examples.
 
 All our inputs as well as our source code are available at
 \url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}. Some systems
@@ -2074,16 +2105,19 @@ inspired from~\cite{FaMo17}). Systems rand1-$i$ have $3$ variables and
 randomly generated equations (of degree depending on $i$), and
 rand2-$i$ are similar, with $4$ variables. These systems are
 generically radical (and in shape position). Systems mixed1-$i$ and
-mixed2-$i$ have similar number of variables, but some of their
+mixed2-$i$ have similar number of variables as the previous ones, but some of their
 solutions are multiple, so the ideals are not radical (and not in
 shape position). Systems mixed3-$i$ have only one multiple root (the
 others are simple), in increasing numbers of variables; they are not
 in shape position. Systems W1-$d$-$n$-$p$ are determinantal equations
-that describe the computation of critical point for the projection
-$\pi_1: (\alpha_1,\dots,\alpha_n) \mapsto \alpha_1$ on
+that describe the computation of critical points for the projection
+$ (\alpha_1,\dots,\alpha_n) \mapsto \alpha_1$ on
 $V(f_1,\dots,f_p)$, where $f_1,\dots,f_p$ are $p$ equations of degree
 $d$ in $n$ variables.
 
+In the columns $m=1,m=4,m=8$, the numbers in parentheses indicate the
+ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
+\mM^s)_{0 \le s< 2d}$.
 
 \begin{table}[H]
  \def\arraystretch{1.2}
@@ -2091,7 +2125,7 @@ $d$ in $n$ variables.
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
 \begin{center}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Sparsity} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & radical \\
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Density $\rho$} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
 		\hline
 		rand1-1&3 &5832&0.0371&1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
 		rand1-2&3 &8000&0.0333&4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
@@ -2125,20 +2159,21 @@ On average, the algorithm performs better by a factor of 3.73 for
 $m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. Increasing
 $m$ has two effects: it (moderately) decreases the effectiveness of
 parallel computations, but also increases the time to compute the
-output polynomials. From the observed speedup and the ratio in the
-table, we can conclude that the bottleneck of the algorithm is
-the computation of that sequence and the latter effect is minor
-compared to the former.
+output polynomials, through minimal generator computation, high-order
+lifting, \dots. From the observed speedup and the ratios in the table,
+we can conclude that the bottleneck of the algorithm is the
+computation of that sequence and the latter effect is minor compared
+to the former.
 
 We can determine the effectiveness of parallel computations by
 comparing combined CPU times (that is, total work).  For example, in
 test rand1-1 we get $4124, 4350, 6008$ seconds for $m=1,4,8$
 respectively; we observed similar patterns for other tests. If the
 parallelization was perfect, the combined CPU time should be roughly
-equal for all values of $m$ since computing $(\mU^{\perp}
-\mM^s)_{s\ge0}$ took more than $99\%$ of the total time for all three
+equal for all values of $m$, since computing $(\mU^{\perp}
+\mM^s)_{0 \le s< 2d}$ took more than $99\%$ of the total time for all three
 values of $m$ in this test. When $m=4$, the overhead from
-parallelization is small whereas when $m=8$, overhead is significant
+parallelization is small whereas when $m=8$, overhead is significant,
 as it is impossible to run 8 threads in parallel on 8 cores without
 switching.
 
@@ -2148,19 +2183,20 @@ switching.
 
 \section{Using the original coordinates}\label{sec:original}
 
-In this section, we propose a refinement of the algorithm given
+In this last section, we propose a refinement of the algorithm given
 previously; the main new feature is that we avoid using a generic
 linear form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.
 Indeed, such a linear combination is likely to result in a
 multiplication matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
 significantly more dense than $\mM_1,\dots,\mM_n$. In all this
 section, we will work under the assumption that $\mM_1$ the sparsest
-matrix among $\mM_1,\dots,\mM_n$.
+matrix among $\mM_1,\dots,\mM_n$, and try to rely on computations
+involving $\mM_1$ as much as possible.
 
 All notation, such as $I$, $\residueI=\K[X_1,\dots,X_n]/I$, its basis
 $\basis=(b_1,\dots,b_D)$, \dots, are as in the two previous sections.
 In particular, we write $V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with
-all $\balpha_i$'s in $\Kbar^n$, and
+all $\balpha_i$'s in $\Kbar{}^n$, and
 $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all $i$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
