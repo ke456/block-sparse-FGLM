@@ -177,7 +177,7 @@
   computes parts of the output in this manner. Using generating series
   expressions going back to work of Bostan {\it et al.}, we show how
   to compute the entire output for a small overhead, without making
-  any assumption on the ideal $I$. We then propose a refinment of this
+  any assumption on the ideal $I$. We then propose a refinement of this
   idea that partially avoids the introduction of a generic linear
   form.  We describe experimental results obtained by an
   implementation based on the C++ libraries LinBox and NTL.
@@ -290,21 +290,24 @@ will be called a {\em zero-dimensional parametrization} of $V(I)$. In
 particular, it generally differs from the description
 in~\cref{eq:RUR}, since the latter keeps trace of the multiplicities
 of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
-the {\em nil-indices} of the solutions).
+the {\em nil-indices} of the solutions). Remark that starting from
+such an output, we can reconstruct the local structure of $I$ at 
+its roots, using algorithms from~\cite{MaMoMo96} or~\cite{NeRaSc17}.
 
-The most costly part of such an algorithm is the computation of the
-values $\ell(\lf^s)$ and $\ell(\lf^s X_i)$; the rest essentially boils
-down to applying the Berlekamp-Massey algorithm and univariate
-polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re and Mou pointed
-out that the multiplication matrices $\mM_1,\dots,\mM_n$ can be
-expected to be sparse; for generic inputs, they give precise estimates
-on the sparsity of these matrices, assuming the validity of a
-conjecture by Moreno-Soc\'ias~\cite{MorenoSocias91}.  On this basis,
-they designed several forms of {\em sparse FGLM} algorithms. For
-instance, if $I$ is in shape position, the algorithms in \cite{FaMo17}
-recover its lexicographic basis, which is as in~\eqref{eq:shapelemma},
-by also considering values of a linear form $\ell:\residueI \to
-\K$. For less favorable inputs, the algorithm falls back on the
+The most costly part of the algorithm of~\cite{BoSaSc03} is the
+computation of the values $\ell(\lf^s)$ and $\ell(\lf^s X_i)$; the
+rest essentially boils down to applying the Berlekamp-Massey algorithm
+and univariate polynomial arithmetic. In~\cite{FaMo17}, Faug{\`e}re
+and Mou pointed out that the multiplication matrices
+$\mM_1,\dots,\mM_n$ can be expected to be sparse; for generic inputs,
+they give precise estimates on the sparsity of these matrices,
+assuming the validity of a conjecture by
+Moreno-Soc\'ias~\cite{MorenoSocias91}.  On this basis, they designed
+several forms of {\em sparse FGLM} algorithms. For instance, if $I$ is
+in shape position, the algorithms in \cite{FaMo17} recover its
+lexicographic basis, which is as in~\eqref{eq:shapelemma}, by also
+considering values of a linear form $\ell:\residueI \to \K$. For less
+favorable inputs, the algorithm falls back on the
 Berlekamp-Massey-Sakata algorithm~\cite{Sakata90} or plain FGLM.
 
 The ideas at play in these algorithms are essentially based on Krylov
@@ -322,6 +325,9 @@ finite field in that context): the algorithm computes the roots of
 $\sqfree$ in $\K$ and substitutes them in the input system, before
 computing a Gr\"obner basis in $n-1$ variables for each of them.
 
+
+
+
 Our first contribution is to give a block version of the algorithm
 in~\cite{BoSaSc03} that extends the approach introduced
 in~\cite{Steel15} to compute all polynomials in~\cref{eq:BoSaSc03} for
@@ -336,7 +342,7 @@ enough characteristic. While we focus on the case where the
 multiplication matrices are sparse, we also give a cost analysis
 for the case of dense multiplication matrices.
 
-Our second contribution is a refinment of our first algorithm, where
+Our second contribution is a refinement of our first algorithm, where
 we try to avoid computation with a generic linear form $\lf =t_1 X_1 +
 \cdots + t_n X_n$ to the extent possible (this is motivated by the
 fact that the multiplication matrix of $\lf$ may be denser than those
@@ -358,7 +364,7 @@ a simple but useful algorithms to compute a so-called {\em scalar
 that arise in the context of FGLM-like algorithms; we prove slightly
 more precise versions of results from~\cite{BoSaSc03} that will be 
 used throughout. The main algorithm is given in \cref{sec:main},
-and the refinment mentioned above is in \cref{sec:original}.
+and the refinement mentioned above is in \cref{sec:original}.
 
 
 \paragraph{Complexity model.}
@@ -1236,7 +1242,7 @@ $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\ell$ in ${\rm
 where $S_i$ is  the union of $S_{i,1},\dots,S_{i,D_i}$,
 with in particular $P_{i,(0,\dots,0)}=U_{i,1}$ and where $P_{i,\mu}$
 depends only on $(U_{i,j})_{j =2,\dots,D_i}$ for all $\mu$ in $S_i$,
-$\mu \ne (0,\dots,0)$. Explicily, we can write $P_{i,\mu}=\sum_{j\in
+$\mu \ne (0,\dots,0)$. Explicitly, we can write $P_{i,\mu}=\sum_{j\in
 	\{1,\dots,D_i\} \text{~such that~} \mu \in S_{i,j}} c_{i,j,\mu}
 U_{i,j}$. 
 
@@ -1380,7 +1386,7 @@ section of this paper.
     t_k^{\mu_k}\right )
 	+ \frac{A}{(T-\lf )^{w}},
   \end{align*}
-  for some polynomial $A \in \Kbar[X_1,\dots,X_n,T]$ of degre less than $w$ in $T$. If we let 
+  for some polynomial $A \in \Kbar[X_1,\dots,X_n,T]$ of degree less than $w$ in $T$. If we let 
   $\pi =\sum_{\mu \in R,\ |\mu|=w} c_{\mu} X_1^{\mu_1} \cdots
   X_n^{\mu_n}$, this becomes
   \begin{align*}
@@ -1861,7 +1867,7 @@ $$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm
 and the total work is
 $$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
-Step~\ref{mainstep3}, but it is simulateously the most costly in
+Step~\ref{mainstep3}, but it is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
 
 \medskip
@@ -1908,6 +1914,14 @@ us $C_{X_i}$. Altogether, the runtime is again $O(D^{\omega} \log(D) +
 nD^2)$, where the second term now gives the cost of computing $\mM$,
 as well as $C_1$ and all $C_{X_i}$.
 
+\begin{remark}
+  Our algorithm only computes the first invariant factor of
+  $\mat{P}_{\mU,\mV}$, that is, of $T \mat{I}_D-\mM$. A natural
+  question is whether computing further invariant factors can be of
+  any use in the algorithm (or possibly can help us determine part of
+  the structure of the algebras $\residueI_i$).
+\end{remark}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Example}
@@ -1927,7 +1941,7 @@ X_2^3 + 61X_2^2 + 96X_2 + 20
 \usebox{0}
 \mathclose{\resizebox{1.2\width}{\ht0}{$\Bigg\rangle$}}
 \subset \F_{101}[X_1,X_2];
-$$ the correponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$
+$$ the corresponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$
 has dimension $D=4$.  Although it does not appear on the generators,
 the ideal $I$ is simply $\mathfrak{m}_1^2 \mathfrak{m}_2$, where
 $\mathfrak{m}_1 =\langle X_1-4,X_2-10\rangle$ and $\mathfrak{m}_2
@@ -2079,7 +2093,7 @@ V_2(60) = 20)$, as expected.
 
 In the following table, we give the timings in seconds for different
 values of $m$ for \cref{algo:block-sparse-fglm}.  Our
-implemention was based on Shoup's NTL \cite{NTL} polynomials
+implementation was based on Shoup's NTL \cite{NTL} polynomials
 as well as LinBox \cite{LinBox} dense and sparse
 matrices and polynomial matrix multiplication. All timings are
 measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
@@ -2194,7 +2208,7 @@ matrix among $\mM_1,\dots,\mM_n$, and try to rely on computations
 involving $\mM_1$ as much as possible.
 
 All notation, such as $I$, $\residueI=\K[X_1,\dots,X_n]/I$, its basis
-$\basis=(b_1,\dots,b_D)$, \dots, are as in the two previous sections.
+$\basis=(b_1,\dots,b_D)$, the local algebras $\residueI_i$, \dots, are as in the two previous sections.
 In particular, we write $V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with
 all $\balpha_i$'s in $\Kbar{}^n$, and
 $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all $i$.
@@ -2206,30 +2220,32 @@ $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all $i$.
 The algorithm will decompose $V$ into two parts: for the first part,
 we will be able to use $X_1$ as a linear form in our zero-dimensional
 parametrization; the remaining points will be dealt with using a
-random linear form $\lf=t_1 X_1 + \cdots + t_n X_n$ as above. Throughout, we rely on the
-following operations: evaluations of linear forms on successive powers
-of a given element in $\residueI$ (such as $1,X_1,X_2^2,\dots$ or
-$1,\lf,\lf^2,\dots$) and (polynomial) linear algebra, as we did before, as well as
-some operations on univariate polynomials related to so-called {\em
-  power projection}~\cite{Shoup94,Shoup99}.
+random linear form $\lf=t_1 X_1 + \cdots + t_n X_n$ as
+above. Throughout, we rely on the following operations: evaluations of
+linear forms on successive powers of a given element in $\residueI$
+(such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$) and (polynomial)
+linear algebra, as we did before, as well as some operations on
+univariate polynomials related to so-called {\em power
+  projection}~\cite{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
-main structure; the subroutines are described in the next sections.
+main structure; the subroutines are described in the next subsections.
 
 \begin{algorithm}[H]
-  \caption{$\mathsf{ParametrizationWithSplitting}(\mM_1,\dots,\mM_n,\mU,\mV,\lf$)}
+  \caption{$\mathsf{BlockParametrizationWithSplitting}(\mM_1,\dots,\mM_n,\mU,\mV,\lf,\mf$)}
           {\bf Input:} \vspace{-0.5em}
 	  \begin{itemize}
 	  \item $\mM_1,\dots,\mM_n$ defined as above
 	  \item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
           \item $\lf =t_1 X_1 + \cdots + t_n X_n$
+          \item $\mf =y_2 X_2 + \cdots + y_n X_n$
 	  \end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
 	\begin{itemize}
 		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
 	\end{itemize}
 	\begin{enumerate}
-		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV)$
+		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV,\mf)$
                 \item let $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s)$ be correction matrices associated
                   to the previous calculation
 		\item let $(R,W_1,\dots,W_n,\lf)=\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,$ \\
@@ -2248,7 +2264,7 @@ sequences of correction matrices, using objects that were computed
 in the call to  $\mathsf{BlockParametrizationX}_1$.
 
 We then apply a modified version of Algorithm $\mainalgoname$, which we call
-$\mainalgoname{\sf Residual}$, and which computes a zero-dimensional
+$\mainalgoname{\sf Residual}$. It computes a zero-dimensional
 parametrization of $V''=V-V'$ using sequences such as $(\mU^\perp
 \mM^s \mV)_{s \ge 0} - \mat{\Delta}_s$, where $\mM= t_1 \mM_1 + \cdots
 + t_n \mM_n$. Subtracting the correction terms $\mat{\Delta}_s$ has
@@ -2258,7 +2274,9 @@ a few points, and few values for the latter sequences will be needed.
 
 The last step involves changing coordinates in
 $((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a linear form instead, and
-performing the union of the two components $V'$ and $V''$.
+performing the union of the two components $V'$ and $V''$. These
+operations can be done in time $O(n D^{(\omega+1)/2}$, see Lemmas~2
+and~3 of~\cite{PoSc13b}; we will not discuss them further.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2285,16 +2303,18 @@ polynomial of $X_1$ in $\prod_{j \in T_j} \residueI_j$ is
 $(T-r_j)^{\mu_j}$, and the minimal polynomial of $X_1$ in $\residueI$ is
 $M=\prod_{j \in \{1,\dots,c\}} (T-r_j)^{\mu_j}$.
 
-Recall that a linear form $\ell: \residueI \to \Kbar$ can be written uniquely
-as $\ell=\sum_{i\in \{1,\dots,\dg\}} \ell_i$, with $\ell_i:\residueI_i \to
-\Kbar$; collecting terms, $\ell$ may also be written as $\ell=\sum_{j
-	\in \{1,\dots,c\}} \lambda_j$, with $\lambda_j=\sum_{i \in T_j}
-\ell_i$.  Given such an $\ell$, we first explain how to compute values
-of the form $\lambda_j(1)$. We will do this for some values of $j$
-only, namely those $j$ for which $\mu_j=1$. This result is close in 
-spirit to \cref{lemma:anyv}, but does not assume that the projection
-$X_1: V \to \Kbar$ is one-to-one (that lemma makes such an 
-assumption for a more general linear mapping  $\lf:V\to \Kbar$).
+Recall that for any linear form $\ell: \residueI \to \K$, the
+extension $\ell: \residueI\otimes_\K \Kbar \to \Kbar$ can be written
+uniquely as $\ell=\sum_{i\in \{1,\dots,\dg\}} \ell_i$, with
+$\ell_i:\residueI_i \to \Kbar$; collecting terms, $\ell$ may also be
+written as $\ell=\sum_{j \in \{1,\dots,c\}} \lambda_j$, with
+$\lambda_j=\sum_{i \in T_j} \ell_i$.  Given such an $\ell$, we first
+explain how to compute values of the form $\lambda_j(1)$. We will do
+this for some values of $j$ only, namely those $j$ for which
+$\mu_j=1$. This result is close in spirit to \cref{lemma:anyv}, but
+does not assume that the projection $X_1: V \to \Kbar$ is one-to-one
+(that lemma makes such an assumption, but works for a more general
+linear mapping $\lf:V\to \Kbar$).
 
 \begin{lemma}\label{lemma:valuelambda}
   Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$ and let $M$ be the minimal
@@ -2373,11 +2393,11 @@ assumption for a more general linear mapping  $\lf:V\to \Kbar$).
 	holds for all $k$ in $\mathfrak{e}$.
 \end{proof}
 
-We now show how to use this result to use sequences of the form
+We now show how this result allows us to use sequences of the form
 $(\ell(X_1^s))_{s \ge 0}$ to compute a zero-dimensional
 parametrization of a subset $V'$ of $V$. Precisely, we characterize
-the set $V'$ as follows: for $i$ in $\{1,\dots,\dg\}$, $\balpha_i$ is in
-$V'$ if and only if:
+the set $V'$ as follows: for $i$ in $\{1,\dots,\dg\}$, $\balpha_i$ is
+in $V'$ if and only if:
 \begin{itemize}
 	\item for $i'$ in $\{1,\dots,\dg\}$, with $i'\ne i$, $\alpha_{i',1} \ne
 	\alpha_{i,1}$;
@@ -2401,7 +2421,7 @@ we will use the following lemma to perform this operation.
 \begin{lemma}\label{lemma:acb2}
   Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be
   a linear form over $\prod_{i \in T_j} \residueI_i$ and let $\mf=y_2
-  X_2 + \cdots + y_n X_n$, for some $y_2,\dots,y_n$. Define constants
+  X_2 + \cdots + y_n X_n$, for some $y_2,\dots,y_n$ in $\K$. Define constants
   $a,b,c$ in $\Kbar$ by
   $$a=\lambda(1),\quad b=\lambda(\mf),\quad c=\lambda(\mf^2).$$
   Then, $j$ is in $\mathfrak{a}$
@@ -2485,11 +2505,11 @@ we will use the following lemma to perform this operation.
 \end{proof}
 
 The previous lemmas allow us to write Algorithm
-$\mathsf{ParametrizationX}_1$. After computing $M$, we determine its
+$\mathsf{BlockParametrizationX}_1$. After computing $M$, we determine its
 factor $F=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$, which is
 obtained by taking the squarefree part of $M$ and dividing it by
 $\gcd(M,M')$. We split this polynomial further using the previous
-results in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
+lemma in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
 conclude using the same kind of calculations as in Algorithm
 $\mainalgoname$.
 
@@ -2545,8 +2565,8 @@ $\mainalgoname$.
   \cref{lemma:omegaOmega}. For $i=1,\dots,D$, let $u_{i,1}$ is the entry at position
   $(i,1)$ in $\mU$, and define the linear 
 form $\ell: \residueI \to \K$ by 
-  $$\ell(f) = \sum_{1 \le i \le D} f_i u_{i,1}, \quad\text{for} f =
-\sum_{i=1}^D u_i b_i.$$ Then, the above lemma proves that $A_i =
+  $$\ell(f) = \sum_{i=1}^D f_i u_{i,1}, \quad\text{for}\quad f =
+\sum_{i=1}^D f_i b_i.$$ Then, the above lemma proves that $A_i =
 \Omega((\ell(\mf^i X_1^s))_{s\ge0},M)$ for $i=0,1,2$ and $A_{X_i} =
 \Omega((\ell(X_i X_1^s))_{s\ge0},M)$ for $i=2,\dots,n$.
 
@@ -2554,7 +2574,8 @@ form $\ell: \residueI \to \K$ by
   root of $F$ as computed at Step~\ref{X1step7b}. By
   \cref{lemma:valuelambda}, for $i=0,1,2$, we have $ A_i(r_j) = M'(r_j)
   (\mf^i \cdot \lambda_j)(1)$, where $\lambda_j =\sum_{i \in T_j}
-  \ell_i$, and the $\ell_i$'s are the components of $\ell$.
+  \ell_i$, where the $\ell_i$'s are the components of $\ell$
+  and where $\mf^i \cdot \lambda_j$ is the linear form $f \mapsto \lambda_j(\mf^i f)$.
   
   As a result, the value of $ A_0  A_2 -  A_1^2$ at
   $r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
@@ -2568,7 +2589,9 @@ form $\ell: \residueI \to \K$ by
   \cref{lemma:valuelambda}. Indeed, for $j$ in $\mathfrak{a}$, 
   $T_j$ is simply equal to $\{\sigma_j\}$, so that we have, for $i=2,\dots,n$,
   $$ A_0(r_j)=M'(r_j) \lambda_j(1) \quad\text{and}\quad 
-  A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i).$$ Now, since $j$
+  A_{X_i}(r_j) = M'(r_j) (X_i \cdot \lambda_j)(1) = M'(r_j) \lambda_j(X_i),$$
+  where as above, $X_i \cdot \lambda_j$ is the linear form $f \mapsto \lambda_j(X_i f)$.
+ Now, since $j$
   is in $\mathfrak{a}$, $\residueI_{\sigma_j}$ is reduced, so that there
   exists a constant $\lambda_{j,1}$ such that for all $f$ in
   $\Kbar[X_1,\dots,X_n]$, $\lambda_j(f)$ takes the form $\lambda_{j,1}
@@ -2576,13 +2599,14 @@ form $\ell: \residueI \to \K$ by
   $$\frac{ A_{X_j}(r_j)}{ A_0 (r_j)} = 
   %% \frac {\Omega((\ell(X_j X_1^s)_{s\ge0},M)(r_j)}{\Omega((\ell(X_1^s))_{s\ge0},M)(r_j)}=
   \frac
-      {M'(r_j) \lambda_{j,1} \alpha_{\sigma_j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{\sigma_j,i}.$$
+      {M'(r_j) \lambda_{j,1} \alpha_{\sigma_j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{\sigma_j,i},$$
+      since $M'(r_j)$ is non-zero.
       For $i=1$, since we use $X_1$ as a separating variable for $V_{\mathfrak{A}}$, 
-      we simply add the polynomial $T$ to our list.
+      we simply insert the polynomial $T$ into our list.
 \end{proof}
 
 The cost analysis is the same as that of Algorithm $\mainalgoname$, the
-only difference being that the density $\rho_1$ of $\mM_1$ plays the 
+crucial difference being that the density $\rho_1$ of $\mM_1$ plays the 
 role of the density $\rho$ of $\mM$ used in that algorithm.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2593,7 +2617,7 @@ Next, we describe an operation of decomposition for linear forms
 $\residueI \to \K$; this is essentially akin to the Chinese Remainder
 Theorem. We then use it to compute the sequences of correction
 matrices $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s)$
-defined in Algorithm $\mathsf{ParametrizationWithSplitting}$.
+defined in Algorithm $\mathsf{BlockParametrizationWithSplitting}$.
 
 As a preamble, we introduce the notation $\PP(r,t)$ for the cost of a
 {\em power projection} operation, as defined
@@ -2608,20 +2632,23 @@ is represented by the vector $(\ell(1),\ell(T),\dots,\ell(T^{r-1}))$.
 In~\cite[Theorem~4]{Shoup94}, Shoup showed that this can be done in
 $\PP(r,t)=O(r^{(\omega-1)/2} t)$ operations in $\K$ for $t \le r$. For
 $t \ge r$, we first solve the problem up to index $r$ in time
-$O(r^{(\omega+1)/2})$; then we use the fact that the sequence we want to
-compute is linearly recurrent to compute all further values in time
+$O(r^{(\omega+1)/2})$; then we use the fact that the sequence 
+$(\ell(H^s))_{s \ge 0}$
+ is linearly recurrent to compute all further values in time
 $O(t\M(r)/r)$, as for instance in Proposition~1 of~\cite{BoFlSaSc06}.
 Thus, for $t \ge r$, we take $\PP(r,t)=O(r^{(\omega+1)/2} +
 t\M(r)/r)$.
 
 \medskip
 
-Let then $D_{\mathfrak{A}}$ be the number of points in
-$V_{\mathfrak{A}}$; since $\residueI_i$ is a reduced algebra for all
+Let $\mathfrak{A}$ and $\mathfrak{B}$ be defined as in the previous 
+subsection, and let $D_{\mathfrak{A}}$ be the number of points in
+$V_{\mathfrak{A}}$. Since $\residueI_i$ is a reduced algebra for all
 $i$ in $\mathfrak{A}$, $D_\mathfrak{A}$ is also the dimension of
 $\residueI_\mathfrak{A} = \prod_{i \in \mathfrak{A}}
-\residueI_i$. Thus, $\residueI_\mathfrak{B}=\prod_{i \in \mathfrak{B}}
+\residueI_i$ and $\residueI_\mathfrak{B}=\prod_{i \in \mathfrak{B}}
 \residueI_i$ has dimension $D_{\mathfrak{B}}=D-D_{\mathfrak{A}}$.
+
 Consider a linear form $\ell: \residueI \to \K$; we still denote
 $\ell$ for its extension $\residueI \otimes_\K \Kbar \to \Kbar$.  It
 can then be decomposed as $\ell= \ell_{\mathfrak{A}} +
@@ -2641,7 +2668,7 @@ $\lf=t_1 X_1 + \cdots+ t_n X_n$, and an upper bound $\tau$, we show
 how to compute the values $\ell_\mathfrak{A}(\lf^s)$, for
 $s=0,\dots,\tau-1$.
 
-Let $E=M/F$; then $E$ and $F$ are coprime, by construction.
+Let $E=M/F$; the division is exact and  $E$ and $F$ are coprime, by construction.
 The equality $\ell= \ell_{\mathfrak{A}} + \ell_{\mathfrak{B}}$ implies
 an equality between generating series
 \begin{align*}
@@ -2664,8 +2691,10 @@ applying our algorithm for univariate power projection to $G=t_1 G_1 + \cdots t_
 The following pseudo-code summarizes this discussion; the cost of the
 algorithm is $O(\M(D_\mathfrak{A})\log(D_\mathfrak{A}) +
 \PP(D_\mathfrak{A},\tau) +nD_\mathfrak{A})$ operations in $\K$, where the
-first term accounts for the cost of the first three steps and 
-the $O(nD_\mathfrak{A})$ describes the cost of computing $G$ as defined above.
+first term accounts for the cost of the first three steps,
+$\PP(D_\mathfrak{A},\tau)$ is the cost of power projection
+ and 
+the term $O(nD_\mathfrak{A})$ describes the cost of computing $G$ as defined above.
 
 \begin{algorithm}[H]
 	\caption{${\sf Decompose}(M, C, ((F,G_1,\dots,G_n),X_1), \lf,\tau)$} {\bf
@@ -2690,18 +2719,25 @@ the $O(nD_\mathfrak{A})$ describes the cost of computing $G$ as defined above.
 \end{algorithm}
 
 We will use this algorithm to compute the correction matrices to be
-used in Algorithm $\mainalgoname{\sf Residual}$. Let $\mU$ and $\mV$
-be the blocking matrices used in $\mainalgoname{\sf X}_1$. In what
-follows, for $i=1,\dots,m$, we let $\ell_i: \residueI \to \K$ be the
-linear form whose values on the basis $\basis=(b_1,\dots,b_D)$ are
-given by the $i$-th column of $\mU$. In other words, $\ell_i(f) =
-\sum_{j=1}^D f_j u_{j,i}$, for $f=\sum_{j=1}^D f_j b_j$. Similarly,
-for $j=1,\dots,m$, we let $\gamma_j$ be the element of $\residueI$
-whose coefficient vector on the basis $\basis$ is the $j$-th column of
-$\mV$.
+used in Algorithm $\mainalgoname{\sf Residual}$. We assume that we
+have stored various quantities computed in Algorithm
+$\mainalgoname{\sf X}_1$: the sequence of matrices
+$(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$, the matrix generator
+$\mat{P}_{\mU,\mV}$, the minimal polynomial $M$ of $X_1$, and of
+course the zero-dimensional parametrization $((F,G_1,\dots,G_n),X_1)$.
 
-In what follows, we write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
-in analogy with the definition of $d$ used in the previous section.
+
+Let $\mU$ and $\mV$ be the blocking matrices used in
+$\mainalgoname{\sf X}_1$. For $i=1,\dots,m$, we let
+$\ell_i: \residueI \to \K$ be the linear form whose values on the
+basis $\basis=(b_1,\dots,b_D)$ are given by the $i$-th column of
+$\mU$. In other words, $\ell_i(f) = \sum_{j=1}^D f_j u_{j,i}$, for
+$f=\sum_{j=1}^D f_j b_j$. Similarly, for $j=1,\dots,m$, we let
+$\gamma_j$ be the element of $\residueI$ whose coefficient vector on
+the basis $\basis$ is the $j$-th column of $\mV$.
+
+In what follows, we also write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
+in analogy with the definition of $d$ used so far.
 \begin{itemize}
 \item To each $(i,j)$ in $\{1,\dots,m\}\times \{1,\dots,m\}$ is
   associated a linear form $\ell_{i,j}: \residueI\to \K$ defined by
@@ -2718,8 +2754,8 @@ in analogy with the definition of $d$ used in the previous section.
   Algorithm $\mathsf{{\sf ScalarNumerator}}$ of
   \cref{ssec:scalar_numer}, using the row vector $\row{a}_i$ defined
   in that section, together with the sequence of matrices
-  $\seqelt{s,\mU,\mV}$ defined in Algorithm $\mainalgoname{\sf X}_1$
-  and the corresponding matrix generator $\mat{P}_{\mU,\mV}$.
+  $\seqelt{s,\mU,\mV}$ and the matrix generator $\mat{P}_{\mU,\mV}$
+computed in Algorithm $\mainalgoname{\sf X}_1$.
 
 \smallskip
 
@@ -2738,8 +2774,7 @@ to be $\ell_{i,j,\mathfrak{A}}(\lf^s)$.
   the $i$th entry of the sequence of column vectors $(\mU^\perp
   \mM_1^s \mM_k \col{\varepsilon}_1)_{s \ge0}$ is the scalar sequence
   $(\ell'_{i,k}(X_1^s))_{s \ge 0}$, where $\col{\varepsilon}_1$ is the
-  column vector $[1~0\cdots~0]^\perp$ already used in the previous
-  section.
+  column vector $[1~0\cdots~0]^\perp$ we already used several times.
 
 \smallskip
 
@@ -2777,10 +2812,11 @@ a single call, which was reported above.
 We finally describe Algorithm $\mainalgoname{\sf Residual}$.  Let
 $\mathfrak{A}$ and $\mathfrak{B}$ be as in the previous section.  This
 part of the main algorithm computes a zero-dimensional parametrization
-of $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we are going to call a
-modified version Algorithm $\mathsf{BlockParametrization}$, where we
-update the values of our matrix sequences before computing the minimal
-matrix generator, using the correction matrices defined just above.
+of the residual set $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we
+are going to call a modified version Algorithm
+$\mathsf{BlockParametrization}$, where we update the values of our
+matrix sequences before computing the minimal matrix generator, using
+the correction matrices defined just above.
 
 The resulting algorithm is as follows. A superficial difference with
 $\mathsf{BlockParametrization}$ is that names of the main variables
@@ -2796,7 +2832,7 @@ The algorithm uses a subroutine called {\sf ScalarNumeratorCorrected}
 at Steps~8 and~9.  It is similar to Algorithm {\sf ScalarNumerator} of
 \cref{ssec:scalar_numer}, with a minor difference: instead of computing the
 vectors $\mat{D}_s \col{\varepsilon}_1$, resp.\ $\mat{D}_s\mM_i
-\col{\varepsilon}_1$, it computes $\mat{D}_s
+\col{\varepsilon}_1$, at the first step of  {\sf ScalarNumerator}, it computes $\mat{D}_s
 \col{\varepsilon}_1-\mat{\Delta}''_s$, resp.\ $\mat{D}_s\mM_i
 \col{\varepsilon}_1-\mat{\Delta}'_{s,i}$, where $\mat{\Delta}'_{s,i}$
 is the $i$th column of $\mat{\Delta}'_{s,i}$.
@@ -2807,6 +2843,7 @@ is the $i$th column of $\mat{\Delta}'_{s,i}$.
 	\begin{itemize}
 	\item $\mM_1,\dots,\mM_n$ defined as above
 	\item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
+        \item sequences of correction matrices $(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s)$
         \item $\lf =t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
 	    {\bf Output:}  \vspace{-0.5em}
@@ -2849,12 +2886,27 @@ is none other than the matrix $\mat{\Delta}_s$, so that
 $\mat{E}_{s,\mU,\mV}$ is equal to $\mU_\mathfrak{B}^\perp
 \mM_\mathfrak{B}^s \mV_\mathfrak{B}$. These are thus the kind of
 Krylov matrices we would obtain if we were working with a basis of
-$\residueI_\mathfrak{B}$. The same phenomenon justifies the 
-computation of $C_1$ and $C_{X_1},\dots,C_{X_n}$.
+$\residueI_\mathfrak{B}$, and shows that we have enough
+terms to compute a minimal matrix generator
+$\mat{S}_{\mU,\mV}$, at least for generic $\mU$ and $\mV$. 
+Similarly, $S$ is generically the minimal polynomial of $X_1$ in
+$Q_\mathfrak{B}$, and $R$ its squarefree part.
+
+The same considerations justify the computation of $C_1$ and
+$C_{X_1},\dots,C_{X_n}$. Indeed, subtracting the correction matrices
+implies that 
+$$C_1 = \Omega( (\ell_1(\lf^s)-\ell_{1,\mathfrak{A}}(\lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(\lf^s))_{s \ge 0}, S)$$
+and
+$$C_{X_i} = \Omega( (\ell_1(X_i \lf^s)-\ell_{1,\mathfrak{A}}(X_i \lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(X_i\lf^s))_{s \ge 0}, S),$$
+for $i=1,\dots,n$. As shown in \cref{ssec:abstractlago}, these are precisely 
+the polynomials we need to compute a zero-dimensional parametrization
+of $V_\mathfrak{B}$.
 
 The cost analysis is similar to that of Algorithm $\mainalgoname$,
-with the exception that the degree $D$ can then be replaced by the
-hopefully much smaller $D_\mathfrak{B}$.
+with the important exception that the sequence length $d=\lceil
+D/m\rceil$ can then be replaced by the (hopefully much smaller)
+$d_\mathfrak{B}=\lceil D_\mathfrak{B}/m\rceil$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2862,29 +2914,32 @@ hopefully much smaller $D_\mathfrak{B}$.
 
 The algorithms in this section were implemented using the same
 platform as the one in the previous section, using in particular NTL's
-built-in implemetation of power projection.
+built-in implementation of power projection.
 
-In the following table, we give the ratio of the timing for
-$\mathsf{BlockParametrizationSplitting}$ to the timing for
-$\mainalgoname$ for each input.  The last column shows the number of
-points in $V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the
-total degree of $I$, $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs and
-the machine used for timings are the same as \cref{section:ex}.
+In the following table, we give the ratio of the runtime of {\sf
+  Block\-Parametrization\-WithSplitting} to that of our first
+algorithm, $\mainalgoname$, for each input: numbers less than $1$
+indicate a speed-up.  The last column shows the number of points in
+$V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the total
+degree of $I$, which is $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs
+and the machine used for timings are the same as in \cref{section:ex}.
 
-The performance of $\mathsf{BlockParametrizationSplitting}$ depends on
+The performance of $\mathsf{BlockParametrizationWithSplitting}$ depends on
 the density of $\mM_1$ and the number of points $D_\mathfrak{A}$.  For
-generic inputs, with no multiplicity, $D_\mathfrak{A}=D$; in the worst
+generic inputs, with no multiplicity, $D_\mathfrak{A}=D$, so we will
+actually not need to spend any time computing correction matrices, or running 
+$\mainalgoname{\sf Residual}$. In the worst
 case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then
-$\mathsf{BlockParametrizationSplitting}$ will take about twice as long
-as $\mainalgoname$ (due to the two calls to
+$\mathsf{BlockParametrizationWithSplitting}$ may take about twice as long
+as $\mainalgoname$ (due to the two calls to respectively
 $\mathsf{BlockParametrizationX}_1$ and
 $\mathsf{BlockParametrizationResidual}$).
 
 This case was not seen in our experiments, since the systems with
-multiplicites generated randomly had few multiple points. Even in an
-unfavourable case like sot1, where $V_\mathfrak{A}$ only accounts for
-$1012$ points out of $7682$ points in the variety, the ratio is close
-to 1.
+multiplicities generated randomly had few multiple points, and so were
+favorable to us. Even in an unfavourable case like sot1, where
+$V_\mathfrak{A}$ only accounts for $1012$ points out of $7682$ points
+in the variety, the ratio is close to 1.
 
 \begin{table}[H]
  \def\arraystretch{1.2}
