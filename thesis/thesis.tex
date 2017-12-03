@@ -2042,7 +2042,7 @@ T^2 + 60T + 62 &       88T + 25\\
 $$
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
 $$P = T^3 + 76T^2 + 100T + 7,$$
-with squarefree part $\sqfree=T^2+8X+61$.
+with squarefree part $\sqfree=T^2+8T+61$.
 Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
 \begin{align*}
 \row{a}_1 &= [T+16,13]\\
@@ -2097,9 +2097,7 @@ implementation was based on Shoup's NTL \cite{NTL} polynomials
 as well as LinBox \cite{LinBox} dense and sparse
 matrices and polynomial matrix multiplication. All timings are
 measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
-value of $m$, we create and run $m$ threads in parallel. Beside each
-timing, the ratio of the time it took to compute $(\mU^{\perp}
-\mM^s)_{s\ge0}$ to the total time is written in brackets.
+value of $m$, we create and run $m$ threads in parallel.
 
 In all cases, we start from multiplication matrices computed from a
 {degrevlex} Gr\"obner basis in Magma~\cite{BoCaPl97}. The timings
