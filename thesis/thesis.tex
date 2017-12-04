@@ -1226,7 +1226,7 @@ in $\Lambda_{i,j}$ have order $1$ or more). Thus, introducing new
 variables $(U_{i,j})_{j =1,\dots,D_i}$, we deduce the existence of
 non-zero homogeneous linear forms $P_{i,\mu}$ in
 $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\ell$ in ${\rm
-	hom}_\Kbar(\residueI_i,\Kbar)$, there exist $\bu_i=(u_{i,j}) \in
+	hom}_\Kbar(\residueI_i,\Kbar)$, there exists $\bu_i=(u_{i,j}) \in
 \Kbar{}^{D_i}$ such that we have
 \begin{align}\label{ell_param}
 \ell: f \mapsto \ell(f)
@@ -1244,7 +1244,7 @@ where $S_i$ is  the union of $S_{i,1},\dots,S_{i,D_i}$,
 with in particular $P_{i,(0,\dots,0)}=U_{i,1}$ and where $P_{i,\mu}$
 depends only on $(U_{i,j})_{j =2,\dots,D_i}$ for all $\mu$ in $S_i$,
 $\mu \ne (0,\dots,0)$. Explicitly, we can write $P_{i,\mu}=\sum_{j\in
-	\{1,\dots,D_i\} \text{~such that~} \mu \in S_{i,j}} c_{i,j,\mu}
+	\{1,\dots,D_i\} \;\mid\; \mu \in S_{i,j}} c_{i,j,\mu}
 U_{i,j}$. 
 
 Fix $\ell$ non-zero in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, written
@@ -1257,11 +1257,11 @@ N_i-1$. Then, we let
 $$\pi =\sum_{\mu \in S_i,\ |\mu|=w}P_{i,\mu}(\bu_i) X_1^{\mu_1} \cdots
 X_n^{\mu_n}$$ be the {\em symbol} of $\ell$; by construction,
 this is a non-zero polynomial. In the following paragraphs, we will
-need the next easy lemma.
+need the next lemma.
 
 \begin{lemma}\label{lemma:symbol0}
   Fix $i$ in $\{1,\dots,\dg\}$. For a generic choice of $\ell$ in
-  ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
+  ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
   $\pi_i(t_1,\dots,t_n)$ is non-zero.
 \end{lemma}
 \begin{proof}
@@ -1270,12 +1270,12 @@ need the next easy lemma.
 	$$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1}
   \cdots X_n^{\mu_n} \in
   \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
-  construction a non-zero polynomial.  Thus, for a generic choice of
-  $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, that define a linear form
+  construction a non-zero polynomial.  As a result, for a generic choice of
+  $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, which defines a linear form
   $\ell$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ as in \cref{ell_param},
   and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
-  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. As a
-  result, the symbol of such a linear form $\ell$ is $\pi
+  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. Thus, the symbol of
+  such a linear form $\ell$ is $\pi
   =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1}
   \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then non-zero.
 \end{proof}
@@ -1288,16 +1288,15 @@ for all $i$, such that the extension $\ell_\Kbar: \residueI\otimes_\K \Kbar
 Note that formally, we should write 
 $\ell_\Kbar = \ell_1 \circ \phi_1 + \cdots + \ell_\dg \circ \phi_\dg$,
 where for all $i$, $\phi_i$ is the canonical projection $\residueI \to \residueI_i$;
-we will however omit the projection operators for simplicity.
+we will however omit these projection operators for simplicity.
 
-We
-call {\em support} of $\ell$ the subset $\mathfrak{S}$ of
+We call {\em support} of $\ell$ the subset $\mathfrak{S}$ of
 $\{1,\dots,\dg\}$ such that $\ell_i$ is non-zero exactly for $i$ in
 $\mathfrak{S}$.  As a consequence, for all $f$ in $\residueI$, we have
-\begin{align}\label{eq:fui}
-\ell(f) &= \ell_1(f) + \cdots + \ell_\dg(f)\nonumber\\
-&=  \sum_{i \in \mathfrak{S}} \ell_i(f).
-\end{align}
+\begin{equation}\label{eq:fui}
+\ell(f) = \ell_1(f) + \cdots + \ell_\dg(f)
+         =  \sum_{i \in \mathfrak{S}} \ell_i(f).
+\end{equation}
 For $i$ in $\mathfrak{S}$, we denote by $w_i$ and $\pi_i$ respectively
 the order and the symbol of $\ell_i$. For such a subset $\mathfrak{S}$
 of $\{1,\dots,\dg\}$, we also write $\residueI_\mathfrak{S}=\prod_{i
