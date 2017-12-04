@@ -76,8 +76,6 @@
 \newcommand{\basis}{\mathscr{B}}
 \newcommand{\trace}{\operatorname{trace}}
 \newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
-\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
-\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
 \newcommand{\mainalgoname}{\mathsf{ BlockParametrization}}
@@ -152,6 +150,9 @@
 \DeclareBoldMathCommand{\balpha}{\alpha}
 \DeclareBoldMathCommand{\bbeta}{\beta}
 
+%%% TODO: comment the next two line before submission
+%\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
+%\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 
 
 \title{Block-Krylov techniques in the context of \\ sparse-FGLM algorithms}
@@ -1036,8 +1037,8 @@ assume for simplicity that memory is not an issue, so we can store all
 elements in the Krylov sequences we are interested in; we discuss this
 again in \cref{ssec:mainalgo}.
 
-Our main algorithm will also need to compute scalar numerators of
-the form \sloppy $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
+Our main algorithm will also resort to scalar numerators of
+the form $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
 \minpoly)$, where $\row{w}$ is a given vector in $\K^{D \times 1}$ and
 $\minpoly$ is the minimal polynomial of $\mM$. Since $\minpoly$ may
 have degree $D$, and then $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
@@ -2090,7 +2091,7 @@ V_2(60) = 20)$, as expected.
 
 \subsection{Experimental results}\label{section:ex}
 
-In the following table, we give the timings in seconds for different
+In \cref{tbl:timings_mainalgo}, we give the timings in seconds for different
 values of $m$ for \cref{algo:block-sparse-fglm}.  Our
 implementation was based on Shoup's NTL \cite{NTL} polynomials
 as well as LinBox \cite{LinBox} dense and sparse
@@ -2131,12 +2132,13 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 \mM^s)_{0 \le s< 2d}$.
 
 \begin{table}[H]
+  \centering
  \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
-\begin{center}
+  \label{tbl:timings_mainalgo}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Density $\rho$} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
 		\hline
 		rand1-1&3 &5832&0.0371&1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
 		rand1-2&3 &8000&0.0333&4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
@@ -2162,7 +2164,6 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 		W1-3-7-3&7 &6480&0.174&10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
 		W1-4-6-2&6 &6480&0.141&9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
 	\end{tabular}
-\end{center}
 \end{table}
 
 
@@ -2790,13 +2791,12 @@ to be $\ell_{i,j,\mathfrak{A}}(\lf^s)$.
 \end{itemize}
 
 In terms of cost, we need to compute all vectors $\row{a}_i$, for
-$i=1,\dots,m$; this takes $ O(m^{\omega} \M(D) \log(m) + m^2
-\M(D)\log(D)\log(m))$ operations in $\K$, using the analysis of
-\cref{eqn:hol_cost}. Then, the total time spent in {\sf
-  ScalarNumerator} is $m(m+n+1)$ times the cost reported in
-\cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the
-total cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of
-a single call, which was reported above.
+$i=1,\dots,m$; using the analysis of \cref{eqn:hol_cost}, this takes
+$O(m^{\omega} \M(D) \log(D) \log(m))$ operations in $\K$.  Then, the total time
+spent in {\sf ScalarNumerator} is $m(m+n+1)$ times the cost reported in
+\cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the total
+cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of a single
+call, which was reported above.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2909,20 +2909,20 @@ The algorithms in this section were implemented using the same
 platform as the one in the previous section, using in particular NTL's
 built-in implementation of power projection.
 
-In the following table, we give the ratio of the runtime of {\sf
-  Block\-Parametrization\-WithSplitting} to that of our first
-algorithm, $\mainalgoname$, for each input: numbers less than $1$
-indicate a speed-up.  The last column shows the number of points in
-$V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the total
-degree of $I$, which is $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs
-and the machine used for timings are the same as in \cref{section:ex}.
+In \cref{tbl:comparison_algos}, we give the ratio of the runtime of {\sf
+Block\-Parametrization\-WithSplitting} to that of our first algorithm,
+$\mainalgoname$, for each input: numbers less than $1$ indicate a speed-up.
+The last column shows the number of points in $V_\mathfrak{A}$, that is,
+$D_\mathfrak{A}$, compared to the total degree of $I$, which is
+$D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs and the machine used for timings
+are the same as in \cref{section:ex}.
 
 The performance of $\mathsf{BlockParametrizationWithSplitting}$ depends on
 the density of $\mM_1$ and the number of points $D_\mathfrak{A}$.  For
 generic inputs, with no multiplicity, $D_\mathfrak{A}=D$, so we will
 actually not need to spend any time computing correction matrices, or running 
 $\mainalgoname{\sf Residual}$. In the worst
-case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then
+case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
 $\mathsf{BlockParametrizationWithSplitting}$ may take about twice as long
 as $\mainalgoname$ (due to the two calls to respectively
 $\mathsf{BlockParametrizationX}_1$ and
@@ -2935,10 +2935,11 @@ $V_\mathfrak{A}$ only accounts for $1012$ points out of $7682$ points
 in the variety, the ratio is close to 1.
 
 \begin{table}[H]
+  \centering
  \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
 	\caption{Comparison of $\mathsf{ParametrizationX}_1$ and $\mainalgoname$}
-        \begin{center}
+  \label{tbl:comparison_algos}
 \begin{tabular}{c|c|c|c|c|c|c}
 \textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$D_\mathfrak{A}/D$\\
 \hline
@@ -2966,7 +2967,6 @@ W1-2-11-4&11 &1920&0.486&0.491&0.505&1920/1920\\
 W1-3-7-3&7 &6480&0.455&0.456&0.468&6480/6480\\
 W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480
 \end{tabular}
-       \end{center}
 \end{table}
 
 
