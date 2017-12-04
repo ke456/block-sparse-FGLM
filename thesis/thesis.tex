@@ -2507,7 +2507,7 @@ The previous lemmas allow us to write Algorithm
 $\mathsf{BlockParametrizationX}_1$. After computing $M$, we determine its
 factor $F=\prod_{j \in \{1,\dots,c\}, \mu_j=1} (T-r_j)$, which is
 obtained by taking the squarefree part of $M$ and dividing it by
-$\gcd(M,M')$. We split this polynomial further using the previous
+its GCD with $\gcd(M,M')$. We split this polynomial further using the previous
 lemma in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
 conclude using the same kind of calculations as in Algorithm
 $\mainalgoname$.
@@ -2530,7 +2530,7 @@ $\mainalgoname$.
   \item\label{X1step5} { compute a minimal matrix generator $\mat{P}_{\mU,\mV}$ of $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$}
   \item\label{X1step6} { let $M$ be the largest invariant factor of $\mat{P}_{\mU,\mV}$}
   \item\label{X1step7} { let $F$ be  the squarefree part  of $M$}
-  \item\label{X1step7b} let $F = F /\gcd(M, M')$
+  \item\label{X1step7b} let $F = F /\gcd(F, \gcd (M, M'))$
   \item\label{X1step8} { let $\row{a}_1 = [M~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item let $\mN = y_2 \mM_2 + \cdots+y_n \mM_n$
   \item \textbf{for} $i=0,1,2$ \textbf{do}
