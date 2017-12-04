@@ -22,6 +22,18 @@
 @String{j-JALG = "Journal of Algorithms"}
 @String{j-IEEE-AT = "IEEE Trans. Automat. Control"}
 
+@article {BoCaPl97,
+    AUTHOR = {Bosma, W. and Cannon, J. and Playoust, C.},
+     TITLE = {The {M}agma algebra system. {I}. {T}he user language},
+   JOURNAL = {J. Symbolic Comput.},
+  FJOURNAL = {Journal of Symbolic Computation},
+    VOLUME = 24,
+      YEAR = 1997,
+    NUMBER = {3-4},
+     PAGES = {235--265},
+}
+
+
 @article{BrGuYu80,
   author = "Brent, R. P. and Gustavson, F. G. and Yun, D. Y. Y.",
   title = "Fast solution of {Toeplitz} systems of equations and computation of {Pad\'e} approximants ",
@@ -136,10 +148,10 @@
 } 
 
 
-@article{Villard97,
+@inproceedings{Villard97,
 	author = {Villard, G.},
 	title = {Further analysis of {C}oppersmith's block {W}iedemann algorithm for the solution of sparse linear systems},
-	Journal = {ISSAC'97},
+booktitle = {ISSAC'97},
 	pages = {32-39},
 publisher = {ACM},
 	year = {1997}	}
@@ -254,7 +266,7 @@ author = "Don Coppersmith",}
 	Keywords = {Polynomial systems solving ; Gr{\"o}bner basis ; Change of ordering ; Fast matrix multiplication},
 	Note = {https://hal.archives-ouvertes.fr/hal-00816724},
 	Pdf = {https://hal.archives-ouvertes.fr/hal-00816724/file/FGHR13.pdf},
-	Title = {{Polynomial Systems Solving by Fast Linear Algebra}},
+	Title = {{Polynomial systems solving by fast linear algebra}},
 	Url = {https://hal.archives-ouvertes.fr/hal-00816724},
 	Year = {2013},
 	Bdsk-Url-1 = {https://hal.archives-ouvertes.fr/hal-00816724}}
@@ -306,6 +318,17 @@ author = "Don Coppersmith",}
   urlopt = "http://www.sciencedirect.com/science/article/pii/S074771710290533X",
 }
 
+@Article{Kaltofen95,
+  author = 	 {Kaltofen, E.},
+  title = 	 {Analysis of {Coppersmith}'s block {Wiedemann} algorithm for the parallel solution of sparse linear systems},
+  journal = 	 {Mathematics of Computation},
+  year = 	 1995,
+  volume =	 64,
+  number =	 210,
+  pages =	 {777-806}
+}
+
+
 @article {KaVi04,
     AUTHOR = {Kaltofen, E. and Villard, G.},
      TITLE = {On the complexity of computing determinants},
@@ -339,7 +362,7 @@ number = 8,
 	Journal = j-AAECC,
 	Number = 5,
 	Pages = {433--461},
-	Title = {Solving zero-dimensional systems through the rational univariate representation},
+	Title = {Solving zero-dimensional systems through the {R}ational {U}nivariate {R}epresentation},
 	Volume = 9,
 	Year = 1999}
 
@@ -384,7 +407,7 @@ number = 8,
 
 
 @inproceedings{Steel15,
-	author = {Allan Steel},
+	author = {Steel, A},
 	title = {Direct Solution of the (11,9,8)-{M}in{R}ank problem by the Block {W}iedemann algorithm in {M}agma with a {T}esla {GPU}},
 	booktitle = {PASCO'15},
         publisher = {ACM},
@@ -448,26 +471,37 @@ pages ={2--6},
 @Article{FaSaSp13,
   author = 	 {Faug\`ere, J.-C. and {Safey El Din}, M. and Spaenlehauer, P.-J.},
   title = 	 {On the complexity of the generalized {M}in{R}ank problem},
-  journal = 	 {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
   year = 	 2013,
   pages = 	 {30-58}}
 
 @article{BaFaSa15,
   author = {Bardet, M. and Faug{\`e}re, J.-C. and Salvy, B.},
-  journal = {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
   pages = {49--70},
   title = {On the Complexity of the {F}5 {G}r{\"o}bner basis Algorithm},
   volume = {70},
   year = {2015}
 }
 
-@incollection {GiMo89,
+@InProceedings{LaOd90,
+  author = 	 {B. A. LaMacchia and A. M. Odlyzko},
+  title = 	 {Solving large sparse linear systems over finite fields},
+  booktitle = 	 {Adv. in Cryptography, Crypto '90},
+  year =	 1990,
+pages = {109--133},
+  number =	 537,
+  series =	 {Lectures Notes in Computer Science},
+ PUBLISHER = {Springer}
+}
+
+@inproceedings {GiMo89,
     AUTHOR = {Gianni, P. and Mora, T.},
      TITLE = {Algebraic solution of systems of polynomial equations using
               {G}r\"obner bases},
  BOOKTITLE = {AAECC'5},
     SERIES = {Lecture Notes in Comput. Sci.},
-    VOLUME = 356,
+number = 356,
      PAGES = {247--257},
  PUBLISHER = {Springer},
       YEAR = 1989,
@@ -549,7 +583,7 @@ pages ={2--6},
 
 @misc{LinBox,
   author = {The LinBox Group},
-  title = {LinBox: Linear algebra over black-box matrices, v1.5.0},
+  title = {LinBox: Linear algebra over black-box matrices, version 1.5.0},
   year = 2017,
 	Howpublished = {\texttt{http://linalg.org/}},
 }
@@ -558,7 +592,7 @@ pages ={2--6},
   author = {Shoup, V.},
   title = {Efficient computation of minimal polynomials in algebraic extensions
 	of finite fields},
-  booktitle = {ISSAC '99},
+  booktitle = {ISSAC'99},
   year = {1999},
   pages = {53--58},
   publisher = {ACM},
@@ -571,7 +605,7 @@ pages ={2--6},
 @article{Shoup94,
     AUTHOR = {Shoup, V.},
      TITLE = {Fast construction of irreducible polynomials over finite fields},
-   JOURNAL = {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
     VOLUME = {17},
       YEAR = {1994},
     NUMBER = {5},
@@ -602,3 +636,32 @@ pages ={2--6},
   publisher = 	 {Prentice-Hall},
   year = 	 1988}
 
+@Article{BoFlSaSc06,
+  author = {A. Bostan and P. Flajolet and B. Salvy and {\'E}. Schost},
+  title = {Fast computation of special resultants},
+  journal = {J. Symbolic Comput.},
+  volume = 41,
+  number = 1,
+  pages = {1-29},
+  year = {2006}
+}
+
+@inproceedings{NeRaSc17,
+  author    = {V. Neiger and
+               H. Rahkooy and
+               {\'{E}}. Schost},
+  title     = {Algorithms for Zero-Dimensional Ideals Using Linear Recurrent Sequences},
+  booktitle = {CASC'17},
+  pages     = {313--328},
+  year      = 2017,
+publisher = {Springer}
+}
+
+@article{PoSc13b,
+title = "On the complexity of computing with zero-dimensional triangular sets",
+   JOURNAL = {J. Symbolic Comput.},
+volume = "50",
+pages = "110-138",
+year = "2013",
+author = "A. Poteaux and \'E. Schost",
+}
