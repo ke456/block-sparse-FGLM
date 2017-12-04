@@ -2274,7 +2274,7 @@ a few points, and few values for the latter sequences will be needed.
 The last step involves changing coordinates in
 $((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a linear form instead, and
 performing the union of the two components $V'$ and $V''$. These
-operations can be done in time $O(n D^{(\omega+1)/2}$, see Lemmas~2
+operations can be done in time $O(n D^{(\omega+1)/2})$, see Lemmas~2
 and~3 of~\cite{PoSc13b}; we will not discuss them further.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2623,7 +2623,7 @@ As a preamble, we introduce the notation $\PP(r,t)$ for the cost of a
 in~\cite{Shoup94,Shoup99}: given a polynomial $F$ in $\K[T]$ of degree
 $r$, a linear form $\ell: \K[T]/F \to \K$, and $H$ in $\K[T]/F$, the
 goal is to compute $(\ell(H^s))_{0 \le s < t}$, for some upper bound
-$t$. We denote this by operation by ${\sf PowerProjection}(F,H,\ell,t)$; this is
+$t$. We denote this operation by ${\sf PowerProjection}(F,H,\ell,t)$; this is
 essentially the analogue for univariate polynomials of the Krylov
 computations that we heavily rely on in this paper. Here, $\ell$ 
 is represented by the vector $(\ell(1),\ell(T),\dots,\ell(T^{r-1}))$.
@@ -2834,7 +2834,7 @@ vectors $\mat{D}_s \col{\varepsilon}_1$, resp.\ $\mat{D}_s\mM_i
 \col{\varepsilon}_1$, at the first step of  {\sf ScalarNumerator}, it computes $\mat{D}_s
 \col{\varepsilon}_1-\mat{\Delta}''_s$, resp.\ $\mat{D}_s\mM_i
 \col{\varepsilon}_1-\mat{\Delta}'_{s,i}$, where $\mat{\Delta}'_{s,i}$
-is the $i$th column of $\mat{\Delta}'_{s,i}$.
+is the $i$th column of $\mat{\Delta}'_{s}$.
 
 \begin{algorithm}[H]
 	\caption{$\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s),\lf)$}
