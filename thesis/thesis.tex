@@ -1307,14 +1307,14 @@ i \in \mathfrak{S}\}$.
 
 \subsection{A fundamental formula}  \label{ssec:genseries}
 
-Let $\lf$ be in $\residueI$ and $\ell$ in ${\rm hom}_\K(\residueI,\K)$.  The sequences
-$(\ell(\lf^s))_{s\ge 0}$, and more generally $(\ell(v \lf^s))_{s\ge
-  0}$, for $v$ in $\residueI$, are the main ingredients in our algorithm.  The
-following lemma justifies this by giving an explicit form for a
-generating series of the form $\sum_{s \ge 0} \ell(v
+Let $\lf$ be in $\residueI$ and $\ell$ in ${\rm hom}_\K(\residueI,\K)$.  The
+sequences $(\ell(\lf^s))_{s\ge 0}$, and more generally the sequences $(\ell(v
+\lf^s))_{s\ge 0}$ for $v$ in $\residueI$, are the core ingredients of our
+algorithm.  This is justified by the following lemma, which gives an explicit
+description of generating series of the form $\sum_{s \ge 0} \ell(v
 \lf^s)/T^{s+1}$. A slightly less precise version of it is in~\cite{BoSaSc03};
-the more explicit expression given here will be needed in the last
-section of this paper.
+the more explicit expression given here will be needed in the last section of
+this paper.
 
 \begin{lemma}\label{lemma:formula}
   Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$, with support $\mathfrak{S}$,
@@ -1329,9 +1329,9 @@ section of this paper.
     \frac{ v(\balpha_i)\, w_i!\, \pi_{i}(t_1,\dots,t_n) +
       (T-\lf(\balpha_i))A_{v,i}} {(T-\lf(\balpha_i))^{w_{i}+1}},
   \end{align}
-  for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ that
-  depend on the choice of $v$, with $A_{v,i}$ of degree less than $w_i$ for all $i$ in
-  $\mathfrak{S}$.
+  for some polynomials $\{A_{v,i} \in \Kbar[T] \mid i \in \mathfrak{S}\}$ which
+  depend on the choice of $v$ and are such that $A_{v,i}$ has degree less than
+  $w_i$ for all $i$ in $\mathfrak{S}$.
 \end{lemma}
 \begin{proof}
   Take $v$ and $\lf$ as above. Consider first an operator of the form $f
