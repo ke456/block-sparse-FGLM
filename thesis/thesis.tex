@@ -154,12 +154,12 @@
 
 
 
-\title{Block-Krylov techniques in the context of sparse-FGLM algorithms}
+\title{Block-Krylov techniques in the context of \\ sparse-FGLM algorithms}
 
 
 \author{Seung Gyu Hyun$^1$ \and Vincent Neiger$^2$ \and Hamid Rahkooy$^1$ \and \'Eric Schost$^1$\\[3mm]
 $^1$Cheriton School of Computer Science, University of Waterloo\\[2mm]
-$^2$XLIM, Universit\'e de Limoges
+$^2$Univ.~Limoges, CNRS, XLIM, UMR 7252, F-87000 Limoges, France
 }
 
 \begin{document}
@@ -167,23 +167,21 @@ $^2$XLIM, Universit\'e de Limoges
 \maketitle
 
 \begin{abstract}
-  Consider a zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$.
-  Inspired by Faug\`ere and Mou's Sparse FGLM algorithm [{\em
-      J. Symbolic Comput.}, 80(8):538-569, 2017], we use Krylov
-  sequences based on multiplication matrices of $I$, in order to
-  compute a description of its zero set by means of univariate
-  polynomials.
+  Consider a zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$.  Inspired by
+  Faug\`ere and Mou's Sparse FGLM algorithm,
+  %%  [{\em J. Symbolic Comput.}, 80(8):538-569, 2017],
+  we use Krylov sequences based on multiplication matrices of $I$ in order to
+  compute a description of its zero set by means of univariate polynomials.
 
-  Steel recently showed how to use
-  Coppersmith's block-Wiedemann algorithm in this context; he
-  describes an algorithm that can be easily parallelized, but only
-  computes parts of the output in this manner. Using generating series
-  expressions going back to work of Bostan {\it et al.}, we show how
-  to compute the entire output for a small overhead, without making
-  any assumption on the ideal $I$. We then propose a refinement of this
-  idea that partially avoids the introduction of a generic linear
-  form.  We describe experimental results obtained by an
-  implementation based on the C++ libraries LinBox and NTL.
+  Steel recently showed how to use Coppersmith's block-Wiedemann algorithm in
+  this context; he describes an algorithm that can be easily parallelized, but
+  only computes parts of the output in this manner. Using generating series
+  expressions going back to work of Bostan, Salvy, and Schost, we show how to
+  compute the entire output for a small overhead, without making any assumption
+  on the ideal $I$. We then propose a refinement of this idea that partially
+  avoids the introduction of a generic linear form.  We comment on experimental
+  results obtained by an implementation based on the C++ libraries LinBox and
+  NTL.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -479,7 +477,7 @@ associated numerator.  This is formalized in the next definition:
   In view of the discussion above, $\Omega(\mathcal{L},P)$ is a polynomial of
   degree less than $\deg(P)$.
 \end{definition}
-\begin{remark} ~
+\begin{remark} \leavevmode
   \begin{itemize}
   \item We may write this definition using expressions in
     variable $T$ instead of $1/T$ as well: given
