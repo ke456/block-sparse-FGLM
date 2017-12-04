@@ -33,14 +33,6 @@
      PAGES = {235--265},
 }
 
-@InProceedings{LaOd90,
-  author = 	 {B. A. LaMacchia and A. M. Odlyzko},
-  title = 	 {Solving large sparse linear systems over finite fields},
-  booktitle = 	 {Adv. in Cryptography, Crypto '90},
-  year =	 1990,
-  number =	 537,
-  series =	 {Lectures Notes in Computer Science}
-}
 
 @article{BrGuYu80,
   author = "Brent, R. P. and Gustavson, F. G. and Yun, D. Y. Y.",
@@ -156,10 +148,10 @@
 } 
 
 
-@article{Villard97,
+@inproceedings{Villard97,
 	author = {Villard, G.},
 	title = {Further analysis of {C}oppersmith's block {W}iedemann algorithm for the solution of sparse linear systems},
-	Journal = {ISSAC'97},
+booktitle = {ISSAC'97},
 	pages = {32-39},
 publisher = {ACM},
 	year = {1997}	}
@@ -274,7 +266,7 @@ author = "Don Coppersmith",}
 	Keywords = {Polynomial systems solving ; Gr{\"o}bner basis ; Change of ordering ; Fast matrix multiplication},
 	Note = {https://hal.archives-ouvertes.fr/hal-00816724},
 	Pdf = {https://hal.archives-ouvertes.fr/hal-00816724/file/FGHR13.pdf},
-	Title = {{Polynomial Systems Solving by Fast Linear Algebra}},
+	Title = {{Polynomial systems solving by fast linear algebra}},
 	Url = {https://hal.archives-ouvertes.fr/hal-00816724},
 	Year = {2013},
 	Bdsk-Url-1 = {https://hal.archives-ouvertes.fr/hal-00816724}}
@@ -370,7 +362,7 @@ number = 8,
 	Journal = j-AAECC,
 	Number = 5,
 	Pages = {433--461},
-	Title = {Solving zero-dimensional systems through the rational univariate representation},
+	Title = {Solving zero-dimensional systems through the {R}ational {U}nivariate {R}epresentation},
 	Volume = 9,
 	Year = 1999}
 
@@ -479,26 +471,37 @@ pages ={2--6},
 @Article{FaSaSp13,
   author = 	 {Faug\`ere, J.-C. and {Safey El Din}, M. and Spaenlehauer, P.-J.},
   title = 	 {On the complexity of the generalized {M}in{R}ank problem},
-  journal = 	 {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
   year = 	 2013,
   pages = 	 {30-58}}
 
 @article{BaFaSa15,
   author = {Bardet, M. and Faug{\`e}re, J.-C. and Salvy, B.},
-  journal = {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
   pages = {49--70},
   title = {On the Complexity of the {F}5 {G}r{\"o}bner basis Algorithm},
   volume = {70},
   year = {2015}
 }
 
-@incollection {GiMo89,
+@InProceedings{LaOd90,
+  author = 	 {B. A. LaMacchia and A. M. Odlyzko},
+  title = 	 {Solving large sparse linear systems over finite fields},
+  booktitle = 	 {Adv. in Cryptography, Crypto '90},
+  year =	 1990,
+pages = {109--133},
+  number =	 537,
+  series =	 {Lectures Notes in Computer Science},
+ PUBLISHER = {Springer}
+}
+
+@inproceedings {GiMo89,
     AUTHOR = {Gianni, P. and Mora, T.},
      TITLE = {Algebraic solution of systems of polynomial equations using
               {G}r\"obner bases},
  BOOKTITLE = {AAECC'5},
     SERIES = {Lecture Notes in Comput. Sci.},
-    VOLUME = 356,
+number = 356,
      PAGES = {247--257},
  PUBLISHER = {Springer},
       YEAR = 1989,
@@ -589,7 +592,7 @@ pages ={2--6},
   author = {Shoup, V.},
   title = {Efficient computation of minimal polynomials in algebraic extensions
 	of finite fields},
-  booktitle = {ISSAC '99},
+  booktitle = {ISSAC'99},
   year = {1999},
   pages = {53--58},
   publisher = {ACM},
@@ -602,7 +605,7 @@ pages ={2--6},
 @article{Shoup94,
     AUTHOR = {Shoup, V.},
      TITLE = {Fast construction of irreducible polynomials over finite fields},
-   JOURNAL = {Journal of Symbolic Computation},
+   JOURNAL = {J. Symbolic Comput.},
     VOLUME = {17},
       YEAR = {1994},
     NUMBER = {5},
@@ -656,7 +659,7 @@ publisher = {Springer}
 
 @article{PoSc13b,
 title = "On the complexity of computing with zero-dimensional triangular sets",
-journal = "Journal of Symbolic Computation",
+   JOURNAL = {J. Symbolic Comput.},
 volume = "50",
 pages = "110-138",
 year = "2013",
