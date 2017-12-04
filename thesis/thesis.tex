@@ -495,7 +495,7 @@ associated numerator.  This is formalized in the next definition:
   \]
  \end{itemize}
 \end{remark}
-We give an example of this construction. Consider the Fibonacci sequence
+Now, we give an example of this construction. Consider the Fibonacci sequence
 $\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
 polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
 ${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
@@ -1122,7 +1122,7 @@ $s=0,\dots,\lceil D/m \rceil-1$.
         \begin{itemize}
         \item         the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly) \in \K[T]$
         \end{itemize}
-        \begin{enumerate}[{\bf 1.}]
+        \begin{enumerate}
         \item compute $\col{E}_s = \mat{L}_s \col{w}$ for $s=0,\dots,\lceil D/m\rceil-1$
         \item use these values to compute the matrix numerator $ \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
         \item {\bf return} the entry of the $1 \times 1$ matrix $\row{a}_i\cdot  \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
@@ -1601,13 +1601,11 @@ choice of a linear form $\residueI\to \K$, namely the trace.
       \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
       \item let $\sqfree$ be the squarefree part of $\minpoly$
       \item let $C_1 = \Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)$
-      \item \textbf{for} $i=1,\dots,n$ \textbf{do}
-		\begin{enumerate}
-		\item let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
-		\end{enumerate}
-	      \item \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
-	      \end{enumerate}
-	      \label{algo:para2}
+      \item \textbf{for} $i=1,\dots,n$ \textbf{do} \\
+            \phantom{for} let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
+      \item \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
+    \end{enumerate}
+    \label{algo:para2}
 \end{algorithm}
 
 \begin{lemma}\label{lemma:para2}
@@ -1719,9 +1717,9 @@ $\lf=t_1 X_1 + \cdots + t_n X_n$; knowing its roots in $\K$, it uses
 an ``evaluation'' method for the rest (several Gr\"obner basis
 computations, all with one variable less).  Our algorithm computes the
 whole zero-dimensional parametrization of $V(I)$ for essentially the
-same cost as the computation of the minimal polynomial. In the
-following, $\col{\varepsilon}_1$ denotes the size-$D$ column vector
-whose only non-zero entry is a $1$ at the first row:
+same cost as the computation of the minimal polynomial. In what
+follows, $\col{\varepsilon}_1$ denotes the size-$D$ column vector
+whose only non-zero entry is a $1$ in the first row:
 $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 
 \begin{algorithm}[H]
@@ -1746,10 +1744,8 @@ $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
   \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item\label{mainstep9}  let $C_1 = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
     (\mat{L}_s)_{0 \le s < d})$
-  \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
-    \begin{enumerate}
-     \item let $C_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
-    \end{enumerate}
+  \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do} \\
+    \phantom{for}  let $C_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
 \item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
 \end{algorithm}
@@ -2535,15 +2531,11 @@ $\mainalgoname$.
   \item\label{X1step7b} let $F = F /\gcd(F, \gcd (M, M'))$
   \item\label{X1step8} { let $\row{a}_1 = [M~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item let $\mN = y_2 \mM_2 + \cdots+y_n \mM_n$
-  \item \textbf{for} $i=0,1,2$ \textbf{do}
-    \begin{enumerate}
-    \item\label{X1step9}  let $A_i = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, 
+  \item \textbf{for} $i=0,1,2$ \textbf{do} \\
+      \phantom{for}  let $A_i = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, 
       \mN^i \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
-    \end{enumerate}
-  \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do}
-    \begin{enumerate}
-     \item let $A_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
-    \end{enumerate}
+  \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do} \\
+      \phantom{for}  let $A_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
 \item\label{X1step11}   \textbf{return} $((F,T,A_{X_2}/ A_0 \bmod F, \dots,A_{X_n}/A_{0} \bmod F),X_1)$
   \end{enumerate}  \label{algo:X1block-sparse-fglm}
 \end{algorithm}
