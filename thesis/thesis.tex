@@ -1596,7 +1596,7 @@ choice of a linear form $\residueI\to \K$, namely the trace.
 	  \end{itemize}
     {\bf Output:}  \vspace{-0.5em}
           \begin{itemize}
-          \item              polynomials $((\sqfree,V_1,\dots,V_n),\lf)$ 
+          \item              polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
           \end{itemize}
     \begin{enumerate}\setlength\itemsep{0em}
       \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
@@ -1733,7 +1733,7 @@ $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item         polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+        \item         polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{mainstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
@@ -1804,14 +1804,13 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 \end{remark}
 
 For the cost analysis, we will mainly focus on a sparse model for
-matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero
-  entries.  As a result, $\mM$ has density at most $n\density$, and a
-  matrix-vector product by $\mM$ can be done in $O(n\density D^2)$
-  operations in $\K$ (we briefly discuss variants of the algorithm
-  using dense linear algebra at the end of this subsection). In
-  particular, the cost incurred at Step~\ref{mainstep1} to compute
-  $\mM$ is $O(n\density D^2)$.
+matrix $\mM$  density $\density \in [0,1)$, that is, at most $\density D^2$ 
+non-zero entries.  As a result, a
+matrix-vector product by $\mM$ can be done in $O(\density D^2)$
+operations in $\K$ (we briefly discuss variants of the algorithm
+using dense linear algebra at the end of this subsection). In
+particular, the cost incurred at Step~\ref{mainstep1} to compute
+$\mM$ is $O(\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1823,10 +1822,10 @@ $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,0}=\row{u}_i$ and
  $\row{\ell}_{i,s+1} = \row{\ell}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$th row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
-  \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
+  \le i < 2d}$ costs $O(d \density D^2) = O(\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
-the {\em span} of Step~\ref{mainstep3} is thus $O(n\density D^3/m)$, whereas
-the total work is $O(n\density D^3)$.
+the {\em span} of Step~\ref{mainstep3} is thus $O(\density D^3/m)$, whereas
+the total work is $O(\density D^3)$.
 
 At Step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
 product
@@ -1863,9 +1862,9 @@ takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular calculations modulo $\sqfree$ take time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, assuming perfect parallelization 
 at Step~\ref{mainstep3}, the total span is
-$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
+$$O\left (\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
-$$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+$$O\left (\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
@@ -2140,29 +2139,35 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
 		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
 		\hline
-		rand1-1&3 &5832&0.0371&1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
-		rand1-2&3 &8000&0.0333&4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
-		rand1-3&3 &10648&0.0302&8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
-		rand2-1&4 &4096&0.0756&1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
-		rand2-2&4 &6561&0.0667&4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
-		rand2-3&4 &10000&0.0597&14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
-		mixed1-1&3 &2808&0.0521&275 (0.998)&73 (0.993)&51 (0.986)&no\\
-		mixed1-2&3 &3591&0.0528&532 (0.998)&140 (0.995)&99 (0.99)&no\\
-		mixed1-3&3 &4312&0.0482&864 (0.999)&230 (0.996)&161 (0.992)&no\\
-		mixed2-1&4 &1552&0.139&104 (0.997)&28 (0.991)&19 (0.984)&no\\
-		mixed2-2&4 &2657&0.105&450 (0.999)&123 (0.996)&84 (0.992)&no\\
-		mixed2-3&4 &4352&0.0843&1718 (0.999)&456 (0.998)&316 (0.996)&no\\
-		mixed3-1&10 &1035&0.233&66 (0.996)&18 (0.989)&12 (0.981)&no\\
-		mixed3-2&11 &2060&0.215&488 (0.998)&129 (0.996)&90 (0.993)&no\\
-		mixed3-3&12 &4109&0.212&3647 (0.999)&968 (0.998)&671 (0.997)&no\\
-		eco12&12 &1024&0.131&62 (0.995)&16 (0.987)&12 (0.979)&yes\\
-		katsura10&11 &1024&0.258&71 (0.996)&19 (0.989)&13 (0.982)&yes\\
-		sot1&5 &8694&0.0002&765 (0.994)&208 (0.983)&143 (0.969)&yes\\
-		vor2&6 &574&0.002&10 (0.99)&3 (0.973)&2 (0.955)&yes\\
-		W1-2-10-4&10 &1344&0.312&164 (0.998)&43 (0.994)&30 (0.99)&yes\\
-		W1-2-11-4&11 &1920&0.319&489 (0.999)&129 (0.997)&90 (0.994)&yes\\
-		W1-3-7-3&7 &6480&0.174&10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
-		W1-4-6-2&6 &6480&0.141&9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
+		rand1-1&3 &5832  &0.1   &1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
+		rand1-2&3 &8000  &0.08  &4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
+		rand1-3&3 &10648 &0.08  &8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
+		rand2-1&4 &4096  &0.18  &1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
+		rand2-2&4 &6561  &0.16  &4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
+		rand2-3&4 &10000 &0.14  &14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
+		mixed1-1&3 &2808 &0.117  &275 (0.998)&73 (0.993)&51 (0.986)&no\\
+		
+		mixed1-2&3 &3591 &0.11  &532 (0.998)&140 (0.995)&99 (0.99)&no\\
+		
+		mixed1-3&3 &4312 &0.102  &864 (0.999)&230 (0.996)&161 (0.992)&no\\
+		mixed2-1&4 &1552 &0.263 &104 (0.997)&28 (0.991)&19 (0.984)&no\\
+		mixed2-2&4 &2657 &0.228 &450 (0.999)&123 (0.996)&84 (0.992)&no\\
+		
+		mixed2-3&4 &4352 &0.20&1718 (0.999)&456 (0.998)&316 (0.996)&no\\
+		
+		mixed3-1&10 &1035&0.56 &66 (0.996)&18 (0.989)&12 (0.981)&no\\
+		
+		mixed3-2&11 &2060&0.53  &488 (0.998)&129 (0.996)&90 (0.993)&no\\
+		mixed3-3&12 &4109&0.50 &3647 (0.999)&968 (0.998)&671 (0.997)&no\\
+		
+		eco12&12 &1024   &0.55  &62 (0.995)&16 (0.987)&12 (0.979)&yes\\
+		katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes\\
+		sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes\\
+		vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes\\
+		W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes\\
+		W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes\\
+		W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
+		W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
 	\end{tabular}
 \end{table}
 
@@ -2240,7 +2245,7 @@ main structure; the subroutines are described in the next subsections.
 	  \end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
 	\begin{itemize}
-		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
 	\end{itemize}
 	\begin{enumerate}
 		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV,\mf)$
@@ -2520,7 +2525,7 @@ $\mainalgoname$.
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item polynomials $((F,G_1,\dots,G_n),X_1)$
+        \item polynomials $((F,G_1,\dots,G_n),X_1)$, with $F,G_1,\dots,G_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{X1step3} { compute $\mat{L}_s = \mU^{\perp}\mM_1^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/m \rceil$}
@@ -2840,7 +2845,7 @@ is the $i$th column of $\mat{\Delta}'_{s}$.
 	\end{itemize}
 	    {\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item  polynomials $((R,W_1,\dots,W_n),\lf)$
+        \item  polynomials $((R,W_1,\dots,W_n),\lf)$, with $R,W_1,\dots,W_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{residualstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
@@ -2943,7 +2948,7 @@ in the variety, the ratio is close to 1.
 \textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$D_\mathfrak{A}/D$\\
 \hline
 rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
-rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
+rand1-2&3 &8000&0.437&0.439&0.448&8000/8000\\
 rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
 rand2-1&4 &4096&0.427&0.429&0.445&4096/4096\\
 rand2-2&4 &6561&0.429&0.425&0.438&6561/6561\\
