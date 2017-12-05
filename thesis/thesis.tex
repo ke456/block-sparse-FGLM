@@ -2539,6 +2539,7 @@ $\mainalgoname$.
   \item \textbf{for} $i=0,1,2$ \textbf{do} \\
       \phantom{for}  let $A_i = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, 
       \mN^i \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
+  \item\label{X1step9} let $F = \gcd(F, A_0A_2-A_1^2)$
   \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do} \\
       \phantom{for}  let $A_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
 \item\label{X1step11}   \textbf{return} $((F,T,A_{X_2}/ A_0 \bmod F, \dots,A_{X_n}/A_{0} \bmod F),X_1)$
