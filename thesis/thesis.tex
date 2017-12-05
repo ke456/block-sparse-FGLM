@@ -1804,14 +1804,13 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 \end{remark}
 
 For the cost analysis, we will mainly focus on a sparse model for
-matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero
-  entries.  As a result, $\mM$ has density at most $n\density$, and a
-  matrix-vector product by $\mM$ can be done in $O(n\density D^2)$
-  operations in $\K$ (we briefly discuss variants of the algorithm
-  using dense linear algebra at the end of this subsection). In
-  particular, the cost incurred at Step~\ref{mainstep1} to compute
-  $\mM$ is $O(n\density D^2)$.
+matrix $\mM$  density $\density \in [0,1)$, that is, at most $\density D^2$ 
+non-zero entries.  As a result, a
+matrix-vector product by $\mM$ can be done in $O(\density D^2)$
+operations in $\K$ (we briefly discuss variants of the algorithm
+using dense linear algebra at the end of this subsection). In
+particular, the cost incurred at Step~\ref{mainstep1} to compute
+$\mM$ is $O(\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1823,10 +1822,10 @@ $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,0}=\row{u}_i$ and
  $\row{\ell}_{i,s+1} = \row{\ell}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$th row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
-  \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
+  \le i < 2d}$ costs $O(d \density D^2) = O(\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
-the {\em span} of Step~\ref{mainstep3} is thus $O(n\density D^3/m)$, whereas
-the total work is $O(n\density D^3)$.
+the {\em span} of Step~\ref{mainstep3} is thus $O(\density D^3/m)$, whereas
+the total work is $O(\density D^3)$.
 
 At Step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
 product
@@ -1863,9 +1862,9 @@ takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular calculations modulo $\sqfree$ take time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, assuming perfect parallelization 
 at Step~\ref{mainstep3}, the total span is
-$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
+$$O\left (\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
-$$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+$$O\left (\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
