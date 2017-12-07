@@ -1030,7 +1030,8 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
         threshold(threshold),
 	U_rows(M, DenseMatrix<GF>(field, 1, D)),
 	V(field, D, M),
-	mul_mats(n+1, SparseMatrix<GF>(field, D, D)),
+	// mul_mats(n+1, SparseMatrix<GF>(field, D, D)),
+	Emul_mats(n+1, Eigen::SparseMatrix<double,Eigen::RowMajor>(D, D)),
 	sparsity(mat.sparsity),
 	name(mat.name),
 	filename(mat.filename),
@@ -1045,18 +1046,41 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 		rand_comb.emplace_back(a);
 	}
 
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++){
+// DOING EIGEN MATRICES
+		vector<Eigen::Triplet<double>> coefficients;
+
 		for (int j = 0; j < mat.x[i].size(); j++){
 			int xx = mat.x[i][j];
 			int yy = mat.y[i][j];
-			GF::Element a(mat.data[i][j]);
-			mul_mats[i].refEntry(xx, yy) = a;
+			// GF::Element a(mat.data[i][j]);
+			// mul_mats[i].refEntry(xx, yy) = a;
+			// GF::Element e;
+			// field.mul(e, rand_comb[i], a);
+			// field.add(e, e, mul_mats[n].refEntry(xx, yy));
+			// mul_mats[n].refEntry(xx, yy) = e;
+			coefficients.push_back(Eigen::Triplet<double> (xx, yy, mat.data[i][j]));
 
-			GF::Element e;
-			field.mul(e, rand_comb[i], a);
-			field.add(e, e, mul_mats[n].refEntry(xx, yy));
-			mul_mats[n].refEntry(xx, yy) = e;
 		}
+		Emul_mats[i].setFromTriplets(coefficients.begin(), coefficients.end());
+		Emul_mats[i].makeCompressed();
+
+		Emul_mats[n] = Emul_mats[n] + (double) rand_comb[i] * Emul_mats[i];
+		Emul_mats[n].makeCompressed();
+	}
+
+
+	long nbM = 0;
+	for (int k = 0; k < Emul_mats[n].outerSize(); ++k)
+		for (Eigen::SparseMatrix<double, Eigen::RowMajor>::InnerIterator it(Emul_mats[n], k); it; ++it){
+			long coef = (long) it.value() % prime ;
+			if (coef != 0)
+				nbM++;
+			it.valueRef() = coef;
+		}
+
+			// it.valueRef() =  (long) it.value() % prime ;
+
 
 	
 #ifdef SPARSITY_COUNT
@@ -1065,10 +1089,8 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 		cout << i << " ";
 	cout << endl;
   cout << "D: " << D << endl;
-#endif
-#ifdef EXTRA_VERBOSE_ON
-	for (auto &i : mul_mats)
-		i.write(cout << "mul mat", Tag::FileFormat::Maple)<<endl;
+  cout << "sparsity M: " << ((double)nbM)/(D*D) << endl;
+
 #endif
 #ifdef VERBOSE_ON
 	cout << "D: " << D << endl;
@@ -1084,6 +1106,11 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
 #endif
 	}
 
+
+
+
+
+
 }
 
 
@@ -1097,63 +1124,31 @@ void Block_Sparse_FGLM::create_random_matrix(Matrix &m){
 		}
 }
 
-//-------------------------------------------------------//
-// puts U*mul_mats[numvar]^i into v, i=0...2D/M          //
-// v_flat is v flattened into a single matrix            //
-// numvar = n means we are using a random combination    //
-//-------------------------------------------------------//
+
+
 void Block_Sparse_FGLM::get_matrix_sequence_left(DenseMatrix<GF> &v_flat, int numvar, int number){
 	MatrixDomain<GF> MD{field};
+	v_flat = DenseMatrix<GF>(field, number*M, D);
 
-	// initialize the left block (random MxD)
-	vector<DenseMatrix<GF>> v = vector<DenseMatrix<GF>>(number, DenseMatrix<GF>(field, M, D));
+	Eigen::setNbThreads(1);
 
-	vector<vector<DenseMatrix<GF>>> mat_seq(M);
-	for (auto &i : mat_seq)
-		i = vector<DenseMatrix<GF>>(number, DenseMatrix<GF>(field, 1, D));
-
-	// initialize the first multiplication matrix
-	SparseMatrix<GF> *T1 = &mul_mats[numvar];
-#ifdef EXTRA_VERBOSE_ON
-	T1->write(cout << "###OUTPUT### Multiplication matrix T:" << endl, Tag::FileFormat::Maple) << endl;
-#endif
-
-	// compute sequence in a parallel fashion
 #pragma omp parallel for num_threads(M)
 	for (int i  = 0; i < M; i++){
-		MatrixDomain<GF> MD2{field};
-		vector<DenseMatrix<GF>> temp_mat_seq(number, DenseMatrix<GF>(field, 1, D)); 
-		temp_mat_seq[0] = U_rows[i];
-		for (size_t j  = 1; j < number; j++) 
-			MD2.mul(temp_mat_seq[j], temp_mat_seq[j-1], *T1);
-		mat_seq[i] = temp_mat_seq;
-	}
 
-	for (size_t i = 0; i < number; i++){
-		auto &temp = v[i];
-		for (int row = 0; row < M; row++){
-			for (int col = 0; col < D; col++){
-				GF::Element a;
-				mat_seq[row][i].getEntry(a, 0, col);
-				temp.refEntry(row, col) = a;
-			}
-		}
-	} 
-
-	// gather all the matrices of l in a single (number*M) x D matrix
-	v_flat = DenseMatrix<GF>(field, number*M, D);
-	for (size_t i = 0; i < number; i++){
-		auto &m = v[i];
-		for (int row = 0; row < M; row++){
-			int r = i * M + row; // starting point for mat
-			for (int col = 0; col < D; col++){
-				GF::Element a;
-				m.getEntry(a,row, col);
-				v_flat.refEntry(r, col) = a;
-			}
+		Eigen::Matrix<double, 1, Eigen::Dynamic> row(D), row2(D);
+		for (long j = 0; j < D; j++)
+			row(0, j) = (double) (long) U_rows[i].getEntry(0, j);
+		for (size_t k  = 0; k < number; k++) {
+			for (long j = 0; j < D; j++)
+				v_flat.refEntry(k*M + i, j) = (row(0, j) = ((long)(row(0, j)) % prime));
+			row2 = row * Emul_mats[numvar];
+			row = row2;
 		}
 	}
+
 }
+
+
 
 //-------------------------------------------------------//
 // Computes sequence v = (UT1^i)V                        //
@@ -1433,7 +1428,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 		for (int j = 0; j < n; j++)
 			if (j != numvar){
 				GF::Element e;
-				field.mul(e, rand_check[j], mul_mats[j].getEntry(i, 0));
+				field.mul(e, rand_check[j], (double) Emul_mats[j].coeff(i, 0));
 				field.add(e, e, rhs.getEntry(i, 0));
 				rhs.refEntry(i, 0) = e;
 			}
@@ -1445,9 +1440,21 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 
 	for (long i = 0; i < D; i++)
 		rhs_2.refEntry(i ,0) = 0;
+
+	
 	for (int j = 0; j < n; j++)
 		if (j != numvar){
-			MD2.mul(tmp, mul_mats[j], rhs);
+
+			Eigen::Matrix<double, Eigen::Dynamic, 1> col(D), col2(D);
+			for (long jj = 0; jj < D; jj++)
+				col(jj, 0) = (double) (long) rhs.getEntry(jj, 0);
+			col2 = Emul_mats[j]*col;
+			for (long jj = 0; jj < D; jj++)
+				tmp.refEntry(jj, 0) =  ((long)(col2(jj, 0)) % prime);
+
+			// MD2.mul(tmp, mul_mats[j], rhs);
+
+
 			for (long i = 0; i < D; i++){
 				GF::Element e;
 				field.mul(e, rand_check[j], tmp.getEntry(i, 0));
@@ -1486,7 +1493,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 	vector<zz_pX> output;
 	for (int j = 0; j < n; j++){
 		for (int i = 0; i < D; i++)
-			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
+			rhs.refEntry(i, 0) = Emul_mats[j].coeff(i, 0);
 		get_matrix_sequence(seq, mat_seq_left_short, rhs);
 		Omega(tmp_vec, u_tilde, mat_gen, seq);
 		output.emplace_back( (tmp_vec[0] * n1_inv) % min_poly_sqfree );
@@ -1743,7 +1750,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 	vector<zz_pX> output_generic;
 	for (int j = 0; j < n; j++){
 		for (int i = 0; i < D; i++)
-			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
+			rhs.refEntry(i, 0) = Emul_mats[j].coeff(i, 0);
 		vector<zz_pX> tmp_vec;
 		get_matrix_sequence(seq, mat_seq_left_generic_short, rhs);
 
@@ -1913,7 +1920,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 
 	for (int j = 0; j < n; j++){
 		for (int i = 0; i < D; i++)
-			rhs.refEntry(i, 0) = mul_mats[j].getEntry(i, 0);
+			rhs.refEntry(i, 0) = Emul_mats[j].coeff(i, 0);
 		vector<zz_pX> tmp_vec;
 		get_matrix_sequence(seq, mat_seq_left_short, rhs);
 		Omega(tmp_vec, u_tilde, mat_gen, seq);  
