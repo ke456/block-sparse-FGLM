@@ -76,8 +76,6 @@
 \newcommand{\basis}{\mathscr{B}}
 \newcommand{\trace}{\operatorname{trace}}
 \newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
-\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
-\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 \newcommand{\genseries}{Z}
 \newcommand{\minpoly}{P}
 \newcommand{\mainalgoname}{\mathsf{ BlockParametrization}}
@@ -152,6 +150,9 @@
 \DeclareBoldMathCommand{\balpha}{\alpha}
 \DeclareBoldMathCommand{\bbeta}{\beta}
 
+%%% TODO: comment the next two line before submission
+%\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
+%\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
 
 
 \title{Block-Krylov techniques in the context of \\ sparse-FGLM algorithms}
@@ -495,7 +496,7 @@ associated numerator.  This is formalized in the next definition:
   \]
  \end{itemize}
 \end{remark}
-We give an example of this construction. Consider the Fibonacci sequence
+Now, we give an example of this construction. Consider the Fibonacci sequence
 $\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
 polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
 ${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
@@ -755,13 +756,13 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   such that the canonical left (resp.~right) matrix generator of
   $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).  For
   $\degBd>0$, define
-  \begin{equation}
-    \label{eqn:series_to_approximate}
+  \[
+    %\label{eqn:series_to_approximate}
     \sys =
     \begin{bmatrix}
       \sum_{0\le s < \degBd} \seqelt{s} \var^{\degBd-s-1} \\ - \mat{I}_{\cdim}
     \end{bmatrix} \in \polMatSpace[(\rdim+\cdim)][\cdim].
-  \end{equation}
+  \]
   Suppose that  $\degBd \ge \degBdr+1$ and let $\mat{B} \in \polMatSpace[(\rdim+\cdim)][(\rdim+\cdim)]$
   be a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$. Then,
   \begin{itemize}
@@ -1036,8 +1037,8 @@ assume for simplicity that memory is not an issue, so we can store all
 elements in the Krylov sequences we are interested in; we discuss this
 again in \cref{ssec:mainalgo}.
 
-Our main algorithm will also need to compute scalar numerators of
-the form \sloppy $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
+Our main algorithm will also resort to scalar numerators of
+the form $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
 \minpoly)$, where $\row{w}$ is a given vector in $\K^{D \times 1}$ and
 $\minpoly$ is the minimal polynomial of $\mM$. Since $\minpoly$ may
 have degree $D$, and then $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
@@ -1122,7 +1123,7 @@ $s=0,\dots,\lceil D/m \rceil-1$.
         \begin{itemize}
         \item         the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0}, \minpoly) \in \K[T]$
         \end{itemize}
-        \begin{enumerate}[{\bf 1.}]
+        \begin{enumerate}
         \item compute $\col{E}_s = \mat{L}_s \col{w}$ for $s=0,\dots,\lceil D/m\rceil-1$
         \item use these values to compute the matrix numerator $ \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
         \item {\bf return} the entry of the $1 \times 1$ matrix $\row{a}_i\cdot  \mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV})$ 
@@ -1595,19 +1596,17 @@ choice of a linear form $\residueI\to \K$, namely the trace.
 	  \end{itemize}
     {\bf Output:}  \vspace{-0.5em}
           \begin{itemize}
-          \item              polynomials $((\sqfree,V_1,\dots,V_n),\lf)$ 
+          \item              polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
           \end{itemize}
     \begin{enumerate}\setlength\itemsep{0em}
       \item let $\minpoly$ be the minimal polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$
       \item let $\sqfree$ be the squarefree part of $\minpoly$
       \item let $C_1 = \Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)$
-      \item \textbf{for} $i=1,\dots,n$ \textbf{do}
-		\begin{enumerate}
-		\item let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
-		\end{enumerate}
-	      \item \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
-	      \end{enumerate}
-	      \label{algo:para2}
+      \item \textbf{for} $i=1,\dots,n$ \textbf{do} \\
+            \phantom{for} let $C_{X_i} = \Omega((\ell(X_i \lf^s))_{s\ge0}, \minpoly)$ 
+      \item \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
+    \end{enumerate}
+    \label{algo:para2}
 \end{algorithm}
 
 \begin{lemma}\label{lemma:para2}
@@ -1719,9 +1718,9 @@ $\lf=t_1 X_1 + \cdots + t_n X_n$; knowing its roots in $\K$, it uses
 an ``evaluation'' method for the rest (several Gr\"obner basis
 computations, all with one variable less).  Our algorithm computes the
 whole zero-dimensional parametrization of $V(I)$ for essentially the
-same cost as the computation of the minimal polynomial. In the
-following, $\col{\varepsilon}_1$ denotes the size-$D$ column vector
-whose only non-zero entry is a $1$ at the first row:
+same cost as the computation of the minimal polynomial. In what
+follows, $\col{\varepsilon}_1$ denotes the size-$D$ column vector
+whose only non-zero entry is a $1$ in the first row:
 $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 
 \begin{algorithm}[H]
@@ -1734,7 +1733,7 @@ $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item         polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+        \item         polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{mainstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
@@ -1746,10 +1745,8 @@ $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
   \item\label{mainstep8} { let $\row{a}_1 = [P~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item\label{mainstep9}  let $C_1 = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \col{\varepsilon}_1, 1, \row{a}_1, 
     (\mat{L}_s)_{0 \le s < d})$
-  \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do}
-    \begin{enumerate}
-     \item let $C_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
-    \end{enumerate}
+  \item\label{mainstep10} \textbf{for} $i=1,\dots,n$ \textbf{do} \\
+    \phantom{for}  let $C_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, \minpoly, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s < d})$
 \item\label{mainstep11}     \textbf{return} $((\sqfree, C_{X_1}/ C_1 \bmod \sqfree, \dots, C_{X_n}/ C_{1} \bmod \sqfree),\lf)$
   \end{enumerate}  \label{algo:block-sparse-fglm}
 \end{algorithm}
@@ -1807,14 +1804,13 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 \end{remark}
 
 For the cost analysis, we will mainly focus on a sparse model for
-matrices $\mM_1,\dots,\mM_n$, assuming that all of them have density
-at most $\density \in [0,1)$, that is, at most $\density D^2$ non-zero
-  entries.  As a result, $\mM$ has density at most $n\density$, and a
-  matrix-vector product by $\mM$ can be done in $O(n\density D^2)$
-  operations in $\K$ (we briefly discuss variants of the algorithm
-  using dense linear algebra at the end of this subsection). In
-  particular, the cost incurred at Step~\ref{mainstep1} to compute
-  $\mM$ is $O(n\density D^2)$.
+matrix $\mM$  density $\density \in [0,1)$, that is, at most $\density D^2$ 
+non-zero entries.  As a result, a
+matrix-vector product by $\mM$ can be done in $O(\density D^2)$
+operations in $\K$ (we briefly discuss variants of the algorithm
+using dense linear algebra at the end of this subsection). In
+particular, the cost incurred at Step~\ref{mainstep1} to compute
+$\mM$ is $O(\density D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1826,10 +1822,10 @@ $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,0}=\row{u}_i$ and
  $\row{\ell}_{i,s+1} = \row{\ell}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$th row of $\mU^\perp$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
-  \le i < 2d}$ costs $O(dn \density D^2) = O(n\density D^3/m )$ field operations. If
+  \le i < 2d}$ costs $O(d \density D^2) = O(\density D^3/m )$ field operations. If
 we are able to compute $m$ vector-matrix products in parallel at once,
-the {\em span} of Step~\ref{mainstep3} is thus $O(n\density D^3/m)$, whereas
-the total work is $O(n\density D^3)$.
+the {\em span} of Step~\ref{mainstep3} is thus $O(\density D^3/m)$, whereas
+the total work is $O(\density D^3)$.
 
 At Step~\ref{mainstep4}, we can then compute $\seqelt{s,\mU,\mV}=\mU^{\perp}\mM^s\mV$, for $s=0,\dots,2d-1$ by the
 product
@@ -1866,9 +1862,9 @@ takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
 m\M(D))$; the final modular calculations modulo $\sqfree$ take time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, assuming perfect parallelization 
 at Step~\ref{mainstep3}, the total span is
-$$O\left (n\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
+$$O\left (\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
-$$O\left (n\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
+$$O\left (\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
 nm\M(D)\right ).$$ Of course, we could parallelize other steps than
 Step~\ref{mainstep3}, but it is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
@@ -2094,7 +2090,7 @@ V_2(60) = 20)$, as expected.
 
 \subsection{Experimental results}\label{section:ex}
 
-In the following table, we give the timings in seconds for different
+In \cref{tbl:timings_mainalgo}, we give the timings in seconds for different
 values of $m$ for \cref{algo:block-sparse-fglm}.  Our
 implementation was based on Shoup's NTL \cite{NTL} polynomials
 as well as LinBox \cite{LinBox} dense and sparse
@@ -2135,38 +2131,44 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 \mM^s)_{0 \le s< 2d}$.
 
 \begin{table}[H]
+  \centering
  \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
-\begin{center}
+  \label{tbl:timings_mainalgo}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{Density $\rho$} & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
 		\hline
-		rand1-1&3 &5832&0.0371&1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
-		rand1-2&3 &8000&0.0333&4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
-		rand1-3&3 &10648&0.0302&8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
-		rand2-1&4 &4096&0.0756&1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
-		rand2-2&4 &6561&0.0667&4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
-		rand2-3&4 &10000&0.0597&14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
-		mixed1-1&3 &2808&0.0521&275 (0.998)&73 (0.993)&51 (0.986)&no\\
-		mixed1-2&3 &3591&0.0528&532 (0.998)&140 (0.995)&99 (0.99)&no\\
-		mixed1-3&3 &4312&0.0482&864 (0.999)&230 (0.996)&161 (0.992)&no\\
-		mixed2-1&4 &1552&0.139&104 (0.997)&28 (0.991)&19 (0.984)&no\\
-		mixed2-2&4 &2657&0.105&450 (0.999)&123 (0.996)&84 (0.992)&no\\
-		mixed2-3&4 &4352&0.0843&1718 (0.999)&456 (0.998)&316 (0.996)&no\\
-		mixed3-1&10 &1035&0.233&66 (0.996)&18 (0.989)&12 (0.981)&no\\
-		mixed3-2&11 &2060&0.215&488 (0.998)&129 (0.996)&90 (0.993)&no\\
-		mixed3-3&12 &4109&0.212&3647 (0.999)&968 (0.998)&671 (0.997)&no\\
-		eco12&12 &1024&0.131&62 (0.995)&16 (0.987)&12 (0.979)&yes\\
-		katsura10&11 &1024&0.258&71 (0.996)&19 (0.989)&13 (0.982)&yes\\
-		sot1&5 &8694&0.0002&765 (0.994)&208 (0.983)&143 (0.969)&yes\\
-		vor2&6 &574&0.002&10 (0.99)&3 (0.973)&2 (0.955)&yes\\
-		W1-2-10-4&10 &1344&0.312&164 (0.998)&43 (0.994)&30 (0.99)&yes\\
-		W1-2-11-4&11 &1920&0.319&489 (0.999)&129 (0.997)&90 (0.994)&yes\\
-		W1-3-7-3&7 &6480&0.174&10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
-		W1-4-6-2&6 &6480&0.141&9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
+		rand1-1&3 &5832  &0.1   &1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
+		rand1-2&3 &8000  &0.08  &4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
+		rand1-3&3 &10648 &0.08  &8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
+		rand2-1&4 &4096  &0.18  &1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
+		rand2-2&4 &6561  &0.16  &4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
+		rand2-3&4 &10000 &0.14  &14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
+		mixed1-1&3 &2808 &0.117  &275 (0.998)&73 (0.993)&51 (0.986)&no\\
+		
+		mixed1-2&3 &3591 &0.11  &532 (0.998)&140 (0.995)&99 (0.99)&no\\
+		
+		mixed1-3&3 &4312 &0.102  &864 (0.999)&230 (0.996)&161 (0.992)&no\\
+		mixed2-1&4 &1552 &0.263 &104 (0.997)&28 (0.991)&19 (0.984)&no\\
+		mixed2-2&4 &2657 &0.228 &450 (0.999)&123 (0.996)&84 (0.992)&no\\
+		
+		mixed2-3&4 &4352 &0.20&1718 (0.999)&456 (0.998)&316 (0.996)&no\\
+		
+		mixed3-1&10 &1035&0.56 &66 (0.996)&18 (0.989)&12 (0.981)&no\\
+		
+		mixed3-2&11 &2060&0.53  &488 (0.998)&129 (0.996)&90 (0.993)&no\\
+		mixed3-3&12 &4109&0.50 &3647 (0.999)&968 (0.998)&671 (0.997)&no\\
+		
+		eco12&12 &1024   &0.55  &62 (0.995)&16 (0.987)&12 (0.979)&yes\\
+		katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes\\
+		sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes\\
+		vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes\\
+		W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes\\
+		W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes\\
+		W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
+		W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
 	\end{tabular}
-\end{center}
 \end{table}
 
 
@@ -2226,7 +2228,7 @@ above. Throughout, we rely on the following operations: evaluations of
 linear forms on successive powers of a given element in $\residueI$
 (such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$) and (polynomial)
 linear algebra, as we did before, as well as some operations on
-univariate polynomials related to so-called {\em power
+univariate polynomials related to the so-called {\em power
   projection}~\cite{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
@@ -2243,7 +2245,7 @@ main structure; the subroutines are described in the next subsections.
 	  \end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
 	\begin{itemize}
-		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$
+		\item polynomials $((\sqfree,V_1,\dots,V_n),\lf)$, with $\sqfree,V_1,\dots,V_n$ in $\K[T]$
 	\end{itemize}
 	\begin{enumerate}
 		\item let $(F,G_1,\dots,G_n,X_1)=\mathsf{BlockParametrizationX}_1(\mM_1,\dots,\mM_n,\mU,\mV,\mf)$
@@ -2273,11 +2275,10 @@ the effect of removing from $V$ the points in $V'$; in those ``lucky''
 cases where $V'$ is a large subset of $V$, $V''=V-V'$ may only contain
 a few points, and few values for the latter sequences will be needed.
 
-The last step involves changing coordinates in
-$((F,G_1,\dots,G_n),X_1)$ to use $\lf$ as a linear form instead, and
-performing the union of the two components $V'$ and $V''$. These
-operations can be done in time $O(n D^{(\omega+1)/2})$, see Lemmas~2
-and~3 of~\cite{PoSc13b}; we will not discuss them further.
+The last step involves changing coordinates in $((F,G_1,\dots,G_n),X_1)$ to use
+$\lf$ as a linear form instead, and performing the union of the two components
+$V'$ and $V''$. These operations can be done in time $O(n D^{(\omega+1)/2})$
+\cite[Lemmas~2 and~3]{PoSc13b}; we will not discuss them further.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2524,7 +2525,7 @@ $\mainalgoname$.
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item polynomials $((F,G_1,\dots,G_n),X_1)$
+        \item polynomials $((F,G_1,\dots,G_n),X_1)$, with $F,G_1,\dots,G_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{X1step3} { compute $\mat{L}_s = \mU^{\perp}\mM_1^s$ for $s=0,\dots,2d-1$, with $d = \lceil D/m \rceil$}
@@ -2535,15 +2536,12 @@ $\mainalgoname$.
   \item\label{X1step7b} let $F = F /\gcd(F, \gcd (M, M'))$
   \item\label{X1step8} { let $\row{a}_1 = [M~0 ~\cdots~ 0] (\mat{P}_{\mU,\mV})^{-1}$}
   \item let $\mN = y_2 \mM_2 + \cdots+y_n \mM_n$
-  \item \textbf{for} $i=0,1,2$ \textbf{do}
-    \begin{enumerate}
-    \item\label{X1step9}  let $A_i = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, 
+  \item \textbf{for} $i=0,1,2$ \textbf{do} \\
+      \phantom{for}  let $A_i = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, 
       \mN^i \col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s<d})$
-    \end{enumerate}
-  \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do}
-    \begin{enumerate}
-     \item let $A_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
-    \end{enumerate}
+  \item\label{X1step9} let $F = \gcd(F, A_0A_2-A_1^2)$
+  \item\label{X1step10} \textbf{for} $i=2,\dots,n$ \textbf{do} \\
+      \phantom{for}  let $A_{X_i} = \mathsf{{\sf ScalarNumerator}}(\mat{P}_{\mU,\mV}, M, \mM_i\col{\varepsilon}_1, 1, \row{a}_1, (\mat{L}_s)_{0 \le s <d})$
 \item\label{X1step11}   \textbf{return} $((F,T,A_{X_2}/ A_0 \bmod F, \dots,A_{X_n}/A_{0} \bmod F),X_1)$
   \end{enumerate}  \label{algo:X1block-sparse-fglm}
 \end{algorithm}
@@ -2575,7 +2573,7 @@ form $\ell: \residueI \to \K$ by
   root of $F$ as computed at Step~\ref{X1step7b}. By
   \cref{lemma:valuelambda}, for $i=0,1,2$, we have $ A_i(r_j) = M'(r_j)
   (\mf^i \cdot \lambda_j)(1)$, where $\lambda_j =\sum_{i \in T_j}
-  \ell_i$, where the $\ell_i$'s are the components of $\ell$
+  \ell_i$, where the $\ell_i$'s are the components of $\ell$,
   and where $\mf^i \cdot \lambda_j$ is the linear form $f \mapsto \lambda_j(\mf^i f)$.
   
   As a result, the value of $ A_0  A_2 -  A_1^2$ at
@@ -2636,7 +2634,7 @@ $t \ge r$, we first solve the problem up to index $r$ in time
 $O(r^{(\omega+1)/2})$; then we use the fact that the sequence 
 $(\ell(H^s))_{s \ge 0}$
  is linearly recurrent to compute all further values in time
-$O(t\M(r)/r)$, as for instance in Proposition~1 of~\cite{BoFlSaSc06}.
+ $O(t\M(r)/r)$, as for instance in~\cite[Proposition~1]{BoFlSaSc06}.
 Thus, for $t \ge r$, we take $\PP(r,t)=O(r^{(\omega+1)/2} +
 t\M(r)/r)$.
 
@@ -2737,7 +2735,7 @@ $f=\sum_{j=1}^D f_j b_j$. Similarly, for $j=1,\dots,m$, we let
 $\gamma_j$ be the element of $\residueI$ whose coefficient vector on
 the basis $\basis$ is the $j$-th column of $\mV$.
 
-In what follows, we also write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
+Hereafter, we also write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
 in analogy with the definition of $d$ used so far.
 \begin{itemize}
 \item To each $(i,j)$ in $\{1,\dots,m\}\times \{1,\dots,m\}$ is
@@ -2798,13 +2796,12 @@ to be $\ell_{i,j,\mathfrak{A}}(\lf^s)$.
 \end{itemize}
 
 In terms of cost, we need to compute all vectors $\row{a}_i$, for
-$i=1,\dots,m$; this takes $ O(m^{\omega} \M(D) \log(m) + m^2
-\M(D)\log(D)\log(m))$ operations in $\K$, using the analysis of
-\cref{eqn:hol_cost}. Then, the total time spent in {\sf
-  ScalarNumerator} is $m(m+n+1)$ times the cost reported in
-\cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the
-total cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of
-a single call, which was reported above.
+$i=1,\dots,m$; using the analysis of \cref{eqn:hol_cost}, this takes
+$O(m^{\omega} \M(D) \log(D) \log(m))$ operations in $\K$.  Then, the total time
+spent in {\sf ScalarNumerator} is $m(m+n+1)$ times the cost reported in
+\cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the total
+cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of a single
+call, which was reported above.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2824,8 +2821,8 @@ $\mathsf{BlockParametrization}$ is that names of the main variables
 have been changed (so as not to create any confusion with those used
 in $\mainalgoname{\sf X}_1$). More importantly, using the correction
 matrices makes it possible for us to compute fewer terms in the
-sequences, namely only $2\lceil D_\mathfrak{B}/m\rceil$, respectively
-$\lceil D_\mathfrak{B}/m\rceil$. Hence, if $D_\mathfrak{B} \ll D$
+sequences, namely only $2\lceil D_\mathfrak{B}/m\rceil$ and
+$\lceil D_\mathfrak{B}/m\rceil$, respectively. Hence, if $D_\mathfrak{B} \ll D$
 (that is, $V_\mathfrak{B}$ contains few points, with small
 multiplicities), this last stage of the algorithm will be fast.
 
@@ -2849,7 +2846,7 @@ is the $i$th column of $\mat{\Delta}'_{s}$.
 	\end{itemize}
 	    {\bf Output:}  \vspace{-0.5em}
         \begin{itemize}
-        \item  polynomials $((R,W_1,\dots,W_n),\lf)$
+        \item  polynomials $((R,W_1,\dots,W_n),\lf)$, with $R,W_1,\dots,W_n$ in $\K[T]$
         \end{itemize}
   \begin{enumerate}
   \item\label{residualstep1}   let $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
@@ -2917,20 +2914,20 @@ The algorithms in this section were implemented using the same
 platform as the one in the previous section, using in particular NTL's
 built-in implementation of power projection.
 
-In the following table, we give the ratio of the runtime of {\sf
-  Block\-Parametrization\-WithSplitting} to that of our first
-algorithm, $\mainalgoname$, for each input: numbers less than $1$
-indicate a speed-up.  The last column shows the number of points in
-$V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the total
-degree of $I$, which is $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs
-and the machine used for timings are the same as in \cref{section:ex}.
+In \cref{tbl:comparison_algos}, we give the ratio of the runtime of {\sf
+Block\-Parametrization\-WithSplitting} to that of our first algorithm,
+$\mainalgoname$, for each input: numbers less than $1$ indicate a speed-up.
+The last column shows the number of points in $V_\mathfrak{A}$, that is,
+$D_\mathfrak{A}$, compared to the total degree of $I$, which is
+$D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs and the machine used for timings
+are the same as in \cref{section:ex}.
 
 The performance of $\mathsf{BlockParametrizationWithSplitting}$ depends on
 the density of $\mM_1$ and the number of points $D_\mathfrak{A}$.  For
 generic inputs, with no multiplicity, $D_\mathfrak{A}=D$, so we will
 actually not need to spend any time computing correction matrices, or running 
 $\mainalgoname{\sf Residual}$. In the worst
-case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then
+case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
 $\mathsf{BlockParametrizationWithSplitting}$ may take about twice as long
 as $\mainalgoname$ (due to the two calls to respectively
 $\mathsf{BlockParametrizationX}_1$ and
@@ -2943,15 +2940,16 @@ $V_\mathfrak{A}$ only accounts for $1012$ points out of $7682$ points
 in the variety, the ratio is close to 1.
 
 \begin{table}[H]
+  \centering
  \def\arraystretch{1.2}
 \setlength\tabcolsep{6pt}
-	\caption{Comparison of $\mathsf{ParametrizationX}_1$ and $\mainalgoname$}
-        \begin{center}
+	\caption{Comparison of $\mathsf{BlockParametrizationWithSplitting}$ and $\mainalgoname$}
+  \label{tbl:comparison_algos}
 \begin{tabular}{c|c|c|c|c|c|c}
 \textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$D_\mathfrak{A}/D$\\
 \hline
 rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
-rand1-20&3 &8000&0.437&0.439&0.448&8000/8000\\
+rand1-2&3 &8000&0.437&0.439&0.448&8000/8000\\
 rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
 rand2-1&4 &4096&0.427&0.429&0.445&4096/4096\\
 rand2-2&4 &6561&0.429&0.425&0.438&6561/6561\\
@@ -2974,7 +2972,6 @@ W1-2-11-4&11 &1920&0.486&0.491&0.505&1920/1920\\
 W1-3-7-3&7 &6480&0.455&0.456&0.468&6480/6480\\
 W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480
 \end{tabular}
-       \end{center}
 \end{table}
 
 
