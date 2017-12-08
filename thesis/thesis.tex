@@ -181,7 +181,7 @@ $^2$Univ.~Limoges, CNRS, XLIM, UMR 7252, F-87000 Limoges, France
   compute the entire output for a small overhead, without making any assumption
   on the ideal $I$. We then propose a refinement of this idea that partially
   avoids the introduction of a generic linear form.  We comment on experimental
-  results obtained by an implementation based on the C++ libraries LinBox and
+  results obtained by an implementation based on the C++ libraries LinBox, Eigen and
   NTL.
 \end{abstract}
 
@@ -355,7 +355,7 @@ residual part; if the former set has large cardinality, this is
 expected to provide a speed-up over the generalist algorithm.
 
 Our algorithms have been implemented in C++ on the basis of
-LinBox~\cite{LinBox} and NTL~\cite{NTL}; an experimental
+LinBox~\cite{LinBox}, Eigen~\cite{Eigen} and NTL~\cite{NTL}; an experimental
 implementation can be found at
 \url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}.
 
@@ -1704,9 +1704,9 @@ on $I$ (radicality, shape position, \dots), except of course that it
 has dimension zero; however, we assume (as in the previous subsection)
 that the characteristic of $\K$ is greater than $D$. 
 
-Then, we present a 
-simple example, and experimental results of an implementation based on 
-the C++ libraries LinBox~\cite{LinBox} and NTL~\cite{NTL}.
+Then, we present a simple example, and experimental results of an
+implementation based on the C++ libraries LinBox~\cite{LinBox},
+Eigen~\cite{Eigen} and NTL~\cite{NTL}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1801,6 +1801,10 @@ is indeed a zero-dimensional parametrization of $V(I)$.
   instead discard each matrix $\mat{L}_s$ after it is used, by
   computing on the fly the column vectors needed for Steps~\ref{mainstep9}
   and~\ref{mainstep10}.
+
+  If the multiplication matrices are dense, little is to be gained
+  this way (since in the worst case they use themselves $n D^2$ field elements),
+  but savings can be substantial if these  matrices are sparse.
 \end{remark}
 
 For the cost analysis, we will mainly focus on a sparse model for
@@ -2090,13 +2094,23 @@ V_2(60) = 20)$, as expected.
 
 \subsection{Experimental results}\label{section:ex}
 
-In \cref{tbl:timings_mainalgo}, we give the timings in seconds for different
-values of $m$ for \cref{algo:block-sparse-fglm}.  Our
-implementation was based on Shoup's NTL \cite{NTL} polynomials
-as well as LinBox \cite{LinBox} dense and sparse
-matrices and polynomial matrix multiplication. All timings are
-measured on an Intel i7-4790 CPU with 32 GB RAM and 8 CPU's. For each
-value of $m$, we create and run $m$ threads in parallel.
+In \cref{tbl:timings_mainalgo}, we give the timings in seconds for
+different values of $m$ for \cref{algo:block-sparse-fglm}.  Our
+implementation was based on Shoup's NTL \cite{NTL} polynomials, LinBox
+\cite{LinBox} for dense polynomial matrices and matrix generator
+computations, and Eigen~\cite{Eigen} for sparse matrix vector
+products. Our implementation is dedicated to small prime fields; we
+store our multiplication matrices using Eigen's {\tt
+  SparseMatrix<double>} class
+
+
+
+
+
+ and polynomial
+matrix multiplication. All timings are measured on an Intel i7-4790
+CPU with 32 GB RAM and 8 CPU's. For each value of $m$, we create and
+run $m$ threads in parallel.
 
 In all cases, we start from multiplication matrices computed from a
 {degrevlex} Gr\"obner basis in Magma~\cite{BoCaPl97}. The timings
@@ -2279,6 +2293,13 @@ The last step involves changing coordinates in $((F,G_1,\dots,G_n),X_1)$ to use
 $\lf$ as a linear form instead, and performing the union of the two components
 $V'$ and $V''$. These operations can be done in time $O(n D^{(\omega+1)/2})$
 \cite[Lemmas~2 and~3]{PoSc13b}; we will not discuss them further.
+
+\begin{remark}
+  Another possibility is to return the parametrizations
+  $(F,G_1,\dots,G_n),X_1)$ and $((R,W_1,\dots,W_n),\lf)$ without
+  performing the union; this has the obvious advantage of partially
+  decomposing the output.
+\end{remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
