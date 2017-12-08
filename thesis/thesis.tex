@@ -2107,10 +2107,11 @@ implementation was based on Shoup's NTL \cite{NTL} polynomials, LinBox
 \cite{LinBox} for dense polynomial matrices and matrix generator
 computations, and Eigen~\cite{Eigen} for sparse matrix / vector
 products. Our implementation is dedicated to small prime fields; thus,
-as is done in~\cite{fflas-ffpack} for dense matrices, we use Eigen's
-{\tt SparseMatrix<double, RowMajor>} class to store our multiplication
-matrices and do the matrix / vector products, reducing the results
-modulo $p$ afterwards.
+as is done in~\cite{fflas-ffpack} for dense matrices, we use machine
+floats to do the bulk of the calculation. Explicitly, we rely on
+Eigen's {\tt SparseMatrix<double, RowMajor>} class to store our
+multiplication matrices and do the matrix / vector products, reducing
+the results modulo $p$ afterwards.
 
 All timings are measured on an Intel Xeon CPU E5-2667 with 128 GB RAM
 and 8 cores (16 available through hyperthreading). For each value of
@@ -2124,13 +2125,14 @@ runtime of two similar stages (degree basis computation and conversion
 to a lex order) in that paper's algorithm.  Rather than optimizing our
 implementation, our main focus here was to demonstrate the effects of
 parallelization, and how the Krylov sequence computation dominates the
-runtime in these examples; in particular, we believe that improvements
+runtime in these examples. In particular, we believe that improvements
 are possible for the polynomial matrix computations (computing 
-minimal matrix generator, its largest invariant factor, \dots)
+minimal matrix generator, its largest invariant factor, \dots), 
+though this is by no means a bottleneck here.
 
 All our inputs as well as our source code are available at
 \url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}. Some systems
-are well-known (Katsura or Eco from~\cite{Morgan88}, while we also
+are well-known (Katsura or Eco from~\cite{Morgan88}), while we also
 consider several families of randomly generated inputs (some are
 inspired from~\cite{FaMo17}). Systems rand1-$i$ have $3$ variables and
 randomly generated equations (of degree depending on $i$), and
@@ -2143,8 +2145,26 @@ root (the others are simple), in increasing numbers of variables; they
 are not in shape position. 
 
 In the columns $m=1,m=3,m=6$, the numbers in parentheses indicate the
-ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
-\mM^s)_{0 \le s< 2d}$.
+part of the total time spent in computing the Krylov sequence
+$(\mU^{\perp} \mM^s)_{0 \le s< 2d}$, with $d=\lceil D/m\rceil$. This is
+always by far the dominant factor.  In other words, the immense
+majority of the time is spent doing sparse matrix / vector products
+for matrices with machine float entries. We used OpenMP {\tt parallel
+  for} pragmas to parallelize the computation of the above sequence,
+as described in \cref{ssec:mainalgo}.
+
+Increasing $m$ has two effects. On the plus side, plainly, it
+decreases the length of the sequence above. On the other side, while
+the algorithm performs better by a factor often close to 3 for $m=3$,
+the gain is not as significant for $m=6$, so that parallelization is
+less effective. It is an interesting question to clarify this issue
+(as the previous paragraph highlights, the key problem is an efficient
+parallelization of the loop that computes $(\mU^{\perp} \mM^s)_{0 \le
+  s< 2d}$).  Besides, increasing $m$ also increases the time to
+compute the output polynomials, through minimal generator computation,
+high-order lifting, \dots. However, from the observed speedup and the
+ratios in the table, we can conclude that this effect is minor.
+
 
 \begin{table}[H]
   \centering
@@ -2153,63 +2173,46 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
   \label{tbl:timings_mainalgo}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ 
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 3}$ & $\bm{m = 6}$ 
                 & \makecell{\textbf{radical} / \\\textbf{shape position}} \\
 		\hline
-		rand1-1&3 &5832  &0.1   &1780 (0.999)&473 (0.997)&329 (0.994)&yes/yes\\
-		rand1-2&3 &8000  &0.08  &4128 (0.999)&1099 (0.998)&759 (0.995)&yes/yes\\
-		rand1-3&3 &10648 &0.08  &8804 (0.999)&2336 (0.998)&1625 (0.996)&yes/yes\\
-		rand2-1&4 &4096  &0.18  &1283 (0.999)&340 (0.997)&237 (0.995)&yes/yes\\
-		rand2-2&4 &6561  &0.16  &4615 (0.999)&1236 (0.998)&851 (0.997)&yes/yes\\
-		rand2-3&4 &10000 &0.14  &14753 (0.999)&3920 (0.999)&2710 (0.998)&yes/yes\\
-		mixed1-1&3 &2808 &0.117  &275 (0.998)&73 (0.993)&51 (0.986)&no/no\\
-		
-		mixed1-2&3 &3591 &0.11  &532 (0.998)&140 (0.995)&99 (0.99)&no/no\\
-		
-		mixed1-3&3 &4312 &0.102  &864 (0.999)&230 (0.996)&161 (0.992)&no/no\\
-		mixed2-1&4 &1552 &0.263 &104 (0.997)&28 (0.991)&19 (0.984)&no/no\\
-		mixed2-2&4 &2657 &0.228 &450 (0.999)&123 (0.996)&84 (0.992)&no/no\\
-		
-		mixed2-3&4 &4352 &0.20&1718 (0.999)&456 (0.998)&316 (0.996)&no/no\\
-		
-		mixed3-1&10 &1035&0.56 &66 (0.996)&18 (0.989)&12 (0.981)&no/no\\
-		
-		mixed3-2&11 &2060&0.53  &488 (0.998)&129 (0.996)&90 (0.993)&no/no\\
-		mixed3-3&12 &4109&0.50 &3647 (0.999)&968 (0.998)&671 (0.997)&no/no\\
-		
-		eco12&12 &1024   &0.55  &62 (0.995)&16 (0.987)&12 (0.979)&yes/yes\\
-		katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes/yes\\
-		sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes/yes\\
-		vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes/yes\\
-		W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes/yes\\
-		W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes/yes\\
-		W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes/yes\\
-		W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes/yes
+rand1-26&3 &17576&0.06& 692(0.98) & 307(0.969) & 168(0.926) & yes/yes \\
+rand1-28&3 &21952&0.05&1261(0.983) & 471(0.971) & 331(0.944)& yes/yes  \\
+rand1-30&3 &27000&0.05&2191(0.986) & 786(0.974) & 512(0.946)& yes/yes  \\
+rand2-10&4 &10000&0.14&301(0.981) & 109(0.964) & 79(0.934)& yes/yes  \\
+rand2-11&4 &14641&0.13&851(0.987) & 303(0.975) & 239(0.961) & yes/yes \\
+rand2-12&4&20736&0.12&2180(0.99) & 784(0.982) & 648(0.972)& yes/yes  \\
+mixed1-22&3 &10864&0.07&207(0.973) & 75(0.947) & 58(0.909) &no/no \\
+mixed1-23&3 &12383&0.07&294(0.976) & 107(0.95) & 92(0.925) &no/no  \\
+mixed1-24&3 &14040&0.07&413(0.979) & 150(0.958) & 125(0.934) &no/no  \\
+mixed2-10&4 &10256&0.16&362(0.984) & 130(0.969) & 113(0.954)  &no/no \\
+mixed2-11&4 &14897&0.14&989(0.988) & 384(0.98) & 278(0.965)  &no/no \\
+mixed2-12&4 &20992&0.13&2480(0.991) & 892(0.984) & 807(0.977)  &no/no \\
+mixed3-12&12 &4109&0.5&75(0.963) & 27(0.941) & 21(0.929)  &no/no \\
+mixed3-13&13&8206&0.48&554(0.982) & 198(0.973) & 171(0.968)   &no/no
+		% katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes/yes\\
+		% sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes/yes\\
+		% vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes/yes\\
+		% W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes/yes\\
+		% W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes/yes\\
+		% W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes/yes\\
+		% W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes/yes
 	\end{tabular}
 \end{table}
 
 
-On average, the algorithm performs better by a factor of 3.73 for
-$m=4$ and by a factor of 5.39 for $m=8$ compared to $m=1$. Increasing
-$m$ has two effects: it (moderately) decreases the effectiveness of
-parallel computations, but also increases the time to compute the
-output polynomials, through minimal generator computation, high-order
-lifting, \dots. From the observed speedup and the ratios in the table,
-we can conclude that the bottleneck of the algorithm is the
-computation of that sequence and the latter effect is minor compared
-to the former.
 
-We can determine the effectiveness of parallel computations by
-comparing combined CPU times (that is, total work).  For example, in
-test rand1-1 we get $4124, 4350, 6008$ seconds for $m=1,4,8$
-respectively; we observed similar patterns for other tests. If the
-parallelization was perfect, the combined CPU time should be roughly
-equal for all values of $m$, since computing $(\mU^{\perp}
-\mM^s)_{0 \le s< 2d}$ took more than $99\%$ of the total time for all three
-values of $m$ in this test. When $m=4$, the overhead from
-parallelization is small whereas when $m=8$, overhead is significant,
-as it is impossible to run 8 threads in parallel on 8 cores without
-switching.
+
+
+
+% We can determine the effectiveness of parallel computations by
+% comparing combined CPU times (that is, total work).  For example, in
+% test rand1-1 we get $4124, 4350, 6008$ seconds for $m=1,4,8$
+% respectively; we observed similar patterns for other tests. If the
+% parallelization was perfect, the combined CPU time should be roughly
+% equal for all values of $m$, since computing $(\mU^{\perp}
+% \mM^s)_{0 \le s< 2d}$ took more than $99\%$ of the total time for all three
+% values of $m$ in this test. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2938,27 +2941,29 @@ The algorithms in this section were implemented using the same
 platform as the one in the previous section, using in particular NTL's
 built-in implementation of power projection.
 
-In \cref{tbl:comparison_algos}, we give the ratio of the runtime of {\sf
-Block\-Parametrization\-WithSplitting} to that of our first algorithm,
-$\mainalgoname$, for each input: numbers less than $1$ indicate a speed-up.
-The last column shows the number of points in $V_\mathfrak{A}$, that is,
-$D_\mathfrak{A}$, compared to the total degree of $I$, which is
-$D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs and the machine used for timings
-are the same as in \cref{section:ex}.
+In \cref{tbl:comparison_algos}, we give the ratio of the runtime of
+{\sf Block\-Parametrization\-WithSplitting} to that of our first
+algorithm, $\mainalgoname$, for each input: numbers less than $1$
+indicate a speed-up.  The last column shows the number of points in
+$V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the total
+degree of $I$, which is $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs,
+the machine used for timings and the prime field are the same as in
+\cref{section:ex}.
 
-The performance of $\mathsf{BlockParametrizationWithSplitting}$ depends on
-the density of $\mM_1$ and the number of points $D_\mathfrak{A}$.  For
-generic inputs, with no multiplicity, $D_\mathfrak{A}=D$, so we will
-actually not need to spend any time computing correction matrices, or running 
-$\mainalgoname{\sf Residual}$. In the worst
-case, if $D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
-$\mathsf{BlockParametrizationWithSplitting}$ may take about twice as long
-as $\mainalgoname$ (due to the two calls to respectively
+The performance of $\mathsf{BlockParametrizationWithSplitting}$
+depends on the density of $\mM_1$ and the number of points
+$D_\mathfrak{A}$.  For generic inputs, with no multiplicity,
+$D_\mathfrak{A}=D$, so we will actually not need to spend any time
+computing correction matrices, or running $\mainalgoname{\sf
+  Residual}$. On the other hand, in the worst case, if
+$D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
+$\mathsf{BlockParametrizationWithSplitting}$ may take about twice as
+long as $\mainalgoname$ (due to the two calls to respectively
 $\mathsf{BlockParametrizationX}_1$ and
 $\mathsf{BlockParametrizationResidual}$).
 
 This case was not seen in our experiments, since the systems with
-multiplicities generated randomly had few multiple points, and so were
+multiplicities generated randomly had few multiple points, and thus were
 favorable to us. Even in an unfavourable case like sot1, where
 $V_\mathfrak{A}$ only accounts for $1012$ points out of $7682$ points
 in the variety, the ratio is close to 1.
@@ -2970,31 +2975,42 @@ in the variety, the ratio is close to 1.
 	\caption{Comparison of $\mathsf{BlockParametrizationWithSplitting}$ and $\mainalgoname$}
   \label{tbl:comparison_algos}
 \begin{tabular}{c|c|c|c|c|c|c}
-\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$&$D_\mathfrak{A}/D$\\
+\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 3}$ & $\bm{m = 6}$&$D_\mathfrak{A}/D$\\
 \hline
-rand1-1&3 &5832&0.435&0.439&0.455&5832/5832\\
-rand1-2&3 &8000&0.437&0.439&0.448&8000/8000\\
-rand1-3&3 &10648&0.437&0.444&0.444&10648/10648\\
-rand2-1&4 &4096&0.427&0.429&0.445&4096/4096\\
-rand2-2&4 &6561&0.429&0.425&0.438&6561/6561\\
-rand2-3&4 &10000&0.426&0.426&0.431&10000/10000\\
-mixed1-1&3 &2808&0.467&0.576&0.545& 2744/2752\\
-mixed1-2&3 &3591&0.545&0.573&0.601& 3375/3402\\
-mixed1-3&3 &4312&0.521&0.541&0.597& 4096/4123\\
-mixed2-1&4 &1552&0.693&0.743&0.807& 1296/1312\\
-mixed2-2&4 &2657&0.557&0.573&0.607& 2041/2417\\
-mixed2-3&4 &4352&0.485&0.493&0.51& 4096/4112\\
-mixed3-1&10 &1035&0.43&0.449&0.532& 1024/1025\\
-mixed3-2&11 &2060&0.413&0.42&0.445& 2048/2049\\
-mixed3-3&12 &4109&0.428&0.434&0.441& 4096/4097\\
-eco12&12 &1024&0.223&0.245&0.307&1024/1024\\
-katsura10&11 &1024&0.411&0.427&0.483&1024/1024\\
-sot1&5 &8694&1.07&1.09&1.19 & 1012/7682\\
-vor2&6 &574&0.49&0.533&0.675&574/574\\
-W1-2-10-4&10 &1344&0.487&0.496&0.527&1344/1344\\
-W1-2-11-4&11 &1920&0.486&0.491&0.505&1920/1920\\
-W1-3-7-3&7 &6480&0.455&0.456&0.468&6480/6480\\
-W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480
+rand1-26&3 &17576&0.426&0.339&0.511& 17576/17576\\
+rand1-28&3 &21952&0.414&0.393&0.461& 21952/21952\\
+rand1-30&3 &27000&0.41&0.54&0.521& 27000/27000\\
+rand2-10&4 &10000&0.412&0.407&0.367& 10000/10000\\
+rand2-11&4 &14641&0.406&0.53&0.365& 14641/14641\\
+rand2-12&4 &20736&0.417&0.412&0.35& 20736/20736\\
+mixed1-22&3 &10864&0.425&0.417&0.446& 10648/10675\\
+mixed1-23&3 &12383&0.42&0.414&0.398&  12167/12194\\
+mixed1-24&3 &14040&0.413&0.404&0.4&  13824/13851\\
+mixed2-10&4 &10256&0.379&0.379&0.434& 10000/10016 \\
+mixed2-11&4 &14897&0.378&0.349&0.402& 14641/14657\\
+mixed2-12&4 &20992&0.39&0.391&0.338& 20736/20752\\
+mixed3-12&12 &4109&0.401&0.392&0.422& 4096/4097\\
+mixed3-13&13&8206&0.41&0.405&0.384& 8192/8193
+% rand2-1&4 &4096&0.427&0.429&0.445&4096/4096\\
+% rand2-2&4 &6561&0.429&0.425&0.438&6561/6561\\
+% rand2-3&4 &10000&0.426&0.426&0.431&10000/10000\\
+% mixed1-1&3 &2808&0.467&0.576&0.545& 2744/2752\\
+% mixed1-2&3 &3591&0.545&0.573&0.601& 3375/3402\\
+% mixed1-3&3 &4312&0.521&0.541&0.597& 4096/4123\\
+% mixed2-1&4 &1552&0.693&0.743&0.807& 1296/1312\\
+% mixed2-2&4 &2657&0.557&0.573&0.607& 2041/2417\\
+% mixed2-3&4 &4352&0.485&0.493&0.51& 4096/4112\\
+% mixed3-1&10 &1035&0.43&0.449&0.532& 1024/1025\\
+% mixed3-2&11 &2060&0.413&0.42&0.445& 2048/2049\\
+% mixed3-3&12 &4109&0.428&0.434&0.441& 4096/4097\\
+% eco12&12 &1024&0.223&0.245&0.307&1024/1024\\
+% katsura10&11 &1024&0.411&0.427&0.483&1024/1024\\
+% sot1&5 &8694&1.07&1.09&1.19 & 1012/7682\\
+% vor2&6 &574&0.49&0.533&0.675&574/574\\
+% W1-2-10-4&10 &1344&0.487&0.496&0.527&1344/1344\\
+% W1-2-11-4&11 &1920&0.486&0.491&0.505&1920/1920\\
+% W1-3-7-3&7 &6480&0.455&0.456&0.468&6480/6480\\
+% W1-4-6-2&6 &6480&0.445&0.448&0.451&6480/6480
 \end{tabular}
 \end{table}
 
