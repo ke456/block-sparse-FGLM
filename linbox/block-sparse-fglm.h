@@ -13,6 +13,8 @@
 #include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
 #include "fflas-ffpack/fflas-ffpack.h"
 #include <NTL/lzz_pX.h>
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
 
 typedef Givaro::Modular<double> GF;
 
@@ -142,7 +144,10 @@ class Block_Sparse_FGLM{
 	std::vector<LinBox::DenseMatrix<GF>> U_rows;
 	LinBox::DenseMatrix<GF> V; //right side of U*T1*V
 	// stores the multiplication matrices T_i
-	std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+
+	// std::vector<LinBox::SparseMatrix<GF>> mul_mats;
+
+	std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> Emul_mats;
 	// coeffs in the random combination
 	std::vector<GF::Element> rand_comb;
 	// sparsities
