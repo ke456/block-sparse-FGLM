@@ -6,6 +6,7 @@
 \usepackage{algorithm, pseudocode}
 \usepackage[shortlabels]{enumitem}% for enumerate / itemize: define reasonable margins
 \setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
+\usepackage{makecell}
 
 % math and theorem names
 \usepackage[colorlinks=true,linkcolor=cyan]{hyperref}
@@ -491,10 +492,11 @@ associated numerator.  This is formalized in the next definition:
   $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
   have
   \[
-    \Omega(\mathcal{L},P) = T^{-d} \left( P \sum_{s=0}^{d-1} \ell_{d - s} T^s \right).
+    \Omega(\mathcal{L},P) = \left( P \sum_{s=0}^{d-1} \ell_{d - 1- s} T^s \right) {\rm~div~} T^d,
     \qedhere
   \]
  \end{itemize}
+where div denotes the quotient in the Euclidean division.
 \end{remark}
 Now, we give an example of this construction. Consider the Fibonacci sequence
 $\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
@@ -654,12 +656,18 @@ $\cdeg{\mat{P}}$ its column degree, which is a size-$s$ vector.
 
 Given a nonsingular matrix of relations $\relbas$ for  $\seq$, we will thus
 write $\mat{\Omega}(\seq, \relbas)= \relbas \seqpm  \in
-\polMatSpace[\rdim][\cdim]$, generalizing \cref{def:omega}.  By the
-previous corollary, this is a polynomial matrix, whose $i$th row has
-degree less than the $i$th row of $\mat{P}$ for $1\le i\le\rdim$.  As
-in the scalar case, if $\mat{P}$ has degree $d$, we only need to know
-$\seqelt{0},\dots,\seqelt{d-1}$ to recover $\mat{\Omega}(\seq,
-\relbas)$.  The cost of computing it then depends on the cost of
+\polMatSpace[\rdim][\cdim]$, generalizing \cref{def:omega}. 
+
+By the previous corollary, this is a polynomial matrix, whose $i$th
+row has degree less than the $i$th row of $\mat{P}$ for $1\le
+i\le\rdim$.  As in the scalar case, if $\mat{P}$ has degree $d$, we
+only need to know $\seqelt{0},\dots,\seqelt{d-1}$ to recover
+$\mat{\Omega}(\seq, \relbas)$ as
+\begin{align}\label{eq:computeOmega}
+  \mat{\Omega}(\seq, \relbas) =  \left ( \relbas \cdot \sum_{s=0}^{d-1} \seqelt{d-1-s} T^s \right ) {\rm~div~} T^d,
+\end{align}
+where div $T^d$ means we keep the quotient of each entry by $T^d$.
+The cost of computing it then depends on the cost of
 rectangular matrix multiplication in sizes $(\rdim,\rdim)$ and
 $(\rdim,\cdim)$. For simplicity, we only give the two most useful
 cases: if $\cdim=\rdim$, this takes $O(\rdim^\omega \M(d))$ operations
@@ -1134,8 +1142,8 @@ $s=0,\dots,\lceil D/m \rceil-1$.
 Computing the first $\lceil D/m \rceil$ values of the sequence
 $\mat{\mathcal{E}}=(\col{e}_s)_{s \ge 0}$ is done by using the
 equality $\col{E}_s = \mat{L}_s \col{w}$ and takes $O(D^2)$ base field
-operations. Then, applying the cost estimate given in
-\cref{section:matrix_seq}, we see that we have enough terms to compute
+operations. Then, applying the cost estimate given after
+\cref{eq:computeOmega}, we see that we have enough terms to compute
 $\mat{\Omega}( (\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}) \in \K[T]^{m
 \times 1}$ and that it takes $O(m^2 \M(D/m)) \subset O(m \M(D))$ operations in
 $\K$. Then, the dot product with $\row{a}_i$ takes $O(m \M(D))$
@@ -2065,8 +2073,8 @@ $$\mat{P}_{\mU,\mV}
 34
 \end{bmatrix}\cdot \frac 1{T^2}+
  \cdots \right),$$ where the columns are the first columns of the
- matrices in \cref{exampleproducts} (we only need $d=2$
- terms in the right-hand side).  From this, we find the scalar
+ matrices in \cref{exampleproducts} -- as per \cref{eq:computeOmega}, we only need $d=2$
+ terms in the right-hand side.  From this, we find the scalar
  numerator $C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
    0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1\cdot
  \mat{\Omega}( (\mU^\perp \mM^s\col{\varepsilon}_1)_{s \ge 0},
@@ -2098,29 +2106,28 @@ In \cref{tbl:timings_mainalgo}, we give the timings in seconds for
 different values of $m$ for \cref{algo:block-sparse-fglm}.  Our
 implementation was based on Shoup's NTL \cite{NTL} polynomials, LinBox
 \cite{LinBox} for dense polynomial matrices and matrix generator
-computations, and Eigen~\cite{Eigen} for sparse matrix vector
-products. Our implementation is dedicated to small prime fields; we
-store our multiplication matrices using Eigen's {\tt
-  SparseMatrix<double>} class
+computations, and Eigen~\cite{Eigen} for sparse matrix / vector
+products. Our implementation is dedicated to small prime fields; thus,
+as is done in~\cite{fflas-ffpack} for dense matrices, we use Eigen's
+{\tt SparseMatrix<double, RowMajor>} class to store our multiplication
+matrices and do the matrix / vector products, reducing the results
+modulo $p$ afterwards.
 
-
-
-
-
- and polynomial
-matrix multiplication. All timings are measured on an Intel i7-4790
-CPU with 32 GB RAM and 8 CPU's. For each value of $m$, we create and
-run $m$ threads in parallel.
+All timings are measured on an Intel Xeon CPU E5-2667 with 128 GB RAM
+and 8 cores (16 available through hyperthreading). For each value of
+$m$ in $\{1,3,6\}$, we create and run $m$ threads in parallel.
 
 In all cases, we start from multiplication matrices computed from a
 {degrevlex} Gr\"obner basis in Magma~\cite{BoCaPl97}. The timings
 reported here do not include this precomputation; instead, we refer
 the reader to~\cite{FaMo17} for extensive experiments comparing the
 runtime of two similar stages (degree basis computation and conversion
-to a lex order) in their algorithm.  Rather than optimizing our
+to a lex order) in that paper's algorithm.  Rather than optimizing our
 implementation, our main focus here was to demonstrate the effects of
 parallelization, and how the Krylov sequence computation dominates the
-runtime in these examples.
+runtime in these examples; in particular, we believe that improvements
+are possible for the polynomial matrix computations (computing 
+minimal matrix generator, its largest invariant factor, \dots)
 
 All our inputs as well as our source code are available at
 \url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}. Some systems
@@ -2129,18 +2136,14 @@ consider several families of randomly generated inputs (some are
 inspired from~\cite{FaMo17}). Systems rand1-$i$ have $3$ variables and
 randomly generated equations (of degree depending on $i$), and
 rand2-$i$ are similar, with $4$ variables. These systems are
-generically radical (and in shape position). Systems mixed1-$i$ and
-mixed2-$i$ have similar number of variables as the previous ones, but some of their
-solutions are multiple, so the ideals are not radical (and not in
-shape position). Systems mixed3-$i$ have only one multiple root (the
-others are simple), in increasing numbers of variables; they are not
-in shape position. Systems W1-$d$-$n$-$p$ are determinantal equations
-that describe the computation of critical points for the projection
-$ (\alpha_1,\dots,\alpha_n) \mapsto \alpha_1$ on
-$V(f_1,\dots,f_p)$, where $f_1,\dots,f_p$ are $p$ equations of degree
-$d$ in $n$ variables.
+generically radical and in shape position. Systems mixed1-$i$ and
+mixed2-$i$ have similar number of variables as the previous ones, but
+some of their solutions are multiple, so the ideals are not radical
+(and not in shape position). Systems mixed3-$i$ have only one multiple
+root (the others are simple), in increasing numbers of variables; they
+are not in shape position. 
 
-In the columns $m=1,m=4,m=8$, the numbers in parentheses indicate the
+In the columns $m=1,m=3,m=6$, the numbers in parentheses indicate the
 ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 \mM^s)_{0 \le s< 2d}$.
 
@@ -2151,37 +2154,38 @@ ratio of time spent in computing the Krylov sequence $(\mU^{\perp}
 	\caption{Timings (in seconds) for polynomials over $\F_{65537}$}
   \label{tbl:timings_mainalgo}
 	\begin{tabular}{c|c|c|c|c|c|c|c}
-		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ & \textbf{radical} \\
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} $\boldsymbol\rho$ & $\bm{m = 1}$ & $\bm{m = 4}$ & $\bm{m = 8}$ 
+                & \makecell{\textbf{radical} / \\\textbf{shape position}} \\
 		\hline
-		rand1-1&3 &5832  &0.1   &1780 (0.999)&473 (0.997)&329 (0.994)&yes\\
-		rand1-2&3 &8000  &0.08  &4128 (0.999)&1099 (0.998)&759 (0.995)&yes\\
-		rand1-3&3 &10648 &0.08  &8804 (0.999)&2336 (0.998)&1625 (0.996)&yes\\
-		rand2-1&4 &4096  &0.18  &1283 (0.999)&340 (0.997)&237 (0.995)&yes\\
-		rand2-2&4 &6561  &0.16  &4615 (0.999)&1236 (0.998)&851 (0.997)&yes\\
-		rand2-3&4 &10000 &0.14  &14753 (0.999)&3920 (0.999)&2710 (0.998)&yes\\
-		mixed1-1&3 &2808 &0.117  &275 (0.998)&73 (0.993)&51 (0.986)&no\\
+		rand1-1&3 &5832  &0.1   &1780 (0.999)&473 (0.997)&329 (0.994)&yes/yes\\
+		rand1-2&3 &8000  &0.08  &4128 (0.999)&1099 (0.998)&759 (0.995)&yes/yes\\
+		rand1-3&3 &10648 &0.08  &8804 (0.999)&2336 (0.998)&1625 (0.996)&yes/yes\\
+		rand2-1&4 &4096  &0.18  &1283 (0.999)&340 (0.997)&237 (0.995)&yes/yes\\
+		rand2-2&4 &6561  &0.16  &4615 (0.999)&1236 (0.998)&851 (0.997)&yes/yes\\
+		rand2-3&4 &10000 &0.14  &14753 (0.999)&3920 (0.999)&2710 (0.998)&yes/yes\\
+		mixed1-1&3 &2808 &0.117  &275 (0.998)&73 (0.993)&51 (0.986)&no/no\\
 		
-		mixed1-2&3 &3591 &0.11  &532 (0.998)&140 (0.995)&99 (0.99)&no\\
+		mixed1-2&3 &3591 &0.11  &532 (0.998)&140 (0.995)&99 (0.99)&no/no\\
 		
-		mixed1-3&3 &4312 &0.102  &864 (0.999)&230 (0.996)&161 (0.992)&no\\
-		mixed2-1&4 &1552 &0.263 &104 (0.997)&28 (0.991)&19 (0.984)&no\\
-		mixed2-2&4 &2657 &0.228 &450 (0.999)&123 (0.996)&84 (0.992)&no\\
+		mixed1-3&3 &4312 &0.102  &864 (0.999)&230 (0.996)&161 (0.992)&no/no\\
+		mixed2-1&4 &1552 &0.263 &104 (0.997)&28 (0.991)&19 (0.984)&no/no\\
+		mixed2-2&4 &2657 &0.228 &450 (0.999)&123 (0.996)&84 (0.992)&no/no\\
 		
-		mixed2-3&4 &4352 &0.20&1718 (0.999)&456 (0.998)&316 (0.996)&no\\
+		mixed2-3&4 &4352 &0.20&1718 (0.999)&456 (0.998)&316 (0.996)&no/no\\
 		
-		mixed3-1&10 &1035&0.56 &66 (0.996)&18 (0.989)&12 (0.981)&no\\
+		mixed3-1&10 &1035&0.56 &66 (0.996)&18 (0.989)&12 (0.981)&no/no\\
 		
-		mixed3-2&11 &2060&0.53  &488 (0.998)&129 (0.996)&90 (0.993)&no\\
-		mixed3-3&12 &4109&0.50 &3647 (0.999)&968 (0.998)&671 (0.997)&no\\
+		mixed3-2&11 &2060&0.53  &488 (0.998)&129 (0.996)&90 (0.993)&no/no\\
+		mixed3-3&12 &4109&0.50 &3647 (0.999)&968 (0.998)&671 (0.997)&no/no\\
 		
-		eco12&12 &1024   &0.55  &62 (0.995)&16 (0.987)&12 (0.979)&yes\\
-		katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes\\
-		sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes\\
-		vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes\\
-		W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes\\
-		W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes\\
-		W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes\\
-		W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes
+		eco12&12 &1024   &0.55  &62 (0.995)&16 (0.987)&12 (0.979)&yes/yes\\
+		katsura10&11&1024&0.63  &71 (0.996)&19 (0.989)&13 (0.982)&yes/yes\\
+		sot1&5 &8694     &0.01  &765 (0.994)&208 (0.983)&143 (0.969)&yes/yes\\
+		vor2&6 &574      &0.51  &10 (0.99)&3 (0.973)&2 (0.955)&yes/yes\\
+		W1-2-10-4&10&1344&0.641 &164 (0.998)&43 (0.994)&30 (0.99)&yes/yes\\
+		W1-2-11-4&11&1920&0.658 &489 (0.999)&129 (0.997)&90 (0.994)&yes/yes\\
+		W1-3-7-3&7  &6480&0.383 &10923 (0.999)&2900 (0.999)&2014 (0.999)&yes/yes\\
+		W1-4-6-2&6  &6480&0.317 &9096 (0.999)&2424 (0.999)&1674 (0.998)&yes/yes
 	\end{tabular}
 \end{table}
 
