@@ -10,7 +10,7 @@ SRCS:= $(filter-out $(TST), $(SRCS))
 SRCD:= $(filter-out $(TST), $(SRCD))
 OBJS:= $(subst .cc,.o,$(SRCS))
 OBJD:= $(subst .cc,.o,$(SRCD))
-TGT:= fglm polmatdom
+TGT:= sfglm
 
 all: $(TGT)
 
@@ -18,20 +18,13 @@ all: $(TGT)
 	$(CXX) $(CXXFLAGS) -c $< $(DFLAGS)
 
 sfglm: $(SRCS) $(TST) $(OBJS)
-	echo $(SRCS)
-	$(CXX) -o sfglm test_fglm.cc $(OBJS) $(LDFLAGS) $(DFLAGS)
+	$(CXX) -o sfglm $(OBJS) $(LDFLAGS) $(DFLAGS)
 
 dfglm: $(SRCD) $(TST) $(OBJD)
-	$(CXX) -o dfglm test_fglm.cc $(OBJD) $(LDFLAGS) $(DFLAGS)
-
-polmatdom: $(SRC) $(OBJ)
-	$(CXX) -DTEST_POLMATDOM -o polmatdom test_polmatdom.cc $(OBJ) $(LDFLAGS) $(DFLAGS)
+	$(CXX) -o dfglm $(OBJD) $(LDFLAGS) $(DFLAGS)
 
 clean:
 	rm $(OBJS) $(OBJD) 
 
 cleanall:
 	rm $(OBJ) $(TGT)
-
-eigen:	$(TST)
-	$(CXX) -o eigen test-eigen.cc  $(CXXFLAGS) $(LDFLAGS) $(DFLAGS)

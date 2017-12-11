@@ -57,42 +57,28 @@ class PolMatDom {
 
 	inline const size_t getPMBasisThreshold() const { return _pmbasis_threshold; }
 
-	template<typename PolMat>
-	void print_degree_matrix( const PolMat &pmat ) const;
-
 	// mbasis algorithm to compute approximant bases
-	// ideally, all these should be const, but issues because of Linbox's multiplication of polmats
-	std::vector<int> old_mbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				     const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> mbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
 				    const std::vector<int> &shift=std::vector<int>(), bool resUpdate=false );
 
 	// pmbasis divide and conquer algorithm to compute approximant bases
-	std::vector<int> old_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-				      const std::vector<int> &shift=std::vector<int>() );
 	std::vector<size_t> pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
 				     const std::vector<int> &shift=std::vector<int>() );
-	std::vector<size_t> popov_pmbasis( PMatrix &approx, const PMatrix &series, const size_t order, 
-					   const std::vector<int> &shift=std::vector<int>() );
 
 	// computing s-owP kernel basis
 	void kernel_basis( PMatrix & kerbas, const PMatrix & pmat );
 
-	// (Heuristic) computes a vector v(x) and a polynomial f(x) such that
-	// v(x) pmat(x) = [0...0 f(x) 0 ... 0], where f(x) is the largest Smith factor,
-	// and it is at position "position"
+	// computes a vector v(x) and a polynomial f(x) such that
+	// v(x) pmat(x) = [0...0 f(x) 0 ... 0], where f(x) is at position,
+	// and generically it is the largest Smith factor of pmat
+	// [the generic aspect is commented in the paper ]
 	// Assumes 'position' is an integer between 0 and pmat.rowdim()-1
-	// Assumes left_multiplier has been initialized with pmat.rowdim() empty polynomials
+	// Assumes the vector left_multiplier has been initialized with pmat.rowdim() empty polynomials
 	void largest_invariant_factor( std::vector<NTL::zz_pX> &left_multiplier, NTL::zz_pX &factor, const PMatrix &pmat, const size_t position );
-
-	// (Heuristic) Smith form of a nonsingular matrix; also computes the unimodular factors
-	void SmithForm( std::vector<Polynomial> &smith, PMatrix &lfac, PMatrix &rfac, const PMatrix &pmat );
-
 
 	// Matrix Berlekamp-Massey: returns a matrix generator for a sequence of matrices
 	template<typename Matrix>
 	void MatrixBerlekampMassey( PMatrix &mat_gen, PMatrix &mat_num, const std::vector<Matrix> & mat_seq );
-	
 };
 
 
