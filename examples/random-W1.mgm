@@ -1,0 +1,39 @@
+
+
+function RandomPolynomial(U, deg)
+    k:=BaseRing(U);
+    if IsFinite(k) then
+	return U![k!Random([1..#k]) : i in [0..deg-1]];
+    else
+	return U![Random([-100000..100000]) : i in [0..deg-1]];
+    end if;
+end function;
+
+function RandomPolynomialMulti(vars, deg)
+    if #vars eq 1 then
+	U:=PolynomialRing(BaseRing(Universe(vars)));
+	return Evaluate(RandomPolynomial(U, deg+1), vars[1]);
+    end if;
+    var:=vars[1];
+    vars:=vars[2..#vars];
+    tmp:=0;
+    for i in [0..deg] do
+	tmp+:=var^i*$$(vars, deg-i);
+    end for;
+    return tmp;
+end function;
+
+function W1_system(D,n,p)
+    function get_equations()
+	K:=PolynomialRing(Integers(), n);
+	eqs1:=[RandomPolynomialMulti([K.i : i in [1..n]], D) : j in [1..p]];
+	eqs2:=Minors(Submatrix(JacobianMatrix(eqs1),1,2,p,n-1),p);
+	return eqs1 cat eqs2, "W1" cat "_" cat IntegerToString(D) cat "_" cat IntegerToString(n) cat "_" cat IntegerToString(p);
+    end function;
+    return get_equations;
+end function;
+
+D:=StringToInteger(D);
+n:=StringToInteger(n);
+p:=StringToInteger(p);
+get_equations:=W1_system(D, n, p);

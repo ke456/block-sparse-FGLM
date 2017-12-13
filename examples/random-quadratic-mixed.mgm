@@ -1,0 +1,17 @@
+
+function quadratic_system(n)
+    function get_equations()
+	K:=PolynomialRing(Integers(), n);
+	all:=Matrix(1, n+1, [K!1] cat [K.i : i in [1..n]]);
+	all_constant:=Matrix(1, n+1, [K!1] cat [Random([-100000..100000]) : i in [1..n]]);
+	eqs1:=[  (all*Matrix(K, n+1, n+1, [Random([-100000..100000]) : i in [1..(n+1)^2]])*Transpose(all))[1][1] : j in [1..n] ];
+	eqs2:=[  (all*Matrix(K, n+1, n+1, [Random([-100000..100000]) : i in [1..(n+1)^2]])*Transpose(all_constant))[1][1] : j in [1..n] ];
+	eqs2:=&cat[ [ x*y : x in eqs2] : y in eqs2];
+	eqs:= &cat[ [ x*y : x in eqs1] : y in eqs2];
+	return eqs, "quadratic_mixed" cat IntegerToString(n) ;
+    end function;
+    return get_equations;
+end function;
+
+n:=StringToInteger(n);
+get_equations:=quadratic_system(n);

@@ -1,0 +1,38 @@
+
+
+function RandomPolynomial(U, deg)
+    k:=BaseRing(U);
+    if IsFinite(k) then
+	return U![k!Random([1..#k]) : i in [0..deg-1]];
+    else
+	return U![Random([-100000..100000]) : i in [0..deg-1]];
+    end if;
+end function;
+
+function RandomPolynomialMulti(vars, deg)
+    if #vars eq 1 then
+	U:=PolynomialRing(BaseRing(Universe(vars)));
+	return Evaluate(RandomPolynomial(U, deg+1), vars[1]);
+    end if;
+    var:=vars[1];
+    vars:=vars[2..#vars];
+    tmp:=0;
+    for i in [0..deg] do
+	tmp+:=var^i*$$(vars, deg-i);
+    end for;
+    return tmp;
+end function;
+
+function three_vars_system(d)
+    function get_equations()
+	K:=PolynomialRing(Integers(), 3);
+	eqs1:=[RandomPolynomialMulti([K.i : i in [1..3]], d) : j in [1..3]];
+	eqs2:=[RandomPolynomialMulti([K.i : i in [1..3]], 1 + Ceiling(d/14)) : j in [1..3]];
+	eqs2:=[x^2 : x in eqs2];
+	return &cat[ [ x*y : x in eqs1] : y in eqs2], "3_vars_mixed" cat IntegerToString(d) ;
+    end function;
+    return get_equations;
+end function;
+
+d:=StringToInteger(d);
+get_equations:=three_vars_system(d);
