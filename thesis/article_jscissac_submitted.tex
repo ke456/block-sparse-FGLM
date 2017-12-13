@@ -151,17 +151,6 @@
 \DeclareBoldMathCommand{\balpha}{\alpha}
 \DeclareBoldMathCommand{\bbeta}{\beta}
 
-%%% TODO: comment the next two line before submission
-%\newcommand{\todo}[1]{\textcolor{red}{({\bf todo:} #1)}}
-%\newcommand{\fixme}[1]{\textcolor{blue}{#1}}
-
-%% TODO list :
-%% IMPORTANT:
-%%  - 
-%% MINOR:
-%%  - update ref to latest version of fflas-ffpack (since we refer to latest version of LinBox)
-
-
 \title{Block-Krylov techniques in the context of \\ sparse-FGLM algorithms}
 
 
@@ -400,12 +389,6 @@ univariate polynomial multiplication over $\K$, for which we assume
 the super-linearity properties of \cite[Section~8.4]{GaGe13}.  Then,
 two $m\times m$ matrices over $\K[T]$ whose degree is less than $d$
 can be multiplied using $O(m^\omega \M(d))$ operations in $\K$.
-
-%% We rely Over a field $\mathbb{K}$, recall that we can compute
-%% multiplication, division with remainder, extended GCD, and square
-%% free part of polynomial of degree at most $n$ in $O^{\tilde{~}}(n)$
-%% field operations ($O^{\tilde{~}}$ omits polylogarithmic factors)
-%% \cite{GaGe13}.
 
 \paragraph{Acknowledgments.} We wish to thank Chenqi Mou and Dave Saunders for useful
 discussions. This research was partially supported by Schost's NSERC
@@ -770,7 +753,6 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   $\seq$ has degree $\le\degBdl$ (resp.~$\le \degBdr$).  For
   $\degBd>0$, define
   \[
-    %\label{eqn:series_to_approximate}
     \sys =
     \begin{bmatrix}
       \sum_{0\le s < \degBd} \seqelt{s} \var^{\degBd-s-1} \\ - \mat{I}_{\cdim}
@@ -797,7 +779,6 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$ has
   polynomial entries, has degree less than $\deg(\rel)$, and is such
   that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
-  %, hence $[\rel \;\; \rem] \in \appMod{\sys}{\degBd}$.
 
   Conversely, for any vectors $\rel \in \relSpace$ and $\rem
   \in \remSpace$, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ and
@@ -846,9 +827,6 @@ In particular, when $\cdim = \rdim$, we can find a minimal
 left matrix generator of $\seq$ in $O(\rdim^\omega \M(\degBd)
 \log(\degBd))$ operations in $\field$.
 
-%% Note (Vincent): if fastpab submission is accepted, update this corollary
-%% --> items 1 and 2 : we get the canonical generator for the same cost
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Application to the block Wiedemann algorithm}\label{ssec:appliW}
@@ -882,7 +860,6 @@ let $d_i = $ deg$(s_i)$ for all $i$; for $i > r$, we let $s_i$ = 1,
 with $d_i = 0$.  We define $\nu = d_1 + \cdots + d_m \le D$ and
 $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 
-%% \todo{unify subscripts  $\mat{P}^{\mU,\mV}$ or   $\seq^{\mU,\mV}$}
 
 \begin{theorem}
   \label{randXY}
@@ -1025,9 +1002,7 @@ The latter algorithm is randomized, since it chooses a random point in $\K$ to
 compute (parts of) the expansion of the inverse of
 $\mat{P}_{\mU,\mV}$.
 
-%% todo for after submission: think about writing the following deterministic approach:
-%% (unless this means spending too much space on something not so central?)
-%% since $\mat{P}_{\mU,\mV}$ is reduced, we could use the expansion of the reversal
+%% Note: since $\mat{P}_{\mU,\mV}$ is reduced, we could use the expansion of the reversal
 
 An alternative solution would be to compute the Smith form of
 $\mat{P}_{\mU,\mV}$, but using an algorithm such as
@@ -2142,7 +2117,8 @@ improvements are possible for the polynomial matrix computations
 \dots), but this is by no means a bottleneck here.
 
 All our inputs as well as our source code are available at
-\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}. Some systems
+\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}.
+Some systems
 are well-known (Katsura or Eco from~\cite{Morgan88}), while we also
 consider several families of randomly generated inputs (some are
 inspired from~\cite{FaMo17}). Systems rand1-$i$ have $3$ variables and
@@ -2703,8 +2679,6 @@ Remark that the support of $\ell_\mathfrak{B}$ is contained in
 $\mathfrak{B}$, and actually equal to $\mathfrak{B}$ for a generic
 $\ell$.
 
-%% \todo{implicit modulo reduction}. 
-
 Suppose that we are given the minimal polynomial $M$ of $X_1$ in
 $\residueI$, the numerator $C=\Omega( (\ell(X_1^s))_{s \ge 0}, M)$, as
 well as the zero-dimensional parametrization $((F,G_1,\dots,G_n),X_1)$
@@ -3022,5 +2996,297 @@ katsura10&11 &1024&0.557&0.661&0.652& 1024/1024
 
 
 \bibliographystyle{plain}
-\bibliography{thesis}
+\begin{thebibliography}{10}
+
+\bibitem{AlBeRoWo94}
+M.~E. Alonso, E.~Becker, M.-F. Roy, and T.~W{\"o}rmann.
+\newblock Zeroes, multiplicities and idempotents for zerodimensional systems.
+\newblock In {\em MEGA'94}, volume 142 of {\em Progress in Mathematics}, pages
+  1--15. Birkh{\"a}user, 1996.
+
+\bibitem{BaFaSa15}
+M.~Bardet, J.-C. Faug{\`e}re, and B.~Salvy.
+\newblock On the complexity of the {F}5 {G}r{\"o}bner basis algorithm.
+\newblock {\em J. Symbolic Comput.}, 70:49--70, 2015.
+
+\bibitem{BeMoMaTr94}
+E.~Becker, T.~Mora, M.~Marinari, and C.~Traverso.
+\newblock The shape of the {S}hape {L}emma.
+\newblock In {\em ISSAC'94}, pages 129--133. ACM, 1994.
+
+\bibitem{BeWo96}
+E.~Becker and T.~W{\"o}rmann.
+\newblock Radical computations of zero-dimensional ideals and real root
+  counting.
+\newblock {\em Mathematics and Computers in Simulation}, 42(4-6):561--569,
+  1996.
+
+\bibitem{BecLab94}
+B.~Beckermann and G.~Labahn.
+\newblock A uniform approach for the fast computation of matrix-type {P}ad\'e
+  approximants.
+\newblock {\em SIAM J. Matrix Anal. Appl.}, 15(3):804--823, 1994.
+
+\bibitem{BoCaPl97}
+W.~Bosma, J.~Cannon, and C.~Playoust.
+\newblock The {M}agma algebra system. {I}. {T}he user language.
+\newblock {\em J. Symbolic Comput.}, 24(3-4):235--265, 1997.
+
+\bibitem{BoFlSaSc06}
+A.~Bostan, P.~Flajolet, B.~Salvy, and {\'E}.~Schost.
+\newblock Fast computation of special resultants.
+\newblock {\em J. Symbolic Comput.}, 41(1):1--29, 2006.
+
+\bibitem{BoSaSc03}
+A.~Bostan, B.~Salvy, and {\'E}.~Schost.
+\newblock Fast algorithms for zero-dimensional polynomial systems using
+  duality.
+\newblock {\em Appl. Algebra Engrg. Comm. Comput.}, 14:239--272, 2003.
+
+\bibitem{BrGuYu80}
+R.~P. Brent, F.~G. Gustavson, and D.~Y.~Y. Yun.
+\newblock Fast solution of {Toeplitz} systems of equations and computation of
+  {Pad\'e} approximants.
+\newblock {\em Journal of Algorithms}, 1(3):259--295, 1980.
+
+\bibitem{Coppersmith94}
+D.~Coppersmith.
+\newblock Solving homogeneous linear equations over {GF}$(2)$ via block
+  {W}iedemann algorithm.
+\newblock {\em Math. Comp.}, 62(205):333--350, 1994.
+
+\bibitem{Faugere02}
+J.-C. Faug\`ere.
+\newblock A new efficient algorithm for computing {G}r\"obner bases without
+  reductions to zero ({F}5).
+\newblock In {\em ISSAC'02}, pages 75--83. ACM, 2002.
+
+\bibitem{FaGaHuRe13}
+J.-C. Faug{\`e}re, P.~Gaudry, L.~Huot, and G.~Renault.
+\newblock {Polynomial systems solving by fast linear algebra}.
+\newblock https://hal.archives-ouvertes.fr/hal-00816724, 2013.
+
+\bibitem{FaGaHuRe14}
+J.-C. Faug\`{e}re, P.~Gaudry, L.~Huot, and G.~Renault.
+\newblock Sub-cubic change of ordering for {G}r{\"o}bner basis: a probabilistic
+  approach.
+\newblock In {\em ISSAC'14}, pages 170--177. ACM, 2014.
+
+\bibitem{FaGiLaMo93}
+J.-C. Faug\`ere, P.~Gianni, D.~Lazard, and T.~Mora.
+\newblock Efficient computation of zero-dimensional {G}r\"obner bases by change
+  of ordering.
+\newblock {\em J. Symbolic Comput.}, 16(4):329--344, 1993.
+
+\bibitem{FaMo17}
+J.-C. Faug{\`e}re and C.~Mou.
+\newblock Sparse {FGLM} algorithms.
+\newblock {\em J. Symbolic Comput.}, 80(8):538--569, 2017.
+
+\bibitem{FaSaSp13}
+J.-C. Faug\`ere, M.~{Safey El Din}, and P.-J. Spaenlehauer.
+\newblock On the complexity of the generalized {M}in{R}ank problem.
+\newblock {\em J. Symbolic Comput.}, pages 30--58, 2013.
+
+\bibitem{fflas-ffpack}
+FFLAS-FFPACK-Team.
+\newblock {\em {FFLAS-FFPACK}: {F}inite {F}ield {L}inear {A}lgebra
+  {S}ubroutines / {P}ackage}, v2.2.2 edition, 2016.
+\newblock \url{http://github.com/linbox-team/fflas-ffpack}.
+
+\bibitem{GaGe13}
+J.~Gathen and J.~Gerhard.
+\newblock {\em Modern Computer Algebra}.
+\newblock Cambridge University Press, Cambridge, third edition, 2013.
+
+\bibitem{GiMo89}
+P.~Gianni and T.~Mora.
+\newblock Algebraic solution of systems of polynomial equations using
+  {G}r\"obner bases.
+\newblock In {\em AAECC'5}, number 356 in Lecture Notes in Comput. Sci., pages
+  247--257. Springer, 1989.
+
+\bibitem{GiJeVi03}
+P.~Giorgi, C.-P. Jeannerod, and G.~Villard.
+\newblock On the complexity of polynomial matrix computations.
+\newblock In {\em ISSAC'03}, pages 135--142. ACM, 2003.
+
+\bibitem{GioLeb14}
+P.~Giorgi and R.~Lebreton.
+\newblock Online order basis algorithm and its impact on the block {W}iedemann
+  algorithm.
+\newblock In {\em ISSAC'14}, pages 202--209. ACM, 2014.
+
+\bibitem{LinBox}
+The~LinBox Group.
+\newblock Linbox: Linear algebra over black-box matrices, version 1.5.0.
+\newblock \texttt{http://linalg.org/}, 2017.
+
+\bibitem{Eigen}
+G.~Guennebaud, B.~Jacob, et~al.
+\newblock Eigen v3.
+\newblock \url{http://eigen.tuxfamily.org}, 2010.
+
+\bibitem{JeNeScVi16}
+C.-P. Jeannerod, V.~Neiger, \'E. Schost, and G.~Villard.
+\newblock Fast computation of minimal interpolation bases in {Popov} form for
+  arbitrary shifts.
+\newblock In {\em ISSAC'16}, pages 295--302. ACM, 2016.
+
+\bibitem{Kailath80}
+T.~Kailath.
+\newblock {\em {Linear Systems}}.
+\newblock Prentice-Hall, 1980.
+
+\bibitem{Kaltofen95}
+E.~Kaltofen.
+\newblock Analysis of {Coppersmith}'s block {Wiedemann} algorithm for the
+  parallel solution of sparse linear systems.
+\newblock {\em Mathematics of Computation}, 64(210):777--806, 1995.
+
+\bibitem{KalVil01}
+E.~Kaltofen and G.~Villard.
+\newblock On the complexity of computing determinants.
+\newblock In {\em ISSAC'01}, pages 13--27. ACM, 2001.
+
+\bibitem{KaVi04}
+E.~Kaltofen and G.~Villard.
+\newblock On the complexity of computing determinants.
+\newblock {\em Comput. Complexity}, 13(3-4):91--130, 2004.
+
+\bibitem{Keller85}
+W.~Keller-Gehrig.
+\newblock Fast algorithms for the characteristic polynomial.
+\newblock {\em Theoret. Comput. Sci.}, 36(2-3):309--317, 1985.
+
+\bibitem{LaOd90}
+B.~A. LaMacchia and A.~M. Odlyzko.
+\newblock Solving large sparse linear systems over finite fields.
+\newblock In {\em Adv. in Cryptography, Crypto '90}, number 537 in Lectures
+  Notes in Computer Science, pages 109--133. Springer, 1990.
+
+\bibitem{Macaulay16}
+F.~S. Macaulay.
+\newblock {\em The Algebraic Theory of Modular Systems}.
+\newblock Cambridge University Press, 1916.
+
+\bibitem{MaMoMo96}
+M.~G. Marinari, H.~M. M{\"o}ller, and T.~Mora.
+\newblock On multiplicities in polynomial system solving.
+\newblock {\em Trans. Amer. Math. Soc.}, 348(8):3283--3321, 1996.
+
+\bibitem{MorenoSocias91}
+G.~Moreno-Soc{\'\i}as.
+\newblock {\em Autour de la fonction de {H}ilbert-{S}amuel (escaliers
+  d'id{\'e}aux polynomiaux)}.
+\newblock PhD thesis, \'Ecole polytechnique, 1991.
+
+\bibitem{Morgan88}
+A.~Morgan.
+\newblock {\em Solving Polynominal Systems Using Continuation for Engineering
+  and Scientific Problems}.
+\newblock Prentice-Hall, 1988.
+
+\bibitem{Mourrain97}
+B.~Mourrain.
+\newblock Isolated points, duality and residues.
+\newblock {\em Journal of Pure and Applied Algebra}, 117/118:469--493, 1997.
+
+\bibitem{Neiger16}
+V.~Neiger.
+\newblock {\em {Bases of relations in one or several variables: fast algorithms
+  and applications}}.
+\newblock PhD thesis, {{\'E}cole Normale Sup{\'e}rieure de Lyon}, November
+  2016.
+
+\bibitem{NeRaSc17}
+V.~Neiger, H.~Rahkooy, and {\'{E}}.~Schost.
+\newblock Algorithms for zero-dimensional ideals using linear recurrent
+  sequences.
+\newblock In {\em CASC'17}, pages 313--328. Springer, 2017.
+
+\bibitem{Popov72}
+V.~M. Popov.
+\newblock Invariant description of linear, time-invariant controllable systems.
+\newblock {\em SIAM Journal on Control}, 10(2):252--264, 1972.
+
+\bibitem{PoSc13b}
+A.~Poteaux and \'E. Schost.
+\newblock On the complexity of computing with zero-dimensional triangular sets.
+\newblock {\em J. Symbolic Comput.}, 50:110--138, 2013.
+
+\bibitem{Rouillier99}
+F.~Rouillier.
+\newblock Solving zero-dimensional systems through the {R}ational {U}nivariate
+  {R}epresentation.
+\newblock {\em Appl. Algebra Engrg. Comm. Comput.}, 9(5):433--461, 1999.
+
+\bibitem{Sakata90}
+S.~Sakata.
+\newblock Extension of the {B}erlekamp-{M}assey algorithm to {$N$} dimensions.
+\newblock {\em Information and Computation}, 84(2):207--239, 1990.
+
+\bibitem{NTL}
+V.~Shoup.
+\newblock {NTL}: A library for doing number theory.
+\newblock \texttt{http://www.shoup.net}.
+
+\bibitem{Shoup94}
+V.~Shoup.
+\newblock Fast construction of irreducible polynomials over finite fields.
+\newblock {\em J. Symbolic Comput.}, 17(5):371--391, 1994.
+
+\bibitem{Shoup99}
+V.~Shoup.
+\newblock Efficient computation of minimal polynomials in algebraic extensions
+  of finite fields.
+\newblock In {\em ISSAC'99}, pages 53--58. ACM, 1999.
+
+\bibitem{Steel15}
+A~Steel.
+\newblock Direct solution of the (11,9,8)-{M}in{R}ank problem by the block
+  {W}iedemann algorithm in {M}agma with a {T}esla {GPU}.
+\newblock In {\em PASCO'15}, pages 2--6. ACM, 2015.
+
+\bibitem{Stor03}
+A.~Storjohann.
+\newblock High-order lifting and integrality certification.
+\newblock {\em J. Symbolic Comput.}, 36:613--648, 2003.
+
+\bibitem{Turner02}
+W.~J. Turner.
+\newblock {\em {Black box linear algebra with the LINBOX library}}.
+\newblock PhD thesis, {North Carolina State University}, 2002.
+
+\bibitem{BarBul92}
+M.~Van~Barel and A.~Bultheel.
+\newblock A general module theoretic framework for vector {M-Pad\'e} and matrix
+  rational interpolation.
+\newblock {\em Numer. Algorithms}, 3:451--462, 1992.
+
+\bibitem{Villard97}
+G.~Villard.
+\newblock Further analysis of {C}oppersmith's block {W}iedemann algorithm for
+  the solution of sparse linear systems.
+\newblock In {\em ISSAC'97}, pages 32--39. ACM, 1997.
+
+\bibitem{Villard97a}
+G.~Villard.
+\newblock A study of {C}oppersmith's block {W}iedemann algorithm using matrix
+  polynomials.
+\newblock Technical report, LMC-IMAG, Report 975 IM, 1997.
+
+\bibitem{Wolovich74}
+W.~A. Wolovich.
+\newblock {\em Linear Multivariable Systems}, volume~11 of {\em Applied
+  Mathematical Sciences}.
+\newblock Springer-Verlag New-York, 1974.
+
+\bibitem{ZhoLab12}
+W.~Zhou and G.~Labahn.
+\newblock Efficient algorithms for order basis computation.
+\newblock {\em J. Symbolic Comput.}, 47(7):793--819, 2012.
+
+\end{thebibliography}
+
 \end{document}

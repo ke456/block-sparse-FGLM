@@ -1,20 +1,10 @@
 /* -*- mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
 
-#define TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
-#define EXTRA_TIMINGS_ON // to activate timings; note that these may be irrelevant if VERBOSE / EXTRA_VERBOSE are also activated
-//#define EXTRA_VERBOSE_ON // extra detailed printed objects, like multiplication matrix and polynomial matrices... unreadable except for very small dimensions
-//#define VERBOSE_ON // some objects printed for testing purposes, but not the biggest ones (large constant matrices, polynomial matrices..)
-//#define NAIVE_ON
-#define WARNINGS_ON // comment out if having warnings for heuristic parts is irrelevant --> should probably be 'on'
+#define TIMINGS_ON // to activate timings
 #define SPARSITY_COUNT // shows the sparsity of the matrices
-// #define TEST_FGLM // testing / timing approximant basis algos
-//#define TEST_APPROX // testing / timing approximant basis algos
-//#define TEST_KERNEL // testing / timing kernel basis algo
-#define TEST_INVARIANT_FACTOR // testing / timing heuristic invariant factor
 // #define OUTPUT_FUNC // outputs the computed functions
 
 #include "block-sparse-fglm.h"
-#include "all.h"
 
 #include <algorithm>
 #include <string>
@@ -44,7 +34,7 @@ void print_poly(const zz_pX& p, std::ostream &ofs){
 
 //-----------------------------------------------//
 //-----------------------------------------------//
-//        Polynomial matrix stuff                //
+//              Polynomial matrix                //
 //-----------------------------------------------//
 //-----------------------------------------------//
 
@@ -83,94 +73,267 @@ void mat_resize (GF &field, PolMatDom::MatrixP &mat, int size){
 	mat = temp;
 }
 
-template<typename PolMat>
-void PolMatDom::print_degree_matrix( const PolMat &pmat ) const {
-	const size_t d = pmat.degree();
-	for ( size_t i=0; i<pmat.rowdim(); ++i ) {
-		for ( size_t j=0; j<pmat.coldim(); ++j ) {
-			int deg = d;
-			while ( deg>=0 and pmat.get(i,j,deg) == 0 )
-				--deg;
-			cout << deg << "  ";
+vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
+{
+	/** Algorithm M-Basis-One as detailed in Section 3 of
+	 *  [Jeannerod, Neiger, Villard. Fast Computation of approximant bases in
+	 *  canonical form. Preprint, 2017]
+	 **/
+	/** Input:
+	 *   - approx: m x m square polynomial matrix, approximation basis
+	 *   - series: m x n polynomial matrix of size = order, series to approximate
+	 *   - order: positive integer, order of approximation
+	 *   - shift: m-tuple of degree shifts (acting on columns of approx)
+	 **/
+	/** Action:
+	 *   - Compute and store in 'approx' an shift-ordered weak Popov
+	 *   approximation basis for (series,order)
+	 *  Note: is order=1, then approx is in shift-Popov form
+	 **/
+	/** Output: shifted minimal degree of (series,order),
+	 * which is equal to the diagonal degrees of approx **/
+	/** Complexity: O(m^w order^2) **/
+
+	const size_t m = series.rowdim();
+	const size_t n = series.coldim();
+	typedef BlasSubmatrix<typename PolMatDom::MatrixP::Matrix> View;
+
+	// initialize approx to the identity matrix
+	approx.resize(0); // to put zeroes everywhere.. there might be a better way to do it but it seems LinBox's approx.clear() fails
+	size_t appsz = 1;
+	approx.resize(appsz);
+	for ( size_t i=0; i<m; ++i )
+		approx.ref(i,i,0) = 1;
+
+	// initial shifted row degrees = shift
+	vector<int> rdeg( shift );
+	// initial shifted minimal degree = (0,...,0)
+	vector<size_t> mindeg( m, 0 );
+
+	// set residual to input series
+	PolMatDom::PMatrix res( this->field(), m, n, series.size() );
+	res.copy( series );
+
+	for ( size_t ord=0; ord<order; ++ord )
+	{
+		//At the beginning of iteration 'ord',
+		//   - approx is an order basis, shift-ordered weak Popov,
+		//   for series at order 'ord'
+		//   - the shift-min(shift) row degrees of approx are rdeg.
+		//   - the max degree in approx is <= appsz
+
+		// Here we follow [Algorithm M-Basis-1] in the above reference
+
+		// coefficient of degree 'ord' of residual, which we aim at cancelling
+		typename PolMatDom::MatrixP::Matrix res_const( approx.field(), m, n );
+		if ( resUpdate ) // res_const is coeff of res of degree ord
+			res_const = res[ord];
+		else // res_const is coeff of approx*res of degree ord
+		{
+			for ( size_t d=0; d<appsz; ++d )
+				this->_BMD.axpyin( res_const, approx[d], res[ord-d] ); // note that d <= appsz-1 <= ord
 		}
-		cout << endl;
-	}
-}
 
-template<typename Matrix>
-void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq ) {
-	// 0. initialize dimensions, shift, matrices
-	size_t M = mat_seq[0].rowdim();
-	size_t d = mat_seq.size();
-	const vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
-	PolMatDom::PMatrix series( this->field(), 2*M, M, d );
-	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, d );
+		// permutation for the stable sort of the shifted row degrees
+		vector<size_t> perm_rdeg( m );
+		iota( perm_rdeg.begin(), perm_rdeg.end(), 0 );
+		stable_sort(perm_rdeg.begin(), perm_rdeg.end(),
+			    [&](const size_t& a, const size_t& b)->bool
+			    {
+				    return (rdeg[a] < rdeg[b]);
+			    } );
 
-	// 1. construct series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
-	// i.e. stacking reversed sequence and -Identity
-	for ( size_t i=0; i<M; ++i )
-		series.ref(i+M,i,0) = this->field().mOne;
+		// permute rows of res_const accordingly
+		vector<size_t> lperm_rdeg( m ); // LAPACK-style permutation
+		FFPACK::MathPerm2LAPACKPerm( lperm_rdeg.data(), perm_rdeg.data(), m );
+		BlasPermutation<size_t> pmat_rdeg( lperm_rdeg );
+		this->_BMD.mulin_right( pmat_rdeg, res_const );
 
-	for ( size_t k=0; k<d; ++k )
-		for ( size_t i=0; i<M; ++i )
-			for ( size_t j=0; j<M; ++j )
-				series.ref(i,j,k) = mat_seq[d-k-1].getEntry(i,j);
+		// compute PLUQ decomposition of res_const
+		BlasPermutation<size_t> P(m), Q(n);
+		size_t rank = FFPACK::PLUQ( res_const.field(), FFLAS::FflasNonUnit,
+					    m, n, res_const.getWritePointer(), res_const.getStride(),
+					    P.getWritePointer(), Q.getWritePointer() );
 
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Approximant basis: input order, shift, series degrees" << endl;
-	cout << d << endl;
-	cout << shift << endl;
-	this->print_degree_matrix( series );
-#ifdef EXTRA_VERBOSE_ON
-	cout << "series entries:" << endl;
-	cout << series << endl;
-#endif
-#endif
+		// compute a part of the left kernel basis of res_const:
+		// -Lbot Ltop^-1 , stored in Lbot
+		// Note: the full kernel basis is [ -Lbot Ltop^-1 | I ] P
+		View Ltop( res_const, 0, 0, rank, rank ); // top part of lower triangular matrix in PLUQ
+		View Lbot( res_const, rank, 0, m-rank, rank ); // bottom part of lower triangular matrix in PLUQ
+		FFLAS::ftrsm( approx.field(), FFLAS::FflasRight, FFLAS::FflasLower,
+			      FFLAS::FflasNoTrans, FFLAS::FflasUnit,
+			      m-rank, rank, approx.field().mOne,
+			      Ltop.getPointer(), Ltop.getStride(),
+			      Lbot.getWritePointer(), Lbot.getStride() );
 
-	// 2. compute approximant basis in ordered weak Popov form
-	vector<size_t> mindeg = this->pmbasis( app_bas, series, d, shift );
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(MatrixBM)### Approximant basis: output rdeg and basis degrees" << endl;
-	cout << mindeg << endl;
-	this->print_degree_matrix( app_bas );
-#ifdef EXTRA_VERBOSE_ON
-	cout << "basis entries:" << endl;
-	cout << app_bas << endl;
-#endif
-#endif
+		// Prop: this "kernel portion" is now stored in Lbot.
+		//Then const_app = perm^{-1} P^{-1} [ [ X Id | 0 ] , [ Lbot | Id ] ] P perm
+		//is an order basis in rdeg-Popov form for const_res at order 1
+		// --> by transitivity,  const_app*approx will be a shift-ordered
+		// weak Popov approximant basis for (series,ord+1)
 
-	// 3. copy into mat_gen and mat_num
-	mat_gen.setsize( mindeg[0]+1 );
-	mat_num.setsize( mindeg[0]+1 );
-	for ( size_t i=0; i<M; ++i )
-		for ( size_t j=0; j<M; ++j )
-			for ( size_t k=0; k<=mindeg[0]; ++k )
+		// A. update approx basis, first steps:
+		for ( size_t d=0; d<appsz; ++d )
+		{
+			// 1. permute rows: approx = P * perm * approx
+			this->_BMD.mulin_right( pmat_rdeg, approx[d] );
+			this->_BMD.mulin_right( P, approx[d] );
+			// 2. multiply by constant: appbot += Lbot apptop
+			View apptop( approx[d], 0, 0, rank, m );
+			View appbot( approx[d], rank, 0, m-rank, m );
+			this->_BMD.axpyin( appbot, Lbot, apptop );
+		}
+
+		// permute row degrees accordingly
+		vector<size_t> lperm_p( P.getStorage() ); // Lapack-style permutation P
+		vector<size_t> perm_p( m ); // math-style permutation P
+		FFPACK::LAPACKPerm2MathPerm( perm_p.data(), lperm_p.data(), m ); // convert
+
+		// B. update shifted row degree, shifted minimal degree,
+		// and new approximant basis size using property: deg(approx) = max(mindeg)
+		for ( size_t i=0; i<rank; ++i )
+		{
+			++rdeg[perm_rdeg[perm_p[i]]];
+			++mindeg[perm_rdeg[perm_p[i]]];
+		}
+		appsz = 1 + *max_element(mindeg.begin(),mindeg.end());
+		approx.resize( appsz );
+
+		// A. update approx basis:
+		// 3. multiply first rank rows by X...
+		for ( size_t d=appsz-1; d>0; --d )
+			for ( size_t i=0; i<rank; ++i )
+				for ( size_t j=0; j<m; ++j )
+					approx.ref(i,j,d) = approx.ref(i,j,d-1);
+		// 4. ... and approx[0]: first rank rows are zero
+		for ( size_t i=0; i<rank; ++i )
+			for ( size_t j=0; j<m; ++j )
+				approx.ref(i,j,0) = 0;
+		// 5. permute the rows again: approx = perm^{-1} * P^{-1} * approx
+		P.Invert();
+		pmat_rdeg.Invert();
+		for ( size_t d=0; d<appsz; ++d )
+		{
+			this->_BMD.mulin_right( P, approx[d] );
+			this->_BMD.mulin_right( pmat_rdeg, approx[d] );
+		}
+
+		// NOTE: resUpdate = True may not be supported currently; assuming False
+		if ( resUpdate )
+		{
+			//if ( resUpdate )
+			//{
+			//	for ( size_t d=ord; d<res.size(); ++d )
+			//		this->_BMD.mulin_right( pmat_rdeg, res[d] );
+			//}
+			// update residual: do same operations as on approx
+			// update residual: 1/ permute all the rows; multiply by constant
+			// note: to simplify later multiplication by X, we permute rows of res[ord]
+			//(but we don't compute the zeroes in the other rows)
+			this->_BMD.mulin_right( P, res[ord] ); // permute rows by P
+			for ( size_t d=ord+1; d<res.size(); ++d )
+				this->_BMD.mulin_right( P, res[d] ); // permute rows by P
+
+			for ( size_t d=ord+1; d<res.size(); ++d )
 			{
-				mat_gen.ref(i,j,k) = app_bas.get(i,j,k);
-				mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
+				// multiply by constant: resbot += Lbot restop
+				View restop( res[d], 0, 0, rank, n );
+				View resbot( res[d], rank, 0, m-rank, n );
+				this->_BMD.axpyin( resbot, Lbot, restop );
 			}
+
+			// update residual: 2/ multiply first rank rows by X...
+			for ( size_t d=res.size()-1; d>ord; --d )
+				for ( size_t i=0; i<rank; ++i )
+					for ( size_t j=0; j<n; ++j )
+						res.ref(i,j,d) = res.ref(i,j,d-1);
+		}
+	}
+	return mindeg;
 }
 
+vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
+{
+	/** Algorithm PM-Basis as detailed in Section 2.2 of
+	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
+	 *  of Polynomial Matrix Computations. ISSAC 2003]
+	 **/
+	/** Input:
+	 *   - approx: m x m square polynomial matrix, approximation basis
+	 *   - series: m x n polynomial matrix of degree < order, series to approximate
+	 *   - order: positive integer, order of approximation
+	 *   - shift: degree shift on the cols of approx
+	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
+	 **/
+	/** Action:
+	 *   - Compute and store in 'approx' a shifted ordered weak Popov
+	 *   approximation basis for (series,order,shift)
+	 **/
+	/* Return:
+	 * - the shifted minimal degree for (series,order)
+	 */
+	/** Output: shifted row degrees of the computed approx **/
+	/** Complexity: O(m^w M(order) log(order) ) **/
 
-/*! \brief Computing s-owP kernel basis of a polynomial matrix
+	if ( order <= this->getPMBasisThreshold() )
+	{
+		vector<size_t> mindeg = mbasis( approx, series, order, shift );
+		return mindeg;
+	}
+	else
+	{
+		size_t m = series.rowdim();
+		size_t n = series.coldim();
+		size_t order1,order2;
+		order1 = order>>1; // order1 ~ order/2
+		order2 = order - order1; // order2 ~ order/2, order1 + order2 = order
+		vector<size_t> mindeg( m );
+
+		PolMatDom::PMatrix approx1( this->field(), m, m, 0 );
+		PolMatDom::PMatrix approx2( this->field(), m, m, 0 );
+
+		{
+			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
+			res1.copy( series, 0, order1-1 );
+			mindeg = pmbasis( approx1, res1, order1, shift ); // first recursive call
+		} // end of scope: res1 is deallocated here
+		{
+			vector<int> rdeg( shift ); // shifted row degrees = mindeg + shift
+			for ( size_t i=0; i<m; ++i )
+				rdeg[i] += mindeg[i];
+			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
+			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
+			vector<size_t> mindeg2( m );
+			mindeg2 = pmbasis( approx2, res2, order2, rdeg ); // second recursive call
+			for ( size_t i=0; i<m; ++i )
+				mindeg[i] += mindeg2[i];
+		} // end of scope: res2 is deallocated here
+		
+		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
+		//approx.resize( approx1.size()+approx2.size()-1 );
+		// in fact, deg(approx) = max(mindeg)  (which is indeed the sum of the mindegs for approx1 and approx2)
+		approx.resize( 1 + *max_element( mindeg.begin(), mindeg.end() ) );
+		this->_PMMD.mul( approx, approx2, approx1 );
+		return mindeg;
+	}
+
+}
+
+/*! \brief Computing a kernel basis of a polynomial matrix
  *
  *  Given an m x n polynomial matrix F, and a shift s = (s1,...,sn),
- *  this function computes a left kernel basis of F in s-ordered
- *  weak Popov form.
+ *  this function computes a left kernel basis of F in ordered
+ *  weak Popov form (for the uniform shift).
  *
- *  Algorithm based on PM-Basis at a high order:
- *  cost bound O~( ? )
+ *  Algorithm based on PM-Basis at a high order
  *  --> faster algorithms are known in some cases,
- *  cf. Zhou-Labahn-Storjohann ISSAC 2012 and Vu Thi Xuan's Master 1 report
+ *  cf. Zhou-Labahn-Storjohann ISSAC 2012
  *
  * \param kerbas: storage for the output kernel basis
  * \param pmat: input polynomial matrix
- * \param shift: input shift
  * \return the shifted minimal degree of the kernel basis (or the shifted pivot degree and index?)
  */
-/* TODO: <vneiger> only supports uniform shift */
-/* TODO: <vneiger> specific to our case -> in general might return only a part of the kernel basis */
-/* TODO: <vneiger> adjust number of rows in output kernel basis after computation */
+/* Not: for simplicity, specific to the present situation -> in general, it might return only a part of the kernel basis */
 void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 {
 	size_t m = pmat.rowdim();
@@ -253,721 +416,38 @@ void PolMatDom::largest_invariant_factor( vector<zz_pX> & left_multiplier, zz_pX
 		left_multiplier[i] /= lc;
 }
 
-void PolMatDom::SmithForm( vector<PolMatDom::Polynomial> &smith, PolMatDom::PMatrix &lfac, PolMatDom::PMatrix &rfac, const PolMatDom::PMatrix &pmat ) {
-	// Heuristic computation of the Smith form and multipliers
-	// Algorithm:
-	//    - compute left Hermite form hmat1 = umat pmat
-	//    - compute right Hermite form hmat2 = hmat1 vmat
-	//      (which is Transpose(LeftHermite(Transpose(hmat1)))
-	//    - then return (smith,lfac,rfac) = (hmat2,umat,vmat)
-	// Note: this is not guaranteed to be correct, but seems to true generically
-	// Implementation: Hermite form computed via kernel basis, itself computed via approximant basis
-	// FIXME degree bounds used to define orders could be improved
-	// FIXME need to use popov_pmbasis for both calls, or pmbasis could suffice?
-	const size_t M = pmat.rowdim();
-	const size_t deg = pmat.degree();
+template<typename Matrix>
+void PolMatDom::MatrixBerlekampMassey( PolMatDom::PMatrix &mat_gen, PolMatDom::PMatrix &mat_num, const vector<Matrix> & mat_seq ) {
+	// 0. initialize dimensions, shift, matrices
+	size_t M = mat_seq[0].rowdim();
+	size_t d = mat_seq.size();
+	const vector<int> shift( 2*M, 0 );  // dim = M + N = 2M
+	PolMatDom::PMatrix series( this->field(), 2*M, M, d );
+	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, d );
 
-	// build Hermite kernel shift:  [0,...,0,0,M deg, 2 M deg, ..., (M-1) M deg]
-	vector<int> shift( 2*M, 0 );
-	for ( size_t i=M; i<2*M; ++i ) {
-		shift[i] = (i-M)*deg*M;
-	}
+	// 1. construct series = Matrix.block( [[sum( [seq[d-k-1] * X^k for k in range(d)] )],[-1]] )
+	// i.e. stacking reversed sequence and -Identity
+	for ( size_t i=0; i<M; ++i )
+		series.ref(i+M,i,0) = this->field().mOne;
 
-	// order d such that approximant basis contains kernel basis
-	const size_t order = 2*M*deg+1;
-
-	// build series matrix: block matrix with first M rows = pmat; last M rows = -identity
-	PolMatDom::PMatrix series( this->field(), 2*M, M, order );
-
-	for ( size_t k=0; k<=deg; ++k )
+	for ( size_t k=0; k<d; ++k )
 		for ( size_t i=0; i<M; ++i )
 			for ( size_t j=0; j<M; ++j )
-				series.ref(i,j,k) = pmat.get(i,j,k);
+				series.ref(i,j,k) = mat_seq[d-k-1].getEntry(i,j);
 
-	for ( size_t i=M; i<2*M; ++i )
-		series.ref(i,i-M,0) = this->field().mOne;
+	// 2. compute approximant basis in ordered weak Popov form
+	vector<size_t> mindeg = this->pmbasis( app_bas, series, d, shift );
 
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### First approximant basis: deg(pmat), input shift, input order..:" << endl;
-	cout << deg << endl;
-	cout << shift << endl;
-	cout << order << endl;
-	cout << "series degrees:" << endl;
-	this->print_degree_matrix(series);
-#ifdef EXTRA_VERBOSE_ON
-	cout << "series entries:" << endl;
-	cout << series << endl;
-#endif
-#endif
-
-	// compute first approximant basis
-	PolMatDom::PMatrix app_bas( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg = this->popov_pmbasis( app_bas, series, order, shift );
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### First approximant basis: shifted row degrees and matrix degrees:" << endl;
-	cout << mindeg << endl;
-	this->print_degree_matrix(app_bas);
-#ifdef EXTRA_VERBOSE_ON
-	cout << "basis entries:" << endl;
-	cout << app_bas << endl;
-#endif
-#endif
-
-	// extract the left factor lfac which is the left block of the smallest degree rows,
-	// as well as Transpose(LeftHermite(pmat)) which is the transpose of the right block of the smallest degree rows.
-	app_bas.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
-	PolMatDom::PMatrix series2( this->field(), 2*M, M, order );
+	// 3. copy into mat_gen and mat_num
+	mat_gen.setsize( mindeg[0]+1 );
+	mat_num.setsize( mindeg[0]+1 );
 	for ( size_t i=0; i<M; ++i )
 		for ( size_t j=0; j<M; ++j )
-			for ( size_t k=0; k<order; ++k ) {
-				lfac.ref(i,j,k) = app_bas.get(i+M,j,k);
-				series2.ref(j,i,k) = app_bas.get(i+M,j+M,k);
-			}
-	// bottom part of series2 = -identity
-	for ( size_t i=0; i<M; ++i )
-		series2.ref(i+M,i,0) = this->field().mOne;
-
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### Second approximant basis: deg(pmat), input shift, input order..:" << endl;
-	cout << deg << endl;
-	cout << shift << endl;
-	cout << order << endl;
-	cout << "series degrees:" << endl;
-	this->print_degree_matrix(series2);
-#ifdef EXTRA_VERBOSE_ON
-	cout << "series entries:" << endl;
-	cout << series2 << endl;
-#endif
-#endif
-
-	// compute second approximant basis
-	PolMatDom::PMatrix app_bas2( this->field(), 2*M, 2*M, order );
-	vector<size_t> mindeg2 = this->popov_pmbasis( app_bas2, series2, order, shift );
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### Second approximant basis: shifted minimal degree and matrix degrees:" << endl;
-	cout << mindeg2 << endl;
-	this->print_degree_matrix(app_bas2);
-#ifdef EXTRA_VERBOSE_ON
-	cout << "basis entries:" << endl;
-	cout << app_bas2 << endl;
-#endif
-#endif
-
-	// extract the right factor rfac, which is the transpose of the bottom left block
-	app_bas2.resize( order ); // make sure size is order (may have been decreased in approximant basis call)
-	for ( size_t i=0; i<M; ++i )
-		for ( size_t j=0; j<M; ++j )
-			for ( size_t k=0; k<order; ++k ) {
-				rfac.ref(j,i,k) = app_bas2.get(i+M,j,k);
-			}
-
-#ifdef WARNINGS_ON
-	// check if this second Hermite form is diagonal
-	bool test=true;
-	for ( size_t i=1; i<M; ++i )
-		for ( size_t j=0; j<i; ++j )
-			for ( size_t k=0; k<app_bas2.size(); ++k ) {
-				if ( app_bas2.get(i+M,j+M,k) != 0 )
-					test=false;
-			}
-	if ( not test ) {
-		cout << "~~~WARNING(Smith)~~~ double Hermite did not yield a diagonal matrix" << endl;
-		cout << "   ------->>> the matrix found is not the Smith form. Ask Vincent to add a third Hermite form." << endl;
-	}
-#endif
-
-	// extract the Smith form
-	for ( size_t i=0; i<M; ++i ) {
-		smith[i] = app_bas2(i+M,i+M);
-		while (!smith[i].empty() && smith[i][smith[i].size()-1] == 0) {
-			smith[i].pop_back();
-		}
-#ifdef WARNINGS_ON
-		if ( smith[i].empty() ) {
-			cout << "~~~WARNING(Smith)~~~ one of the Smith factors is zero" << endl;
-			cout << "   ------->>> something went wrong: check for other warnings above." << endl;
-		}
-#endif
-	}
-
-#ifdef VERBOSE_ON
-	cout << "###OUTPUT(Smith)### Degrees of Smith factors:" << endl;
-	for ( size_t i=0; i<M; ++i )
-		cout << smith[i].size()-1 << "  " ;
-	cout << endl;
-	cout << "###OUTPUT(Smith)### Degrees in left Smith factor:" << endl;
-	this->print_degree_matrix( lfac );
-	cout << "###OUTPUT(Smith)### Degrees in right Smith factor:" << endl;
-	this->print_degree_matrix( rfac );
-#ifdef EXTRA_VERBOSE_ON
-	cout << "###OUTPUT(Smith)### Smith factors entries:" << endl;
-	cout << smith << endl;
-	cout << "###OUTPUT(Smith)### Left Smith factor entries:" << endl;
-	cout << lfac << endl;
-	cout << "###OUTPUT(Smith)### Right Smith factor entries:" << endl;
-	cout << rfac << endl;
-#endif
-#endif
-}
-
-
-vector<int> PolMatDom::old_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
-{
-	/** Algorithm PM-Basis as detailed in Section 2.2 of
-	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
-	 *  of Polynomial Matrix Computations. ISSAC 2003]
-	 **/
-	/** Input:
-	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of degree < order, series to approximate
-	 *   - order: positive integer, order of approximation
-	 *   - shift: degree shift on the cols of approx
-	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
-	 **/
-	/** Action:
-	 *   - Compute and store in 'approx' a shifted minimal approximation basis for (series,order,shift)
-	 **/
-	/** Output: shifted row degrees of the computed approx **/
-	/** Complexity: O(m^w M(order) log(order) ) **/
-	/** TODO study the impact of the threshold **/
-
-	if ( order <= this->getPMBasisThreshold() )
-	{
-		std::vector<int> rdeg = old_mbasis( approx, series, order, shift );
-		return rdeg;
-	}
-	else
-	{
-		size_t m = series.rowdim();
-		size_t n = series.coldim();
-		size_t order1,order2;
-		order1 = order>>1; // order1 ~ order/2
-		order2 = order - order1; // order2 ~ order/2, order1 + order2 = order
-		vector<int> rdeg( shift );
-
-		PolMatDom::PMatrix approx1( this->field(), m, m, 0 );
-		PolMatDom::PMatrix approx2( this->field(), m, m, 0 );
-
-		{
-			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
-			res1.copy( series, 0, order1-1 );
-			rdeg = old_pmbasis( approx1, res1, order1, rdeg ); // first recursive call
-		} // end of scope: res1 is deallocated here
-		{
-			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
-			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
-			rdeg = old_pmbasis( approx2, res2, order2, rdeg ); // second recursive call
-		} // end of scope: res2 is deallocated here
-		
-		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
-		approx.resize( approx1.size()+approx2.size()-1 );
-		this->_PMMD.mul( approx, approx2, approx1 );
-		// the shifted row degree of approx is rdeg
-		//--> bound on deg(approx): max(rdeg)-min(shift) (FIXME a bit pessimistic..)
-		int maxdeg = *max_element( rdeg.begin(), rdeg.end() ) - *std::min_element( shift.begin(), shift.end() );
-		approx.resize( 1 + min( (int) order, maxdeg ) );
-		return rdeg;
-	}
-
-}
-
-vector<size_t> PolMatDom::popov_pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
-{
-	/** Algorithm Popov-PM-Basis as detailed in
-	 *  [Jeannerod, Neiger, Villard. Fast Computation of approximant bases in
-	 *  canonical form. Preprint, 2017]
-	 **/
-	/** Input:
-	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of degree < order, series to approximate
-	 *   - order: positive integer, order of approximation
-	 *   - shift: degree shift on the cols of approx
-	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
-	 **/
-	/** Action:
-	 *   - Compute and store in 'approx' the shift-Popov approximation basis for (series,order)
-	 **/
-	/** Output: shifted row degrees of the computed approx **/
-	/** Complexity: O(m^w M(order) log(order) ) **/
-
-	// 1. compute shift-owP approximant basis
-	size_t m = series.rowdim();
-	vector<size_t> mindeg = pmbasis( approx, series, order, shift );
-	
-	// 2. compute -mindeg-owP approximant basis
-
-	//// Note: if mindeg+shift is uniform,
-	//// then approx is already in -mindeg-owP form
-	//bool uniform=true;
-	//for ( size_t i=0; i<m-1; ++i )
-	//{
-	//	if ( (int)mindeg[i] + shift[i] != (int)mindeg[i+1] + shift[i+1]) {
-	//		uniform = false;
-	//	}
-	//}
-
-	//if ( !uniform )
-	//{
-		vector<int> mindegshift( m );
-		for ( size_t i=0; i<m; ++i )
-			mindegshift[i] = - (int)mindeg[i];
-		pmbasis( approx, series, order, mindegshift );
-	//}
-
-	// 3. left-multiply by inverse of -mindeg-row leading matrix
-	// Note: cdeg(approx) = mindeg
-	PolMatDom::MatrixP::Matrix lmat( this->field(), m, m );
-	for ( size_t i=0; i<m; ++i )
-		for ( size_t j=0; j<m; ++j )
-			lmat.setEntry( i, j, approx.get( i, j, mindeg[j] ) );
-#ifdef EXTRA_VERBOSE_ON
-	cout << "###OUTPUT(popov_pmbasis)### leading matrix of -mindeg-owP app-basis:" << endl;
-	cout << lmat << endl;
-#endif
-	this->_BMD.invin( lmat );
-	for ( size_t k=0; k<approx.size(); ++k ) {
-		this->_BMD.mulin_right( lmat, approx[k] );
-	}
-	return mindeg;
-}
-
-
-vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const std::vector<int> &shift )
-{
-	/** Algorithm PM-Basis as detailed in Section 2.2 of
-	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
-	 *  of Polynomial Matrix Computations. ISSAC 2003]
-	 **/
-	/** Input:
-	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of degree < order, series to approximate
-	 *   - order: positive integer, order of approximation
-	 *   - shift: degree shift on the cols of approx
-	 *   - threshold: depth for leaves of recursion (when the current order reaches threshold, apply mbasis)
-	 **/
-	/** Action:
-	 *   - Compute and store in 'approx' a shifted ordered weak Popov
-	 *   approximation basis for (series,order,shift)
-	 **/
-	/* Return:
-	 * - the shifted minimal degree for (series,order)
-	 */
-	/** Output: shifted row degrees of the computed approx **/
-	/** Complexity: O(m^w M(order) log(order) ) **/
-	/** TODO study the impact of the threshold **/
-
-	if ( order <= this->getPMBasisThreshold() )
-	{
-		vector<size_t> mindeg = mbasis( approx, series, order, shift );
-		return mindeg;
-	}
-	else
-	{
-		size_t m = series.rowdim();
-		size_t n = series.coldim();
-		size_t order1,order2;
-		order1 = order>>1; // order1 ~ order/2
-		order2 = order - order1; // order2 ~ order/2, order1 + order2 = order
-		vector<size_t> mindeg( m );
-
-		PolMatDom::PMatrix approx1( this->field(), m, m, 0 );
-		PolMatDom::PMatrix approx2( this->field(), m, m, 0 );
-
-		{
-			PolMatDom::PMatrix res1( this->field(), m, n, order1 ); // first residual: series truncated mod X^order1
-			res1.copy( series, 0, order1-1 );
-			mindeg = pmbasis( approx1, res1, order1, shift ); // first recursive call
-		} // end of scope: res1 is deallocated here
-		{
-			vector<int> rdeg( shift ); // shifted row degrees = mindeg + shift
-			for ( size_t i=0; i<m; ++i )
-				rdeg[i] += mindeg[i];
-			PolMatDom::PMatrix res2( series.field(), m, n, order2 ); // second residual: midproduct 
-			this->_PMMD.midproductgen( res2, approx1, series, true, order1+1, order1+order2 ); // res2 = (approx1*series / X^order1) mod X^order2
-			vector<size_t> mindeg2( m );
-			mindeg2 = pmbasis( approx2, res2, order2, rdeg ); // second recursive call
-			for ( size_t i=0; i<m; ++i )
-				mindeg[i] += mindeg2[i];
-		} // end of scope: res2 is deallocated here
-		
-		// for PMD.mul we need the size to be the sum (even though we have a better bound on the output degree)
-		//approx.resize( approx1.size()+approx2.size()-1 );
-		// in fact, deg(approx) = max(mindeg)  (which is indeed the sum of the mindegs for approx1 and approx2)
-		approx.resize( 1 + *max_element( mindeg.begin(), mindeg.end() ) );
-		this->_PMMD.mul( approx, approx2, approx1 );
-		return mindeg;
-	}
-
-}
-
-
-
-vector<int> PolMatDom::old_mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift )
-{
-	/** Algorithm M-Basis as detailed in Section 2.1 of
-	 *  [Giorgi, Jeannerod, Villard. On the Complexity 
-	 *  of Polynomial Matrix Computations. ISSAC 2003]
-	 **/
-	/** Input:
-	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of degree < order, series to approximate
-	 *   - order: positive integer, order of approximation
-	 *   - shift: degree shifts on the cols of approx
-	 **/
-	/** Action:
-	 *   - Compute and store in 'approx' a minimal shifted approximation basis for (series,order,shift)
-	 **/
-	/** Output: shifted row degrees of the computed approx **/
-	/** Complexity: O(m^w order^2) **/
-
-	bool resUpdate = true; // true: continuously update the residual. false: compute the residual from approx and series. //FIXME should be argument
-
-	const size_t m = series.rowdim();
-	const size_t n = series.coldim();
-	typedef BlasSubmatrix<typename PolMatDom::MatrixP::Matrix> View;
-
-	// allocate some space for approx:
-	//FIXME right now size = order (pessimistic in many usual cases)
-	// maybe an idea: first, twice the expected degree (generic instance),
-	//will be increased later if necessary
-	// but still this pessimistic version doesn't seem to really impact the timing.. ??
-	size_t size_app = order+1;
-	approx.resize(0); // to put zeroes everywhere.. FIXME may be a better way to do it but it seems approx.clear() fails
-	approx.resize( size_app );
-
-	// set approx to identity, initial degree of approx = 0	
-	for ( size_t i=0; i<m; ++i )
-		approx.ref(i,i,0) = 1;
-	size_t maxdeg = 0; // actual max degree in the matrix
-
-	// initial row shifted degrees = shift - min(shift)
-	//this way, we have during all the algo the upper bound max(rdeg) on the degree of approx
-	vector<size_t> rdeg( m );
-	int min_shift = *min_element( shift.begin(), shift.end() );
-	for ( size_t i=0; i<m; ++i )
-		rdeg[i] = (size_t) (shift[i] - min_shift);
-
-	// set residual to input series
-	PolMatDom::PMatrix res( this->field(), m, n, series.size() );
-	res.copy( series );
-
-	for ( size_t ord=0; ord<order; ++ord )
-	{
-		//At the beginning of iteration 'ord',
-		//   - approx is an order basis, shift-reduced,
-		//   for series at order 'ord'
-		//   - the shift-min(shift) row degrees of approx are rdeg.
-		//   - the max degree in approx is <= maxdeg
-
-		// permutation which sorts the shifted row degrees increasingly
-		vector<size_t> perm_rdeg( m );
-		for ( size_t i=0; i<m; ++i )
-			perm_rdeg[i] = i;
-		sort(perm_rdeg.begin(), perm_rdeg.end(),
-		     [&](const size_t& a, const size_t& b)->bool
-		     {
-			     return (rdeg[a] < rdeg[b]);
-		     } );
-
-		// permute rows of res and approx accordingly, as well as row degrees
-		vector<size_t> lperm_rdeg( m ); // LAPACK-style permutation
-		FFPACK::MathPerm2LAPACKPerm( lperm_rdeg.data(), perm_rdeg.data(), m );
-		BlasPermutation<size_t> pmat_rdeg( lperm_rdeg );
-		if ( resUpdate )
-		{
-			for ( size_t d=ord; d<res.size(); ++d )
-				this->_BMD.mulin_right( pmat_rdeg, res[d] );
-		}
-		for ( size_t d=0; d<=maxdeg; ++d )
-			this->_BMD.mulin_right( pmat_rdeg, approx[d] );
-		vector<size_t> old_rdeg( rdeg );
-		for ( size_t i=0; i<m; ++i )
-			rdeg[i] = old_rdeg[perm_rdeg[i]];
-		
-		// coefficient of degree 'ord' of residual:
-		//we aim at cancelling this matrix with a degree 1 polynomial matrix
-		typename PolMatDom::MatrixP::Matrix res_const( approx.field(), m, n );
-
-		if ( resUpdate ) // res_const is coeff of res of degree ord
-			res_const = res[ord];
-		else // res_const is coeff of approx*res of degree ord
-		{
-			for ( size_t d=0; d<=maxdeg; ++d ) // FIXME using midproduct may (should) be faster?
-				this->_BMD.axpyin( res_const, approx[d], res[ord-d] ); // note that d <= maxdeg <= ord
-		}
-		
-		// compute PLUQ decomposition of res_const
-		BlasPermutation<size_t> P(m), Q(n);
-		size_t rank = FFPACK::PLUQ( res_const.field(), FFLAS::FflasNonUnit, //FIXME TODO investigate see below ftrsm
-					    m, n, res_const.getWritePointer(), res_const.getStride(),
-					    P.getWritePointer(), Q.getWritePointer() );
-
-		// compute a part of the left kernel basis of res_const:
-		// -Lbot Ltop^-1 , stored in Lbot
-		// Note: the full kernel basis is [ -Lbot Ltop^-1 | I ] P
-		View Ltop( res_const, 0, 0, rank, rank ); // top part of lower triangular matrix in PLUQ
-		View Lbot( res_const, rank, 0, m-rank, rank ); // bottom part of lower triangular matrix in PLUQ
-		FFLAS::ftrsm( approx.field(), FFLAS::FflasRight, FFLAS::FflasLower,
-			      FFLAS::FflasNoTrans, FFLAS::FflasUnit, // FIXME TODO works only if nonunit in PLUQ and unit here; or converse. But not if consistent...?????? investigate
-			      approx.rowdim()-rank, rank, approx.field().mOne,
-			      Ltop.getPointer(), Ltop.getStride(),
-			      Lbot.getWritePointer(), Lbot.getStride() );
-
-		// Prop: this "kernel portion" is now stored in Lbot.
-		//Then const_app = [ [ X Id | 0 ] , [ Lbot | Id ] ] P
-		//is an order basis in rdeg-Popov form for const_res at order 1
-		// --> by transitivity,  const_app*approx will be an order basis
-		//for (series,ord+1,shift)
-
-		// update approx basis: 1/ permute all the rows; multiply by constant
-		for ( size_t d=0; d<=maxdeg; ++d )
-			this->_BMD.mulin_right( P, approx[d] ); // permute rows by P
-
-		for ( size_t d=0; d<=maxdeg; ++d )
-		{ // multiply by constant: appbot += Lbot apptop
-			View apptop( approx[d], 0, 0, rank, approx.coldim() );
-			View appbot( approx[d], rank, 0, approx.rowdim()-rank, approx.coldim() );
-			this->_BMD.axpyin( appbot, Lbot, apptop );
-		}
-
-		// permute row degrees accordingly
-		vector<size_t> lperm_p( P.getStorage() ); // Lapack-style permutation P
-		vector<size_t> perm_p( m ); // math-style permutation P
-		FFPACK::LAPACKPerm2MathPerm( perm_p.data(), lperm_p.data(), m ); // convert
-		vector<size_t> old_rdeg_bis( rdeg );
-		for ( size_t i=0; i<rank; ++i ) // update rdeg: rows <rank will be multiplied by X
-			rdeg[i] = old_rdeg_bis[ perm_p[i] ] + 1;
-		for ( size_t i=rank; i<rdeg.size(); ++i ) // update rdeg: wrdeg of rows >=rank is unchanged
-			rdeg[i] = old_rdeg_bis[ perm_p[i] ];
-
-		// compute new max degree
-		// Beware: deg(approx) bounded by max(rdeg) BECAUSE we ensured the corresponding shift satisfies min(shift)=0
-		// FIXME slightly pessimistic.. do we care? make sure almost not pessimistic in generic case
-		maxdeg = min( ord+1, *max_element( rdeg.begin(), rdeg.end() ) );
-
-		// update approx basis: 2/ multiply first rank rows by X...
-		for ( size_t d=maxdeg; d>0; --d )
-			for ( size_t i=0; i<rank; ++i )
-				for ( size_t j=0; j<approx.coldim(); ++j )
-					approx.ref(i,j,d) = approx.ref(i,j,d-1);
-		// ... and approx[0]: first rank rows are zero
-		for ( size_t i=0; i<rank; ++i )
-			for ( size_t j=0; j<approx.coldim(); ++j )
-				approx.ref(i,j,0) = 0;
-
-		if ( resUpdate )
-		{
-			// update residual: do same operations as on approx
-			// update residual: 1/ permute all the rows; multiply by constant
-			// note: to simplify later multiplication by X, we permute rows of res[ord]
-			//(but we don't compute the zeroes in the other rows)
-			this->_BMD.mulin_right( P, res[ord] ); // permute rows by P
-			for ( size_t d=ord+1; d<res.size(); ++d )
-				this->_BMD.mulin_right( P, res[d] ); // permute rows by P
-
-			for ( size_t d=ord+1; d<res.size(); ++d )
+			for ( size_t k=0; k<=mindeg[0]; ++k )
 			{
-				// multiply by constant: resbot += Lbot restop
-				View restop( res[d], 0, 0, rank, res.coldim() );
-				View resbot( res[d], rank, 0, res.rowdim()-rank, res.coldim() );
-				this->_BMD.axpyin( resbot, Lbot, restop );
+				mat_gen.ref(i,j,k) = app_bas.get(i,j,k);
+				mat_num.ref(i,j,k) = app_bas.get(i,j+M,k);
 			}
-
-			// update residual: 2/ multiply first rank rows by X...
-			for ( size_t d=res.size()-1; d>ord; --d )
-				for ( size_t i=0; i<rank; ++i )
-					for ( size_t j=0; j<res.coldim(); ++j )
-						res.ref(i,j,d) = res.ref(i,j,d-1);
-		}
-	}
-
-	approx.resize( maxdeg+1 ); // TODO put before update approx basis and remove initial pessimistic allocation
-	// now we shift back to the original shift (note approx has no zero row)
-	vector<int> rdeg_out( m );
-	for ( size_t i=0; i<m; ++i )
-		rdeg_out[i] = min_shift + (int) rdeg[i];
-
-	return rdeg_out;
-}
-
-
-vector<size_t> PolMatDom::mbasis( PolMatDom::PMatrix &approx, const PolMatDom::PMatrix &series, const size_t order, const vector<int> &shift, bool resUpdate )
-{
-	/** Algorithm M-Basis-One as detailed in Section 3 of
-	 *  [Jeannerod, Neiger, Villard. Fast Computation of approximant bases in
-	 *  canonical form. Preprint, 2017]
-	 **/
-	/** Input:
-	 *   - approx: m x m square polynomial matrix, approximation basis
-	 *   - series: m x n polynomial matrix of size = order, series to approximate
-	 *   - order: positive integer, order of approximation
-	 *   - shift: m-tuple of degree shifts (acting on columns of approx)
-	 **/
-	/** Action:
-	 *   - Compute and store in 'approx' an shift-ordered weak Popov
-	 *   approximation basis for (series,order)
-	 *  Note: is order=1, then approx is in shift-Popov form
-	 **/
-	/** Output: shifted minimal degree of (series,order),
-	 * which is equal to the diagonal degrees of approx **/
-	/** Complexity: O(m^w order^2) **/
-
-	const size_t m = series.rowdim();
-	const size_t n = series.coldim();
-	typedef BlasSubmatrix<typename PolMatDom::MatrixP::Matrix> View;
-
-	// initialize approx to the identity matrix
-	approx.resize(0); // to put zeroes everywhere.. FIXME may be a better way to do it but it seems approx.clear() fails
-	size_t appsz = 1;
-	approx.resize(appsz);
-	for ( size_t i=0; i<m; ++i )
-		approx.ref(i,i,0) = 1;
-
-	// initial shifted row degrees = shift
-	vector<int> rdeg( shift );
-	// initial shifted minimal degree = (0,...,0)
-	vector<size_t> mindeg( m, 0 );
-
-	// set residual to input series
-	PolMatDom::PMatrix res( this->field(), m, n, series.size() );
-	res.copy( series );
-
-	for ( size_t ord=0; ord<order; ++ord )
-	{
-		//At the beginning of iteration 'ord',
-		//   - approx is an order basis, shift-ordered weak Popov,
-		//   for series at order 'ord'
-		//   - the shift-min(shift) row degrees of approx are rdeg.
-		//   - the max degree in approx is <= appsz
-
-		// Here we follow [Algorithm M-Basis-1] in the above reference
-
-		// coefficient of degree 'ord' of residual, which we aim at cancelling
-		typename PolMatDom::MatrixP::Matrix res_const( approx.field(), m, n );
-		if ( resUpdate ) // res_const is coeff of res of degree ord
-			res_const = res[ord];
-		else // res_const is coeff of approx*res of degree ord
-		{
-			for ( size_t d=0; d<appsz; ++d )
-				this->_BMD.axpyin( res_const, approx[d], res[ord-d] ); // note that d <= appsz-1 <= ord
-		}
-
-		// permutation for the stable sort of the shifted row degrees
-		vector<size_t> perm_rdeg( m );
-		iota( perm_rdeg.begin(), perm_rdeg.end(), 0 );
-		stable_sort(perm_rdeg.begin(), perm_rdeg.end(),
-			    [&](const size_t& a, const size_t& b)->bool
-			    {
-				    return (rdeg[a] < rdeg[b]);
-			    } );
-
-		// permute rows of res_const accordingly
-		vector<size_t> lperm_rdeg( m ); // LAPACK-style permutation
-		FFPACK::MathPerm2LAPACKPerm( lperm_rdeg.data(), perm_rdeg.data(), m );
-		BlasPermutation<size_t> pmat_rdeg( lperm_rdeg );
-		this->_BMD.mulin_right( pmat_rdeg, res_const );
-
-		// compute PLUQ decomposition of res_const
-		BlasPermutation<size_t> P(m), Q(n);
-		size_t rank = FFPACK::PLUQ( res_const.field(), FFLAS::FflasNonUnit, //FIXME TODO investigate see below ftrsm
-					    m, n, res_const.getWritePointer(), res_const.getStride(),
-					    P.getWritePointer(), Q.getWritePointer() );
-
-		// compute a part of the left kernel basis of res_const:
-		// -Lbot Ltop^-1 , stored in Lbot
-		// Note: the full kernel basis is [ -Lbot Ltop^-1 | I ] P
-		View Ltop( res_const, 0, 0, rank, rank ); // top part of lower triangular matrix in PLUQ
-		View Lbot( res_const, rank, 0, m-rank, rank ); // bottom part of lower triangular matrix in PLUQ
-		FFLAS::ftrsm( approx.field(), FFLAS::FflasRight, FFLAS::FflasLower,
-			      FFLAS::FflasNoTrans, FFLAS::FflasUnit, // FIXME TODO works only if nonunit in PLUQ and unit here; or converse. But not if consistent...?????? investigate
-			      m-rank, rank, approx.field().mOne,
-			      Ltop.getPointer(), Ltop.getStride(),
-			      Lbot.getWritePointer(), Lbot.getStride() );
-
-		// Prop: this "kernel portion" is now stored in Lbot.
-		//Then const_app = perm^{-1} P^{-1} [ [ X Id | 0 ] , [ Lbot | Id ] ] P perm
-		//is an order basis in rdeg-Popov form for const_res at order 1
-		// --> by transitivity,  const_app*approx will be a shift-ordered
-		// weak Popov approximant basis for (series,ord+1)
-
-		// A. update approx basis, first steps:
-		for ( size_t d=0; d<appsz; ++d )
-		{
-			// 1. permute rows: approx = P * perm * approx
-			this->_BMD.mulin_right( pmat_rdeg, approx[d] );
-			this->_BMD.mulin_right( P, approx[d] );
-			// 2. multiply by constant: appbot += Lbot apptop
-			View apptop( approx[d], 0, 0, rank, m );
-			View appbot( approx[d], rank, 0, m-rank, m );
-			this->_BMD.axpyin( appbot, Lbot, apptop );
-		}
-
-		// permute row degrees accordingly
-		vector<size_t> lperm_p( P.getStorage() ); // Lapack-style permutation P
-		vector<size_t> perm_p( m ); // math-style permutation P
-		FFPACK::LAPACKPerm2MathPerm( perm_p.data(), lperm_p.data(), m ); // convert
-
-		// B. update shifted row degree, shifted minimal degree,
-		// and new approximant basis size using property: deg(approx) = max(mindeg)
-		for ( size_t i=0; i<rank; ++i )
-		{
-			++rdeg[perm_rdeg[perm_p[i]]];
-			++mindeg[perm_rdeg[perm_p[i]]];
-		}
-		appsz = 1 + *max_element(mindeg.begin(),mindeg.end());
-		approx.resize( appsz );
-
-		// A. update approx basis:
-		// 3. multiply first rank rows by X...
-		for ( size_t d=appsz-1; d>0; --d )
-			for ( size_t i=0; i<rank; ++i )
-				for ( size_t j=0; j<m; ++j )
-					approx.ref(i,j,d) = approx.ref(i,j,d-1);
-		// 4. ... and approx[0]: first rank rows are zero
-		for ( size_t i=0; i<rank; ++i )
-			for ( size_t j=0; j<m; ++j )
-				approx.ref(i,j,0) = 0;
-		// 5. permute the rows again: approx = perm^{-1} * P^{-1} * approx
-		P.Invert();
-		pmat_rdeg.Invert();
-		for ( size_t d=0; d<appsz; ++d )
-		{
-			this->_BMD.mulin_right( P, approx[d] );
-			this->_BMD.mulin_right( pmat_rdeg, approx[d] );
-		}
-
-		// TODO work on resUpdate = True; now assuming False
-		if ( resUpdate )
-		{
-			//if ( resUpdate )
-			//{
-			//	for ( size_t d=ord; d<res.size(); ++d )
-			//		this->_BMD.mulin_right( pmat_rdeg, res[d] );
-			//}
-			// update residual: do same operations as on approx
-			// update residual: 1/ permute all the rows; multiply by constant
-			// note: to simplify later multiplication by X, we permute rows of res[ord]
-			//(but we don't compute the zeroes in the other rows)
-			this->_BMD.mulin_right( P, res[ord] ); // permute rows by P
-			for ( size_t d=ord+1; d<res.size(); ++d )
-				this->_BMD.mulin_right( P, res[d] ); // permute rows by P
-
-			for ( size_t d=ord+1; d<res.size(); ++d )
-			{
-				// multiply by constant: resbot += Lbot restop
-				View restop( res[d], 0, 0, rank, n );
-				View resbot( res[d], rank, 0, m-rank, n );
-				this->_BMD.axpyin( resbot, Lbot, restop );
-			}
-
-			// update residual: 2/ multiply first rank rows by X...
-			for ( size_t d=res.size()-1; d>ord; --d )
-				for ( size_t i=0; i<rank; ++i )
-					for ( size_t j=0; j<n; ++j )
-						res.ref(i,j,d) = res.ref(i,j,d-1);
-		}
-	}
-	return mindeg;
 }
 
 //-----------------------------------------------//
@@ -1092,25 +572,13 @@ Block_Sparse_FGLM::Block_Sparse_FGLM(size_t M, InputMatrices& mat, size_t thresh
   cout << "sparsity M: " << ((double)nbM)/(D*D) << endl;
 
 #endif
-#ifdef VERBOSE_ON
-	cout << "D: " << D << endl;
-#endif
 
 	zz_p::init(prime);
 
 	create_random_matrix(V);
 	for (auto &i : U_rows){
 		create_random_matrix(i);
-#ifdef EXTRA_VERBOSE_ON
-		i.write(cout << "###OUTPUT### U_row:= ", Tag::FileFormat::Maple) << endl;
-#endif
 	}
-
-
-
-
-
-
 }
 
 
@@ -1277,18 +745,6 @@ void Block_Sparse_FGLM::smith(PolMatDom::MatrixP &u_tilde, PolMatDom::PMatrix &m
 	tm.stop();
 	cout << " ###TIME### Matrix Berlekamp Massey: " << tm.usertime() << endl; 
 #endif
-#ifdef VERBOSE_ON
-  	cout << "###OUTPUT### Matrix generator degrees:" << endl;
-	PMD.print_degree_matrix( mat_gen );
-  	cout << "###OUTPUT### Matrix numerator degrees:" << endl;
-	PMD.print_degree_matrix( mat_num );
-#endif
-#ifdef EXTRA_VERBOSE_ON
-  	cout << "###OUTPUT### Matrix generator entries:" << endl;
-	cout << mat_gen << endl;
-  	cout << "###OUTPUT### Matrix numerator entries:" << endl;
-	cout << mat_num << endl;
-#endif
 
 	//---------------------------------------
 	// 3. u_tilde and minpoly
@@ -1354,15 +810,6 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_non_generic(){
 	tm.stop();
 	cout << "###TIME### left sequence (UT1^i): " << ": " << tm.usertime() << " (user time)" << endl;
 	cout << "###TIME### left sequence (UT1^i): " << tm.realtime() << " (real time)" << endl;
-#endif
-#ifdef VERBOSE_ON	
-	cout << "###OUTPUT### Matrix sequence (U T^i)_i :" << endl;
-	cout << "Length d = " << getLength() << endl;
-#ifdef EXTRA_VERBOSE_ON	
-	cout << "Entries:" << endl;
-	for (auto &i: mat_seq_left)
-		i.write(cout, Tag::FileFormat::Maple)<<endl;
-#endif
 #endif
 
 	// ----------------------------------------------
@@ -1856,15 +1303,6 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 	cout << "###TIME### left sequence (UT^i): " << ": " << tm.usertime() << " (user time)" << endl;
 	cout << "###TIME### left sequence (UT^i): " << tm.realtime() << " (real time)" << endl;
 #endif
-#ifdef VERBOSE_ON	
-	cout << "###OUTPUT### Matrix sequence (U T^i)_i :" << endl;
-	cout << "Length d = " << getLength() << endl;
-#ifdef EXTRA_VERBOSE_ON	
-	cout << "Entries:" << endl;
-	for (auto &i: mat_seq_left)
-		i.write(cout, Tag::FileFormat::Maple)<<endl;
-#endif
-#endif
 
 	// ----------------------------------------------
 	// 2 get the matrix generator, the minpoly, the vector u_tilde
@@ -1978,276 +1416,7 @@ vector<zz_pX>  Block_Sparse_FGLM::get_lex_basis_generic(){
 	return output; 
 }
 
-
-template <typename PolMat>
-bool test_order( const PolMat &approx, const PolMat &series, const size_t order )
-{
-	PolynomialMatrixMulDomain<typename PolMat::Field> PMD(approx.field());
-	PolMat prod( approx.field(), approx.rowdim(), series.coldim(), approx.size()+series.size() );
-	PMD.mul( prod, approx, series );
-
-	bool test = true;
-	size_t d = 0;
-	while ( test && d<order )
-	{
-		for ( size_t i=0; i<prod.rowdim(); ++i )
-			for ( size_t j=0; j<prod.coldim(); ++j )
-			{
-				if ( prod.ref(i,j,d) != 0 )
-				{
-					test = false;
-//					std::cout << d << "\t" << i << "\t" << j << std::endl;
-				}
-			}
-		++d;
-	}
-	return test;
-}
-
-template <typename PolMat>
-bool test_kernel( const PolMat &kerbas, const PolMat &pmat )
-{
-	PolynomialMatrixMulDomain<typename PolMat::Field> PMD(kerbas.field());
-	PolMat prod( kerbas.field(), kerbas.rowdim(), pmat.coldim(), kerbas.size()+pmat.size()-1 );
-	PMD.mul( prod, kerbas, pmat );
-
-	bool test = true;
-	size_t d = 0;
-	while ( test && d<kerbas.size()+pmat.size()-1 )
-	{
-		for ( size_t i=0; i<prod.rowdim(); ++i )
-			for ( size_t j=0; j<prod.coldim(); ++j )
-			{
-				if ( prod.ref(i,j,d) != 0 )
-				{
-					test = false;
-					cout << "degree " << d << endl;
-				}
-			}
-		++d;
-	}
-	return test;
-}
-
-template <typename PolMat>
-bool test_invariant_factor( const vector<zz_pX> left_multiplier, const zz_pX & factor, const PolMat &pmat, const size_t position )
-{
-	PolMatDom PMD(pmat.field());
-	const size_t m = pmat.rowdim();
-	vector<PolMatDom::Polynomial> smith( m );
-	PolMatDom::PMatrix lfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
-	PolMatDom::PMatrix rfac(PMD.field(), m, m, 2*pmat.rowdim()*pmat.size());
-	PMD.SmithForm( smith, lfac, rfac, pmat );
-
-	bool test = true;
-
-	// test if factor is same as factor in Smith form
-	size_t d = 0;
-	while ( test && d< std::min((long) smith[0].size(),deg(factor)+1) )
-	{
-		if ( smith[0][d] != coeff(factor,d) )
-			test = false;
-		++d;
-	}
-
-	// test if left multiplier is indeed left multiplier
-	size_t sz = 0;
-	for (size_t i=0; i<m; ++i)
-		if ( deg(left_multiplier[i])+1 > sz )
-			sz = deg(left_multiplier[i])+1;
-	PolynomialMatrixMulDomain<typename PolMat::Field> PMMD(pmat.field());
-	PolMatDom::PMatrix vec( pmat.field(), 1, m, sz );
-	for (size_t i=0; i<m; ++i)
-	for (size_t k=0; k<sz; ++k)
-	{
-		size_t a;
-		conv( a, left_multiplier[i][k] );
-		vec.ref(0,i,k) = a;
-	}
-	PolMatDom::PMatrix prod( pmat.field(), 1, m, sz+pmat.size()-1 );
-	PMMD.mul( prod, vec, pmat );
-	size_t i=0;
-	// check if all entries but position are zero
-	while ( test && i<m )
-	{
-		if ( i!=position )
-		{
-			d=0;
-			while ( test && d<sz+pmat.size()-1 )
-			{
-				if ( prod.get(0,i,d) != 0 )
-					test = false;
-				++d;
-			}
-		}
-		++i;
-	}
-	d=0;
-	while ( test && d < std::min( sz+pmat.size()-1, (size_t) deg(factor)+1 ) )
-	{
-		if ( prod.get(0,position,d) != coeff(factor,d) )
-			test=false;
-		++d;
-	}
-
-	return test;
-}
-
-int main_polmatdom( int argc, char **argv ){
-	// default arguments
-	size_t p = 23068673;  // size of the base field
-	size_t M = 4;   // row dimension for the blocks
-	size_t D = 512; // vector space dimension / dimension of multiplication matrices
-	size_t n = 2;  // number of variables / of multiplication matrices
-	size_t threshold = 128;  // threshold MBasis / PMBasis
-
-	static Argument args[] = {
-		{ 'p', "-p p", "Set cardinality of the base field to p.", TYPE_INT, &p },
-		{ 'n', "-n n", "Set number of variables to n.", TYPE_INT, &n },
-		{ 'M', "-M M", "Set the row block dimension to M.", TYPE_INT,       &M },
-		{ 'D', "-D D", "Set dimension of test matrices to MxN.", TYPE_INT,  &D },
-		{ 't', "-t threshold", "Set threshold mbasis / pmbasis to t.", TYPE_INT,  &threshold },
-		END_OF_ARGUMENTS
-	};
-
-	parseArguments (argc, argv, args);
-
-	GF field(p);
-	long seed = time(NULL);
-	typename GF::RandIter rd(field,0,seed);
-	PolMatDom PMD( field, threshold );
-	zz_p::init( p );
-
-#ifdef TEST_APPROX
-	cout << "~~~~~~~~~~~STARTING TESTS APPROXIMANTS~~~~~~~~~~~~~" << endl;
-	size_t order = 2*ceil(D/(double)M);
-	cout << "order for approximant basis : " << order << endl;
-	cout << "dimensions of input series matrix : " << 2*M << " x " << M << endl;
-	PolMatDom::PMatrix series( field, 2*M, M, order );
-	for ( size_t d=0; d<order; ++d )
-		for ( size_t i=0; i<2*M; ++i )
-			for ( size_t j=0; j<M; ++j )
-				rd.random( series.ref( i, j, d ) );
-	const vector<int> shift( 2*M, 0 );
-	Timer tm;
-	{
-		cout << "~~~NOW TESTING OLD MBASIS~~~" << endl;
-		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
-		tm.clear(); tm.start();
-		vector<int> rdeg1 = PMD.old_mbasis( app_bas, series, order, shift );
-		tm.stop();
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### degrees in approx basis:" << endl;
-		PMD.print_degree_matrix( app_bas );
-#endif
-		cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-		cout << "###TIME### approx basis: " << tm.usertime() << endl;
-	}
-	{
-		cout << "~~~NOW TESTING OLD PMBASIS~~~" << endl;
-		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
-		tm.clear(); tm.start();
-		vector<int> rdeg2 = PMD.old_pmbasis( app_bas, series, order, shift );
-		tm.stop();
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### degrees in approx basis:" << endl;
-		PMD.print_degree_matrix( app_bas );
-#endif
-		cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-		cout << "###TIME### approx basis: " << tm.usertime() << endl;
-	}
-	{
-		cout << "~~~NOW TESTING NEW MBASIS~~~" << endl;
-		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
-		tm.clear(); tm.start();
-		vector<size_t> mindeg3 = PMD.mbasis( app_bas, series, order, shift );
-		tm.stop();
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### degrees in approx basis:" << endl;
-		PMD.print_degree_matrix( app_bas );
-#endif
-		cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-		cout << "###TIME### approx basis: " << tm.usertime() << endl;
-	}
-	{
-		cout << "~~~NOW TESTING NEW PMBASIS~~~" << endl;
-		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
-		tm.clear(); tm.start();
-		vector<size_t> mindeg4 = PMD.pmbasis( app_bas, series, order, shift );
-		tm.stop();
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### degrees in approx basis:" << endl;
-		PMD.print_degree_matrix( app_bas );
-#endif
-		cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-		cout << "###TIME### approx basis: " << tm.usertime() << endl;
-	}
-	{
-		cout << "~~~NOW TESTING POPOV_PMBASIS~~~" << endl;
-		PolMatDom::PMatrix app_bas( field, 2*M, 2*M, order );
-		tm.clear(); tm.start();
-		vector<size_t> mindeg5 = PMD.popov_pmbasis( app_bas, series, order, shift );
-		tm.stop();
-#ifdef VERBOSE_ON
-		cout << "###OUTPUT### degrees in approx basis: " << endl;
-		PMD.print_degree_matrix( app_bas );
-#endif
-		cout << "###CORRECTNESS### has required order: " << test_order( app_bas, series, order ) << endl;
-		cout << "###TIME### approx basis: " << tm.usertime() << endl;
-	}
-#endif
-#ifdef TEST_KERNEL
-	{
-		cout << "~~~NOW TESTING KERNEL BASIS~~~" << endl;
-		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
-		cout << "dimensions of input matrix : " << M << " x " << M-1 << endl;
-		cout << "degree of input matrix : " << degree << endl;
-		PolMatDom::PMatrix pmat( field, M, M-1, degree+1 );
-		for ( size_t d=0; d<=degree; ++d )
-			for ( size_t i=0; i<M; ++i )
-				for ( size_t j=0; j<M-1; ++j )
-					rd.random( pmat.ref( i, j, d ) );
-		Timer tm;
-		PolMatDom::PMatrix kerbas( field, 1, M, 0 ); // one is enough except extreme bad luck
-		tm.clear(); tm.start();
-		PMD.kernel_basis( kerbas, pmat );
-		tm.stop();
-		cout << "###OUTPUT### degrees in kernel basis: " << endl;
-		PMD.print_degree_matrix( kerbas );
-		cout << "###CORRECTNESS### is kernel: " << test_kernel( kerbas, pmat ) << endl;
-		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
-	}
-#endif // TEST_KERNEL
-#ifdef TEST_INVARIANT_FACTOR
-	{
-		cout << "~~~NOW TESTING INVARIANT FACTOR~~~" << endl;
-		size_t degree = ceil(D/(double)M); // should be close to the degree of the MatrixBM output
-		size_t position = std::max(M-2,(size_t)0);
-		cout << "dimensions of input matrix : " << M << " x " << M << endl;
-		cout << "input matrix random of degree " << degree << endl;
-		cout << "position : " << position << endl;
-		PolMatDom::PMatrix pmat( field, M, M, degree+1 );
-		for ( size_t d=0; d<=degree; ++d )
-			for ( size_t i=0; i<M; ++i )
-				for ( size_t j=0; j<M; ++j )
-					rd.random( pmat.ref( i, j, d ) );
-		Timer tm;
-		vector<zz_pX> left_multiplier( M );
-		zz_pX factor;
-		tm.clear(); tm.start();
-		PMD.largest_invariant_factor( left_multiplier, factor, pmat, position );
-		tm.stop();
-		//cout << "###OUTPUT### degrees in kernel basis: " << endl;
-		//PMD.print_degree_matrix( kerbas );
-		cout << "###CORRECTNESS### is largest factor: " << test_invariant_factor( left_multiplier, factor, pmat, position ) << endl;
-		cout << "###TIME### kernel basis: " << tm.usertime() << endl;
-	}
-#endif // TEST_INVARIANT_FACTOR
-
-	return 0;
-}
-
-int main_fglm( int argc, char **argv ){
+int main( int argc, char **argv ){
 	// default arguments
 	size_t M = 4;   // row dimension for the blocks
 	string F = "";

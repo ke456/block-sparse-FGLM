@@ -1,7 +1,0 @@
-Vincent :
-  -- system solving (Newton or divide-and-conquer)
-  -- write summary about MatrixBM (relying on Turner if possible)
-  -- tune pmbasis threshold
-  -- implement dense "multi-Krylov" algorithm
-  -- can we obtain the same output via the dense version?
-
