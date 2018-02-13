@@ -41,23 +41,36 @@ tailored for the particular linear algebra problems encountered in this kind of
 computations.
 
 More precisely, polynomial system solving often involves computing a first
-Gr\"obner basis, typically with the F5 algorithm, and then using for example
-the FGLM algorithm to obtain a representation of the sought roots.  In the
+Gr\"obner basis, typically with the F5 algorithm,
+% TODO citation to Faugere's paper about F5
+and then using for example
+the FGLM algorithm
+% TODO citation to the FGLM paper
+to obtain a representation of the sought roots.  In the
 first step, one has to deal with matrices of large dimension which are sparse
 and exhibit a noticeable structure.  The second step corresponds to finding the
 nullspace of matrix with a structure which may be called multi-Krylov: the matrix
 is formed by a given vector and its images by the successive powers of the
 so-called multiplication matrices.
 
-It was also observed recently that, by exploiting the sparsity of these
-multiplication matrices, one can reduce the problem to the computation of
-generators for a multi-dimensional linearly recurrent sequence.  This revived
-interest into this problem, with the goal of designing algorithms which
-outperform the Berlekamp-Massey-Sakata algorithm, well-known for its
+It was also observed recently
+% TODO citation to Faugere Mou
+that, by exploiting the sparsity of these multiplication matrices, one can
+reduce the problem to the computation of generators for a multi-dimensional
+linearly recurrent sequence. 
+% TODO should probably say a word about Wiedemann as in our work and Steel's
+% work, this would also be the opportunity to cite Gilles Villard's work
+This revived interest into this problem, with the goal of designing algorithms
+which outperform the Berlekamp-Massey-Sakata algorithm, well-known for its
 applications to the decoding of algebraic geometry codes.  Some approaches have
-already been described, involving computations with matrices that have a
-multi-layered block-Hankel structure.  This was noticed to have direct links
-with the decomposition of symmetric tensors.
+already been described,
+% TODO cite work of Berthomieu et al, and work of Mourrain at ISSAC 17
+involving computations with matrices that have a multi-layered block-Hankel
+structure.  This was noticed to have direct links with the decomposition of
+symmetric tensors.
+% TODO cite work of Tsigaridas - Mourrain et al
+
+% TODO Vincent->Hamid: don't hesitate to insert something about deflation... I am not able to.
 
 This session aims at gathering the main actors behind these recent
 developments, and naturally all researchers interested in future developments
