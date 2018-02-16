@@ -31,20 +31,20 @@
 
 \textbf{Abstract:}
 
-In the last decades, a lot of progress has been made on the design and the
-implementation of efficient algorithms related to zero-dimensional ideals,
-including for solving polynomial systems, i.e. determining the finite set of
-roots common to a given collection of multivariate polynomials.  During this
-process, it has turned out that these algorithms heavily rely on routines from
-linear algebra.  This session focuses on the study of algorithms specifically
+In the last decades, a lot of progress has been made on the study of efficient
+algorithms related to zero-dimensional ideals, including for solving polynomial
+systems, i.e. determining the finite set of roots common to a given collection
+of multivariate polynomials.  During this process, it has turned out that these
+algorithms heavily rely on some routines from linear algebra.  This
+session focuses on the design and the implementation of algorithms specifically
 tailored for the particular linear algebra problems encountered in this kind of
 computations.
 
 More precisely, polynomial system solving often involves computing a first
-Gr\"obner basis, typically with the F5 algorithm, and then using for example
-the FGLM algorithm \cite{FaGiLaMo93} to obtain a representation of the sought
-roots.  In the first step, one has to deal with matrices of large dimension
-which are sparse and exhibit a noticeable structure.  The second step
+Gr\"obner basis, typically with the F5 algorithm, and then working on finding a
+representation of the sought roots, using for example the FGLM algorithm
+\cite{FaGiLaMo93}.  In the first step, one has to deal with matrices of large
+dimension which are sparse and exhibit a noticeable structure.  The second step
 corresponds to finding the nullspace of a matrix with a ``multi-Krylov''
 structure: the matrix is formed by some vector and its images by successive
 powers of the so-called multiplication matrices.
