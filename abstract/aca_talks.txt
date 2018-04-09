@@ -1,0 +1,46 @@
+CONFIRMED TALKS
+
+Daniel Augot, Inria Saclay - Île-de-France, France
+30mn/1h?
+
+Mariemi Alonso
+Complutense University of Madrid, Spain
+Border basis, Hilbert Scheme of points and flat deformations
+30mn/1h?
+(joint work with Bernard Mourrain)
+
+Michela Ceria, Department of Computer Science, University of Milan, Italy
+Combinatorics of ideals of points: a Cerlienco-Mureddu-like approach for an iterative lex game
+30mn
+(joint work with Teo Mora)
+
+Martin Kreuzer, University of Passau, Germany
+Computing Subschemes of the Border Basis Scheme
+30mn (just after Lorenzo Robbiano)
+(joint work with Le Ngoc Long and Lorenzo Robbiano)
+
+Simone Naldi, XLIM -- University of Limoges, France
+On the computation of algebraic relations of bivariate polynomials
+30mn
+(joint work with Vincent Neiger and Grace Younes)
+
+Lorenzo Robbiano, University of Genoa (Italy)
+Special Properties of Zero-Dimensional Ideals: new Algorithms
+1h
+(joint work with Martin Kreuzer and Le Ngoc Long)
+
+Thibaut Verron, Johannes Kepler University, Linz, Austria
+Signature-based Criteria for Möller’s Algorithm for Computing Gröbner Bases over PIDs
+30mn
+(joint work with Maria Francis)
+
+EXPECTED TALKS
+
+Anna Bigatti
+30mn/1h?
+
+Robin Larrieu
+30mn
+
+Teo Mora
+30mn
