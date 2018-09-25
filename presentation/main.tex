@@ -105,7 +105,7 @@
 		$I \subset \mathbb{K}[x_1,\dots,x_n]$: zero dimensional ideal\\
 		$\mathcal{B}$: monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
 		$M_1,\dots,M_n$: multiplication matrices for $x_1,\dots,x_n$ resp.\\
-		$D$ : dimension of $\mathbb{K}[x_1,\dots,x_n]/I$
+		$D$ : vector space dimension of $\mathbb{K}[x_1,\dots,x_n]/I$
 	\end{center}
 	Find the Gr\"obner basis wrt lexicographical ordering
 	(change of ordering)\\
@@ -141,21 +141,28 @@
 	$V(I)$ has one point in $GF(97)$: $(35,88)$
 \end{frame}
 
+\begin{frame}{Sparse-FGLM}
+	\begin{itemize}
+		\item Faug\`ere and Mou [2017]
+		\item Key idea: min. poly of $M_n$ equals $P_n$
+		\item $M_i$'s expected to be sparse: use the Wiedemann algorithm
+	\end{itemize}
+\end{frame}
+
 \begin{frame}{Wiedemann Algorithm}
 	\begin{itemize}
-		\item Solves linear system $Ax = b$, $A \in \mathbb{K}^{m\times m}$
+		\item Solves linear system $Mx = b$, $M \in \mathbb{K}^{D\times D}$
 		\item able to exploit the sparsity of $A$
-		\item Key idea: for $u,v \in \mathbb{K}^{m\times 1}$ random,\\
+		\item Key idea: for $u,v \in \mathbb{K}^{D\times 1}$ random,\\
 		minimal polynomial generator 
-		$P = \sum_{i=0}^{d} p_i T^i$
+		$P = \sum_{i=0}^{D} p_i T^i$
 		of $(u A^i v^{t})_{i\ge 0}$ is also the minimal polynomial of $A$
 	\end{itemize}
 	\pause
 	\begin{definition}[Minimal Polynomial Generator]
-		Minimal polynomial generator $P = p_0 + p_1 T + \dots + p_d T^d$ of a
-		sequence $(L_s)_{s\ge0}$ is the monic polynomial of lowest degree such
-		that 
-		$$ p_0 L_s + p_1 L_{s+1} + \dots + p_d L_{s+d} = 0, \; \forall s \ge 0$$
+		Minimal polynomial generator $P = p_0 + p_1 T + \dots + p_d T^D$ of a (linearly recurrent)
+		sequence $(L_s)_{s\ge0}$ is the monic polynomial of lowest degree st 
+		$$ p_0 L_s + p_1 L_{s+1} + \dots + p_D L_{s+D} = 0, \; \forall s \ge 0$$
 		Equivalently, $P \sum_{s\ge 0} L_s/ T^{s+1}$ is a polynomial. 
 	\end{definition}
 	
@@ -163,16 +170,6 @@
 	\begin{align*}
 	\sum_{i=0}^{d}p_i u M^{s+i} v^{t} = 0 \iff \sum_{i=0}^{d}p_i M^{s+i}  = 0
 	\end{align*}
-\end{frame}
-
-\begin{frame}{Sparse-FGLM}
-	\begin{itemize}
-		\item Faug\`ere and Mou [2017]
-		\item Key idea: min. poly of $M_n$ equals $P_n$
-		\item $M_i$'s expected to be sparse: use the Wiedemann algorithm
-	\end{itemize}
-	
-	
 \end{frame}
 
 \begin{frame}{Sparse-FGLM}
@@ -224,6 +221,10 @@
 		\item Bottleneck: computing $(u M_n^s)_{0 \le s < 2D}$
 		\item difficult to parallelize: need $uM_n^{s}$ to compute $uM_n^{s+1}$
 		\item Use block Wiedemann algorithm instead!
+		
+	\end{itemize}
+	For "bad" inputs:
+	\begin{itemize}
 		\item Uses Berlekamp-Massey-Sakata algorithm for non radical/shape position ideals
 	\end{itemize}
 \end{frame}
@@ -269,16 +270,11 @@
 \end{frame}
 
 \begin{frame}{Minimal Polynomial Matrix Generator}
-	\begin{definition}[Minimal Polynomial Matrix Generator]
-		A (left) matrix generator $F$ for a sequence of
-		$m\times m$ matrices $(A_s)_{s\ge 0}$ is an
-		$m\times m$ matrix
-		whose rows form a basis of the module of left vector
-		relations for $(A_s)_{s\ge 0}$. $F$ is minimal if
-		it is row reduced.
-	\end{definition}
+	Let $F = \sum_{i=0}^{\lceil{D/m}\rceil} F_i T^i$,
+	where $F_i \in \mathbb{K}^{m\times m}$, be the 
+	minimal polynomial matrix generator of $(A_s)_{s\ge 0}$
 	\begin{itemize}
-		\item $F$ \textit{cancels} $(A_s)_{s\ge 0}$
+		\item $\sum_{i=0}^{\lceil{D/m}\rceil} F_i A_{s+i} =0$ for any $s\ge 0$
 		\item $F \sum_{s\ge 0} A_s/T^{s+1}$ has polynomial entries
 		\item Expected to have degree at most $\lceil D/m \rceil$
 		\item Berlekamp-Massey, Extended Euclidean, Pad\'e
@@ -294,7 +290,7 @@
 		\item Compute by:
 		\begin{itemize}
 			\item Smith Normal Form
-			\item LCM of denominators of $y$ that satisfy $Py = b$, for random b
+			\item LCM of denominators of $y$ that satisfy $Fy = b$, for random b
 		\end{itemize}
 		\item Find $a$ that satisfy $aF = \begin{bmatrix}
 		0 & \dots & 0 & P
