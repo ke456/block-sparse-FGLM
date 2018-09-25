@@ -1,0 +1,21 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {paragraph}{Complexity model.}{5}{section*.2}
+\contentsline {section}{\numberline {2}Linearly recurrent sequences}{6}{section.2}
+\contentsline {subsection}{\numberline {2.1}Scalar sequences}{6}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Linearly recurrent matrix sequences}{8}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Application to the block Wiedemann algorithm}{11}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Computing a scalar numerator}{14}{subsection.2.4}
+\contentsline {section}{\numberline {3}Sequences associated to a zero-dimensional ideal}{16}{section.3}
+\contentsline {subsection}{\numberline {3.1}The structure of the dual}{16}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}A fundamental formula}{18}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Computing a zero-dimensional parametrization}{22}{subsection.3.3}
+\contentsline {section}{\numberline {4}The main algorithm}{23}{section.4}
+\contentsline {subsection}{\numberline {4.1}Description, correctness and cost analysis}{24}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Example}{27}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Experimental results}{29}{subsection.4.3}
+\contentsline {section}{\numberline {5}Using the original coordinates}{31}{section.5}
+\contentsline {subsection}{\numberline {5.1}Overview}{31}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Describing the subset $V'$ of $V$}{32}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Computing correction matrices}{37}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Describing the residual set}{40}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Experimental results}{42}{subsection.5.5}

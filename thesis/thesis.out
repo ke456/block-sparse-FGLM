@@ -1,0 +1,20 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Linearly recurrent sequences}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Scalar sequences}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Linearly recurrent matrix sequences}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Application to the block Wiedemann algorithm}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Computing a scalar numerator}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Sequences associated to a zero-dimensional ideal}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{The structure of the dual}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{A fundamental formula}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Computing a zero-dimensional parametrization}{section.3}% 10
+\BOOKMARK [1][-]{section.4}{The main algorithm}{}% 11
+\BOOKMARK [2][-]{subsection.4.1}{Description, correctness and cost analysis}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.2}{Example}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.3}{Experimental results}{section.4}% 14
+\BOOKMARK [1][-]{section.5}{Using the original coordinates}{}% 15
+\BOOKMARK [2][-]{subsection.5.1}{Overview}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.2}{Describing the subset V' of V}{section.5}% 17
+\BOOKMARK [2][-]{subsection.5.3}{Computing correction matrices}{section.5}% 18
+\BOOKMARK [2][-]{subsection.5.4}{Describing the residual set}{section.5}% 19
+\BOOKMARK [2][-]{subsection.5.5}{Experimental results}{section.5}% 20

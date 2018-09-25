@@ -1,0 +1,478 @@
+% Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+%
+% In principle, this file can be redistributed and/or modified under
+% the terms of the GNU Public License, version 2.
+%
+% However, this file is supposed to be a template to be modified
+% for your own needs. For this reason, if you use this file as a
+% template and not specifically distribute it as part of a another
+% package/program, I grant the extra permission to freely copy and
+% modify this file as you see fit and even to delete this copyright
+% notice. 
+
+\documentclass{beamer}
+
+% There are many different themes available for Beamer. A comprehensive
+% list with examples is given here:
+% http://deic.uab.es/~iblanes/beamer_gallery/index_by_theme.html
+% You can uncomment the themes below if you would like to use a different
+% one:
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{boxes}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{default}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+\usepackage{mathrsfs,graphicx, multicol}
+\usepackage{algorithm, pseudocode}
+\usepackage{bm}
+\usepackage{amsmath,amssymb,amsfonts,epsfig,color,xspace,mathrsfs}
+\usepackage{algorithm, pseudocode}
+
+\usepackage{makecell}
+
+% math and theorem names
+\usepackage{amsthm,thmtools}
+
+\title{Block Sparse-FGLM}
+
+% A subtitle is optional and this may be deleted
+%\subtitle{Optional Subtitle}
+
+\author{Kevin Hyun \and Vincent Neiger \and Hamid Rahkooy \and \'Eric Schost}
+% - Give the names in the same order as the appear in the paper.
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+
+\subject{Theoretical Computer Science}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+\setbeamertemplate{footline}{%
+	\hfill\usebeamertemplate***{}
+	\hspace{1cm}\insertframenumber{}/\inserttotalframenumber}
+\userightsidebartemplate{0pt}{}
+
+% Let's get started
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+%  \tableofcontents
+  % You might wish to add the option [pausesections]
+%\end{frame}
+
+% Section and subsections will appear in the presentation overview
+% and table of contents.
+\section{First Main Section}
+
+\subsection{First Subsection}
+
+\begin{frame}{Introduction}
+	Given:
+	\begin{center}
+		$I \subset \mathbb{K}[x_1,\dots,x_n]$: zero dimensional ideal\\
+		$\mathcal{B}$: monomial basis of $\mathbb{K}[x_1,\dots,x_n]/I$\\
+		$M_1,\dots,M_n$: multiplication matrices for $x_1,\dots,x_n$ resp.\\
+		$D$ : dimension of $\mathbb{K}[x_1,\dots,x_n]/I$
+	\end{center}
+	Find the Gr\"obner basis wrt lexicographical ordering
+	(change of ordering)\\
+	\pause
+	More precisely, find univariate polynomials $P_1,\dots, P_n$ st:
+	$$ \{ x_1- P_1(x_n), x_2-P_2(x_n), \dots, P_n(x_n) \}$$
+	where
+	$$ V(I) = \{  (P_1(\tau), P_2(\tau), \dots, \tau) \mid P_n(\tau) = 0   \}$$
+\end{frame}
+
+\begin{frame}{Example}
+	Given, in $GF(97)$
+	\begin{align*}
+	I &= \langle -27x_2^2 - 28x_2x_1 - 45x_1^2 - 44x_2 - 12x_1 + 16, \\
+	&\;\;\; -20x_2^2 + 39x_2x_1 + 13x_1^2 - 35x_2 - 17x_1 + 6\rangle\\
+	\mathcal{B} &= \{ x_1^2,x_1,x_2,1 \}, D = 4, \\
+	M_1 &= \begin{bmatrix}
+	27& 59&  9&  0\\
+	57&  2& 37&  0\\
+	91& 44& 21&  1\\
+	23&  1& 75&  0
+	\end{bmatrix},
+	M_2 = \begin{bmatrix}
+	60&  1& 59&  0\\
+	57&  0&  2&  1\\
+	46&  0& 44&  0\\
+	95&  0&  1&  0
+	\end{bmatrix}
+	\end{align*}
+	Want
+	$$ \{
+	x_1 -(86x_2^3 + 49x_2^2 + 39x_2 + 38) ,x_2^4 + 47x_2^3 + 16x_2^2 + 64x_2 + 16\}$$
+	$V(I)$ has one point in $GF(97)$: $(35,88)$
+\end{frame}
+
+\begin{frame}{Wiedemann Algorithm}
+	\begin{itemize}
+		\item Solves linear system $Ax = b$, $A \in \mathbb{K}^{m\times m}$
+		\item able to exploit the sparsity of $A$
+		\item Key idea: for $u,v \in \mathbb{K}^{m\times 1}$ random,\\
+		minimal polynomial generator 
+		$P = \sum_{i=0}^{d} p_i T^i$
+		of $(u A^i v^{t})_{i\ge 0}$ is also the minimal polynomial of $A$
+	\end{itemize}
+	\pause
+	\begin{definition}[Minimal Polynomial Generator]
+		Minimal polynomial generator $P = p_0 + p_1 T + \dots + p_d T^d$ of a
+		sequence $(L_s)_{s\ge0}$ is the monic polynomial of lowest degree such
+		that 
+		$$ p_0 L_s + p_1 L_{s+1} + \dots + p_d L_{s+d} = 0, \; \forall s \ge 0$$
+		Equivalently, $P \sum_{s\ge 0} L_s/ T^{s+1}$ is a polynomial. 
+	\end{definition}
+	
+	In other words:
+	\begin{align*}
+	\sum_{i=0}^{d}p_i u M^{s+i} v^{t} = 0 \iff \sum_{i=0}^{d}p_i M^{s+i}  = 0
+	\end{align*}
+\end{frame}
+
+\begin{frame}{Sparse-FGLM}
+	\begin{itemize}
+		\item Faug\`ere and Mou [2017]
+		\item Key idea: min. poly of $M_n$ equals $P_n$
+		\item $M_i$'s expected to be sparse: use the Wiedemann algorithm
+	\end{itemize}
+	
+	
+\end{frame}
+
+\begin{frame}{Sparse-FGLM}
+	Let $e = \begin{bmatrix}
+	1 & 0 & \dots & 0
+	\end{bmatrix}^t$\\
+	Given $M_1,\dots,M_n$ and $D$ as before:
+	\begin{itemize}
+		\item[1.] Choose $u\in \mathbb{K}^{1\times D}$ of random entries
+		\item[2.] Compute $L_s = u M_n^s e$ for $s= 0,\dots, 2D$
+		\item[3.] Let $P$ be the
+		minimal polynomial generator
+		of $(L_s)_{0\le s \le 2D}$
+		\item[4.] Let $N = P \sum_{s\ge 0} L_s / T^{s+1}$
+		\item[5.] for $i = 1 \dots n-1$:
+		\begin{itemize}
+			\item[5a.] Compute $N_i = P \sum_{s\ge 0} (uM_n^s M_i e)/ T^{s+1}  $
+			\item[5b.] Let $C_i = N_i / N \mod P$
+		\end{itemize}
+		\item[6.] Return $\{ x_1 - C_1, x_2-C_2,\dots, P  \}$
+	\end{itemize}
+	\begin{itemize}
+		\item Randomized; may lose some points
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Example cont.}
+	Given previous input:
+	\begin{itemize}
+		\item Choose $u = \begin{bmatrix} 3 & 11 & 1 & 2 \end{bmatrix}$\\
+		\item $(uM_2^s e)_ {0 \le i < 2D} = (3,69,96,94,58,65,8,61)$,\\
+		with minimum polynomial generator: $P = T^4 + 47T^3 + 16T^2 + 64T + 16$\\
+		\pause
+		\item $N = P(3/T + 69/T^2 + 96/T^3 + \dots  ) =  3T^3+16T^2+ 89T+82 $\\
+		\item $N_1 = P(7/T +1/T^2 + 5/T^3 + \dots) = 73T^3+ 88T^2+ 55T+31$\\
+		\pause
+		\item Finally $N_1/N \mod P = 86T^3 + 49T^2 + 39T + 38$
+	\end{itemize}
+	Recall, lex basis of $I$:
+	$$ \{
+	x_1 -(86x_2^3 + 49x_2^2 + 39x_2 + 38) ,x_2^4 + 47x_2^3 + 16x_2^2 + 64x_2 + 16\}$$
+	
+	
+\end{frame}
+
+\begin{frame}{Closer Look}
+	\begin{itemize}
+		\item Berlekamp-Massey algorithm finds the minimal polynomial
+		\item Bottleneck: computing $(u M_n^s)_{0 \le s < 2D}$
+		\item difficult to parallelize: need $uM_n^{s}$ to compute $uM_n^{s+1}$
+		\item Use block Wiedemann algorithm instead!
+		\item Uses Berlekamp-Massey-Sakata algorithm for non radical/shape position ideals
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Block Sparse-FGLM}
+	Three goals:
+	\begin{enumerate}
+		\item Easily parallelizable
+		\item Deal with non radical/shape position ideals without using Berlekamp-Massey-Sakata
+		\item Avoid using generic linear forms $x = t_1 x_1 + \dots + t_n x_n$ as much
+		as possible
+	\end{enumerate}
+	\pause
+	Additionally,
+	\begin{itemize}
+		\item Steel [2015] already showed how to compute $P_n(x_n)$ through the block Wiedemann algorithm
+		\item Computed the rest through ``evaluation" method
+		\item Want to compute the rest algebraically
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Block Wiedemann Algorithm}
+	\begin{itemize}
+		\item Coppersmith [1994], Kaltofen [1995], Villard [1997], Kaltofen and Villard [2001]
+		\item Compute matrix sequences
+		rather than scalar
+		\item Choose $m \in \mathbb{N}$ and
+		$U,V \in \mathbb{K}^{m \times D}$ of random entries
+		\item Compute (in parallel),
+		for $1 \le s < 2D/m$,
+		\begin{align*}
+		L_{s,1} &= u_1 M^s\\
+		L_{s,2} &= u_2 M^s\\
+		\vdots\\
+		L_{s,m} &= u_m M^s
+		\end{align*}
+		and
+		$$ A_s = L_s V^t, 0\le s < 2D/m$$
+		\item Exists a notion of \textbf{minimal polynomial matrix generator}
+		
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}{Minimal Polynomial Matrix Generator}
+	\begin{definition}[Minimal Polynomial Matrix Generator]
+		A (left) matrix generator $F$ for a sequence of
+		$m\times m$ matrices $(A_s)_{s\ge 0}$ is an
+		$m\times m$ matrix
+		whose rows form a basis of the module of left vector
+		relations for $(A_s)_{s\ge 0}$. $F$ is minimal if
+		it is row reduced.
+	\end{definition}
+	\begin{itemize}
+		\item $F$ \textit{cancels} $(A_s)_{s\ge 0}$
+		\item $F \sum_{s\ge 0} A_s/T^{s+1}$ has polynomial entries
+		\item Expected to have degree at most $\lceil D/m \rceil$
+		\item Berlekamp-Massey, Extended Euclidean, Pad\'e
+		approximant, $\sigma$-basis, Toeplitz/Hankel solver
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Computing Scalar Quantities}
+	\begin{itemize}
+		\item Given block quantities, want corresponding scalar quantities
+		\item Largest invariant factor of $F =$
+		minimal polynomial generator $P$
+		\item Compute by:
+		\begin{itemize}
+			\item Smith Normal Form
+			\item LCM of denominators of $y$ that satisfy $Py = b$, for random b
+		\end{itemize}
+		\item Find $a$ that satisfy $aF = \begin{bmatrix}
+		0 & \dots & 0 & P
+		\end{bmatrix}$ by linear system solving
+		\item $N = aF \sum_{s\ge 0} U M^s e/ T^{s+1}$ corresponds to scalar
+		numerator $N = P\sum_{s\ge 0} u_n M^s e/ T^{s+1}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{``Bad" Inputs}
+	\begin{itemize}
+		\item Need $x_n$ to \textbf{separate} all points in $V(I)$
+		\item Choose $x = t_1 x_1 + \dots + t_n x_n$ with multiplication matrix $M$
+		\item Compute output weaker than lex basis of $I$ [Bostan et al, 2003]
+		\begin{definition}[Zero-dimensional Parametrization]
+			The tuple $((Q,V_1,\dots,V_n),x)$, where $Q$ is a monic square-free
+			polynomial and $V_i$'s are polynomials of degree less than $Q$, such
+			that
+			$$ V(I) = \{ (V_1(\tau), \dots, V_n(\tau)) \mid Q(\tau) = 0 \} $$
+		\end{definition}
+		\item Similar to computing the lex basis for the radical of $I$
+	\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Block Sparse-FGLM}
+	Given $M,M_1,\dots,M_n$, $D$ as before:
+		\begin{itemize}
+			\item[]{\bf 1.~} {\sf choose $U,V \in \mathbb{K}^{m \times D}$}
+			\item[]{\bf 2.~} {\sf $A_s = UM^sV^t$ for $0 \le s < 2d$, with $d = \frac{D}{m}$}
+			\item[]{\bf 3.~} {\sf $F = {\sf MatrixBerlekampMassey}((A_s)_{0\le s < 2d})$}
+			\item[]{\bf 4.~} {\sf $P=$ largest invariant factor of $F$ and $R={\sf SquareFreePart}(P)$}
+			\item[]{\bf 5.~} {\sf $N = F\sum_{s\ge 0} \frac{UM^s e}{T^{i+1}}$}
+			\item[]{\bf 6.~} {\sf $a = [0 ~\cdots 0 P] F^{-1}$}
+			\item[]{\bf 7.~} {\sf $N^*=$ first entry of $aN$}
+			\item[]{\bf 8.~} {\sf for $j = 1 \dots n$:}
+			\begin{itemize}
+				\item[]{\bf 8.1.} ~~{\sf $N_j = F\sum_{i\ge 0} \frac{(UM^i M_j e)}{T^{i+1}}$}
+				\item[]{\bf 8.2.} ~~{\sf $N^*_j=$ first entry of $aN_j$}
+				\item[]{\bf 8.3.} ~~{\sf $R_j=N^*_j/N^*$ mod $R$}
+			\end{itemize}
+			\item[]{\bf 9.~} {return $((R,R_1,\dots,R_n), x)$}
+		\end{itemize}
+\end{frame}
+
+\begin{frame}{Example cont.}
+	\begin{itemize}
+		\item Choose $m = 2, 
+		U = \begin{bmatrix}
+		95 & 78 & 40 & 77\\
+		21 & 0  & 84 & 2
+		\end{bmatrix},
+		V^t = \begin{bmatrix}
+		84 & 55 & 12 & 33\\
+		43 & 27 & 81 & 50
+		\end{bmatrix}
+		$
+		\item $(UM_2^sV^t)_{0 \le s < 4} = 
+		\bigg(  
+		\begin{bmatrix}
+		62& 89\\
+		25& 47
+		\end{bmatrix},
+		\begin{bmatrix}
+		10& 95\\
+		45& 92
+		\end{bmatrix},
+		\begin{bmatrix}
+		61& 93\\
+		32& 50
+		\end{bmatrix},
+		\begin{bmatrix}
+		22& 49\\
+		 5& 13
+		\end{bmatrix} 
+		\bigg)$
+		\pause
+		\item $F = \begin{bmatrix}
+		T^2 + 19T + 17&       41T + 68\\
+		      18T + 61& T^2 + 28T + 11
+		\end{bmatrix}$\\
+		 and $P = T^4 + 47T^3 + 16T^2 + 64T + 16$\\
+		 and $a = \begin{bmatrix}
+		       36 + 79T & 17 + 19T + T^2
+		 \end{bmatrix}$
+		 \pause
+		 \item $N = F\bigg( 
+		 \begin{bmatrix}
+		 95\\21
+		 \end{bmatrix}/T +
+		 \begin{bmatrix}
+		 6\\12
+		 \end{bmatrix}/T^2 + \dots
+		 \bigg) =
+		 \begin{bmatrix}
+		 53+95T\\79+21T
+		 \end{bmatrix}$ \\
+		 and $N^* = aN = 50 + 56T + 29T^2 + 21T^3$
+		 \pause
+		 \item $N_1 = F\bigg(
+		 \begin{bmatrix}
+		 95\\76
+		 \end{bmatrix}/T+
+		 \begin{bmatrix}
+		 76\\11
+		 \end{bmatrix}/T^2 + \dots
+		 \bigg) = 
+		 \begin{bmatrix}
+		 50 + 95T\\
+		 66 + 76T
+		 \end{bmatrix}$ \\
+		 and $N_1^* = aN_1 = 12 + 22T + 91T^2 + 76T^3$
+		 \pause
+		 \item Finally $N_1^* / N^* \mod P = 86T^3 + 49T^2 + 39T + 38$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Experimental Results}
+	\begin{itemize}
+		\item Implemented in LinBox, Eigen, NTL
+		\item $M_i$'s computed by Magma, over $GF(65537)$
+	\end{itemize}
+	\begin{center}
+		\begin{tabular}{c|c|c|c|c|c|c}
+			\textbf{name}& $\bm{n}$ & $\bm{D}$ & \textbf{density} & $\bm{m = 1}$ & $\bm{m = 3}$ & $\bm{m = 6}$ \\
+			\hline
+			rand1-26&3 &17576&0.06& 692 & 307& 168  \\
+			rand1-28&3 &21952&0.05&1261 & 471 & 331   \\
+			rand1-30&3 &27000&0.05&2191 & 786 & 512   \\
+			rand2-10&4 &10000&0.14&301  & 109 & 79    \\
+			rand2-11&4 &14641&0.13&851  & 303 & 239  \\
+			rand2-12&4&20736&0.12&2180  & 784 & 648   \\
+			mixed1-22&3 &10864&0.07&207 & 75 & 58   \\
+			mixed1-23&3 &12383&0.07&294 & 107 & 92   \\
+			mixed1-24&3 &14040&0.07&413 & 150 & 125  \\
+			mixed2-10&4 &10256&0.16&362 & 130 & 113 \\
+			mixed2-11&4 &14897&0.14&989 & 384 & 278 \\
+			mixed2-12&4 &20992&0.13&2480& 892 & 807 \\
+			mixed3-12&12 &4109&0.5&75   & 27 & 21   \\
+			mixed3-13&13&8206&0.48&554  & 198 & 171
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Using Original Coordinates}
+	\begin{itemize}
+		\item Multiplication matrix $M$ for $x = t_1 x_1 + \dots + t_n x_n$ denser than $M_i$'s
+		\item Compute as many points in $V(I)$ as possible using $x_n$
+		\item Compute the residual points by using $x= t_1 x_1 + \dots + t_n x_n$
+		\item Some additional polynomial operations required
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Experimental Results}
+	\begin{itemize}
+		\item Ratio of improved/original
+	\end{itemize}
+	\begin{tabular}{c|c|c|c|c|c|c}
+		\textbf{name}& $\bm{n}$ & $\bm{D}$ & $\bm{m = 1}$ & $\bm{m = 3}$ & $\bm{m = 6}$&$x_n/x$\\
+		\hline
+		rand1-26&3 &17576&0.426&0.339&0.511& 17576/17576\\
+		rand1-28&3 &21952&0.414&0.393&0.461& 21952/21952\\
+		rand1-30&3 &27000&0.41&0.54&0.521& 27000/27000\\
+		rand2-10&4 &10000&0.412&0.407&0.367& 10000/10000\\
+		rand2-11&4 &14641&0.406&0.53&0.365& 14641/14641\\
+		rand2-12&4 &20736&0.417&0.412&0.35& 20736/20736\\
+		mixed1-22&3 &10864&0.425&0.417&0.446& 10648/10675\\
+		mixed1-23&3 &12383&0.42&0.414&0.398&  12167/12194\\
+		mixed1-24&3 &14040&0.413&0.404&0.4&  13824/13851\\
+		mixed2-10&4 &10256&0.379&0.379&0.434& 10000/10016 \\
+		mixed2-11&4 &14897&0.378&0.349&0.402& 14641/14657\\
+		mixed2-12&4 &20992&0.39&0.391&0.338& 20736/20752\\
+		mixed3-12&12 &4109&0.401&0.392&0.422& 4096/4097\\
+		mixed3-13&13&8206&0.41&0.405&0.384& 8192/8193
+	\end{tabular}
+\end{frame}
+
+\end{document}
+
+
+
