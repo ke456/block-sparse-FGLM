@@ -212,7 +212,7 @@ $\deg(R_n)$ (and $R_n$ squarefree); this is known as the {\em
   \;\,\text{is a root of}\;\, R_n\}.$$ As a result, the standard approach to
  solve a zero-dimensional system by means of Gr\"obner basis
  algorithms is to first compute a Gr\"obner basis for a degree ordering
- and then convert it to a more readable output, such as a lexicographic
+ and then convert it to a more exploitable output, such as a lexicographic
  basis. As pointed out in~\cite{FaMo17}, the latter step, while of
  polynomial complexity, can now be a bottleneck in practice. This
  paper will thus focus on this step; in order to describe our 
@@ -265,7 +265,7 @@ The algorithms of~\cite{AlBeRoWo94, BeWo96, Rouillier99} rely on
 Indeed, these algorithms compute sequences of values of the form
 $v_s=(\trace(\lf^s))_{s \ge 0}$ and 
 $v_{s,i}=(\trace(\lf^s X_i))_{s \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
-form and $\lf=t_1 X_1 + \cdots + t_n X_n$ is  a $\K$-linear combination of the variables.
+form and $\lf=t_1 X_1 + \cdots + t_n X_n$ is some $\K$-linear combination of the variables.
 From these values, one may then recover the output in~\cref{eq:RUR} by means
 of structured linear algebra calculations.
 
@@ -285,7 +285,7 @@ $\K[T]$ of degree less than $\deg(\sqfree)$ for all $i$. The tuple
  $((\sqfree,V_1,\dots,V_n),\lf)$ computed by  such algorithms
 will be called a {\em zero-dimensional parametrization} of $V(I)$. In
 particular, it generally differs from the description
-in~\cref{eq:RUR}, since the latter keeps trace of the multiplicities
+in~\cref{eq:RUR}, since the latter keeps track of the multiplicities
 of the solutions (the algorithm in~\cite{BoSaSc03} actually computes
 the {\em nil-indices} of the solutions). Remark that starting from
 such an output, we can reconstruct the local structure of $I$ at 
@@ -304,64 +304,62 @@ several forms of {\em sparse FGLM} algorithms. For instance, if $I$ is
 in shape position, the algorithms in \cite{FaMo17} recover its
 lexicographic basis, which is as in~\eqref{eq:shapelemma}, by also
 considering values of a linear form $\ell:\residueI \to \K$. For less
-favorable inputs, the algorithm falls back on the
+favorable inputs, these algorithms fall back on the
 Berlekamp-Massey-Sakata algorithm~\cite{Sakata90} or plain FGLM.
 
-The ideas at play in these algorithms are essentially based on Krylov
-subspace methods, using projections and Berlekamp-Massey techniques.
-These techniques have also been widely used in integer factorization
-or discrete logarithm calculations, going back to~\cite{LaOd90}.
-To easily parallelize the
-bottleneck of the algorithm, it is
-then natural to adapt to our situation the block version of such
-algorithms, as pioneered by Coppersmith~\cite{Coppersmith94}  in the
-context of integer factorization. This was already discussed by Steel
+The ideas at play in these algorithms are essentially based on Krylov subspace
+methods, using projections as well as Berlekamp-Massey techniques, along the
+lines of Wiedemann's algorithm to solve sparse linear systems
+\cite{Wiedemann86}. These techniques have also been widely used in integer
+factorization or discrete logarithm calculations, going back to~\cite{LaOd90}.
+It has become customary to design block versions of such algorithms to
+parallelize their bottleneck, as pioneered by Coppersmith~\cite{Coppersmith94}
+in the context of integer factorization: it is then natural to adapt this
+strategy to our situation. This was already discussed by Steel
 in~\cite{Steel15}, where he showed how to compute the analogue of the
-polynomial $\sqfree$ in \cref{eq:BoSaSc03} using such techniques. In that reference, one is
-only interested in the solutions in the base field $\K$ ($\K$ being a
-finite field in that context): the algorithm computes the roots of
-$\sqfree$ in $\K$ and substitutes them in the input system, before
-computing a Gr\"obner basis in $n-1$ variables for each of them.
+polynomial $\sqfree$ in \cref{eq:BoSaSc03} using such techniques. In that
+reference, one is only interested in the solutions in the base field $\K$ ($\K$
+being a finite field in that context): the algorithm computes the roots of
+$\sqfree$ in $\K$ and substitutes them in the input system, before computing a
+Gr\"obner basis in $n-1$ variables for each of them.
 
 Our first contribution is to give a block version of the algorithm
 in~\cite{BoSaSc03} that extends the approach introduced
 in~\cite{Steel15} to compute all polynomials in~\cref{eq:BoSaSc03} for
 essentially the same cost as the computation of $\sqfree$. More
-precisely, the bottleneck for the algorithm of~\cite{Steel15} is the
+precisely, the bottleneck of the algorithm of~\cite{Steel15} is the
 computation of a block-Krylov sequence; we show that once this
 sequence has been computed, not only $\sqfree$ but also all other
 polynomials in the zero-dimensional parametrization can be efficiently
 obtained. Compared with the algorithms of~\cite{FaMo17}, a notable
 difference is that our algorithm deals with any ideal zero-dimensional
 $I$ (for instance, we do not require shape position), but the
-base field must have high enough characteristic (and our output is
+base field must have sufficiently large characteristic (and our output is
 somewhat weaker than a Gr\"obner basis, since multiplicities are not
 computed). While we focus on the case where the multiplication
 matrices are sparse, we also give a cost analysis for the case of
 dense multiplication matrices.
 
 Our second contribution is a refinement of our first algorithm, where
-we try to avoid computation with a generic linear form $\lf =t_1 X_1 +
+we try to avoid computations with a generic linear form $\lf =t_1 X_1 +
 \cdots + t_n X_n$ to the extent possible (this is motivated by the
-fact that the multiplication matrix of $\lf$ may be denser than those
-of the variables $X_i$). The algorithm first computes zero-dimensional
+fact that the multiplication matrix of $\lf$ is often denser than those
+of the variables $X_i$). The algorithm first computes a zero-dimensional
 parametrization of a subset of $V(I)$ for which we can take $\lf$
 equal to (say) $X_1$, and falls back on the previous approach for the
 residual part; if the former set has large cardinality, this is
-expected to provide a speed-up over the generalist algorithm.
+expected to provide a speed-up over the general algorithm.
 
-Our algorithms have been implemented in C++ on the basis of
-LinBox~\cite{LinBox}, Eigen~\cite{Eigen} and NTL~\cite{NTL}; an experimental
-implementation can be found at
-\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}.
+For experimental purposes, our algorithms have been implemented in C++ using
+the libraries LinBox~\cite{LinBox}, Eigen~\cite{Eigen} and NTL~\cite{NTL}.
 
 The paper is organized as follows. The next section mainly reviews
 known results on scalar and matrix recurrent sequences, and introduces
-a simple but useful algorithm to compute a so-called {\em scalar
+a simple useful algorithm to compute a so-called {\em scalar
   numerator} for such sequences. \cref{sec:seq0} describes sequences
 that arise in the context of FGLM-like algorithms; we prove slightly
-more precise versions of results from~\cite{BoSaSc03} that will be 
-used throughout. The main algorithm is given in \cref{sec:main},
+refined versions of results from~\cite{BoSaSc03} that will be 
+used throughout the paper. The main algorithm is given in \cref{sec:main},
 and the refinement mentioned above is in \cref{sec:original}.
 
 
@@ -390,9 +388,10 @@ the super-linearity properties of \cite[Section~8.4]{GaGe13}.  Then,
 two $m\times m$ matrices over $\K[T]$ whose degree is less than $d$
 can be multiplied using $O(m^\omega \M(d))$ operations in $\K$.
 
-\paragraph{Acknowledgments.} We wish to thank Chenqi Mou and Dave Saunders for useful
-discussions. This research was partially supported by Schost's NSERC
-Discovery Grant.
+\paragraph{Acknowledgments.} We wish to thank Chenqi Mou and Dave Saunders for
+useful discussions. This research was partially supported by NSERC (Schost's
+NSERC Discovery Grant) and by the CNRS-INS2I Institute through its program for
+young researchers (Neiger's project ARCADIE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3275,6 +3274,11 @@ G.~Villard.
 \newblock A study of {C}oppersmith's block {W}iedemann algorithm using matrix
   polynomials.
 \newblock Technical report, LMC-IMAG, Report 975 IM, 1997.
+
+\bibitem{Wiedemann86}
+D. Wiedemann.
+\newblock {\em Solving sparse linear equations over finite fields}.
+\newblock IEEE Trans. Inf. Theory IT-32, pp. 54--62, 1986.
 
 \bibitem{Wolovich74}
 W.~A. Wolovich.
