@@ -188,18 +188,18 @@ $^2$Univ.~Limoges, CNRS, XLIM, UMR 7252, F-87000 Limoges, France
 
 Computing the Gr\"obner basis of an ideal with respect to a given term
 ordering is an essential step in solving systems of polynomials.
-Certain term orderings, such as the degree reverse lexicographical
+Certain term orderings, such as the degree reverse lexicographic
 ordering (\textit{degrevlex}), tend to make the computation of the
 Gr\"obner basis faster. This has been observed empirically since the
 1980's and is now supported by theoretical results, at least for some
 ``nice'' families of inputs, such as complete intersections or certain
 determinantal systems~\cite{Faugere02,FaSaSp13,BaFaSa15}.  On the
-other hand, other orderings, such as the lexicographical ordering
+other hand, other orderings, such as the lexicographic ordering
 (\textit{lex}), make it easier to find the coordinates of the
 solutions, or to perform arithmetic operations in the corresponding
 residue class ring.  For instance, for a zero-dimensional radical
 ideal $I$ in generic coordinates in $\K[X_1,\dots,X_n]$, for some
-field $\K$, the Gr\"obner basis of $I$ for the lexicographic order
+field $\K$, the Gr\"obner basis of $I$ for the lexicographic ordering
 with $X_1 > \cdots > X_n$ has the form
 \begin{equation}\label{eq:shapelemma}
  \{ X_1 - R_1(X_n),\dots,X_{n-1}-R_{n-1}(X_n),R_n(X_n)\},
@@ -2108,7 +2108,7 @@ In all cases, we start from multiplication matrices computed from a
 reported here do not include this precomputation; instead, we refer
 the reader to~\cite{FaMo17} for extensive experiments comparing the
 runtime of two similar stages (degree basis computation and conversion
-to a lex order) in that paper's algorithm.  Rather than optimizing our
+to a lex ordering) in that paper's algorithm.  Rather than optimizing our
 implementation, our main focus here was to demonstrate the effects of
 parallelization, and how the Krylov sequence computation dominates the
 runtime in these examples. In particular, we believe that many
