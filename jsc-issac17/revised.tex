@@ -409,9 +409,9 @@ for the computation of a {\em minimal matrix generator} of a linearly
 recurrent matrix sequence, as well as a degree bound for such
 generators, when the matrices we consider are obtained from a Krylov
 sequence. These results are for the most part not new
-(see~\cite{Villard97,Villard97a,KalVil01,Turner02}), but the cost
+(see~\cite{Villard97,Villard97a,KalVil01,Turner02,KaVi04}), but the cost
 analysis we give uses results not available when those references were
-first written.  The fourth and last subsection presents a useful
+written.  The fourth and last subsection presents a useful
 result for our main algorithm that allows us to compute a
 ``numerator'' for a scalar sequence from a similar object obtained for
 a matrix sequence.
@@ -425,7 +425,7 @@ Let $\K$ be a field and consider a sequence $\mathcal{L}=(\ell_s)_{s
 p_0 + \cdots + p_d T^d \in\K[T]$ {\em cancels} the sequence
 $\mathcal{L}$ if $p_0 \ell_s + \cdots + p_d \ell_{s+d}=0$ for all $s
 \ge 0$. The sequence $\mathcal{L}$ is {\em linearly recurrent} if
-there exists a non-zero polynomial that cancels it.  The {\em minimal
+there exists a nonzero polynomial that cancels it.  The {\em minimal
   polynomial} of a linearly recurrent sequence
 $\mathcal{L}=(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest
 degree that cancels it; the {\em order} of $\mathcal{L}$ is the degree
@@ -443,7 +443,7 @@ $\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$.
 
 It is often easier to work with a closed form that has the actual
 minimal polynomial as its denominator, rather than its reverse; this
-is done by working with generating series in the variable $1/T$.  Let
+is done by working with generating series in the variable $1/T$.  More precisely, let
 $\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
 be any polynomial; then, $\minpoly$ cancels the sequence $\mathcal{L}$
 if and only if $Q=\minpoly \genseries $ is a polynomial, in which case $Q$
@@ -452,9 +452,9 @@ $1/T$, the minimal polynomial of $\mathcal{L}$ is thus the
 monic polynomial $\minpoly$ of lowest degree for which there exists $Q \in
 \K[T]$ such that $\genseries=Q/\minpoly$.
 
-In particular, given a sequence $\mathcal{L}=(\ell_s)_{s \ge 0}$ and a
+In particular, given a scalar sequence and a
 polynomial that cancels it, there is a well-defined notion of
-associated numerator.  This is formalized in the next definition:
+associated numerator. This is formalized in the next definition:
 \begin{definition}
   \label{def:omega}
   Let $\mathcal{L}=(\ell_s)_{s \ge 0}\in \K^\N$ be a sequence and $P$ be a
@@ -464,11 +464,12 @@ associated numerator.  This is formalized in the next definition:
     \Omega(\mathcal{L},P) = P \genseries, \quad\text{where}\quad
     \genseries=\sum_{s \ge 0} \frac {\ell_s}{T^{s+1}}.
   \]
-  In view of the discussion above, $\Omega(\mathcal{L},P)$ is a polynomial of
+  In particular, $\Omega(\mathcal{L},P)$ is a polynomial of
   degree less than $\deg(P)$.
 \end{definition}
-\begin{remark} \leavevmode
-  \begin{itemize}
+
+Here are two remarks concerning this definition:
+\begin{itemize}
   \item We may write this definition using expressions in
     variable $T$ instead of $1/T$ as well: given
     $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
@@ -476,15 +477,17 @@ associated numerator.  This is formalized in the next definition:
     T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
     P(1/T)$ and $d=\deg(P)$; then
     $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
-\item We only need to know the first $d=\deg(P)$ coefficients
-  $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
-  have
-  \[
-    \Omega(\mathcal{L},P) = \left( P \sum_{s=0}^{d-1} \ell_{d - 1- s} T^s \right) {\rm~div~} T^d,
-  \]
- \end{itemize}
-where div denotes the quotient in the Euclidean division.
-\end{remark}
+  \item We only need to know the first $d=\deg(P)$ coefficients
+    $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
+    have
+    \[
+      \Omega(\mathcal{L},P) = \left( P \sum_{s=0}^{d-1} \ell_{d - 1- s} T^s \right) {\rm~div~} T^d,
+    \]
+    where div denotes the quotient in the Euclidean division.
+\end{itemize}
+
+\medskip
+
 Now, we give an example of this construction. Consider the Fibonacci sequence
 $\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
 polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
@@ -520,12 +523,13 @@ multiplication in degree $\deg(P)$.
 
 Next, we discuss the analogue of these ideas for matrix sequences; our main
 goal is to give a cost estimate for the computation of a suitable {\em matrix
-generator} for a matrix sequence $\seq$, obtained by means of recent algorithms
+generator} for a matrix sequence, obtained by means of recent algorithms
 for approximant bases. A similar discussion, but relying on the approximant
 basis algorithm in \cite{BecLab94}, can be found in~\cite[Chapter~4]{Turner02}.
 Note also that the latter reference uses the generating series in $\var$ while
 here we use that in $1/\var$, thus obtaining the sought generator directly as a
-submatrix of the computed approximant basis.
+submatrix of the computed approximant basis, without requiring polynomial
+reversals.
 
 We first define the notion of linear recurrence for matrix sequences over a
 field $\field$ as in~\cite[Section~3]{KalVil01}
@@ -545,7 +549,7 @@ $\rel = \row{p}_0 + \cdots + \row{p}_\degBd T^\degBd \in
 $  \row{p}_0 \seqelt{s} + \cdots + \row{p}_{\degBd} \seqelt{s+\degBd} = \row{0}$ holds for all
     $s \ge 0$;
   \item $\seq$ is  \emph{linearly recurrent} if it admits  a
-    non-zero scalar relation.
+    nonzero scalar relation.
   \end{itemize}
 \end{definition}
 For designing efficient algorithms, it will be useful to rely on
@@ -927,7 +931,7 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
 %%     \cdots ~ \mM^{N-1} \scrV]$, whereas $\langle \mV \rangle$ is the
 %%   span of $[\mV ~ \mM \mV ~ \cdots ~\mM^{N-1} \mV]$.
 %% Take a
-%%  maximal non-zero minor $\mu$ of $K_\scrV$; as soon as $\mu(Y)\ne 0$,
+%%  maximal nonzero minor $\mu$ of $K_\scrV$; as soon as $\mu(Y)\ne 0$,
 %%  we have equality of the dimensions.
   Now, for a generic $\mU$ in $\K^{D\times m}$, $D_\mU=D_\scrU$. On
   the other hand, by~\cite[Lemma~4.3]{Villard97a}, for any $\mU$
@@ -1174,7 +1178,7 @@ the direct product $\residueI_1\times \cdots \times \residueI_\dg$.  We let $N_i
 {\em nil-index} of $\residueI_i$, that is, the maximal integer $N$ such that
 $\m_{\alpha_i}^N$ is not contained in $I_i$; for instance, $N_i=0$ if
 and only if $\residueI_i$ is a field, if and only if $\balpha_i$ is a
-non-singular root of $I$. We also let $\D_i=\dim_\Kbar(\residueI_i)$, so that
+nonsingular root of $I$. We also let $\D_i=\dim_\Kbar(\residueI_i)$, so that
 we have $D_i \ge N_i$ and $\D=\D_1 + \cdots + \D_\dg$.
 
 The sequences we consider below are of the form $(\ell(\lf^s))_{s \ge
@@ -1200,13 +1204,13 @@ where $\Lambda_{i,j}$ is the operator
 $$f \mapsto \Lambda_{i,j}(f) = \sum_{\mu=(\mu_1,\dots,\mu_n) \in
 	S_{i,j}} c_{i,j,\mu} \frac{ \partial^{\mu_1 + \cdots + \mu_n} f}
 {\partial X_1^{\mu_1} \cdots \partial X_n^{\mu_n}},$$ for some finite
-subset $S_{i,j}$ of $\N^n$ and non-zero constants $c_{i,j,\mu}$ in
+subset $S_{i,j}$ of $\N^n$ and nonzero constants $c_{i,j,\mu}$ in
 $\Kbar$. 
 %% Let $w_{i,j}$ be the maximum of all $|\mu|$ for $\mu$ in
 %% $S_{i,j}$, with $|\mu| = \mu_1 +\cdots + \mu_n $.
 %% By~\cite[Lemma~3.3]{Mourrain97}, we have that $\max_j w_{i,j} =N_i$
 %% for all $i$.
-For instance, when $\balpha_i$ is non-singular, we have $D_i=1$, so
+For instance, when $\balpha_i$ is nonsingular, we have $D_i=1$, so
 there is only one function $\lambda_{i,j}$, namely $\lambda_{i,1}$; we
 write it $\lambda_{i,1}(f) = f(\balpha_i)$.
 
@@ -1215,7 +1219,7 @@ $\lambda_{i,1}(f) = f(\balpha_i)$; for $j>1$, we can then also assume
 that $S_{i,j}$ does not contain $\mu=(0,\dots,0)$ (that is, all terms
 in $\Lambda_{i,j}$ have order $1$ or more). Thus, introducing new
 variables $(U_{i,j})_{j =1,\dots,D_i}$, we deduce the existence of
-non-zero homogeneous linear forms $P_{i,\mu}$ in
+nonzero homogeneous linear forms $P_{i,\mu}$ in
 $(U_{i,j})_{j=1,\dots,D_i}$ such that for any $\ell$ in ${\rm
 	hom}_\Kbar(\residueI_i,\Kbar)$, there exists $\bu_i=(u_{i,j}) \in
 \Kbar{}^{D_i}$ such that we have
@@ -1238,22 +1242,22 @@ $\mu \ne (0,\dots,0)$. Explicitly, we can write $P_{i,\mu}=\sum_{j\in
 	\{1,\dots,D_i\} \;\mid\; \mu \in S_{i,j}} c_{i,j,\mu}
 U_{i,j}$. 
 
-Fix $\ell$ non-zero in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, written
+Fix $\ell$ nonzero in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$, written
 as in \cref{ell_param}. We can then
 define its {\em order} $w$ and {\em symbol} $\pi$. The former is
 the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
 $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$ such that $P_{i,\mu}(\bu_i)$ is
-non-zero; by~\cite[Lemma~3.3]{Mourrain97} we have $w \le
+nonzero; by~\cite[Lemma~3.3]{Mourrain97} we have $w \le
 N_i-1$. Then, we let
 $$\pi =\sum_{\mu \in S_i,\ |\mu|=w}P_{i,\mu}(\bu_i) X_1^{\mu_1} \cdots
 X_n^{\mu_n}$$ be the {\em symbol} of $\ell$; by construction,
-this is a non-zero polynomial. In the following paragraphs, we will
+this is a nonzero polynomial. In the following paragraphs, we will
 need the next lemma.
 
 \begin{lemma}\label{lemma:symbol0}
   Fix $i$ in $\{1,\dots,\dg\}$. For a generic choice of $\ell$ in
   ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
-  $\pi_i(t_1,\dots,t_n)$ is non-zero.
+  $\pi_i(t_1,\dots,t_n)$ is nonzero.
 \end{lemma}
 \begin{proof}
   Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
@@ -1261,14 +1265,14 @@ need the next lemma.
 	$$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1}
   \cdots X_n^{\mu_n} \in
   \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
-  construction a non-zero polynomial.  As a result, for a generic choice of
+  construction a nonzero polynomial.  As a result, for a generic choice of
   $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, which defines a linear form
   $\ell$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ as in \cref{ell_param},
   and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
-  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is non-zero. Thus, the symbol of
+  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is nonzero. Thus, the symbol of
   such a linear form $\ell$ is $\pi
   =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1}
-  \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then non-zero.
+  \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then nonzero.
 \end{proof}
 
 Finally, we say a word about global objects.  Fix a linear form $\ell:
@@ -1282,7 +1286,7 @@ where for all $i$, $\phi_i$ is the canonical projection $\residueI \to \residueI
 we will however omit these projection operators for simplicity.
 
 We call {\em support} of $\ell$ the subset $\mathfrak{S}$ of
-$\{1,\dots,\dg\}$ such that $\ell_i$ is non-zero exactly for $i$ in
+$\{1,\dots,\dg\}$ such that $\ell_i$ is nonzero exactly for $i$ in
 $\mathfrak{S}$.  As a consequence, for all $f$ in $\residueI$, we have
 \begin{equation}\label{eq:fui}
 \ell(f) = \ell_1(f) + \cdots + \ell_\dg(f)
@@ -1414,7 +1418,7 @@ lemma; this leads us to the following definitions.
   all indices $i$ such that 
   \begin{itemize}
   \item $\lf(\balpha_{i'}) \ne \lf(\balpha_i)$ for $i' \ne i$ in $\mathfrak{S}$;
-  \item $\pi_i(t_1,\dots,t_n)$ is non-zero.
+  \item $\pi_i(t_1,\dots,t_n)$ is nonzero.
   \end{itemize}
 \item $\{r_1,\dots,r_c\}$ are the pairwise distinct values taken by $\lf$ on
   $V_\mathfrak{S}$, for some $c \le |\mathfrak{S}|$.
@@ -1423,7 +1427,7 @@ lemma; this leads us to the following definitions.
   \begin{itemize}
   \item the fiber $\lf^{-1}(r_j) \subset V_{\mathfrak{S}}$ contains a single
     point, written $\balpha_{\sigma_j}$;
-  \item   $\pi_{\sigma_j}(t_1,\dots,t_n)$ is non-zero.
+  \item   $\pi_{\sigma_j}(t_1,\dots,t_n)$ is nonzero.
   \end{itemize}
   Remark that $j \mapsto \sigma_j$ induces a one-to-one correspondence
   between  $\mathfrak{t}$ and  $\mathfrak{T}$, and that $\lf(\balpha_{\sigma_j})=r_j$ 
@@ -1438,7 +1442,7 @@ lemma; this leads us to the following definitions.
  for $v$ in $\K[X_1,\dots,X_n]$, $\minpoly$
   cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
 there
-  exist non-zero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
+  exist nonzero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
   for $v$ in $\K[X_1,\dots,X_n]$,
   $$\Omega((\ell(v \lf^s))_{s\ge0},\minpoly) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
 \end{lemma}
@@ -1473,9 +1477,9 @@ there
   \end{align*}
   where $y_j$ is the maximum of all $w_i$ for $i$ in $T_j$.  Remark
   that for $v=1$, our condition that $\pi_i(t_1,\dots,t_n)$ is
-  non-zero for $i$ in $\mathfrak{T}$, together with our assumption on
+  nonzero for $i$ in $\mathfrak{T}$, together with our assumption on
   the characteristic of $\K$, imply that in the second line, all terms
-  in the first sum are non-zero and in reduced form.
+  in the first sum are nonzero and in reduced form.
   
   After simplifying terms in the second sum, we can rewrite the
   expression above as
@@ -1507,7 +1511,7 @@ there
 	\frac{D_{v,j}}
 	     {(T-r_{j} )^{z_{v,j}}},
   \end{align}
-  where all terms in the second sum are non-zero and in reduced form
+  where all terms in the second sum are nonzero and in reduced form
   (and similarly for the first sum, for $v=1$).
   This implies that the minimal
   polynomial of the sequence $(\ell(v\lf^s))_{s \ge 0}$ is 
@@ -1557,7 +1561,7 @@ there
   w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
   \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
   \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}$$
-  for $k$ in $\mathfrak{t}$. This is a non-zero constant, independent 
+  for $k$ in $\mathfrak{t}$. This is a nonzero constant, independent 
   of $v$, which completes the proof.
 \end{proof}
 
@@ -1714,7 +1718,7 @@ Gr\"obner basis computations, all with one variable less).
 Our algorithm computes the whole zero-dimensional parametrization of
 $V(I)$ for essentially the same cost as the computation of the minimal
 polynomial. In what follows, $\col{\varepsilon}_1$ denotes the
-size-$D$ column vector whose only non-zero entry is a $1$ in the first
+size-$D$ column vector whose only nonzero entry is a $1$ in the first
 row: $\col{\varepsilon}_1 =[1~0~\cdots~0]^\perp$.
 
 \begin{algorithm}[H]
@@ -1803,7 +1807,7 @@ is indeed a zero-dimensional parametrization of $V(I)$.
 
 For the cost analysis, we will mainly focus on a sparse model,
 assuming that $\mM$, as well as all $\mM_i$'s, have density $\density
-\in [0,1]$, that is, at most $\density D^2$ non-zero entries.  As a
+\in [0,1]$, that is, at most $\density D^2$ nonzero entries.  As a
 result, a matrix-vector product by $\mM$ can be done in $O(\density
 D^2)$ operations in $\K$ (we briefly discuss variants of the algorithm
 using dense linear algebra at the end of this subsection). In
@@ -2045,7 +2049,7 @@ Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\m
 &=\left [\begin{matrix} 84T + 55 \\ 38T + 11   \end{matrix}\right ].
 \end{align*}
 The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1}.$
-The latter is made from the entries of non-negative degree in the product
+The latter is made from the entries of nonnegative degree in the product
 $$\mat{P}_{\mU,\mV} 
 \left (
 \begin{bmatrix}
@@ -2494,12 +2498,12 @@ we will use the following lemma to perform the decomposition.
   c = u_{\sigma_j,1} \mf(\balpha_{\sigma_j})^2,
   $$ so that we have $ac=b^2$, for {\em any} choice of $\lambda$ and
   $\mf$. Now, we suppose that $j$ is not in $\mathfrak{a}$, and we prove
-  that for a generic choice of $\lambda$ and $\mf$, $ac-b^2$ is non-zero.
+  that for a generic choice of $\lambda$ and $\mf$, $ac-b^2$ is nonzero.
   The quantity $ac-b^2$ is a polynomial in the parameters
   $(\bu_i)_{i\in T_j}$, and $(y_i)_{i \in \{2,\dots,n\}}$, and we have
   to show that it is not identically zero. We discuss two cases; in both
   of them, we prove that a suitable specialization of $ac-b^2$ is
-  non-zero.
+  nonzero.
   
   Suppose first that for at least one index $\sigma$ in $T_j$,
   $\residueI_\sigma$ is not reduced. In this case, there exists as least one
@@ -2510,7 +2514,7 @@ we will use the following lemma to perform the decomposition.
   and all $y_r$ for $r\ne \rho$. Then, under this specialization,
   $ac-b^2$ becomes
   $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})y_\rho)^2$,
-  which is non-zero, so that $ac-b^2$ itself must be non-zero.
+  which is nonzero, so that $ac-b^2$ itself must be nonzero.
   
   Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
   has cardinality at least $2$, with $\residueI_\sigma$ reduced for all $\sigma$
@@ -2524,7 +2528,7 @@ we will use the following lemma to perform the decomposition.
   c=u_{\sigma,1}\mf(\balpha_{\sigma})^2+u_{\sigma',1}\mf(\balpha_{\sigma'})^2.
   $$
   Then, $ac-b^2$ is equal to $2u_{\sigma,1}u_{\sigma',1}(\mf(\balpha_{\sigma})-\mf(\balpha_{\sigma'}))^2$,
-  which is non-zero, since $\balpha_\sigma \ne \balpha_{\sigma'}$.
+  which is nonzero, since $\balpha_\sigma \ne \balpha_{\sigma'}$.
 \end{proof}
 
 The previous lemmas allow us to write Algorithm
@@ -2598,7 +2602,7 @@ form $\ell: \residueI \to \K$ by
   and where $\mf^i \cdot \lambda_j$ is the linear form $f \mapsto \lambda_j(\mf^i f)$.
   
   As a result, the value of $ A_0  A_2 -  A_1^2$ at
-  $r_j$ is (up to the non-zero factor $M'(r_j)^2$) equal to the
+  $r_j$ is (up to the nonzero factor $M'(r_j)^2$) equal to the
   quantity $ac-b^2$ defined in \cref{lemma:acb2}, so for a
   generic choice of $\ell$ (that is, of $\mU$) and $\mf$, it vanishes if and only if $j$ is
   in $\mathfrak{a}$. Thus, after Step~\ref{X1step9}, 
@@ -2620,7 +2624,7 @@ form $\ell: \residueI \to \K$ by
   %% \frac {\Omega((\ell(X_j X_1^s)_{s\ge0},M)(r_j)}{\Omega((\ell(X_1^s))_{s\ge0},M)(r_j)}=
   \frac
       {M'(r_j) \lambda_{j,1} \alpha_{\sigma_j,i}}{M'(r_j) \lambda_{j,1}} = \alpha_{\sigma_j,i},$$
-      since $M'(r_j)$ is non-zero.
+      since $M'(r_j)$ is nonzero.
       For $i=1$, since we use $X_1$ as a separating variable for $V_{\mathfrak{A}}$, 
       we simply insert the polynomial $T$ into our list.
 \end{proof}
