@@ -609,7 +609,7 @@ rank less than $\rdim$.)
     generator} $\mat{P}$ for $\seq$ is a matrix in $\relbasSpace$ whose rows form a basis
   of the module of left vector relations for $\seq$. This basis is said to be
   \begin{itemize}
-  \item \emph{minimal} if $\mat{P}$ is row reduced \cite{Wolovich74,Kailath80};
+  \item \emph{minimal} if $\mat{P}$ is in reduced form \cite{Wolovich74,Kailath80};
   \item \emph{canonical} if $\mat{P}$ is in Popov form \cite{Popov72,Kailath80}.
   \end{itemize}
 \end{definition}
@@ -655,9 +655,9 @@ i\le\rdim$.  As in the scalar case, if $\mat{P}$ has degree $d$, we
 only need to know $\seqelt{0},\dots,\seqelt{d-1}$ to recover
 $\mat{\Omega}(\seq, \relbas)$ as
 \begin{align}\label{eq:computeOmega}
-  \mat{\Omega}(\seq, \relbas) =  \left ( \relbas \cdot \sum_{s=0}^{d-1} \seqelt{d-1-s} T^s \right ) {\rm~div~} T^d,
+  \mat{\Omega}(\seq, \relbas) =  \left ( \relbas \cdot \sum_{s=0}^{d-1} \seqelt{d-1-s} T^s \right ) \;\mathrm{div}\; T^d,
 \end{align}
-where div $T^d$ means we keep the quotient of each entry by $T^d$.
+where ``$\mathrm{div}\; T^d$'' means we keep the quotient of each entry by $T^d$.
 The cost of computing it then depends on the cost of
 rectangular matrix multiplication in sizes $(\rdim,\rdim)$ and
 $(\rdim,\cdim)$. For simplicity, we only give the two most useful
@@ -773,7 +773,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \end{itemize}
 \end{theorem}
 \begin{proof}
-  For any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
+  We first observe that for any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
   \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem]
   \in \appMod{\sys}{\degBd}$. Indeed, from
   \cref{lem:linearly_recurrent}, if $\rel$ is a relation for $\seq$
@@ -783,7 +783,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   polynomial entries, has degree less than $\deg(\rel)$, and is such
   that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
 
-  Conversely, for any vectors $\rel \in \relSpace$ and $\rem
+  Conversely, we show that for any vectors $\rel \in \relSpace$ and $\rem
   \in \remSpace$, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ and
   $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$, then $\rel$ is a
   relation for $\seq$. Indeed, if $[\rel \;\; \rem]
@@ -820,7 +820,7 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
     operations in $\field$ if $\cdim \in O(\rdim)$. This bound
       assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
-      particular if $\M(\ )$ is quasi-linear and $\omega>2$.
+      particular if $d \mapsto \M(d)$ is quasi-linear and $\omega>2$.
   \item the canonical left matrix generator for $\seq$
     using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
     \log(\cdim\degBd)^3)$ operations in $\field$.
