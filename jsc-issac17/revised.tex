@@ -805,7 +805,7 @@ needed, since in our main algorithm, we will always use $\cdim =
 \rdim$.  However, we believe that the more general form stated here
 may find further applications. The proof is a direct consequence of
 the previous theorem, using the algorithms of
-respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
+respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeaNeiVil18}.
 \begin{corollary}\label{coro:cost_approx}
   Let $\seq \subset \seqeltSpace$ be a linearly recurrent sequence and
   let $\degBd = \degBdl+\degBdr+1$, where $(\degBdl,\degBdr) \in
@@ -820,10 +820,11 @@ respectively~\cite{GiJeVi03},~\cite{ZhoLab12}, and~\cite{JeNeScVi16}.
     $O(\rdim^\omega \M(\cdim\degBd/\rdim) \log(\degBd))$
     operations in $\field$ if $\cdim \in O(\rdim)$. This bound
       assumes $\M(kd) \in O(k^{\omega-1} \M(d))$; this holds in
-      particular if $d \mapsto \M(d)$ is quasi-linear and $\omega>2$.
+      particular if $d \mapsto \M(d)$ is quasi-linear.
   \item the canonical left matrix generator for $\seq$
-    using $O((\rdim+\cdim)^{\omega-1} \M(\cdim\degBd)
-    \log(\cdim\degBd)^3)$ operations in $\field$.
+    using $O((\rdim+\cdim)^{\omega} \M(\frac{\cdim\degBd}{\rdim+\cdim})
+    \log(\frac{\cdim\degBd}{\rdim+\cdim})^2)$ operations in $\field$, assuming
+    \(\rdim+\cdim \le \cdim\degBd\).
   \end{itemize}
 \end{corollary}
 In particular, when $\cdim = \rdim$, we can find a minimal
@@ -3135,6 +3136,11 @@ C.-P. Jeannerod, V.~Neiger, \'E. Schost, and G.~Villard.
 \newblock Fast computation of minimal interpolation bases in {Popov} form for
   arbitrary shifts.
 \newblock In {\em ISSAC'16}, pages 295--302. ACM, 2016.
+
+\bibitem{JeaNeiVil18}
+C.-P. Jeannerod, V.~Neiger, and G.~Villard.
+\newblock Fast computation of approximant bases in canonical form.
+\newblock Accepted for publication in {\em J. Symbolic Comput.}, 2018.
 
 \bibitem{Kailath80}
 T.~Kailath.
