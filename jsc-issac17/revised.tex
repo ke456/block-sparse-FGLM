@@ -2140,8 +2140,8 @@ improvements are possible for the polynomial matrix computations
 (computing minimal matrix generator, its largest invariant factor,
 \dots), but this is by no means a bottleneck here.
 
-All our inputs as well as our source code are available at
-\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}.
+\textcolor{red}{All our inputs as well as our source code are available at
+\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}}.
 Some systems
 are well-known (Katsura or Eco from~\citep{Morgan88}), while we also
 consider several families of randomly generated inputs (some are
@@ -2169,7 +2169,7 @@ In the columns $m=1,m=3,m=6$, the numbers in parentheses indicate the
 part of the total time spent in computing the Krylov sequence
 $(\mUt \mM^s)_{0 \le s< 2d}$, with $d=\lceil D/m\rceil$. This is
 always by far the dominant factor.  In other words, the immense
-majority of the time is spent doing sparse matrix / vector products
+majority of the time is spent doing sparse matrix-vector products
 for matrices with machine float entries. 
 
 Increasing $m$ has two effects. On the plus side, plainly, it
