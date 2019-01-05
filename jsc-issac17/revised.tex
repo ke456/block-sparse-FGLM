@@ -1030,7 +1030,7 @@ $\seqelt{s,\mU,\mV}=\mUt \mM^s \mV = \mat{L}_s\mV$ for
 $s=0,\dots,2\lceil D/m \rceil$. Note that in our description, we
 assume for simplicity that memory is not an issue, so that we can
 store all needed elements from e.g. sequence $\mat{L}_s$; we discuss
-this in slightly more detail in \cref{ssec:mainalgo}.
+this in more detail in \cref{ssec:mainalgo}.
 
 Our main algorithm will also resort to scalar numerators of
 the form $\Omega((\row{u}_i \mM^s \col{w})_{s \ge 0},
@@ -1043,7 +1043,7 @@ may need to compute up to $D$ terms of the sequence $\row{u}_i \mM^s
 \col{w}$, which we would of course like to avoid. We now present an
 alternative solution which involves solving a univariate polynomial linear system
 and computing a matrix numerator, but only uses the sequence elements
-$\mat{L}_s= \mUt \mM^s$ for $s=0,\dots,\lceil D/m \rceil-1$,
+$\mat{L}_s= \mUt \mM^s$ for $s=0,\dots,\lceil D/m \rceil-1$
 which have already been computed.
 
 Fix $i$ in $1,\dots,m$ and let $\row{a}_i$ be the row vector defined
@@ -1112,6 +1112,7 @@ $s=0,\dots,\lceil D/m \rceil-1$.
     \item $\row{w}$ in $\K^{D \times 1}$
     \item $i$ in $\{1,\dots,m\}$
     \item $\row{a}_i =  [0~\cdots~0~\minpoly~0~\cdots~0]  (\mat{P}_{\mU,\mV})^{-1} \in \K[T]^{1\times m}$
+      where $\minpoly$ appears at the $i$th entry
 		\item $\mat{L}_s = \mUt \mM^s \in \K^{m\times D}$, for $s=0,\dots,\lceil D/m\rceil-1$
 	\end{itemize}
 	{\bf Output:}  \vspace{-0.5em}
@@ -1129,15 +1130,15 @@ $s=0,\dots,\lceil D/m \rceil-1$.
 
 Computing the first $\lceil D/m \rceil$ values of the sequence
 $\mat{\mathcal{E}}=(\col{e}_s)_{s \ge 0}$ is done by using the
-equality $\col{E}_s = \mat{L}_s \col{w}$ and takes $O(D^2)$ base field
+equality $\col{E}_s = \mat{L}_s \col{w}$ and takes $O(D^2)$ field
 operations. Then, applying the cost estimate given after
 \cref{eq:computeOmega}, we see that we have enough terms to compute
-$\mat{\Omega}( (\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}) \in \K[T]^{m
+$\mat{\Omega}(\mat{\mathcal{E}}, \mat{P}_{\mU,\mV}) \in \K[T]^{m
 \times 1}$ and that it takes $O(m^2 \M(D/m)) \subset O(m \M(D))$ operations in
 $\K$. Then, the dot product with $\row{a}_i$ takes $O(m \M(D))$
 operations, since both vectors have size $m$ and entries of degree at
 most $D$. Thus, the runtime is 
-$$O(D^2 + m \M(D)) \subset \softO{D^2}$$
+\(O(D^2 + m \M(D)) \subset \softO{D^2}\)
 operations in $\K$.
 
 
