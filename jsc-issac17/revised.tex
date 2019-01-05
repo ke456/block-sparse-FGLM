@@ -606,7 +606,7 @@ following basic result, which can be found for example in
 %% \begin{proof}
 %% 	The set of vector relations for $\seq$ is a $\polRing$-submodule of
 %% 	$\relSpace$, and hence is free of rank at most $\rdim$
-%% 	\cite[Chapter~12]{DumFoo04}.
+%% 	\citep[Chapter~12]{DumFoo04}.
 %%
 %% 	If $\seq$ is linearly recurrent, let $p \in \polRing$ be a nontrivial scalar
 %% 	relation for $\seq$. Then each vector $[0 \; \cdots \; 0 \; p \; 0 \; \cdots
@@ -935,12 +935,12 @@ $\delta = \lceil \nu / m \rceil \le \lceil D / m \rceil$.
   $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$.
 	
   Let us next introduce a matrix $\scrU$ of indeterminates of size $D
-  \times m$, and let $\mat{P}_{\scrU}$ be the canonical generating
-  polynomial of the ``generic'' sequence $(\trsp{\scrU} \mM^s)_{s \ge
+  \times m$, and let $\mat{P}_{\scrU}$ be the canonical matrix generator
+  of the ``generic'' sequence $(\trsp{\scrU} \mM^s)_{s \ge
     0}$. The notation $\langle \scrU \rangle$ and $D_\scrU$ are
   defined as above.  In particular,
-  by~\citep[Proposition~6.1]{Villard97a}, the canonical generating
-  polynomial $\mat{P}_{\scrU}$ has degree $\delta$ and determinantal
+  by~\citep[Proposition~6.1]{Villard97a}, the canonical matrix generator
+  $\mat{P}_{\scrU}$ has degree $\delta$ and determinantal
   degree $\nu$.
   
 %%  Indeed,
@@ -1719,10 +1719,10 @@ LinBox, Eigen and NTL.
 
 We mentioned that the method of \citet{Steel15} already uses the block
 Wiedemann algorithm to compute the minimal polynomial $\minpoly$ of
-$\lf=t_1 X_1 + \cdots + t_n X_n$; given sufficiently many terms of the
+$\lf=t_1 X_1 + \cdots + t_n X_n$; \textcolor{red}{given sufficiently many terms of the
 sequence $(\mUt \mM^s \mV)$, this is done by means of polynomial
 lattice reduction, without computing the matrix generator
-$\mat{P}_{\mU,\mV}$. Knowing the roots of $\minpoly$ in $\K$, that
+$\mat{P}_{\mU,\mV}$}. Knowing the roots of $\minpoly$ in $\K$, that
 algorithm uses an ``evaluation'' method for the rest (several
 Gr\"obner basis computations, all with one variable less).
 
@@ -1736,7 +1736,7 @@ row: $\col{\varepsilon}_1 =\trsp{[1~0~\cdots~0]}$.
 	\caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$}
 	{\bf Input:} \vspace{-0.5em}
 	\begin{itemize}
-		\item $\mM_1,\dots,\mM_n$ defined as above
+		\item $\mM_1,\dots,\mM_n$ multiplication matrices defined as above
 		\item  $\mU,\mV \in \mathbb{K}^{D \times m}$, for some block dimension  $m \in \{1,\dots,D\}$
                 \item $\lf =t_1 X_1 + \cdots + t_n X_n$
 	\end{itemize}
@@ -1772,10 +1772,10 @@ generator of the sequence $\seq_{\mU,\mV}$, that $\minpoly$ is the minimal
 polynomial of $\lf$ and $\sqfree$ its squarefree part.
 
 We find the rest of the polynomials in the output by following
-\cref{algo:para2}. Crucially, the scalar numerators $\Omega(\cdots)$
-needed in this algorithm are computed using the method of
-\cref{ssec:scalar_numer}. Indeed, applying  \cref{lemma:omegaOmega},
-we see that calling  Algorithm $\mathsf{ ScalarNumerator}$
+\cref{algo:para2}. In particular, the scalar numerators
+needed in this algorithm are computed using \cref{algo:scalar_numerator}
+($\mathsf{ScalarNumerator}$); indeed, applying \cref{lemma:omegaOmega},
+we see that calling this algorithm
 at Steps~\ref{mainstep9} and~\ref{mainstep10}
 computes $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge
   0}, \minpoly) \quad\text{and}\quad C_{X_i} = \Omega((\row{u}_1 \mM^s
@@ -1816,14 +1816,13 @@ is indeed a zero-dimensional parametrization of $V(I)$.
   but savings can be substantial if these  matrices are sparse.
 \end{remark}
 
-For the cost analysis, we will mainly focus on a sparse model,
-assuming that $\mM$, as well as all $\mM_i$'s, have density $\density
-\in [0,1]$, that is, at most $\density D^2$ nonzero entries.  As a
-result, a matrix-vector product by $\mM$ can be done in $O(\density
-D^2)$ operations in $\K$ (we briefly discuss variants of the algorithm
-using dense linear algebra at the end of this subsection). In
-particular, the cost incurred at Step~\ref{mainstep1} to compute $\mM$
-is $O(\density n D^2)$.
+For the cost analysis, we will mainly focus on a sparse model: we let $\density
+\in [0,1]$ denote the density of $\mM$ and the $\mM_i$'s, that is,
+all these matrices have at most $\density D^2$ nonzero entries.  As a result, a
+matrix-vector product by $\mM$ can be done in $O(\density D^2)$ operations in
+$\K$ (we briefly discuss variants of the algorithm using dense linear algebra
+at the end of this subsection). In particular, the cost incurred at
+Step~\ref{mainstep1} to compute $\mM$ is $O(\density n D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
@@ -1863,7 +1862,7 @@ of size $O(D) \times D$ by $D \times m$; since $m \le D$, this  costs $O(m^{\ome
 base field operations.
 
 Recall from \cref{section:matrix_seq} that we can compute a minimal
-generating polynomial $\mat{P}_{\mU,\mV}$ in time $O(m^{\omega}
+matrix generator $\mat{P}_{\mU,\mV}$ in time $O(m^{\omega}
 \M(D/m) \log(D/m))$, which is in $O(m^{\omega-1} \M(D) \log(D))$.  In
 \cref{ssec:appliW,ssec:scalar_numer}, we saw that the
 largest invariant factor $P$ and the vector $\row{a}_1$ can be
@@ -1872,14 +1871,14 @@ takes time $O(\M(D) \log(D))$.
 
 In \cref{ssec:scalar_numer}, we saw that each call to {\sf ScalarNumerator}
 takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
-m\M(D))$; the final modular calculations modulo $\sqfree$ take time $O(n\M(D) + \M(D) \log(D))$.
+m\M(D))$; the final modular calculations modulo $\sqfree$ at Step \ref{mainstep11} take time $O(n\M(D) + \M(D) \log(D))$.
 Altogether, assuming perfect parallelization 
 at Step~\ref{mainstep3}, the total span is
 $$O\left (\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
 $$O\left (\density D^3 + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 +
-nm\M(D)\right ).$$ Of course, we could parallelize other steps than
-Step~\ref{mainstep3}, but it is simultaneously the most costly in
+nm\M(D)\right ).$$ Although one may work on parallelizing other steps than
+Step~\ref{mainstep3}, we note that this step is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
 
 \medskip
@@ -1897,25 +1896,24 @@ $m=1$. In this case, blocking has no effect. We compute the
 row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
 square-and-multiply technique used in the algorithm of \citet{Keller85},
 for $O(D^\omega \log(D))$ operations in
-$\K$. For generic choices of $\mU$ and $\mV$, the minimum generating
-polynomial matrix $\mat{P}_{\mU,\mV}$ is equal to the minimum
-polynomial $\minpoly$ of $\mM$, and can be computed by the
-Berlekamp-Massey algorithm, or a fast version of it; besides,
+$\K$. For generic choices of $\mU$ and $\mV$, the canonical matrix generator
+$\mat{P}_{\mU,\mV}$ is equal to the minimum
+polynomial $\minpoly$ of $\mM$, and can be computed efficiently by the
+Berlekamp-Massey algorithm (or a fast version of it); besides,
 $\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
 numerators is simply a power series multiplication in degree at most
 $D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, where
 the second term gives the cost of computing $\mM$.
 
-
 When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
-matrices and $d = D/m = 1$. A minimal generating polynomial of
+matrices and $d = D/m = 1$. The canonical matrix generator of
 $\seq_{\mU,\mV} = (\mUt\mV, \mUt\mM\mV,\dots)$ is
 $\mat{P}_{\mU,\mV} = T \mat{I}_D - \mUt\mM\itrsp{\mU}$ and its
 largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
 $O(D^\omega \log(D))$ operations in $\K$ using high-order lifting.
 
 The numerator $\mat{\Omega}(\mUt \mM \col{\varepsilon}_1,
-\mat{P}_{\mU,mV})$ is then seen to be $\mUt \col{\varepsilon}_1$, that is, the
+\mat{P}_{\mU,\mV})$ is then seen to be $\mUt \col{\varepsilon}_1$, that is, the
 first column of $\mUt$; we recover $C_1$ from it through a dot
 product with $\row{a}_1$. Similarly, the numerator
 $\mat{\Omega}(\mUt \mM \mM_i \col{\varepsilon}_1,
@@ -1995,7 +1993,7 @@ $$ \mU = \begin{bmatrix}
 \end{bmatrix}.
 $$ We compute the first $2d=2\lceil D/m\rceil =4$ terms in the matrix
 sequence $\seq_{\mU,\mV} = (\mUt\mM^s\mV)_{s\ge0}$ and its
-minimum generating matrix polynomial $\mat{P}_{\mU,\mV}$. This is done
+minimum matrix generator $\mat{P}_{\mU,\mV}$. This is done
 by first computing
 \begin{align}\label{exampleproducts}
 \mUt =
