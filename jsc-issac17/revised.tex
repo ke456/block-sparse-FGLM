@@ -1950,13 +1950,13 @@ X_2^3 + 61X_2^2 + 96X_2 + 20
 \mathclose{\resizebox{1.2\width}{\ht0}{$\Bigg\rangle$}}
 \subset \F_{101}[X_1,X_2];
 $$ the corresponding residue class ring $\residueI=\F_{101}[X_1,X_2]/I$
-has dimension $D=4$.  Although it does not appear on the generators,
+has dimension $D=4$.  Although it is not obvious from the generators,
 the ideal $I$ is simply $\mathfrak{m}_1^2 \mathfrak{m}_2$, where
 $\mathfrak{m}_1 =\langle X_1-4,X_2-10\rangle$ and $\mathfrak{m}_2
 =\langle X_1-5,X_2-20\rangle$ (this immediately implies that $D=3+1=4$).
 
-We choose $\lf = 2X_1 + 53 X_2$, so that $X_1$, $X_2$ and $\lf$ have respective multiplication matrices
-in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$ given by
+We choose $\lf = 2X_1 + 53 X_2$, so that the multiplication matrices of $X_1$, $X_2$ and $\lf$
+\textcolor{red}{in the basis $\basis=(1,X_2,X_2,X_2^2)$} of $\residueI$ are respectively
 \begin{align*}
 \mM_1 = \begin{bmatrix}
   7   & 91 & 100& 0\\
@@ -1969,7 +1969,7 @@ in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$ given by
   5 &  0 &  2 & 1\\
   0 &  0 & 10 & 0\\
   81&  0 & 71 & 0
-\end{bmatrix},\,
+\end{bmatrix},\,\text{and }
 \mM = \begin{bmatrix}
 13 & 33&  74&  0\\
 44 &  4&  45&  53\\
@@ -1977,9 +1977,10 @@ in the basis $\basis=(1,X_2,X_2,X_2^2)$ of $\residueI$ given by
 53 & 41&  97&  0
 \end{bmatrix}.
 \end{align*}
+
 We choose $m = 2$ and take $\mU,\mV \in \F_{101}^{D\times m}$ with 
 entries
-$$ \mU = \begin{bmatrix}
+\[ \mU = \begin{bmatrix}
 84& 38\\
 29& 58\\
 80& 43\\
@@ -1991,7 +1992,8 @@ $$ \mU = \begin{bmatrix}
   0&  95\\
  59&  89
 \end{bmatrix}.
-$$ We compute the first $2d=2\lceil D/m\rceil =4$ terms in the matrix
+\]
+We compute the first $2d=2\lceil D/m\rceil =4$ terms in the matrix
 sequence $\seq_{\mU,\mV} = (\mUt\mM^s\mV)_{s\ge0}$ and its
 minimum matrix generator $\mat{P}_{\mU,\mV}$. This is done
 by first computing
@@ -2022,8 +2024,10 @@ by first computing
 34&  56&  55&  34
 \end{bmatrix}, \nonumber
 \end{align}
+
 from which we get, by right-multiplication by $\mV$,
-$$ \seq_{\mU,\mV} =
+\[
+  \seq_{\mU,\mV} =
 \begin{bmatrix}
 92& 75\\  
 83& 51
@@ -2040,26 +2044,28 @@ $$ \seq_{\mU,\mV} =
 94& 51\\
 91& 51
 \end{bmatrix},\dots
-$$
-and
-$$ \mat{P}_{\mU,\mV} =
+\]
+and then we obtain the canonical matrix generator
+\[
+  \mat{P}_{\mU,\mV} =
 \begin{bmatrix}
 T^2 + 60T + 62 &       88T + 25\\
      100T + 33 & T^2 + 84T + 78
 \end{bmatrix}.
-$$
+\]
+
 The largest invariant factor of $\mat{P}_{\mU,\mV}$ is 
-$$P = T^3 + 76T^2 + 100T + 7,$$
+$P = T^3 + 76T^2 + 100T + 7$,
 with squarefree part $\sqfree=T^2+8T+61$.
-Next, we compute the row vector $\row{a}_1$ and the numerator $\mat{\Omega}( (\mUt \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$:
-\begin{align*}
-\row{a}_1 &= [T+16,13]\\
+Next, we compute the row vector $\row{a}_1 = [T+16,13]$ 
+by solving $\row{a}_1 = [P~~0] (\mat{P}_{\mU,\mV})^{-1}$,
+and the matrix numerator
+\[
 \mat{\Omega}( (\mUt \mM^s\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) 
-&=\left [\begin{matrix} 84T + 55 \\ 38T + 11   \end{matrix}\right ].
-\end{align*}
-The former is obtained by solving $\row{a}_1 = [~P~0~] (\mat{P}_{\mU,\mV})^{-1}.$
-The latter is made from the entries of nonnegative degree in the product
-$$\mat{P}_{\mU,\mV} 
+=\left [\begin{matrix} 84T + 55 \\ 38T + 11 \end{matrix}\right ]
+\]
+which is made from the entries of nonnegative degree in the product
+\[\mat{P}_{\mU,\mV} 
 \left (
 \begin{bmatrix}
 84\\  
@@ -2069,24 +2075,30 @@ $$\mat{P}_{\mU,\mV}
 54\\  
 34
 \end{bmatrix}\cdot \frac 1{T^2}+
- \cdots \right),$$ where the columns are the first columns of the
- matrices in \cref{exampleproducts} -- as per \cref{eq:computeOmega}, we only need $d=2$
- terms in the right-hand side.  From this, we find the scalar
- numerator $C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
-   0}, \minpoly)$ by means of the dot product $[~C_1~] = \row{a}_1\cdot
+ \cdots \right),
+ \]
+ where the columns are the first columns of the
+ matrices in \cref{exampleproducts} (as per \cref{eq:computeOmega}, we only need $d=2$
+ terms in the right-hand side).  From this, we find the scalar
+ numerator 
+ \[
+   C_1 = \Omega((\row{u}_1 \mM^s\col{\varepsilon}_1)_{s \ge
+   0}, \minpoly) = 84T^2 + 75T + 13
+ \]
+ by means of the dot product $[~C_1~] = \row{a}_1\cdot
  \mat{\Omega}( (\mUt \mM^s\col{\varepsilon}_1)_{s \ge 0},
- \mat{P}_{\mU,\mV})$; we get
-$$ C_1 = 84T^2 + 75T + 13.$$
-To find $C_{X_1}$, we proceed similarly: we compute  $\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV})$,
-and we obtain, after dot product with $\row{a}_1$,
-\begin{align*}
-\mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0}, \mat{P}_{\mU,\mV}) &=
-\left [\begin{matrix} 88T + 19 \\ 57T+40
-  \end{matrix} \right  ]\\
-C_{X_1} &= 88T^2 + 47T  + 16.
-\end{align*}
-Thus, the polynomial $V_1 = C_{X_1}/C_1 \bmod \sqfree$ is 
-given by $V_1= 15T+14$. 
+ \mat{P}_{\mU,\mV})$.
+
+We then find $C_{X_1} = 88T^2 + 47T  + 16$, by proceeding similarly: we compute
+the matrix numerator
+\[
+  \mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0},
+  \mat{P}_{\mU,\mV}) = \begin{bmatrix} 88T + 19 \\ 57T+40
+  \end{bmatrix}
+\]
+and we take the dot product with $\row{a}_1$.
+Thus, we obtain the polynomial $V_1 = C_{X_1}/C_1 \bmod \sqfree =
+15T+14$. 
 We compute $V_2= 49T+9$ in the same way,
 and our output is 
 $$((T^2+8T+61, 15T+14, 49T+9), 2X_1 + 53 X_2).$$ As a sanity check, we
