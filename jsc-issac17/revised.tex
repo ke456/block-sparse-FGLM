@@ -203,8 +203,6 @@ Polynomial systems; Block-Krylov algorithms; Sparse FGLM.
 \end{frontmatter}
 
 
-
-
 \section{Introduction}
 
 Computing the Gr\"obner basis of an ideal with respect to a given term
@@ -1169,16 +1167,15 @@ We now focus on our main question: computing a zero-dimensional
 parametrization of an algebraic set of the form $V=V(I)$, for some
 zero-dimensional ideal $I$ in $\K[X_1,\dots,X_n]$. 
 
-We write $V=\{\balpha_1,\dots,\balpha_\dg\},$ with all $\balpha_i$'s
-in $\Kbar{}^n$, and $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for
+We write $V=\{\balpha_1,\dots,\balpha_\dg\},$ with $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n}) \in \Kbar{}^n$ for
 all $i$.  We also let $\D$ be the dimension of
 $\residueI=\K[X_1,\dots,X_n]/I$, so that $\dg \le \D$, and {\em we
   assume that ${\rm char}(\K)$ is greater than $D$}.
 
-In this section, we recall and slightly expand on results from the appendix
+In this section, we recall and expand on results from the appendix
 of~\cite{BoSaSc03}, with the objective of computing a zero-dimensional
 parametrization of $V$. These results were themselves inspired by 
-those in~\cite{Rouillier99}, which were devoted to computations
+those in~\cite{Rouillier99}, the latter being devoted to computations
 with the trace linear form $\residueI\to\K$.
 
 At this stage, we do not discuss data structures or complexity (this
