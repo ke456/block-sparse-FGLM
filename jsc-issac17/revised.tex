@@ -1590,13 +1590,7 @@ As a first application, the following algorithm shows how to compute a
 zero-dimensional parametrization of $V_{\mathfrak{S}}$. Our main usage
 of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$, in which case
 $V_{\mathfrak{S}}=V$, but in the last section of the paper, we will
-also work with strict subsets. At this stage, we do not discuss data
-structures, complexity, or what terms in the sequences are needed;
-this is the subject of the next section.
-
-This algorithm is from~\cite{BoSaSc03}; we point out that a precursor
-of this kind of results is in~\cite{Rouillier99}, for a particular
-choice of a linear form $\residueI\to \K$, namely the trace.
+also work with strict subsets.
 
 \begin{algorithm}[H]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
@@ -1639,7 +1633,7 @@ choice of a linear form $\residueI\to \K$, namely the trace.
   Besides, we recall that for a generic $\ell$ in ${\rm
     hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$, the minimal polynomials of
   $(\ell(\lf^s))_{s \ge 0}$ and of $\lf$ are the same
-  (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ we compute
+  (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ computed
   at Step~1 is indeed the minimal polynomial of $\lf$ (with roots
   $\{r_j \mid j \in \mathfrak{t}\}$), and we can apply \cref{lemma:anyv};
   then, for any root $r_j$ of $\minpoly$, and $i=1,\dots,n$, we
@@ -1673,7 +1667,7 @@ Z_1 = \sum_{s \ge 0} \frac{\ell(X^s_1)}{T^{s+1}}
 &= \frac{17}{T-1} + \frac{33}{T-3}
 = \frac{17(T-3)+33(T-1)}{(T-1)(T-3)} \\
 Z_{X_2} = \sum_{s\ge0} \frac{\ell(X_2X_1^s)}{T^{s+1} }
-&= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{t-3}
+&= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{T-3}
 = \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}.
 \end{align*}
 These generating series have for common denominator $\minpoly = (T-1)(T-3)$,
@@ -1689,7 +1683,7 @@ V_2
 &=\frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{17(T-3)+33(T-1)} \mod \minpoly\\
 &=100 T +5.
 \end{align*}
-Then, $ V_2(1) = 4$ and $V_2(3) = 2$, as needed.
+Then, $V_2(1) = 4$ and $V_2(3) = 2$, as expected.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
