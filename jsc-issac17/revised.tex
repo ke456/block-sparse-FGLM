@@ -407,10 +407,10 @@ the super-linearity properties of \citep[Section~8.4]{GaGe13}.  Then,
 two $m\times m$ matrices over $\K[T]$ whose degree is less than $d$
 can be multiplied using $O(m^\omega \M(d))$ operations in $\K$.
 
-\paragraph{Acknowledgments.} We wish to thank Chenqi Mou and Dave Saunders for
-useful discussions. This research was partially supported by NSERC (Schost's
-NSERC Discovery Grant) and by the CNRS-INS2I Institute through its program for
-young researchers (Neiger's project ARCADIE).
+\paragraph{Acknowledgments.} We wish to thank Chenqi Mou, Dave Saunders, and
+Gilles Villard for useful discussions. This research was partially supported by
+NSERC (Schost's NSERC Discovery Grant) and by the CNRS-INS2I Institute through
+its program for young researchers (Neiger's project ARCADIE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2240,20 +2240,18 @@ ideals in shape position or not.
 \section{Using the original coordinates}\label{sec:original}
 
 In this last section, we propose a refinement of the algorithm given
-previously; the main new feature is that we avoid using a generic
-linear form $\lf = t_1 X_1 + \cdots + t_n X_n$ as much as possible.
-Indeed, such a linear combination is likely to result in a
-multiplication matrix $\mM = t_1 \mM_1 + \cdots + t_n \mM_n$
-significantly more dense than $\mM_1,\dots,\mM_n$. In all this
-section, we will work under the assumption that $\mM_1$ is the sparsest
-matrix among $\mM_1,\dots,\mM_n$, and try to rely on computations
+previously; the main new feature is that we focus on avoiding or reducing the
+use of a generic linear form $\lf = t_1 X_1 + \cdots + t_n X_n$.  Indeed, such
+a linear combination is likely to result in a multiplication matrix $\mM = t_1
+\mM_1 + \cdots + t_n \mM_n$ significantly less sparse than $\mM_1,\dots,\mM_n$.
+In all this section, we will work under the assumption that $\mM_1$ is the
+sparsest matrix among $\mM_1,\dots,\mM_n$, and try to rely on computations
 involving $\mM_1$ as much as possible.
 
 All notation, such as $I$, $\residueI=\K[X_1,\dots,X_n]/I$, its basis
 $\basis=(b_1,\dots,b_D)$, the local algebras $\residueI_i$, \dots, are as in the  previous two sections.
 In particular, we write $V=V(I)=\{\balpha_1,\dots,\balpha_\dg\},$ with
-all $\balpha_i$'s in $\Kbar{}^n$, and
-$\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n})$ for all $i$.
+$\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n}) \in \Kbar{}^n$ for all $i$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2265,13 +2263,13 @@ parametrization; the remaining points will be dealt with using a
 random linear form $\lf=t_1 X_1 + \cdots + t_n X_n$ as
 above. Throughout, we rely on the following operations: evaluations of
 linear forms on successive powers of a given element in $\residueI$
-(such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$) and (polynomial)
-linear algebra, as we did before, as well as some operations on
+(such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$) and
+linear algebra over the univariate polynomials, as we did before, as well as some operations on
 univariate polynomials related to the so-called {\em power
 projection}~\citep{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
-main structure; the subroutines are described in the next subsections.
+main structure; the subroutines are detailed in the next subsections.
 
 \begin{algorithm}[H]
   \caption{$\mathsf{BlockParametrizationWithSplitting}(\mM_1,\dots,\mM_n,\mU,\mV,\lf,\mf$)}
@@ -2307,11 +2305,11 @@ in the call to  $\mathsf{BlockParametrizationX}_1$.
 
 We then apply a modified version of Algorithm $\mainalgoname$, which we call
 $\mainalgoname{\sf Residual}$. It computes a zero-dimensional
-parametrization of $V''=V-V'$ using sequences such as $(\mUt
+parametrization of $V''=V\setminus V'$ using sequences such as $(\mUt
 \mM^s \mV)_{s \ge 0} - \mat{\Delta}_s$, where $\mM= t_1 \mM_1 + \cdots
 + t_n \mM_n$. Subtracting the correction terms $\mat{\Delta}_s$ has
 the effect of removing from $V$ the points in $V'$; in those ``lucky''
-cases where $V'$ is a large subset of $V$, $V''=V-V'$ may only contain
+cases where $V'$ is a large subset of $V$, then $V''=V\setminus V'$ contains
 a few points, and few values for the latter sequences will be needed.
 
 The last step involves changing coordinates in $((F,G_1,\dots,G_n),X_1)$ to use
@@ -2320,10 +2318,10 @@ $V'$ and $V''$. These operations can be done in time $O(n D^{(\omega+1)/2})$
 \citep[Lemmas~2 \&~3]{PoSc13b}; we will not discuss them further.
 
 \begin{remark}
-  Another possibility is to return the parametrizations
-  $(F,G_1,\dots,G_n),X_1)$ and $((R,W_1,\dots,W_n),\lf)$ without
-  performing the union; this has the obvious advantage of partially
-  decomposing the output.
+  Another possibility would be to return the parametrizations
+  $((F,G_1,\dots,G_n),X_1)$ and $((R,W_1,\dots,W_n),\lf)$ without performing
+  the union, which has the obvious advantage of partially decomposing the
+  output.
 \end{remark}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2454,7 +2452,7 @@ in $V'$ if and only if:
 \end{itemize}
 We denote by $\mathfrak{A}\subset \{1,\dots,\dg\}$ the set of
 corresponding indices $i$, and we let
-$\mathfrak{B}=\{1,\dots,\dg\}-\mathfrak{A}$, so that we have
+$\mathfrak{B}=\{1,\dots,\dg\}\setminus\mathfrak{A}$, so that we have
 $V'=V_{\mathfrak{A}}$ and $V''=V_{\mathfrak{B}}$.  Remark that $X_1$
 separates the points of $V'$.
 
@@ -2854,7 +2852,7 @@ call, which was reported above.
 We finally describe Algorithm $\mainalgoname{\sf Residual}$.  Let
 $\mathfrak{A}$ and $\mathfrak{B}$ be as in the previous section.  This
 part of the main algorithm computes a zero-dimensional parametrization
-of the residual set $V_\mathfrak{B}=V-V_\mathfrak{A}$. For this, we
+of the residual set $V_\mathfrak{B}=V\setminus V_\mathfrak{A}$. For this, we
 are going to call a modified version Algorithm
 $\mathsf{BlockParametrization}$, where we update the values of our
 matrix sequences before computing the minimal matrix generator, using
@@ -2980,9 +2978,9 @@ $\mathsf{BlockParametrizationX}_1$ and
 $\mathsf{BlockParametrizationResidual}$, together with the overhead induced 
 by power projection).
 
-This unlucky case was seldomly seen in our experiments, since the
+This unlucky case was seldom seen in our experiments, since the
 systems with multiplicities generated randomly had few multiple
-points, and thus were favorable to us. An unfavourable case is system
+points, and thus were favorable to us. An unfavorable case is system
 sot1, where $V_\mathfrak{A}$ only accounts for $1012$ points out of
 $7682$ points in the variety. 
 
