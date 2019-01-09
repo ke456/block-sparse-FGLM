@@ -147,7 +147,8 @@ k:=GF(65537);
 U<T>:=PolynomialRing(k);
 n:=4;
 pol_ring:=PolynomialRing(k,n);
-
+primary_ideal(pol_ring, [k!0 : i in [1..n]], true: max_degree:=3);
+    
 m:=[10,3,3,2,2,2];
 ideals, pts:=get_ideals(pol_ring, m);
 mat_muls, one:=get_mat_muls(ideals);
