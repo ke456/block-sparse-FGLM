@@ -1543,8 +1543,7 @@ $t_1,\dots,t_n$, $\mU$ and $\mV$. The first step computes the
 multiplication matrix $\mM=t_1 \mM_1 + \cdots + t_n \mM_n$ of $\lf=t_1
 X_1 + \cdots + t_n X_n$.
 Then, we compute the first $2d$ terms of the sequence $\seq_{\mU,\mV}=
-(\mUt\mM^s\mV)_{s\ge 0}$. For generic choices of these two
-matrices, as discussed in \cref{ssec:appliW}, \cref{randXY} shows that
+(\mUt\mM^s\mV)_{s\ge 0}$. As discussed in \cref{ssec:appliW}, \cref{randXY} shows that
 the matrix polynomial $\mat{P}_{\mU,\mV}$ is indeed a minimal left
 generator of the sequence $\seq_{\mU,\mV}$, that $\minpoly$ is the minimal 
 polynomial of $\lf$ and $\sqfree$ its squarefree part.
@@ -1567,15 +1566,15 @@ computes $$C_1 = \Omega((\row{u}_i \mM^s \col{\varepsilon}_1)_{s \ge
 %% $$
 %% Algorithm $\mathsf{\sf{ScalarNumerator}}$ precisely computes these quantities.
 
-Let $\ell:\residueI \to \K$ be the linear form $f = \sum_{i=1}^D f_i b_i \mapsto 
-\sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at position
-$(i,1)$ in $\mU$. The two polynomials above can be rewritten
-as 
-$$C_1 = \Omega( (\ell(X^s))_{s \ge 0}, \minpoly) \quad\text{and}\quad
-C_{X_i} = \Omega( (\ell(X_i X^s))_{s \ge 0}, \minpoly),$$ so they
-coincide with the polynomials computed in \cref{algo:para2}.  Then,
-\cref{lemma:para2} shows that for generic $\mU$ and $\lf$, the output
-of $\mainalgoname$
+Let $\ell:\residueI \to \K$ be the linear form $f = \sum_{i=1}^D f_i b_i
+\mapsto \sum_{1 \le i \le D} f_i u_{i,1}$, where $u_{i,1}$ is the entry at
+position $(i,1)$ in $\mU$. The two polynomials above can be rewritten as 
+\[
+  C_1 = \Omega( (\ell(X^s))_{s \ge 0}, \minpoly) \quad\text{and}\quad
+C_{X_i} = \Omega( (\ell(X_i X^s))_{s \ge 0}, \minpoly),
+\]
+so they coincide with the polynomials in \cref{algo:para2}.  Thus, by
+\cref{lemma:para2}, for generic $\mU$ and $\lf$ the output of $\mainalgoname$
 is indeed a zero-dimensional parametrization of $V(I)$.  
 
 \begin{remark}
@@ -1589,9 +1588,9 @@ is indeed a zero-dimensional parametrization of $V(I)$.
   computing on the fly the column vectors needed for Steps~\ref{mainstep9}
   and~\ref{mainstep10}.
 
-  If the multiplication matrices are dense, little is to be gained
-  this way (since in the worst case they use themselves $n D^2$ field elements),
-  but savings can be substantial if these  matrices are sparse.
+  If the multiplication matrices are dense, little is gained this way (in
+  the worst case, they use themselves $n D^2$ field elements), but savings can
+  be substantial if these  matrices are sparse.
 \end{remark}
 
 For the cost analysis, we focus on a sparse model: we let $\density
@@ -1604,7 +1603,7 @@ Step~\ref{mainstep1} to compute $\mM$ is $O(\density n D^2)$.
 In this context, the main purpose of Coppersmith's blocking strategy
 is to allow for easy parallelization. Computing the matrices
 $\mat{L}_s=\mUt\mM^s$, for $s=0,\dots,2d-1$, is the bottleneck
-of the algorithm, but this can be parallelized. This is done by
+of the algorithm but can be parallelized. This is done by
 working row-wise, computing independently the sequences
 $(\row{\ell}_{i,s})_{0 \le s < 2d}$ of the $i$th rows of
 $(\mat{L}_s)_{0 \le s < 2d}$ as $\row{\ell}_{i,0}=\row{u}_i$ and
@@ -1612,7 +1611,7 @@ $\row{\ell}_{i,s+1} = \row{\ell}_{i,s}
 \mM$ for all $i,s$, where $\row{u}_i$ is the $i$th row of $\mUt$.
 For a fixed $i \in \{1,\dots,m\}$, computing $(\mat{\ell}_{i,s})_{0
 \le i < 2d}$ costs $O(d \density D^2) = O(\density D^3/m )$ field operations. If
-we are able to compute $m$ vector-matrix products in parallel at once,
+we are able to compute in parallel $m$ vector-matrix products at once,
 the {\em span} of Step~\ref{mainstep3} is thus $O(\density D^3/m)$, whereas
 the total work is $O(\density D^3)$.
 
@@ -1632,7 +1631,7 @@ $$
   \mUt \mM \mV\\
   \mUt \mM^2 \mV\\
   \vdots \\
-  \mUt \mM^{2d} \mV\\
+  \mUt \mM^{2d-1} \mV\\
 \end{bmatrix}
 $$
 of size $O(D) \times D$ by $D \times m$; since $m \le D$, this  costs $O(m^{\omega-2}D^2)$
@@ -1650,9 +1649,9 @@ computed in time $O(m^{\omega-1} \M(D) \log(D) \log(m))$.  Computing $\sqfree$
 takes time $O(\M(D) \log(D))$.
 
 In \cref{ssec:scalar_numer}, we saw that each call to {\sf ScalarNumerator}
-takes $O(D^2 + m\M(D))$ operations in $\K$, for a total of $O(nD^2 + n
-m\M(D))$; the final modular calculations modulo $\sqfree$ at Step \ref{mainstep11} take time $O(n\M(D) + \M(D) \log(D))$.
-Altogether, assuming perfect parallelization 
+takes $O(D^2 + m\M(D))$ operations, for a total of $O(nD^2 + n
+m\M(D))$; the final computations modulo $\sqfree$ at Step \ref{mainstep11} take time $O(n\M(D) + \M(D) \log(D))$.
+Thus, altogether, assuming perfect parallelization 
 at Step~\ref{mainstep3}, the total span is
 $$O\left (\density \frac{D^3}m + m^{\omega-1} \M(D) \log(D) \log(m) + nD^2 + nm\M(D)\right ),$$
 and the total work is
@@ -1679,14 +1678,14 @@ discuss how they parallelize, merely pointing out that one may simply
 parallelize dense matrix multiplications throughout the algorithms.
 
 Let us first discuss the modifications in the algorithm to apply if we choose
-$m=1$. In this case, blocking has no effect. We compute the
+$m=1$. We compute the
 row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
-square-and-multiply technique used in the algorithm of \citet{Keller85},
+square-and-multiply technique from \citep{Keller85},
 for $O(D^\omega \log(D))$ operations in
 $\K$. For generic choices of $\mU$ and $\mV$, a minimal matrix generator
 $\mat{P}_{\mU,\mV}$ is equal to the minimum
 polynomial $\minpoly$ of $\mM$, and can be computed efficiently by the
-Berlekamp-Massey algorithm (or a fast version of it); besides,
+Berlekamp-Massey algorithm; besides,
 $\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
 numerators is simply a power series multiplication in degree at most
 $D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, where
@@ -1866,7 +1865,7 @@ by means of the dot product $[~C_1~] = \row{a}_1\cdot
 \mat{\Omega}( (\mUt \mM^s\col{\varepsilon}_1)_{s \ge 0},
 \mat{P}_{\mU,\mV})$.
 
-We then find $C_{X_1} = 88T^2 + 47T  + 16$, by proceeding similarly: we compute
+We then find $C_{X_1} = 88T^2 + 47T  + 16$, by proceeding similarly: we find
 the matrix numerator
 \[
   \mat{\Omega}( (\row{u}_1 \mM^s \mM_1\col{\varepsilon}_1)_{s \ge 0},
@@ -1900,8 +1899,8 @@ Eigen's {\tt SparseMatrix<double, RowMajor>} class to store our
 multiplication matrices and do the matrix-vector products, reducing
 the results modulo $p$ afterwards.
 
-All timings are measured on an Intel Xeon CPU E5-2667 with 128 GB RAM
-and 8 cores (16 available through hyperthreading). For each value of
+All timings are measured on an Intel Xeon CPU E5-2667 with 128GB RAM
+and 8 cores (or 16 via hyperthreading). For each value of
 $m$ in $\{1,3,6\}$, we create and run $m$ threads in parallel.
 
 In all cases, we start from multiplication matrices computed from a
@@ -1912,10 +1911,9 @@ runtime of two similar algorithmic stages (degree basis computation and
 conversion to a lex ordering).  Rather than optimizing our
 implementation, our main focus here was to demonstrate the effects of
 parallelization, and how the Krylov sequence computation dominates the
-runtime in these examples. In particular, we believe that
-improvements are possible for the polynomial matrix computations
-(computing minimal matrix generator, its largest invariant factor,
-\dots), but this is by no means a bottleneck here.
+runtime in these examples. In particular, improvements are possible for
+polynomial matrix computations (minimal matrix generator, largest invariant
+factor, \dots), but this is by no means a bottleneck here.
 
 All our inputs as well as our source code are available at
 \url{https://github.com/vneiger/block-sparse-fglm}.
@@ -1924,7 +1922,7 @@ are well-known (Katsura or Eco from~\citep{Morgan88}), while we also
 consider families of randomly generated inputs (some are
 inspired from~\citep{FaMo17}). Systems rand1-$i$ have $3$ variables and
 randomly generated equations (of degree depending on $i$), and
-rand2-$i$ are similar, with $4$ variables. These systems are
+rand2-$i$ are similar with $4$ variables. These systems are
 generically radical and in shape position (for the projection on the
 first coordinate axis; the last column uses that
 convention). Systems mixed1-$i$ and mixed2-$i$ have similar numbers of
@@ -1940,17 +1938,17 @@ variables.
 
 
 We used OpenMP {\tt parallel
-for} pragmas to parallelize the computation of the above sequence,
+for} pragmas to parallelize the computation of the Krylov sequence,
 as described in \cref{ssec:mainalgo}.
-In the columns $m=1,m=3,m=6$, the numbers in parentheses indicate the
+In the columns $m=1$, $m=3$, $m=6$, the numbers in brackets indicate the
 fraction of the total time spent in computing the Krylov sequence
 $(\mUt \mM^s)_{0 \le s< 2d}$, with $d=\lceil D/m\rceil$. This is
-always by far the dominant factor.  In other words, the immense
-majority of the time is spent doing sparse matrix-vector products
-for matrices with machine float entries. 
+always by far the dominant factor.  In other words, almost all the time is
+spent doing sparse matrix-vector products for matrices with machine float
+entries. 
 
-Increasing $m$ has two effects. On the plus side, plainly, it
-decreases the length of the sequence above. On the other side, while
+Increasing $m$ has two effects. On the plus side, it
+decreases the length of the Krylov sequence. On the other side, while
 the algorithm performs better by a factor often close to 3 for $m=3$,
 the gain is not as significant for $m=6$, so that parallelization is
 less effective. It is an interesting question to clarify this issue.  Besides, increasing $m$ also increases the time to
@@ -1994,7 +1992,7 @@ We refer the reader to experiments with systems of comparable (or
 higher) degrees presented in~\citep{FaMo17} (the algorithm in that
 reference does not use a blocking strategy). Recall that the output
 in~\citep{FaMo17} is somewhat stronger than here (the authors compute a
-Gr\"obner basis of the input ideal, so multiplicities are kept). On
+Gr\"obner basis of the input ideal, so multiplicities are preserved). On
 the other hand, for ideals not in shape position, Table~2 of that
 reference reports only the calculation of the last polynomial in the
 Gr\"obner basis, whereas our algorithm makes no distinction between
