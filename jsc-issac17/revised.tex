@@ -2824,24 +2824,22 @@ to \citep[Theorem~4.5]{Turner02}.
   \{0,\ldots,\degBdr-1\}$.
 \end{lemma}
 \begin{proof}
-  In what follows, for an $u \times v$ polynomial matrix $\mat{Q}$, we
-  denote by $\cdeg{\mat{Q}}$ its column degree, that is, the length-$v$ vector
-  of the degrees of its columns. 
-
-  Consider a minimal right generator $\relbas \in \polMatSpace[\rdim]$
-  in Popov form. Then, we have $\relbas =
-  \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\rdim}}} - \mat{Q}$, where
-  $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\rdim})$ termwise
-  and $\mat{L} \in \matSpace[\rdim]$ is unit upper triangular. Define
+  In this proof, for a $u \times v$ polynomial matrix $\mat{Q}$, we denote by
+  $\cdeg{\mat{Q}}$ the length-$v$ vector of the degrees of the columns of
+  \(\mat{Q}\).  Consider a minimal right generator $\relbas \in
+  \polMatSpace[\rdim]$ in Popov form (defined in \citep{Popov72,Kailath80}).
+  Then, we have $\relbas = \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\rdim}}} -
+  \mat{Q}$, where $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\rdim})$
+  termwise and $\mat{L} \in \matSpace[\rdim]$ is unit upper triangular. Define
   the matrix $\mat{U} =
-  \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_{\rdim}}}
-  \mat{L}^{-1}$, which is in $\polMatSpace[\rdim]$ since $\degBdr \ge
-  \deg(\relbas) = \max_j t_j$. Then, the columns of the right multiple
-  $\relbas \mat{U} = \var^{\degBdr} \mat{I}_\rdim - \mat{Q} \mat{U}$
-  are right relations for $\seq$, and we have $\deg(\mat{Q} \mat{U}) <
-  \degBdr$. As a consequence, writing $\mat{Q} \mat{U} = \sum_{0 \le k
-    < \degBdr} \mat{Q}_k \var^k$, we have $\seqelt{s+\degBdr} =
-  \sum_{0 \le k < \degBdr} \seqelt{s+k} \mat{Q}_k$ for all $s \ge 0$.
+  \diag{\var^{\degBdr-t_1},\ldots,\var^{\degBdr-t_{\rdim}}} \mat{L}^{-1}$,
+  which is in $\polMatSpace[\rdim]$ since $\degBdr \ge \deg(\relbas) = \max_j
+  t_j$. Then, the columns of the right multiple $\relbas \mat{U} =
+  \var^{\degBdr} \mat{I}_\rdim - \mat{Q} \mat{U}$ are right relations for
+  $\seq$, and we have $\deg(\mat{Q} \mat{U}) < \degBdr$. Thus, writing $\mat{Q}
+  \mat{U} = \sum_{0 \le k < \degBdr} \mat{Q}_k \var^k$, we have
+  $\seqelt{s+\degBdr} = \sum_{0 \le k < \degBdr} \seqelt{s+k} \mat{Q}_k$ for
+  all $s \ge 0$.
 
   Assuming that $\row{p}_0 \seqelt{s} + \cdots + \row{p}_{\degBd} \seqelt{s +
   \degBd} = \row{0}$ holds for all $s \in \{0,\ldots,\degBdr-1\}$, we
@@ -2876,7 +2874,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   Let $\seq = (\seqelt{s})_{s\ge 0}$ be a linearly recurrent sequence
   of matrices in $\sseqeltSpace$ and let $(\degBdl,\degBdr) \in \NN^2$
   be such that the minimal left (resp.~right) matrix generator of
-  $\seq$ have degree at most $degBdl$ (resp.~at most $\degBdr$).  For
+  $\seq$ have degree at most $\degBdl$ (resp.~at most $\degBdr$).  For
   $\degBd>0$, define
   \[
     \sys =
