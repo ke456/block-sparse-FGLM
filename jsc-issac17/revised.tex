@@ -72,7 +72,7 @@
 \newcommand{\degBdr}{d_{r}} % bound on degree of a right minimal generator
 \newcommand{\degBdl}{d_{\ell}} % bound on degree of a left minimal generator
 \newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
-\newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
+%\newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
 \newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
 \newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
 \newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
@@ -466,7 +466,8 @@ $Q=\minpoly \genseries $ is a polynomial, in which case $Q$ must have
 degree less than $\deg(\minpoly)$.  In particular, given a scalar
 sequence and a polynomial that cancels it, there is a well-defined
 notion of associated numerator. This is formalized in the next
-definition:
+definition.
+
 \begin{definition}
   \label{def:omega}
   Let $\mathcal{L}=(\ell_s)_{s \ge 0}\in \K^\N$ be a sequence and $P$ be a
@@ -599,8 +600,8 @@ found for example in \citep{Villard97,KalVil01,Turner02}.
   \item a \emph{left matrix generator} if its rows form a basis of the
     module of left vector relations for $\seq$.
   \end{itemize}
-  In the latter case, $\mat{P}$ is a {\em minimal generator} if it is in
-  reduced form \citep{Wolovich74,Kailath80}.
+  In the latter case, $\mat{P}$ is a {\em minimal generator} if it is in row
+  reduced form.
   %% \begin{itemize}
   %%   \item \emph{canonical} if $\mat{P}$ is in Popov form \citep{Popov72,Kailath80}.
   %% \end{itemize}
@@ -609,23 +610,27 @@ found for example in \citep{Villard97,KalVil01,Turner02}.
 %% Besides, all matrix generators $\relbas \in \relbasSpace$ have the same
 %% determinantal degree $\deg(\det(\relbas))$, which we denote by $\degDet$.  
 
+We refer to \citep{Wolovich74,Kailath80} for a definition of reduced forms.
 The following proposition, which can be proved by a direct examination
-of the terms in the product $\relbas \seqpm$, shows that matrices of
+of the terms in the product $\relbas \seqpm$, shows that matrix
 relations are denominators in a fraction description of the generating
 series of the sequence. As suggested in the previous subsection,
 working with generating series in $1/T$ turns out to be the most
-convenient choice here. In what follows, for an $r \times s$ matrix
-$\mat{P}$ with entries in $\K[T]$, we denote by $\rdeg{\mat{P}}$ its
-row degree, that is, the size-$r$ vector of the degrees of its rows.
+convenient choice here.
+% In what follows, for an $r \times s$ matrix
+% $\mat{P}$ with entries in $\K[T]$, we denote by $\rdeg{\mat{P}}$ its
+% row degree, that is, the size-$r$ vector of the degrees of its rows.
+
 \begin{proposition}
   Let $\seq = (\seqelt{s})_{s\ge 0}$ be a sequence of matrices in
   $\sseqeltSpace$ and let $\mat{P}$ be a nonsingular matrix in $\relbasSpace$. 
-  Then, $\mat{P}$ is a left matrix of relations for $\seq$ if and only
+  Then, $\mat{P}$ is a left matrix relation for $\seq$ if and only
   if the generating series $\seqpm = \sum_{s\ge 0} \seqelt{s} /
   \var^{s+1} \in \field\Poxi^{\rdim \times \rdim}$ can be written as a
   matrix fraction $\seqpm = \relbas^{-1} \nummat$, with $\nummat \in
-  \polMatSpace[\rdim][\rdim]$. In this case, we have $\rdeg{\nummat} <
-  \rdeg{\relbas}$ termwise.
+  \polMatSpace[\rdim][\rdim]$. In this case, 
+  the \(i\)th row of $\nummat$ has degree less than the \(i\)th row of
+  $\relbas$, for \(1\le i\le \rdim\).
 \end{proposition}
 %% Although we will not need it, we mention that $\relbas$ is a matrix
 %% generator for $\seq$ if and only if the fraction $\relbas^{-1}
@@ -656,7 +661,7 @@ row degree, that is, the size-$r$ vector of the degrees of its rows.
 %%   terms of negative degree.
 %% \end{proof}
 
-Given a nonsingular matrix of relations $\relbas$ for $\seq$, we will
+Given a nonsingular matrix relation $\relbas$ for $\seq$, we will
 thus write $\mat{\Omega}(\seq, \relbas)= \relbas \seqpm \in
 \polMatSpace[\rdim][\rdim]$, generalizing \cref{def:omega}. 
 By the previous proposition, this is a polynomial matrix, whose $i$th
@@ -682,30 +687,28 @@ operations in $\K$.
 %% --> the cost would be better, O(m^w M(d/m))
 %% more generally, average row degree ~nd/m -->  O(m^w M(nd/m))
 
-Given a linearly recurrent sequence, our goal will be to find a
-minimal left matrix generator of it (and then the corresponding
-numerator, but as we just saw, this will be easy). In order to do this, we
-will assume that we know bounds on the degree of this left generator,
-but also on that of a {\em right} generator. Indeed, in all the
-previous discussion, we may also consider vector relations operating
-on the right. In particular, \cref{lem:module_rank} shows that if a
-sequence is linearly recurrent, these right relations form a submodule
-of $\polMatSpace[\rdim][1]$ of rank $\rdim$, so that a linearly
-recurrent sequence also admits right generators.
+Given a linearly recurrent sequence, our goal will be to find a minimal left
+matrix generator of it (from which we will easily deduce the corresponding
+numerator). In order to do this, we will assume that we know bounds on the
+degree of this left generator, but also on that of a {\em right} generator.
+Indeed, in all the previous discussion, we may also consider vector relations
+operating on the right. In particular, \cref{lem:module_rank} shows that if a
+sequence is linearly recurrent, these right relations form a submodule of
+$\polMatSpace[\rdim][1]$ of rank $\rdim$, so that a linearly recurrent sequence
+also admits right generators.
 
-As it turns out, all minimal left generators have the same degree
-(since they all have the same Popov form, and taking Popov forms of
-reduced matrices does not change their degree); the same remark holds
-for minimal right generators. Knowing bounds $(\degBdl,\degBdr)$ on these
-degrees allows us to control the number of terms of the sequence we
-will access during the algorithm (the bounds $(\degBdl,\degBdr)$
-correspond to $(\gamma_1,\gamma_2)$ in
+As it turns out, all minimal left generators have the same degree (by property
+of reduced forms); the same remark holds for minimal right generators. Knowing
+bounds $(\degBdl,\degBdr)$ on these degrees allows us to control the number of
+terms of the sequence we will access during the algorithm (the bounds
+$(\degBdl,\degBdr)$ correspond to $(\gamma_1,\gamma_2)$ in
 \citep[Definitions~4.6~and~4.7]{Turner02} and $(\delta_l,\delta_r)$ in
-\citep[Section~4.2]{Villard97a}).
-In concrete terms, the fast computation of minimal matrix generators
-is usually handled via minimal approximant bases algorithms
-\citep{Villard97,Turner02,GioLeb14}. The runtime below is obtained by
-using the approximant bases algorithm of~\citep{GiJeVi03}.
+\citep[Section~4.2]{Villard97a}).  In concrete terms, the fast computation of
+minimal matrix generators is usually handled via minimal approximant basis
+algorithms \citep[see for example][]{Villard97,Turner02,GioLeb14}. The runtime
+below is obtained by using the divide and conquer approximant basis algorithm
+in~\citep{GiJeVi03}.
+
 \begin{theorem}\label{coro:cost_approx}
   Let $\seq = (\seqelt{s})_{s\ge 0}$ be a linearly recurrent sequence
   of matrices in $\sseqeltSpace$ and let $\degBd = \degBdl+\degBdr+1$,
@@ -856,8 +859,8 @@ recover the scalar numerator $\Omega((\row{u}_i \mM^s \col{w})_{s \ge
 0}, \minpoly)$ as a dot product.
 \begin{lemma}\label{lemma:omegaOmega}
   For a generic choice of $\mU$ and $\mV$, and for any $\col{w}$ in
-  $\K^{D \times 1}$, $ \mat{P}_{\mU,\mV}$ is a nonsingular matrix of
-  relations for the sequence $\mat{\mathcal{E}} =
+  $\K^{D \times 1}$, $ \mat{P}_{\mU,\mV}$ is a nonsingular matrix
+  relation for the sequence $\mat{\mathcal{E}} =
   (\col{e}_s)_{s\ge0}$, with $\col{e}_s=\mUt \mM^s\, \col{w}$
   for all $s$, and we have
   \begin{align}\label{eq:OmegaOmega}
@@ -2822,8 +2825,8 @@ to \citep[Theorem~4.5]{Turner02}.
 \end{lemma}
 \begin{proof}
   In what follows, for an $u \times v$ polynomial matrix $\mat{Q}$, we
-  denote by $\cdeg{\mat{Q}}$ its column degree, that is, the length
-  $v$ vector of the degrees of its columns. 
+  denote by $\cdeg{\mat{Q}}$ its column degree, that is, the length-$v$ vector
+  of the degrees of its columns. 
 
   Consider a minimal right generator $\relbas \in \polMatSpace[\rdim]$
   in Popov form. Then, we have $\relbas =
