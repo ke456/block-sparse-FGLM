@@ -2,7 +2,7 @@
 
 \usepackage{bm} % for bold \bm
 \usepackage{mathrsfs} % for \mathscr
-\usepackage{algorithm, pseudocode}
+\usepackage{algorithm} % for algorithms
 
 % for enumerate / itemize: define reasonable margins
 \usepackage[shortlabels]{enumitem}
@@ -890,7 +890,7 @@ assume that we know $\mat{P}_{\mU,\mV}$, $P$, $\row{a}_i$ and the
 matrices $\mat{L}_s=\mUt \mM^s \in \K^{m \times D}$ for
 $s=0,\dots,\lceil D/m \rceil-1$.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{{\sf ScalarNumerator}($\mat{P}_{\mU,\mV}, \minpoly, \row{w}, i, \row{a}_i,(\mat{L}_s)_{0 \le s < \lceil D/m\rceil}$)}
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -1358,14 +1358,13 @@ this paper.
 
 \subsection{Computing a zero-dimensional parametrization}  \label{ssec:abstractlago}
 
-As a corollary, we recover the following
-result~\cite[Proposition~3]{BoSaSc03}, that shows how to compute a
-zero-dimensional parametrization of $V_{\mathfrak{S}}$. Our main usage
-of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$, in which case
-$V_{\mathfrak{S}}=V$, but in the last section of the paper, we will
-also work with strict subsets. 
+As a corollary, we recover the following result, that shows how to compute a
+zero-dimensional parametrization of $V_{\mathfrak{S}}$ (see \cref{algo:para2}).
+Our main usage of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$, in which case
+$V_{\mathfrak{S}}=V$, but in the last section of the paper, we will also work
+with strict subsets. 
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}\setlength\itemsep{0em}
@@ -1387,9 +1386,10 @@ also work with strict subsets.
   \label{algo:para2}
 \end{algorithm}
 
-\begin{lemma}\label{lemma:para2}
-  Suppose that $\ell$ is a generic element of ${\rm
-  hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$ and that $\lf$ is a generic
+\begin{lemma}[{\citep[Proposition~3]{BoSaSc03}}]
+  \label{lemma:para2}
+  Let $\ell$ be a generic element of ${\rm
+  hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$ and $\lf$ be a generic
   linear form. Then the output $((\sqfree,V_1,\dots,V_n),\lf)$ of
   $\mathsf{Parametrization}(\ell,\lf)$ is a zero-dimensional
   parametrization of $V_{\mathfrak{S}}$.
@@ -1436,14 +1436,14 @@ $\lf=X_1$, which separates the points of $V(I)$.  We choose the linear form
 then, $\mathfrak{S}=\{1,2\}$, and the symbols $\pi_1$ and $\pi_2$ 
 are respectively the constants 17 and 33. We have
 \begin{align*}
-  \ell(X_1^s) &= 17 \cdot 1^s + 33 \cdot 3^s\\
+  \ell(X_1^s) &= 17 \cdot 1^s + 33 \cdot 3^s,\\
   \ell(X_2X_1^s) &= 17 \cdot 4 \cdot 1^s + 33 \cdot 2 \cdot 3^s.
 \end{align*} 
 We associate a generating series to each sequence:
 \begin{align*}
   Z_1 = \sum_{s \ge 0} \frac{\ell(X^s_1)}{T^{s+1}}
 &= \frac{17}{T-1} + \frac{33}{T-3}
-= \frac{17(T-3)+33(T-1)}{(T-1)(T-3)} \\
+= \frac{17(T-3)+33(T-1)}{(T-1)(T-3)}, \\
 Z_{X_2} = \sum_{s\ge0} \frac{\ell(X_2X_1^s)}{T^{s+1} }
 &= \frac{17\cdot 4}{T-1} + \frac{33 \cdot 2}{T-3}
 = \frac{17\cdot 4 (T-3) + 33\cdot 2(T-1)}{(T-1)(T-3)}.
@@ -1451,9 +1451,10 @@ Z_{X_2} = \sum_{s\ge0} \frac{\ell(X_2X_1^s)}{T^{s+1} }
 These generating series have for common denominator $\minpoly = (T-1)(T-3)$,
 whose roots are the coordinates of $X_1$ in $V(I)$;
 their numerators are respectively
-$$C_{1} = \Omega((\ell(X^s_1))_{s\ge 0},\minpoly) = 17 (T-3) + 33(T-1)$$
-and
-$$C_{X_2} = \Omega((\ell(X_2X^s_1))_{s\ge 0},\minpoly) = 17\cdot 4 (T-3) + 33\cdot 2(T-1).$$
+\begin{align*}
+  C_{1} &= \Omega((\ell(X^s_1))_{s\ge 0},\minpoly) = 17 (T-3) + 33(T-1), \\
+  C_{X_2} &= \Omega((\ell(X_2X^s_1))_{s\ge 0},\minpoly) = 17\cdot 4 (T-3) + 33\cdot 2(T-1).
+\end{align*}
 Now, let
 \[
   V_2 
@@ -1472,11 +1473,11 @@ Then, $V_2(1) = 4$ and $V_2(3) = 2$, as expected.
 In this section, we extend the algorithm of~\citep{BoSaSc03} to compute
 a zero-dimensional parametrization of $V(I)$, for some
 zero-dimensional ideal $I$ of $\K[X_1,\dots,X_n]$, by using blocking
-methods. As input, we assume that we know a monomial basis
+methods. Our input is a monomial basis
 $\basis=(b_1,\dots,b_D)$ of $\residueI=\K[X_1,\dots,X_n]/I$, together
 with the multiplication matrices $\mM_1,\dots,\mM_n$ of respectively
 $X_1,\dots,X_n$ in this basis; for definiteness, we suppose that the
-first basis element in $\basis$ is~$b_1=1$. As before, we let $D$ denote the
+first basis element in $\basis$ is~$b_1=1$. As above, $D$ denotes the
 dimension of $\residueI$.
 
 The first subsection presents the main algorithm. Its main feature is
@@ -1503,13 +1504,13 @@ $\lf=t_1 X_1 + \cdots + t_n X_n$; {given sufficiently many terms of the
 algorithm uses an ``evaluation'' method for the rest (several
 Gr\"obner basis computations, all with one variable less).
 
-Our algorithm computes the whole zero-dimensional parametrization of
-$V(I)$ for essentially the same cost as the computation of the minimal
-polynomial. In what follows, $\col{\varepsilon}_1$ denotes the
-size-$D$ column vector whose only nonzero entry is a $1$ in the first
-row: $\col{\varepsilon}_1 =\trsp{[1~0~\cdots~0]}$.
+Our algorithm (\cref{algo:block-sparse-fglm}) computes the whole
+zero-dimensional parametrization of $V(I)$ for essentially the same cost as the
+computation of the minimal polynomial. Hereafter, $\col{\varepsilon}_1$
+denotes the size-$D$ column vector whose only nonzero entry is a $1$ at the
+first index: $\col{\varepsilon}_1 =\trsp{[1~0~\cdots~0]}$.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{$\mainalgoname(\mM_1,\dots,\mM_n,\mU,\mV,\lf)$}
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -1957,8 +1958,7 @@ compute the output polynomials, through minimal generator computation,
 high-order lifting, \dots. However, from the observed speedup and the
 ratios in the table, we can conclude that this effect is minor.
 
-
-\begin{table}[H]
+\begin{table}[ht]
   \centering
   %\def\arraystretch{1}
   \setlength\tabcolsep{4pt}
@@ -2047,7 +2047,7 @@ operations on univariate polynomials related to the so-called {\em
 The main algorithm is as follows. For the moment, we only describe its
 main structure; the subroutines are detailed in the next subsections.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{$\mathsf{BlockParametrizationWithSplitting}(\mM_1,\dots,\mM_n,\mU,\mV,\lf,\mf$)}
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -2335,7 +2335,7 @@ lemma in order to find $\prod_{j \in \mathfrak{a}} (T-r_j)$, and we
 conclude using the same kind of calculations as in Algorithm
 $\mainalgoname$.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{$\mainalgoname{\sf X}_1(\mM_1,\dots,\mM_n,\mU,\mV,\mf$)}
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -2508,8 +2508,8 @@ parametrization of $V_\mathfrak{A}$. As a result, we can finally
 compute $\ell_\mathfrak{A}(\lf^s)$, for $s=0,\dots,\tau-1$ by
 applying our algorithm for univariate power projection to $G=t_1 G_1 + \cdots t_n G_n$.
 
-The following algorithm summarizes this discussion. Its cost bound
-is
+\cref{algo:decompose} (\textsf{Decompose}) summarizes this discussion. Its cost
+bound is
 \[
   O(\M(D_\mathfrak{A})\log(D_\mathfrak{A}) + \PP(D_\mathfrak{A},\tau) +nD_\mathfrak{A})
 \]
@@ -2517,7 +2517,7 @@ operations in $\K$, where the first term accounts for the cost of the first
 three steps, $\PP(D_\mathfrak{A},\tau)$ is the cost of power projection and the
 term $O(nD_\mathfrak{A})$ is the cost of computing $G$ as defined above.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{${\sf Decompose}(M, C, ((F,G_1,\dots,G_n),X_1), \lf,\tau)$} {\bf
   Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -2537,16 +2537,15 @@ term $O(nD_\mathfrak{A})$ is the cost of computing $G$ as defined above.
     \item compute the first $D_\mathfrak{A}$ terms $(v_0,\dots,v_{D_\mathfrak{A}-1})$ of the Laurent series $A/F$
     \item {\bf return} ${\sf PowerProjection}(F, t_1 G_1 + \cdots + t_n G_n, (v_0,\dots,v_{D_\mathfrak{A}-1}),\tau)$
   \end{enumerate}
+  \label{algo:decompose}
 \end{algorithm}
 
-We will use this algorithm to compute the correction matrices to be
-used in Algorithm $\mainalgoname{\sf Residual}$. We assume that we
-have stored various quantities computed in Algorithm
-$\mainalgoname{\sf X}_1$: the sequence of matrices
-$(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$, the matrix generator
-$\mat{P}_{\mU,\mV}$, the minimal polynomial $M$ of $X_1$, and of
-course the zero-dimensional parametrization $((F,G_1,\dots,G_n),X_1)$.
-
+Algorithm \textsf{Decompose} will be used for obtaining correction matrices
+given as input of Algorithm $\mainalgoname{\sf Residual}$. We assume that we
+have stored various quantities computed in Algorithm $\mainalgoname{\sf X}_1$:
+the sequence of matrices $(\seqelt{s,\mU,\mV})_{0 \le s < 2d}$, the matrix
+generator $\mat{P}_{\mU,\mV}$, the minimal polynomial $M$ of $X_1$, and the
+parametrization $((F,G_1,\dots,G_n),X_1)$.
 
 Let $\mU$ and $\mV$ be the blocking matrices used in
 $\mainalgoname{\sf X}_1$. For $i=1,\dots,m$, we let
@@ -2556,7 +2555,7 @@ $\mU$. In other words, $\ell_i(f) = \sum_{j=1}^D f_j u_{j,i}$, for
 $f=\sum_{j=1}^D f_j b_j$. Similarly, for $j=1,\dots,m$, we let
 $\gamma_j$ be the element of $\residueI$ whose coefficient vector on
 the basis $\basis$ is the $j$-th column of $\mV$.
-Hereafter, we also write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
+Hereafter, we write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
 in analogy with the definition of $d$ used so far.
 \begin{itemize}
   \item To each $(i,j)$ in $\{1,\dots,m\}\times \{1,\dots,m\}$ is
@@ -2656,7 +2655,7 @@ vectors $\mat{D}_s \col{\varepsilon}_1$, resp.\ $\mat{D}_s\mM_i
 \col{\varepsilon}_1-\mat{\Delta}'_{s,i}$, where $\mat{\Delta}'_{s,i}$
 is the $i$th column of $\mat{\Delta}'_{s}$.
 
-\begin{algorithm}[H]
+\begin{algorithm}[ht]
   \caption{$\mainalgoname{\sf Residual}(\mM_1,\dots,\mM_n,\mU,\mV,(\mat{\Delta}_s),(\mat{\Delta}'_s),(\mat{\Delta}''_s),\lf)$}
   {\bf Input:} \vspace{-0.5em}
   \begin{itemize}
@@ -2764,9 +2763,9 @@ sot1, where $V_\mathfrak{A}$ only accounts for $1012$ points out of
 $7682$ points in the variety. 
 
 
-\begin{table}[H]
+\begin{table}[ht]
   \centering
-  \def\arraystretch{1.2}
+  %\def\arraystretch{1.1}
   \setlength\tabcolsep{6pt}
   \caption{Comparison of $\mathsf{BlockParametrizationWithSplitting}$ and $\mainalgoname$}
   \label{tbl:comparison_algos}
@@ -2825,7 +2824,7 @@ to \citep[Theorem~4.5]{Turner02}.
 \end{lemma}
 \begin{proof}
   In this proof, for a $u \times v$ polynomial matrix $\mat{Q}$, we denote by
-  $\cdeg{\mat{Q}}$ the length-$v$ vector of the degrees of the columns of
+  $\cdeg{\mat{Q}}$ the size-$v$ vector of the degrees of the columns of
   \(\mat{Q}\).  Consider a minimal right generator $\relbas \in
   \polMatSpace[\rdim]$ in Popov form (defined in \citep{Popov72,Kailath80}).
   Then, we have $\relbas = \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\rdim}}} -
