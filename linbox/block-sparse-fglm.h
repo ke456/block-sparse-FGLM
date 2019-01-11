@@ -4,7 +4,7 @@
 
 #include <string>
 
-// #include <linbox/integer.h>
+// LinBox polynomial matrices
 #include <linbox/matrix/sparse-matrix.h>
 #include <linbox/matrix/dense-matrix.h>
 #include <linbox/matrix/matrix-domain.h>
@@ -12,7 +12,11 @@
 #include "linbox/matrix/polynomial-matrix.h"
 #include "linbox/algorithms/polynomial-matrix/polynomial-matrix-domain.h"
 #include "fflas-ffpack/fflas-ffpack.h"
+
+// NTL polynomials
 #include <NTL/lzz_pX.h>
+
+// Eigen matrices
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 

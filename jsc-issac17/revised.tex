@@ -22,10 +22,6 @@
 % references / hyperlinks
 \usepackage[linkcolor=black,colorlinks=true,citecolor=blue,urlcolor=blue]{hyperref} 
 \usepackage[capitalise]{cleveref}
-\crefname{subsec}{Subsection}{Subsections}
-\Crefname{subsec}{Subsection}{Subsections}
-\crefname{problem}{Problem}{Problems}
-\Crefname{problem}{Problem}{Problems}
 
 %% ------------------------------------------------
 %% --------- FOR MATRIX BERLEKAMP-MASSEY ----------
@@ -1914,8 +1910,8 @@ improvements are possible for the polynomial matrix computations
 (computing minimal matrix generator, its largest invariant factor,
 \dots), but this is by no means a bottleneck here.
 
-\textcolor{red}{All our inputs as well as our source code are available at
-\url{https://git.uwaterloo.ca/sghyun/Block-sparse-FGLM}}.
+All our inputs as well as our source code are available at
+\url{https://github.com/vneiger/block-sparse-fglm}.
 Some systems
 are well-known (Katsura or Eco from~\citep{Morgan88}), while we also
 consider several families of randomly generated inputs (some are
@@ -2793,6 +2789,7 @@ $7682$ points in the variety.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 \section*{Appendix}
 
 In this appendix, we prove Theorem~\ref{coro:cost_approx} from
@@ -3053,9 +3050,8 @@ implies Theorem~\ref{coro:cost_approx}.
 %%   for generic $\mU$ and $\mV$, we also have
 %%   $\deg(\det(\mat{P}_{\mU,\mV}))=\deg(\det(\mat{P}_{\mU}))=\nu$, and the conclusion follows.
 
-
-
 \bibliographystyle{elsarticle-harv} 
 \bibliography{biblio}
+
 
 \end{document}
