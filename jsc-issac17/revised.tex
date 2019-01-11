@@ -376,14 +376,15 @@ the libraries LinBox~\citep{LinBox}, Eigen~\citep{Eigen} and NTL~\citep{NTL}.
 The paper is organized as follows. The next section mainly reviews
 known results on scalar and matrix recurrent sequences, and introduces
 a simple useful algorithm to compute a so-called {\em scalar
-numerator} for such sequences. \cref{sec:seq0} describes sequences
+  numerator} for such sequences. \cref{sec:seq0} describes sequences
 that arise in the context of FGLM-like algorithms; we prove slightly
-refined versions of results from~\citep{BoSaSc03} that will be 
-used throughout the paper. The main algorithm is given in \cref{sec:main},
+refined versions of results from~\citep{BoSaSc03} that will be used
+throughout the paper. The main algorithm is given in \cref{sec:main},
 and the refinement mentioned above is in \cref{sec:original}.
+Finally, in appendix, we prove a few technical statements on linearly
+recurrent matrix sequences.
 
-
-\paragraph{Complexity model.}
+\paragraph{Complexity model}
 We measure the cost of our algorithms by counting basic operations in
 $\K$ at unit cost. Most algorithms are randomized; they involve the
 choice of a vector $\gamma \in \K^S$ of field elements, for an integer
@@ -408,10 +409,12 @@ the super-linearity properties of \citep[Section~8.4]{GaGe13}.  Then,
 two $m\times m$ matrices over $\K[T]$ whose degree is less than $d$
 can be multiplied using $O(m^\omega \M(d))$ operations in $\K$.
 
-\paragraph{Acknowledgments.} We wish to thank Chenqi Mou, Dave Saunders, and
-Gilles Villard for useful discussions. This research was partially supported by
-NSERC (Schost's NSERC Discovery Grant) and by the CNRS-INS2I Institute through
-its program for young researchers (Neiger's project ARCADIE).
+\paragraph{Acknowledgments} We wish to thank Chenqi Mou, Dave Saunders, and
+Gilles Villard for several discussions, and a reviewer of the first
+version of this paper for their useful remarks. This research was
+partially supported by NSERC (Schost's NSERC Discovery Grant) and by
+the CNRS-INS2I Institute through its program for young researchers
+(Neiger's project ARCADIE).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -422,7 +425,6 @@ its program for young researchers (Neiger's project ARCADIE).
 This section starts with a review of known facts on linearly recurrent
 sequences: we first discuss the scalar case, and then we show how the ideas
 carry over to matrix sequences. 
-
 The main results we will need from the first three subsections
 are~\cref{coro:cost_approx} and \cref{randXY}, which give cost
 estimates for the computation of a {\em minimal matrix generator} of a
@@ -450,30 +452,25 @@ $\mathcal{L}=(\ell_s)_{s \ge 0}$ is the monic polynomial of lowest
 degree that cancels it; the {\em order} of $\mathcal{L}$ is the degree
 of this polynomial~$\minpoly$.
 
-One can rephrase these properties in terms of the generating series $S=\sum_{s
-\ge 0} \ell_s T^s \in \K[[T]]$ associated to $\mathcal{L}$.  Then, $\minpoly$
-cancels $\mathcal{L}$ if and only if ${\rm rev}(\minpoly) S$ is a polynomial,
-where ${\rm rev}(\minpoly)=T^d \minpoly(1/T)$; in this case, ${\rm
-rev}(\minpoly) S$ must have degree less than $d$.  The sequence $\mathcal{L}$
-is linearly recurrent if and only if there exist polynomials $A,B$ in $\K[T]$
-such that $S=A/B$; these polynomials are unique if we assume $\gcd(A,B)=1$ and
-$B(0)=1$.  Given these $A$ and $B$, the minimal polynomial of $\mathcal{L}$ is
-$\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$. 
+%% One can rephrase these properties in terms of the generating series $S=\sum_{s
+%% \ge 0} \ell_s T^s \in \K[[T]]$ associated to $\mathcal{L}$.  Then, $\minpoly$
+%% cancels $\mathcal{L}$ if and only if ${\rm rev}(\minpoly) S$ is a polynomial,
+%% where ${\rm rev}(\minpoly)=T^d \minpoly(1/T)$; in this case, ${\rm
+%% rev}(\minpoly) S$ must have degree less than $d$.  The sequence $\mathcal{L}$
+%% is linearly recurrent if and only if there exist polynomials $A,B$ in $\K[T]$
+%% such that $S=A/B$; these polynomials are unique if we assume $\gcd(A,B)=1$ and
+%% $B(0)=1$.  Given these $A$ and $B$, the minimal polynomial of $\mathcal{L}$ is
+%% $\minpoly = T^{\max(\deg(A)+1,\deg(B))}B(1/T)$. 
 
-It is often easier to work with a closed form that has the actual
-minimal polynomial as its denominator, rather than its reverse; this
-is done by working with generating series in the variable $1/T$.  More precisely, let
-$\genseries = \sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$
-be any polynomial; then, $\minpoly$ cancels the sequence $\mathcal{L}$
-if and only if $Q=\minpoly \genseries $ is a polynomial, in which case $Q$
-must have degree less than $\deg(\minpoly)$.  Using generating series in
-$1/T$, the minimal polynomial of $\mathcal{L}$ is thus the
-monic polynomial $\minpoly$ of lowest degree for which there exists $Q \in
-\K[T]$ such that $\genseries=Q/\minpoly$.
-
-In particular, given a scalar sequence and a
-polynomial that cancels it, there is a well-defined notion of
-associated numerator. This is formalized in the next definition:
+In terms of generating series, it is easier to work here with
+generating series in the variable $1/T$.  Let thus $\genseries =
+\sum_{s\ge0} \ell_s / T^{s+1}$ and $\minpoly$ be any polynomial; then,
+$\minpoly$ cancels the sequence $\mathcal{L}$ if and only if
+$Q=\minpoly \genseries $ is a polynomial, in which case $Q$ must have
+degree less than $\deg(\minpoly)$.  In particular, given a scalar
+sequence and a polynomial that cancels it, there is a well-defined
+notion of associated numerator. This is formalized in the next
+definition:
 \begin{definition}
   \label{def:omega}
   Let $\mathcal{L}=(\ell_s)_{s \ge 0}\in \K^\N$ be a sequence and $P$ be a
@@ -487,54 +484,52 @@ associated numerator. This is formalized in the next definition:
   degree less than $\deg(P)$.
 \end{definition}
 
-Here are two remarks concerning this definition:
-\begin{itemize}
-  \item We may write this definition using expressions in
-    variable $T$ instead of $1/T$ as well: given
-    $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
-    $\Omega(\mathcal{L},P)$ by considering $S=\sum_{s\ge 0} \ell_s
-    T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
-    P(1/T)$ and $d=\deg(P)$; then
-    $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
-  \item We only need to know the first $d=\deg(P)$ coefficients
-    $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
-    have
-    \[
-      \Omega(\mathcal{L},P) = \left( P \sum_{s=0}^{d-1} \ell_{d - 1- s} T^s \right) {\rm~div~} T^d,
-    \]
-    where div denotes the quotient in the Euclidean division.
-\end{itemize}
+ %% We may write this definition using expressions in
+ %%    variable $T$ instead of $1/T$ as well: given
+ %%    $\mathcal{L}=(\ell_s)_{s\ge0}$ and $P$ as above, we recover
+ %%    $\Omega(\mathcal{L},P)$ by considering $S=\sum_{s\ge 0} \ell_s
+ %%    T^s$ and computing $A = {\rm rev}(P) S$, with ${\rm rev}(P)=T^d
+ %%    P(1/T)$ and $d=\deg(P)$; then
+%%    $$\Omega(\mathcal{L} ,P) = T^{d - 1} A (1/T).$$ 
 
-\medskip
+The numerators thus defined are related to the Lagrange interpolation
+polynomials; this will explain why they play an important role in our
+main algorithm. Assuming that $\mathcal{L}$ is known to have order at
+most $d$ and that we are given $\ell_0,\dots,\ell_{2d-1}$, we can recover
+its minimal polynomial $P$ by means of the Berlekamp-Massey algorithm,
+or of Euclid's algorithm~\citep{BrGuYu80}. Given $P$ and
+$\ell_0,\dots,\ell_{d-1}$, we can deduce
+$\Omega(\mathcal{L},P)$ by a simple multiplication.
 
-Now, we give an example of this construction. Consider the Fibonacci sequence
-$\mathcal{L} = (1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
-polynomial $P=T^2-T-1$, and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
-${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
-$$S = \frac{A}{{\rm rev}(P)} = \frac{1}{1-T-T^2},$$
-so that $\Omega(\mathcal{L},P)=T^{2-1} \cdot 1=T$. Equivalently, defining
-$\genseries = \sum_{s\ge0} \ell_{s}/T^{s+1}$, we recover 
+%% for the cost $\M(\deg(P))$ of one polynomial multiplication in degree
+%% $\deg(P)$.
+%% Note that we need to know the first $d=\deg(P)$ coefficients
+%% $\ell_0,\dots,\ell_{d-1}$ to compute $\Omega(\mathcal{L}, P)$. Explicitly, we
+%% have
+%% \[
+%% \Omega(\mathcal{L},P) = \left( P \sum_{s=0}^{d-1} \ell_{d - 1- s} T^s \right) {\rm~div~} T^d,
+%% \]
+%% where div denotes the quotient in the Euclidean division.
+
+As an example, consider the Fibonacci sequence $\mathcal{L} =
+(1,1,2,3,5,8,\dots)$, which is linearly recurrent with minimal
+polynomial $P=T^2-T-1$.
+%%  and define $S= \sum_{s\ge 0} \ell_{s} T^s$ and
+%% ${\rm rev}(P) = 1-T-T^2$. Then, we can write $S$ in closed form as
+%% $$S = \frac{A}{{\rm rev}(P)} = \frac{1}{1-T-T^2},$$
+%% so that $\Omega(\mathcal{L},P)=T^{2-1} \cdot 1=T$. Equivalently, defining
+Defining
+$\genseries = \sum_{s\ge0} \ell_{s}/T^{s+1}$, we obtain
 \[
   \Omega(\mathcal{L},P) = (T^2-T-1)\left (\frac 1T +\frac 1{T^2} + \frac
   2{T^3} + \frac 3{T^4} + \cdots \right ) =T.
 \]
-The numerators thus defined are related to the Lagrange interpolation
-polynomials; this will explain why they play an important role in our main
-algorithm. Explicitly, suppose that $\mathcal{L} = (a_1^s + \cdots + a_n^s)_{s
-\ge 0}$ for some pairwise distinct elements $a_1,\dots,a_n \in \K$. Then, its
-minimal polynomial is $\minpoly=\prod_{i=1}^n (T-a_i)$, and the numerator
-$\Omega(\mathcal{L}, P)$ is  $ \sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
 
-Let us go back to the general case of a sequence $\mathcal{L}
-=(\ell_s)_{s\ge0}\in\K^\N$.  In terms of complexity, assuming that
-$\mathcal{L}$ is known to have order at most $d$ and that we are given
-its first $2d$ terms, we can recover its minimal polynomial $P$ by
-means of the Berlekamp-Massey algorithm, or of Euclid's algorithm
-applied to rational function reconstruction; this can be done in
-$O(\M(d)\log(d))$ operations in $\K$ \citep{BrGuYu80}. Given $P$ and
-$\ell_0,\dots,\ell_{\deg(P)-1}$, we can deduce $\Omega(\mathcal{L},P)$
-for the cost $\M(\deg(P))$ of one polynomial multiplication in degree
-$\deg(P)$.
+%% Explicitly, suppose that $\mathcal{L} = (a_1^s + \cdots + a_n^s)_{s
+%% \ge 0}$ for some pairwise distinct elements $a_1,\dots,a_n \in \K$. Then, its
+%% minimal polynomial is $\minpoly=\prod_{i=1}^n (T-a_i)$, and the numerator
+%% $\Omega(\mathcal{L}, P)$ is  $ \sum_{i=1}^n \prod_{i'\ne i} (T-a_{i'})$.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -547,7 +542,7 @@ recent algorithms for approximant bases. A similar discussion, relying
 on the approximant basis algorithm in~\citep{BecLab94}, can be found
 in~\citep[Chapter~4]{Turner02}; as a result, in the body of the text,
 we indicate only the key definitions and results (and in particular,
-an improved complexity analysis). Proofs of the main statements are in
+an improved complexity analysis). Proofs of some statements are in
 appendix.
 
 We first define linear recurrences for matrix sequences over a field
@@ -691,20 +686,21 @@ operations in $\K$.
 %% --> the cost would be better, O(m^w M(d/m))
 %% more generally, average row degree ~nd/m -->  O(m^w M(nd/m))
 
-Given a linearly recurrent sequence, our goal is to find a minimal
-left matrix generator of it. In order to do this, we will assume that
-we know bounds on the degree of this left generator, but also on that
-of a {\em right} generator. Indeed, in all the previous discussion, we
-may also consider vector relations operating on the right. In
-particular, \cref{lem:module_rank} shows that if a sequence is
-linearly recurrent, these right relations form a submodule of
-$\polMatSpace[\rdim][1]$ of rank $\rdim$, so that a linearly recurrent
-sequence also admits right generators.
+Given a linearly recurrent sequence, our goal will be to find a
+minimal left matrix generator of it (and then the corresponding
+numerator, but as we just saw, this will be easy). In order to do this, we
+will assume that we know bounds on the degree of this left generator,
+but also on that of a {\em right} generator. Indeed, in all the
+previous discussion, we may also consider vector relations operating
+on the right. In particular, \cref{lem:module_rank} shows that if a
+sequence is linearly recurrent, these right relations form a submodule
+of $\polMatSpace[\rdim][1]$ of rank $\rdim$, so that a linearly
+recurrent sequence also admits right generators.
 
 As it turns out, all minimal left generators have the same degree
 (since they all have the same Popov form, and taking Popov forms of
 reduced matrices does not change their degree); the same remark holds
-minimal right generators. Knowing bounds $(\degBdl,\degBdr)$ on these
+for minimal right generators. Knowing bounds $(\degBdl,\degBdr)$ on these
 degrees allows us to control the number of terms of the sequence we
 will access during the algorithm (the bounds $(\degBdl,\degBdr)$
 correspond to $(\gamma_1,\gamma_2)$ in
@@ -730,14 +726,12 @@ using the approximant bases algorithm of~\citep{GiJeVi03}.
 
 \subsection{Application to the block Wiedemann algorithm}\label{ssec:appliW}
 
-We next apply the results seen above to a particular class of
-matrix sequences, namely the Krylov sequences used in Coppersmith's block
-Wiedemann algorithm~\citep{Coppersmith94}. 
-
-Let $\mM$ be in $\mathbb{K}^{D \times D}$ and $\mU,\mV \in
-\mathbb{K}^{D \times m}$ be two blocking matrices for some $m\le D$. We can
-then define
-the Krylov sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0} \subset
+We next apply the results seen above to a particular class of matrix
+sequences, namely the Krylov sequences used in Coppersmith's block
+Wiedemann algorithm~\citep{Coppersmith94}.  Let $\mM$ be in
+$\mathbb{K}^{D \times D}$ and $\mU,\mV \in \mathbb{K}^{D \times m}$ be
+two blocking matrices for some $m\le D$. We can then define the Krylov
+sequence $\seq_{\mU,\mV}=(\seqelt{s,\mU,\mV})_{s \ge 0} \subset
 \matSpace[m]$ by
 $$\seqelt{s,\mU,\mV} = \mUt \mM^s \mV, \quad s \ge 0.$$ This
 sequence is linearly recurrent, since the minimal polynomial of $\mM$
@@ -1008,7 +1002,6 @@ $\Kbar$.
 For instance, when $\balpha_i$ is nonsingular, we have $D_i=1$, so
 there is only one function $\lambda_{i,j}$, namely $\lambda_{i,1}$; we
 write it $\lambda_{i,1}(f) = f(\balpha_i)$.
-
 More generally, we can always take $\lambda_{i,1}$ of the form
 $\lambda_{i,1}(f) = f(\balpha_i)$; for $j>1$, we can then also assume
 that $S_{i,j}$ does not contain $\mu=(0,\dots,0)$ (that is, all terms
@@ -1046,29 +1039,31 @@ nonzero; by~\citep[Lemma~3.3]{Mourrain97} we have $w \le
 N_i-1$. Then, we let
 $$\pi =\sum_{\mu \in S_i,\ |\mu|=w}P_{i,\mu}(\bu_i) X_1^{\mu_1} \cdots
 X_n^{\mu_n}$$ be the {\em symbol} of $\ell$; by construction,
-this is a nonzero polynomial. In the following paragraphs, we will
-need the next lemma.
+this is a nonzero polynomial. 
 
-\begin{lemma}\label{lemma:symbol0}
-  Fix $i$ in $\{1,\dots,\dg\}$. For a generic choice of $\ell$ in
-  ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
-  $\pi_i(t_1,\dots,t_n)$ is nonzero.
-\end{lemma}
-\begin{proof}
-  Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
-  $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$, and define 
-  $$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1}
-  \cdots X_n^{\mu_n} \in
-  \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
-  construction a nonzero polynomial.  As a result, for a generic choice of
-  $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, which defines a linear form
-  $\ell$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ as in \cref{ell_param},
-  and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
-  $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is nonzero. Thus, the symbol of
-  such a linear form $\ell$ is $\pi
-  =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1}
-  \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then nonzero.
-\end{proof}
+%% In the following paragraphs, we will
+%% need the next lemma.
+
+%% \begin{lemma}\label{lemma:symbol0}
+%%   Fix $i$ in $\{1,\dots,\dg\}$. For a generic choice of $\ell$ in
+%%   ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ and of $t_1,\dots,t_n$ in $\Kbar{}^n$,
+%%   $\pi_i(t_1,\dots,t_n)$ is nonzero.
+%% \end{lemma}
+%% \begin{proof}
+%%   Let $\Omega$ be the maximum of all $|\mu|=\mu_1+\cdots+\mu_n$ for
+%%   $\mu=(\mu_1,\dots,\mu_n)$ in $S_i$, and define 
+%%   $$\Pi =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu} X_1^{\mu_1}
+%%   \cdots X_n^{\mu_n} \in
+%%   \Kbar[U_{i,1},\dots,U_{i,D_i},X_1,\dots,X_n];$$ this is by
+%%   construction a nonzero polynomial.  As a result, for a generic choice of
+%%   $\bu_i=(u_{i,1},\dots,u_{i,D_i})$, which defines a linear form
+%%   $\ell$ in ${\rm hom}_\Kbar(\residueI_i,\Kbar)$ as in \cref{ell_param},
+%%   and of $t_1,\dots,t_n$ in $\Kbar{}^n$, the value
+%%   $\Pi(u_{i,1},\dots,u_{i,D_i},t_1,\dots,t_n)$ is nonzero. Thus, the symbol of
+%%   such a linear form $\ell$ is $\pi
+%%   =\sum_{\mu \in S_i,\ |\mu|=\Omega}P_{i,\mu}(\bu_i) X_1^{\mu_1}
+%%   \cdots X_n^{\mu_n},$ and $\pi(t_1,\dots,t_n)$ is then nonzero.
+%% \end{proof}
 
 Finally, we say a word about global objects.  Fix a linear form $\ell:
 \residueI \to \K$. By the Chinese Remainder Theorem, there exist unique
@@ -1196,179 +1191,180 @@ this paper.
   claim in the lemma.
 \end{proof}
 
-\noindent 
-The most useful consequence of this lemma is the following
-interpolation formula involving the operator $\Omega$ of the previous
-section, which generalizes a comment we made in \cref{section:linseq}.
+%% \noindent 
+%% The most useful consequence of this lemma is the following
+%% interpolation formula involving the operator $\Omega$ of the previous
+%% section.
 
-Fix a subset $\mathfrak{S}$ of $\{1,\dots,\dg\}$, and let $\lf$
-be as in the previous lemma. The mapping
-$\lf:V_\mathfrak{S} \to \Kbar$ defined by $\balpha_i \mapsto
-\lf(\balpha_{i})$ plays a special role in the formula in the previous
-lemma; this leads us to the following definitions.
-\begin{itemize}
-  \item We consider $\ell$ and $\lf$ as in \cref{lemma:formula}, such
-    that $\ell$ has support $\mathfrak{S}$.
-  \item $\mathfrak{T}$ is the subset of $\mathfrak{S}$ consisting of
-    all indices $i$ such that 
-    \begin{itemize}
-      \item $\lf(\balpha_{i'}) \ne \lf(\balpha_i)$ for $i' \ne i$ in $\mathfrak{S}$;
-      \item $\pi_i(t_1,\dots,t_n)$ is nonzero.
-    \end{itemize}
-  \item $\{r_1,\dots,r_c\}$ are the pairwise distinct values taken by $\lf$ on
-    $V_\mathfrak{S}$, for some $c \le |\mathfrak{S}|$.
-  \item $\mathfrak{t}$ is the set of all indices $j$ in
-    $\{1,\dots,c\}$ such that
-    \begin{itemize}
-      \item the fiber $\lf^{-1}(r_j) \subset V_{\mathfrak{S}}$ contains a single
-        point, written $\balpha_{\sigma_j}$;
-      \item   $\pi_{\sigma_j}(t_1,\dots,t_n)$ is nonzero.
-    \end{itemize}
-    Remark that $j \mapsto \sigma_j$ induces a one-to-one correspondence
-    between  $\mathfrak{t}$ and  $\mathfrak{T}$, and that $\lf(\balpha_{\sigma_j})=r_j$ 
-    for all $j$ in $\mathfrak{t}$.
-\end{itemize}
+%% Fix a subset $\mathfrak{S}$ of $\{1,\dots,\dg\}$, and let $\lf$
+%% be as in the previous lemma. The mapping
+%% $\lf:V_\mathfrak{S} \to \Kbar$ defined by $\balpha_i \mapsto
+%% \lf(\balpha_{i})$ plays a special role in the formula in the previous
+%% lemma; this leads us to the following definitions.
+%% \begin{itemize}
+%%   \item We consider $\ell$ and $\lf$ as in \cref{lemma:formula}, such
+%%     that $\ell$ has support $\mathfrak{S}$.
+%%   \item $\mathfrak{T}$ is the subset of $\mathfrak{S}$ consisting of
+%%     all indices $i$ such that 
+%%     \begin{itemize}
+%%       \item $\lf(\balpha_{i'}) \ne \lf(\balpha_i)$ for $i' \ne i$ in $\mathfrak{S}$;
+%%       \item $\pi_i(t_1,\dots,t_n)$ is nonzero.
+%%     \end{itemize}
+%%   \item $\{r_1,\dots,r_c\}$ are the pairwise distinct values taken by $\lf$ on
+%%     $V_\mathfrak{S}$, for some $c \le |\mathfrak{S}|$.
+%%   \item $\mathfrak{t}$ is the set of all indices $j$ in
+%%     $\{1,\dots,c\}$ such that
+%%     \begin{itemize}
+%%       \item the fiber $\lf^{-1}(r_j) \subset V_{\mathfrak{S}}$ contains a single
+%%         point, written $\balpha_{\sigma_j}$;
+%%       \item   $\pi_{\sigma_j}(t_1,\dots,t_n)$ is nonzero.
+%%     \end{itemize}
+%%     Remark that $j \mapsto \sigma_j$ induces a one-to-one correspondence
+%%     between  $\mathfrak{t}$ and  $\mathfrak{T}$, and that $\lf(\balpha_{\sigma_j})=r_j$ 
+%%     for all $j$ in $\mathfrak{t}$.
+%% \end{itemize}
 
-\begin{lemma} \label{lemma:anyv}
-  Let $\ell$, $\lf$ and all other notation be as above. Let further
-  $\minpoly$ be the minimal polynomial of $\lf$ in
-  $\residueI_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
-  polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then,
-  for $v$ in $\K[X_1,\dots,X_n]$, $\minpoly$
-  cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
-  there
-  exist nonzero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
-  for $v$ in $\K[X_1,\dots,X_n]$,
-  $$\Omega((\ell(v \lf^s))_{s\ge0},\minpoly) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
-\end{lemma}
-\begin{proof}
-  For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
-  $\mathfrak{S}$ such that $\lf(\balpha_{i})=r_j$; the sets
-  $T_1,\dots,T_c$ form a partition of $\mathfrak{S}$. When $T_j$ has
-  cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
+%% \begin{lemma} \label{lemma:anyv}
+%%   Let $\ell$, $\lf$ and all other notation be as above. Let further
+%%   $\minpoly$ be the minimal polynomial of $\lf$ in
+%%   $\residueI_\mathfrak{S}$. Suppose that $\minpoly$ is also the minimal
+%%   polynomial of the sequence $(\ell(\lf^s))_{s \ge 0}$. Then,
+%%   for $v$ in $\K[X_1,\dots,X_n]$, $\minpoly$
+%%   cancels the sequence $(\ell(v \lf^s))_{s\ge0}$ and
+%%   there
+%%   exist nonzero constants $\{c_j \mid j \in \mathfrak{t}\}$ such that
+%%   for $v$ in $\K[X_1,\dots,X_n]$,
+%%   $$\Omega((\ell(v \lf^s))_{s\ge0},\minpoly)(r_j) = c_{j} v(\balpha_{\sigma_j}) \quad \text{for all $j$ in $\mathfrak{t}$.}$$
+%% \end{lemma}
+%% \begin{proof}
+%%   For $j=1,\dots,c$, we write $T_j$ for the set of all indices $i$ in
+%%   $\mathfrak{S}$ such that $\lf(\balpha_{i})=r_j$; the sets
+%%   $T_1,\dots,T_c$ form a partition of $\mathfrak{S}$. When $T_j$ has
+%%   cardinality~$1$, we thus have $T_j=\{\sigma_j\}$.
 
-  Take an arbitrary $v$ in $\K[X_1,\dots,X_n]$ and let us
-  collect terms in \cref{eq:sumgenseries} as
-  \begin{align*}
-    \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
-    \sum_{j \in \{1,\dots,c\}}
-    \sum_{i \in T_j} \frac{
-      v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
-    + (T-r_{j} )A_{v,i}}
-    {(T-r_{j} )^{w_{i}+1}}\\
-    =&
-    \sum_{j \in \mathfrak{t}}
-    \frac{
-      v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
-    + (T-r_{j}  )A_{v,\sigma_j} }
-    {(T-r_{j} )^{w_{\sigma_j}+1}}\\
-     &+
-     \sum_{j \in \{1,\dots,c\}-\mathfrak{t}}
-     \frac{   \sum_{i \in T_j} \Big( \big[
-           v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
-         + (T-r_{j}  )A_{v,i} \big ]
-     (T-r_{j} )^{y_j-(w_i+1)}\Big)}
-     {(T-r_{j} )^{y_j}},
-  \end{align*}
-  where $y_j$ is the maximum of all $w_i$ for $i$ in $T_j$.  Remark
-  that for $v=1$, our condition that $\pi_i(t_1,\dots,t_n)$ is
-  nonzero for $i$ in $\mathfrak{T}$, together with our assumption on
-  the characteristic of $\K$, imply that in the second line, all terms
-  in the first sum are nonzero and in reduced form.
+%%   Take an arbitrary $v$ in $\K[X_1,\dots,X_n]$ and let us
+%%   collect terms in \cref{eq:sumgenseries} as
+%%   \begin{align*}
+%%     \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
+%%     \sum_{j \in \{1,\dots,c\}}
+%%     \sum_{i \in T_j} \frac{
+%%       v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
+%%     + (T-r_{j} )A_{v,i}}
+%%     {(T-r_{j} )^{w_{i}+1}}\\
+%%     =&
+%%     \sum_{j \in \mathfrak{t}}
+%%     \frac{
+%%       v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
+%%     + (T-r_{j}  )A_{v,\sigma_j} }
+%%     {(T-r_{j} )^{w_{\sigma_j}+1}}\\
+%%      &+
+%%      \sum_{j \in \{1,\dots,c\}-\mathfrak{t}}
+%%      \frac{   \sum_{i \in T_j} \Big( \big[
+%%            v(\balpha_{i})   w_{i}!\, \pi_{i}(t_1,\dots,t_n)
+%%          + (T-r_{j}  )A_{v,i} \big ]
+%%      (T-r_{j} )^{y_j-(w_i+1)}\Big)}
+%%      {(T-r_{j} )^{y_j}},
+%%   \end{align*}
+%%   where $y_j$ is the maximum of all $w_i$ for $i$ in $T_j$.  Remark
+%%   that for $v=1$, our condition that $\pi_i(t_1,\dots,t_n)$ is
+%%   nonzero for $i$ in $\mathfrak{T}$, together with our assumption on
+%%   the characteristic of $\K$, imply that in the second line, all terms
+%%   in the first sum are nonzero and in reduced form.
 
-  After simplifying terms in the second sum, we can rewrite the
-  expression above as
-  \begin{align*}
-    \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
-    \sum_{j \in \mathfrak{t}} \frac{
-      v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
-    + (T-r_{j} )A_{v,\sigma_{j}}}
-    {(T-r_{j} )^{w_{\sigma_{j}}+1}}  
-    +\sum_{j \in  \{1,\dots,c\}-\mathfrak{t}}
-    \frac{D_{v,j}}
-    {(T-r_{j})^{z_{v,j}}},
-  \end{align*}
-  for some positive integers $\{z_{v,j} \mid j\in
-    \{1,\dots,c\}-\mathfrak{t}\}$ and polynomials $\{D_{v,j} \mid j\in
-  \{1,\dots,c\}-\mathfrak{t}\}$ such that for all $j$ in $
-  \{1,\dots,c\}-\mathfrak{t}$, we have $\deg(D_{v,j}) < z_{v,j}$ and
-  $\gcd(D_{v,j}, T-r_{j} )=1$. Some of the polynomials $D_{v,j}$ may
-  vanish, so we let $\mathfrak{u}_v \subset
-  \{1,\dots,c\}-\mathfrak{t}$ be the set of all $j$ for which this is
-  not the case.  We then arrive at our final form for this sum, namely
-  \begin{align}\label{eq:sumgenseries_collect1}
-    \sum_{s \ge 0}  \frac{\ell(v \lf^s)}{T^{s+1}} =&
-    \sum_{j \in \mathfrak{t}} \frac{
-      v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
-    + (T-r_{j}  )A_{v,\sigma_{j}}}
-    {(T-r_{j} )^{w_{\sigma_{j}}+1}}  
-    +\sum_{j \in  \mathfrak{u}_v}
-    \frac{D_{v,j}}
-    {(T-r_{j} )^{z_{v,j}}},
-  \end{align}
-  where all terms in the second sum are nonzero and in reduced form
-  (and similarly for the first sum, for $v=1$).
-  This implies that the minimal
-  polynomial of the sequence $(\ell(v\lf^s))_{s \ge 0}$ is 
-  $$\minpoly_v=\prod_{j \in \mathfrak{t}} (T-r_{j})^{\zeta_j} \prod_{j
-  \in \mathfrak{u}_v} (T-r_{j})^{z_{v,j}},$$
-  for some integers $\{\zeta_j \le w_{\sigma_{j}}+1 \mid j \in \mathfrak{t}\}$; for $v=1$, 
-  we actually have $\zeta_j = w_{\sigma_{j}}+1$ for all such~$j$.
+%%   After simplifying terms in the second sum, we can rewrite the
+%%   expression above as
+%%   \begin{align*}
+%%     \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =&
+%%     \sum_{j \in \mathfrak{t}} \frac{
+%%       v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
+%%     + (T-r_{j} )A_{v,\sigma_{j}}}
+%%     {(T-r_{j} )^{w_{\sigma_{j}}+1}}  
+%%     +\sum_{j \in  \{1,\dots,c\}-\mathfrak{t}}
+%%     \frac{D_{v,j}}
+%%     {(T-r_{j})^{z_{v,j}}},
+%%   \end{align*}
+%%   for some positive integers $\{z_{v,j} \mid j\in
+%%     \{1,\dots,c\}-\mathfrak{t}\}$ and polynomials $\{D_{v,j} \mid j\in
+%%   \{1,\dots,c\}-\mathfrak{t}\}$ such that for all $j$ in $
+%%   \{1,\dots,c\}-\mathfrak{t}$, we have $\deg(D_{v,j}) < z_{v,j}$ and
+%%   $\gcd(D_{v,j}, T-r_{j} )=1$. Some of the polynomials $D_{v,j}$ may
+%%   vanish, so we let $\mathfrak{u}_v \subset
+%%   \{1,\dots,c\}-\mathfrak{t}$ be the set of all $j$ for which this is
+%%   not the case.  We then arrive at our final form for this sum, namely
+%%   \begin{align}\label{eq:sumgenseries_collect1}
+%%     \sum_{s \ge 0}  \frac{\ell(v \lf^s)}{T^{s+1}} =&
+%%     \sum_{j \in \mathfrak{t}} \frac{
+%%       v(\balpha_{\sigma_{j}})   w_{\sigma_{j}}!\, \pi_{{\sigma_{j}}}(t_1,\dots,t_n)
+%%     + (T-r_{j}  )A_{v,\sigma_{j}}}
+%%     {(T-r_{j} )^{w_{\sigma_{j}}+1}}  
+%%     +\sum_{j \in  \mathfrak{u}_v}
+%%     \frac{D_{v,j}}
+%%     {(T-r_{j} )^{z_{v,j}}},
+%%   \end{align}
+%%   where all terms in the second sum are nonzero and in reduced form
+%%   (and similarly for the first sum, for $v=1$).
+%%   This implies that the minimal
+%%   polynomial of the sequence $(\ell(v\lf^s))_{s \ge 0}$ is 
+%%   $$\minpoly_v=\prod_{j \in \mathfrak{t}} (T-r_{j})^{\zeta_j} \prod_{j
+%%   \in \mathfrak{u}_v} (T-r_{j})^{z_{v,j}},$$
+%%   for some integers $\{\zeta_j \le w_{\sigma_{j}}+1 \mid j \in \mathfrak{t}\}$; for $v=1$, 
+%%   we actually have $\zeta_j = w_{\sigma_{j}}+1$ for all such~$j$.
 
-  Now, for $v=1$, we assume that the minimal polynomial of the sequence
-  $(\ell(\lf^s))_{s \ge 0}$ is the minimal polynomial $\minpoly$ of $t$ in
-  $\residueI_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
-  $z_j=z_{1,j}$ for all $j$ in $\mathfrak{u}$, we can thus write it as
-  $$\minpoly=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1}
-  \prod_{j \in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the
-  minimal polynomial of $\lf$ in $\residueI_\mathfrak{S}$, it also cancels the
-  sequence $(\ell(v \lf^s))_{s \ge 0}$ for any $v$, so that for all
-  $v$, $\minpoly_v$ divides $\minpoly$ (which proves the first point
-  in the lemma), and in particular $\mathfrak{u}_v$ is contained in
-  $\mathfrak{u}$.
-  We can then rewrite the
-  sum in \cref{eq:sumgenseries_collect1} as $$ \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =\frac{\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)}{\minpoly},$$ with
-  \begin{align*}
-    & \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)= \\
-    &\;\; \sum_{j \in \mathfrak{t}} \Big(\big[
-        v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
-      + (T-r_j) A_{v,\sigma_j}\big]
-      \prod_{\iota \in \mathfrak{t}-\{j\}}(T-r_{\iota} )^{w_{\sigma_{\iota}}+1}
-    \Big)\prod_{j \in \mathfrak{u}}(T-r_j )^{z_j}
-    \\
-    &\;\; +
-    \Big(\prod_{j \in \mathfrak{t}}(T-r_{j} )^{w_{\sigma_j}+1}\Big)
-    \sum_{j \in \mathfrak{u}_v} \Big (
-      (T-r_j)^{z_{j}-z_{v,j}} D_{v,j}
-    \prod_{\iota \in \mathfrak{u}-\{j\}}(T-r_{\iota} )^{z_{\iota}}\Big).
-  \end{align*}
-  In particular, 
-  for $k$ in $\mathfrak{t}$,
-  the value $\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)$ is 
-  \begin{align*}
-    \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)&= v(\balpha_{\sigma_{k}}) w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
-    \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
-    \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}\\
-                                                    &= v(\balpha_{\sigma_{k}}) c_{k},
-  \end{align*}
-  with 
-  $$c_{k}=
-  w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
-  \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
-  \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}$$
-  for $k$ in $\mathfrak{t}$. This is a nonzero constant, independent 
-  of $v$, which completes the proof.
-\end{proof}
+%%   Now, for $v=1$, we assume that the minimal polynomial of the sequence
+%%   $(\ell(\lf^s))_{s \ge 0}$ is the minimal polynomial $\minpoly$ of $t$ in
+%%   $\residueI_\mathfrak{S}$.  Writing $\mathfrak{u}=\mathfrak{u}_1$ and
+%%   $z_j=z_{1,j}$ for all $j$ in $\mathfrak{u}$, we can thus write it as
+%%   $$\minpoly=\prod_{j \in \mathfrak{t}} (T-r_{j})^{w_{\sigma_{j}}+1}
+%%   \prod_{j \in \mathfrak{u}} (T-r_{j})^{z_{j}}.$$ Since it is the
+%%   minimal polynomial of $\lf$ in $\residueI_\mathfrak{S}$, it also cancels the
+%%   sequence $(\ell(v \lf^s))_{s \ge 0}$ for any $v$, so that for all
+%%   $v$, $\minpoly_v$ divides $\minpoly$ (which proves the first point
+%%   in the lemma), and in particular $\mathfrak{u}_v$ is contained in
+%%   $\mathfrak{u}$.
+%%   We can then rewrite the
+%%   sum in \cref{eq:sumgenseries_collect1} as $$ \sum_{s \ge 0} \frac{\ell(v \lf^s)}{T^{s+1}} =\frac{\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)}{\minpoly},$$ with
+%%   \begin{align*}
+%%     & \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)= \\
+%%     &\;\; \sum_{j \in \mathfrak{t}} \Big(\big[
+%%         v(\balpha_{\sigma_{j}})  w_{\sigma_j}!\, \pi_{\sigma_j}(t_1,\dots,t_n)
+%%       + (T-r_j) A_{v,\sigma_j}\big]
+%%       \prod_{\iota \in \mathfrak{t}-\{j\}}(T-r_{\iota} )^{w_{\sigma_{\iota}}+1}
+%%     \Big)\prod_{j \in \mathfrak{u}}(T-r_j )^{z_j}
+%%     \\
+%%     &\;\; +
+%%     \Big(\prod_{j \in \mathfrak{t}}(T-r_{j} )^{w_{\sigma_j}+1}\Big)
+%%     \sum_{j \in \mathfrak{u}_v} \Big (
+%%       (T-r_j)^{z_{j}-z_{v,j}} D_{v,j}
+%%     \prod_{\iota \in \mathfrak{u}-\{j\}}(T-r_{\iota} )^{z_{\iota}}\Big).
+%%   \end{align*}
+%%   In particular, 
+%%   for $k$ in $\mathfrak{t}$,
+%%   the value $\Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)$ is 
+%%   \begin{align*}
+%%     \Omega((\ell(v \lf^s))_{s \ge 0} ,\minpoly)(r_k)&= v(\balpha_{\sigma_{k}}) w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
+%%     \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
+%%     \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}\\
+%%                                                     &= v(\balpha_{\sigma_{k}}) c_{k},
+%%   \end{align*}
+%%   with 
+%%   $$c_{k}=
+%%   w_{\sigma_k}!\, \pi_{\sigma_k}(t_1,\dots,t_n)
+%%   \prod_{\iota \in \mathfrak{t}-\{k\}}(r_\iota-r_{k} )^{w_{\sigma_{\iota}}+1}
+%%   \prod_{j \in \mathfrak{u}}(r_j-r_{k} )^{z_{k}}$$
+%%   for $k$ in $\mathfrak{t}$. This is a nonzero constant, independent 
+%%   of $v$, which completes the proof.
+%% \end{proof}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Computing a zero-dimensional parametrization}  \label{ssec:abstractlago}
 
-As a first application, the following algorithm shows how to compute a
+As a corollary, we recover the following
+result~\cite[Proposition~3]{BoSaSc03}, that shows how to compute a
 zero-dimensional parametrization of $V_{\mathfrak{S}}$. Our main usage
 of it will be with $\mathfrak{S}=\{1,\dots,\dg\}$, in which case
 $V_{\mathfrak{S}}=V$, but in the last section of the paper, we will
-also work with strict subsets.
+also work with strict subsets. 
 
 \begin{algorithm}[H]
   \caption{$\mathsf{Parametrization}(\ell,\lf)$}  ~\\
@@ -1399,32 +1395,37 @@ also work with strict subsets.
   $\mathsf{Parametrization}(\ell,\lf)$ is a zero-dimensional
   parametrization of $V_{\mathfrak{S}}$.
 \end{lemma}
-\begin{proof}
-  A generic choice of $\lf$ separates the points of
-  $V_{\mathfrak{S}}$, and we saw in \cref{lemma:symbol0} that for a
-  generic choice of $\ell$ and $\lf$, $\pi_i(t_1,\dots,t_n)$ vanishes
-  for no index $i$ in $\mathfrak{S}$.  As a result, with the notation
-  introduced prior to \cref{lemma:anyv}, we have
-  $\mathfrak{T}=\mathfrak{S}$ and $\mathfrak{t}$ consists of
-  $|\mathfrak{S}|$ pairwise distinct values.
 
-  Besides, we recall that for a generic $\ell$ in ${\rm
-  hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$, the minimal polynomials of
-  $(\ell(\lf^s))_{s \ge 0}$ and of $\lf$ are the same
-  (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ computed
-  at Step~1 is indeed the minimal polynomial of $\lf$ (with roots
-  $\{r_j \mid j \in \mathfrak{t}\}$), and we can apply \cref{lemma:anyv};
-  then, for any root $r_j$ of $\minpoly$, and $i=1,\dots,n$, we
-  have
-  $$\frac{ C_{X_i}(r_j)}{ C_1(r_j)} = \frac{\Omega((\ell(X_i
-  \lf^s))_{s\ge0}, \minpoly)(r_j)}{\Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)(r_j)}=
-  \frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$ so that
-  $ C_{X_i}/ C_1 \bmod P$ is the $i$th polynomial in the
-  zero-dimensional parametrization of $V$ corresponding to $\lf$.
-\end{proof}
+%% \begin{proof}
+%%   A generic choice of $\lf$ separates the points of
+%%   $V_{\mathfrak{S}}$, and we saw in \cref{lemma:symbol0} that for a
+%%   generic choice of $\ell$ and $\lf$, $\pi_i(t_1,\dots,t_n)$ vanishes
+%%   for no index $i$ in $\mathfrak{S}$.  As a result, with the notation
+%%   introduced prior to \cref{lemma:anyv}, we have
+%%   $\mathfrak{T}=\mathfrak{S}$ and $\mathfrak{t}$ consists of
+%%   $|\mathfrak{S}|$ pairwise distinct values.
 
-We demonstrate how this algorithm works through a small example, in 
-which we already know the coordinates of the solutions. Let 
+%%   Besides, we recall that for a generic $\ell$ in ${\rm
+%%   hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$, the minimal polynomials of
+%%   $(\ell(\lf^s))_{s \ge 0}$ and of $\lf$ are the same
+%%   (\cref{lemma:minpoly}).  Thus, the polynomial $\minpoly$ computed
+%%   at Step~1 is indeed the minimal polynomial of $\lf$ (with roots
+%%   $\{r_j \mid j \in \mathfrak{t}\}$), and we can apply \cref{lemma:anyv};
+%%   then, for any root $r_j$ of $\minpoly$, and $i=1,\dots,n$, we
+%%   have
+%%   $$\frac{ C_{X_i}(r_j)}{ C_1(r_j)} = \frac{\Omega((\ell(X_i
+%%   \lf^s))_{s\ge0}, \minpoly)(r_j)}{\Omega((\ell(\lf^s))_{s\ge0} ,\minpoly)(r_j)}=
+%%   \frac{c_j \alpha_{\sigma_j,i}}{c_j} = \alpha_{\sigma_j,i},$$ so that
+%%   $ C_{X_i}/ C_1 \bmod P$ is the $i$th polynomial in the
+%%   zero-dimensional parametrization of $V$ corresponding to $\lf$.
+%% \end{proof}
+
+The proof in~\cite{BoSaSc03} is written for
+$\mathfrak{S}=\{1,\dots,\kappa\}$, but works equally as well for the
+more general case; it uses a weaker form of the previous lemma, that
+is sufficient in this case.  We demonstrate how this algorithm works
+through a small example, in which we already know the coordinates of
+the solutions. Let
 $$I = \langle (X_1-1)(X_2-2),(X_1-3)(X_2-4)\rangle \subset
 \F_{101}[X_1,X_2].$$ Then, $V(I) = \{\balpha_1,\balpha_2\}$,
 with $\balpha_1= (1,4)$ and $\balpha_2=(3,2)$; we take
@@ -1497,10 +1498,9 @@ LinBox, Eigen and NTL.
 
 We mentioned that the method of \citet{Steel15} already uses the block
 Wiedemann algorithm to compute the minimal polynomial $\minpoly$ of
-$\lf=t_1 X_1 + \cdots + t_n X_n$; \textcolor{red}{given sufficiently many terms of the
+$\lf=t_1 X_1 + \cdots + t_n X_n$; {given sufficiently many terms of the
   sequence $(\mUt \mM^s \mV)$, this is done by means of polynomial
-  lattice reduction, without computing the matrix generator
-$\mat{P}_{\mU,\mV}$}. Knowing the roots of $\minpoly$ in $\K$, that
+  lattice reduction}. Knowing the roots of $\minpoly$ in $\K$, that
 algorithm uses an ``evaluation'' method for the rest (several
 Gr\"obner basis computations, all with one variable less).
 
@@ -1594,12 +1594,11 @@ is indeed a zero-dimensional parametrization of $V(I)$.
   but savings can be substantial if these  matrices are sparse.
 \end{remark}
 
-For the cost analysis, we will mainly focus on a sparse model: we let $\density
-\in [0,1]$ denote the density of $\mM$ and the $\mM_i$'s, that is,
-all these matrices have at most $\density D^2$ nonzero entries.  As a result, a
-matrix-vector product by $\mM$ can be done in $O(\density D^2)$ operations in
-$\K$ (we briefly discuss variants of the algorithm using dense linear algebra
-at the end of this subsection). In particular, the cost incurred at
+For the cost analysis, we focus on a sparse model: we let $\density
+\in [0,1]$ denote the density of $\mM$ and the $\mM_i$'s, that is, all
+these matrices have at most $\density D^2$ nonzero entries.  As a
+result, a matrix-vector product by $\mM$ can be done in $O(\density
+D^2)$ operations in $\K$. In particular, the cost incurred at
 Step~\ref{mainstep1} to compute $\mM$ is $O(\density n D^2)$.
 
 In this context, the main purpose of Coppersmith's blocking strategy
@@ -1659,46 +1658,6 @@ nm\M(D)\right ).$$ Although one may work on parallelizing other steps than
 Step~\ref{mainstep3}, we note that this step is simultaneously the most costly in
 theory and in practice, and the easiest to parallelize. 
 
-%% \medskip
-
-%% We conclude this section by a discussion of ``dense'' versions of the
-%% algorithm (to be used when the density $\density$ is close to $1$). 
-%% If we use a dense model for our matrices, our algorithms
-%% should rely on dense matrix multiplication. We will see two possible
-%% approaches, which respectively take $m=1$ and $m=D$; we will not
-%% discuss how they parallelize, merely pointing out that one may simply
-%% parallelize dense matrix multiplications throughout the algorithms.
-
-%% Let us first discuss the modifications in the algorithm to apply if we choose
-%% $m=1$. In this case, blocking has no effect. We compute the
-%% row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
-%% square-and-multiply technique used in the algorithm of \citet{Keller85},
-%% for $O(D^\omega \log(D))$ operations in
-%% $\K$. For generic choices of $\mU$ and $\mV$, a minimal matrix generator
-%% $\mat{P}_{\mU,\mV}$ is equal to the minimum
-%% polynomial $\minpoly$ of $\mM$, and can be computed efficiently by the
-%% Berlekamp-Massey algorithm (or a fast version of it); besides,
-%% $\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
-%% numerators is simply a power series multiplication in degree at most
-%% $D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, where
-%% the second term gives the cost of computing $\mM$.
-
-%% When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
-%% matrices and $d = D/m = 1$. The canonical matrix generator of
-%% $\seq_{\mU,\mV} = (\mUt\mV, \mUt\mM\mV,\dots)$ is
-%% $\mat{P}_{\mU,\mV} = T \mat{I}_D - \mUt\mM\itrsp{\mU}$ and its
-%% largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
-%% $O(D^\omega \log(D))$ operations in $\K$ using high-order lifting.
-
-%% The numerator $\mat{\Omega}(\mUt \mM \col{\varepsilon}_1,
-%% \mat{P}_{\mU,\mV})$ is then seen to be $\mUt \col{\varepsilon}_1$, that is, the
-%% first column of $\mUt$; we recover $C_1$ from it through a dot
-%% product with $\row{a}_1$. Similarly, the numerator
-%% $\mat{\Omega}(\mUt \mM \mM_i \col{\varepsilon}_1,
-%% \mat{P}_{\mU,mV})$ is $\mUt \mM_i \col{\varepsilon}_1$, and gives
-%% us $C_{X_i}$. Altogether, the runtime is again $O(D^{\omega} \log(D) +
-%% nD^2)$, where the second term now gives the cost of computing $\mM$,
-%% as well as $C_1$ and all $C_{X_i}$.
 
 \begin{remark}
   Our algorithm only computes the first invariant factor of
@@ -1707,6 +1666,45 @@ theory and in practice, and the easiest to parallelize.
   any use in the algorithm (or possibly can help us determine part of
   the structure of the algebras $\residueI_i$).
 \end{remark}
+
+We conclude this section by a discussion of ``dense'' versions of the
+algorithm (to be used when the density $\density$ is close to $1$). 
+If we use a dense model for our matrices, our algorithms
+should rely on dense matrix multiplication. We will see two possible
+approaches, which respectively take $m=1$ and $m=D$; we will not
+discuss how they parallelize, merely pointing out that one may simply
+parallelize dense matrix multiplications throughout the algorithms.
+
+Let us first discuss the modifications in the algorithm to apply if we choose
+$m=1$. In this case, blocking has no effect. We compute the
+row-vectors $\mat{L}_s$, for $s=0,\dots,2D-1$, using the
+square-and-multiply technique used in the algorithm of \citet{Keller85},
+for $O(D^\omega \log(D))$ operations in
+$\K$. For generic choices of $\mU$ and $\mV$, a minimal matrix generator
+$\mat{P}_{\mU,\mV}$ is equal to the minimum
+polynomial $\minpoly$ of $\mM$, and can be computed efficiently by the
+Berlekamp-Massey algorithm (or a fast version of it); besides,
+$\row{a}_1 = P (\mat{P}_{\mU,\mV})^{-1} = 1$. Computing the scalar
+numerators is simply a power series multiplication in degree at most
+$D$. Altogether, the runtime is $O(D^{\omega} \log(D) + nD^2)$, where
+the second term gives the cost of computing $\mM$.
+
+When $m = D$, $\mU,\mV \in \mathbb{K}^{D \times D}$ are square
+matrices and $d = D/m = 1$. The canonical matrix generator of
+$\seq_{\mU,\mV} = (\mUt\mV, \mUt\mM\mV,\dots)$ is
+$\mat{P}_{\mU,\mV} = T \mat{I}_D - \mUt\mM\itrsp{\mU}$ and its
+largest invariant factor $\minpoly$ and $\row{a}_1$ can be computed in
+$O(D^\omega \log(D))$ operations in $\K$ using high-order lifting.
+
+The numerator $\mat{\Omega}(\mUt \mM \col{\varepsilon}_1,
+\mat{P}_{\mU,\mV})$ is then seen to be $\mUt \col{\varepsilon}_1$, that is, the
+first column of $\mUt$; we recover $C_1$ from it through a dot
+product with $\row{a}_1$. Similarly, the numerator
+$\mat{\Omega}(\mUt \mM \mM_i \col{\varepsilon}_1,
+\mat{P}_{\mU,mV})$ is $\mUt \mM_i \col{\varepsilon}_1$, and gives
+us $C_{X_i}$. Altogether, the runtime is again $O(D^{\omega} \log(D) +
+nD^2)$, where the second term now gives the cost of computing $\mM$,
+as well as $C_1$ and all $C_{X_i}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -2039,10 +2037,10 @@ parametrization; the remaining points will be dealt with using a
 random linear form $\lf=t_1 X_1 + \cdots + t_n X_n$ as
 above. Throughout, we rely on the following operations: evaluations of
 linear forms on successive powers of a given element in $\residueI$
-(such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$) and
-linear algebra over the univariate polynomials, as we did before, as well as some operations on
-univariate polynomials related to the so-called {\em power
-projection}~\citep{Shoup94,Shoup99}.
+(such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$), linear
+algebra over univariate polynomials, as we did before, as well as some
+operations on univariate polynomials related to the so-called {\em
+  power projection}~\citep{Shoup94,Shoup99}.
 
 The main algorithm is as follows. For the moment, we only describe its
 main structure; the subroutines are detailed in the next subsections.
@@ -2132,10 +2130,11 @@ written as $\ell=\sum_{j \in \{1,\dots,c\}} \lambda_j$, with
 $\lambda_j=\sum_{i \in T_j} \ell_i$.  Given such an $\ell$, we first
 explain how to compute values of the form $\lambda_j(1)$. We will do
 this for some values of $j$ only, namely those $j$ for which
-$\mu_j=1$. This result is close in spirit to \cref{lemma:anyv}, but
-does not assume that the projection $X_1: V \to \Kbar$ is one-to-one
-(that lemma makes such an assumption, but works for a more general
-linear mapping $\lf:V\to \Kbar$).
+$\mu_j=1$. 
+%% This result is close in spirit to \cref{lemma:anyv}, but
+%% does not assume that the projection $X_1: V \to \Kbar$ is one-to-one
+%% (that lemma makes such an assumption, but works for a more general
+%% linear mapping $\lf:V\to \Kbar$).
 
 \begin{lemma}\label{lemma:valuelambda}
   Let $\ell$ be in ${\rm hom}_\K(\residueI,\K)$ and let $M$ be the minimal
@@ -2551,7 +2550,6 @@ $\mU$. In other words, $\ell_i(f) = \sum_{j=1}^D f_j u_{j,i}$, for
 $f=\sum_{j=1}^D f_j b_j$. Similarly, for $j=1,\dots,m$, we let
 $\gamma_j$ be the element of $\residueI$ whose coefficient vector on
 the basis $\basis$ is the $j$-th column of $\mV$.
-
 Hereafter, we also write $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m \rceil$,
 in analogy with the definition of $d$ used so far.
 \begin{itemize}
@@ -2613,7 +2611,7 @@ in analogy with the definition of $d$ used so far.
 \end{itemize}
 
 In terms of cost, we need to compute all vectors $\row{a}_i$, for
-$i=1,\dots,m$; using the analysis of \cref{eqn:hol_cost}, this takes
+$i=1,\dots,m$; using~\cref{eqn:hol_cost}, this takes
 $O(m^{\omega} \M(D) \log(D) \log(m))$ operations in $\K$.  Then, the total time
 spent in {\sf ScalarNumerator} is $m(m+n+1)$ times the cost reported in
 \cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the total
@@ -2797,10 +2795,16 @@ $7682$ points in the variety.
 
 \section*{Appendix}
 
-In this appendix, we prove results claimed in
-Sections~\ref{section:matrix_seq} and~\ref{ssec:appliW}, starting with
-Theorem~\ref{coro:cost_approx}. The first lemma we need is similar to
-\citep[Theorem~4.5]{Turner02}.
+In this appendix, we prove Theorem~\ref{coro:cost_approx} from
+Section~\ref{section:matrix_seq}: {\em  Let $\seq = (\seqelt{s})_{s\ge 0}$ be a linearly recurrent sequence
+  of matrices in $\sseqeltSpace$ and let $\degBd = \degBdl+\degBdr+1$,
+  where $(\degBdl,\degBdr) \in \NN^2$ are such that the minimal left
+  (resp.~right) matrix generators of $\seq$ have degree at most $\degBdl$
+  (resp.~at most $\degBdr$). Then, given $\seqelt{0},\dots,\seqelt{d-1}$,
+  one can compute a minimal left matrix generator of $\seq$ in
+  $O(\rdim^\omega \M(\degBd) \log(\degBd))$ operations in $\field$.}
+ The first lemma we need is similar
+to \citep[Theorem~4.5]{Turner02}.
 \begin{lemma}
   \label{lem:finitely_many_terms}
   Let $\seq = (\seqelt{s})_{s\ge 0}$ be a linearly recurrent sequence
@@ -2875,14 +2879,13 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   \]
   Suppose that  $\degBd \ge \degBdr+1$ and let $\mat{B} \in \polMatSpace[(\rdim+\rdim)][(\rdim+\rdim)]$
   be a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$. Then,
-  \begin{itemize}
-    \item if $\mat{B}$ is in Popov form, then its $\rdim\times\rdim$ leading
-      principal submatrix is the minimal matrix generator for $\seq$ that is in Popov form;
-    \item if $\mat{B}$ is row reduced then, it has exactly $\rdim$ rows of
+ %% if $\mat{B}$ is in Popov form, then its $\rdim\times\rdim$ leading
+ %%      principal submatrix is the minimal matrix generator for $\seq$ that is in Popov form;
+ %%    \item
+      if $\mat{B}$ is row reduced, it has exactly $\rdim$ rows of
       degree $\le\degBdl$, and they form a submatrix $[\relbas \;\; \remmat] \in
       \polMatSpace[\rdim][(\rdim+\rdim)]$ of $\mat{B}$ such that $\relbas$ is a
       minimal matrix generator for~$\seq$.
-  \end{itemize}
 \end{theorem}
 \begin{proof}
   We first observe that for any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
@@ -2905,7 +2908,7 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
   degree $\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le s <
   \degBd} \seqelt{s} \var^{\degBd-s-1})$ are zero. Then,
   \cref{lem:finitely_many_terms} shows that $\rel$ is a relation for
-  $\seq$. The two items in the theorem follow.
+  $\seq$. The theorem follows.
 \end{proof}
 
 
@@ -2940,113 +2943,115 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
 %% \end{corollary}
 
 
-Using the fast approximant basis algorithm of~\citep{GiJeVi03},
-Theorem~\ref{coro:cost_approx} follows. Next, we discuss
-Theorem~\ref{randXY}.  Recall that we are now considering a sequence
-of the form $\seq_{\mU,\mV} = (\mU^T \mat{M} \mV)_{s \ge 0}$, and we
-wish to prove properties of its minimal generators, for generic $\mU$
-and $\mV$.
+Using the fast approximant basis algorithm of~\citep{GiJeVi03}, this
+implies Theorem~\ref{coro:cost_approx}.
 
-%% {\em 
-%%   For a generic choice of $\mU$ and $\mV$ in $\K^{D \times m}$, the
-%%   following holds.  Let $\mat{P}_{\mU,\mV}$ be a minimal left
-%%   generator for $\seq_{\mU,\mV}$ and denote by $\sigma_1, \dots,
-%%   \sigma_k$ the invariant factors of $\mat{P}_{\mU,\mV}$, for some $k
-%%   \le m$, ordered as above, and write $\sigma_{k+1}=\cdots=\sigma_m=1$.
-%%   Then,
-%%   \begin{itemize}
-%%     \item $\mat{P}_{\mU,\mV}$ is a minimal left generator for the
-%%       matrix sequence $\seqL_{\mU} = (\mUt \mM^s)_{s \ge 0}$;
-%%     \item $\mat{P}_{\mU,\mV}$ has degree $\delta$;
-%%     \item $s_i = \sigma_i$ for $1 \le i \le m$.
-%%   \end{itemize}
-%% }
+%%  Next, we discuss
+%% Theorem~\ref{randXY}.  Recall that we are now considering a sequence
+%% of the form $\seq_{\mU,\mV} = (\mU^T \mat{M} \mV)_{s \ge 0}$, and we
+%% wish to prove properties of its minimal generators, for generic $\mU$
+%% and $\mV$.
 
-Without loss of generality, we assume that $\mat{P}_{\mU,\mV}$ is the
-unique minimal left generator for $\seq_{\mU,\mV}$ in Popov form. The
-sequence $\seqL_{\mU}=(\mU^T \mat{M}^s)_{s \ge 0}$ is linearly
-generated as well, and we let $\mat{P}_{\mU}$ be its minimal left
-generator in Popov form (we defined matrix generators for sequences of
-square matrices, but the same definitions apply to rectangular
-matrices with no change).  We denote by $\langle \mU \rangle$ the
-vector space generated by the rows of $\mUt$, $\mUt \mM$, $\mUt
-\mM^2$, $\dots$, and we write $D_\mU=\dim(\langle \mU \rangle)$.
+%% %% {\em 
+%% %%   For a generic choice of $\mU$ and $\mV$ in $\K^{D \times m}$, the
+%% %%   following holds.  Let $\mat{P}_{\mU,\mV}$ be a minimal left
+%% %%   generator for $\seq_{\mU,\mV}$ and denote by $\sigma_1, \dots,
+%% %%   \sigma_k$ the invariant factors of $\mat{P}_{\mU,\mV}$, for some $k
+%% %%   \le m$, ordered as above, and write $\sigma_{k+1}=\cdots=\sigma_m=1$.
+%% %%   Then,
+%% %%   \begin{itemize}
+%% %%     \item $\mat{P}_{\mU,\mV}$ is a minimal left generator for the
+%% %%       matrix sequence $\seqL_{\mU} = (\mUt \mM^s)_{s \ge 0}$;
+%% %%     \item $\mat{P}_{\mU,\mV}$ has degree $\delta$;
+%% %%     \item $s_i = \sigma_i$ for $1 \le i \le m$.
+%% %%   \end{itemize}
+%% %% }
 
-First, we prove that for any $\mU$ in $\K^{D \times m}$, for a generic
-$\mV$ in $\K^{D\times m}$, $\mat{P}_{\mU}=\mat{P}_{\mU,\mV}$.  Indeed,
-by~\citep[Lemma~4.2]{Villard97a},
-there exist matrices $\mat{J}_\mU$ in $\K^{D\times D_\mU}$ and
-$\mN_\mU \in \K^{D_\mU \times D_\mU}$, with $\mat{J}_\mU$ of full rank
-$D_\mU$, and where $\mN_\mU$ is a matrix of the restriction of
-$\trsp{\mM}$ to $\langle \mU \rangle$, such that
-$\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$ if and only if the dimension of the
-vector space generated by the rows of the span of
-$\trsp{\mV}\mat{J}_\mU, \trsp{\mV} \mat{J}_\mU \mN_\mU, \trsp{\mV}
-\mat{J}_\mU \mN_\mU^2,\dots$ is equal to $D_\mU$.
-  %% , with $\mB_\mV=\trsp{\mM}_\mV$
-  %% and $\mZ=\mat{P}_\trsp{\mV} \mU \in \K^{D_\mV \times m}$.
+%% Without loss of generality, we assume that $\mat{P}_{\mU,\mV}$ is the
+%% unique minimal left generator for $\seq_{\mU,\mV}$ in Popov form. The
+%% sequence $\seqL_{\mU}=(\mU^T \mat{M}^s)_{s \ge 0}$ is linearly
+%% generated as well, and we let $\mat{P}_{\mU}$ be its minimal left
+%% generator in Popov form (we defined matrix generators for sequences of
+%% square matrices, but the same definitions apply to rectangular
+%% matrices with no change).  We denote by $\langle \mU \rangle$ the
+%% vector space generated by the rows of $\mUt$, $\mUt \mM$, $\mUt
+%% \mM^2$, $\dots$, and we write $D_\mU=\dim(\langle \mU \rangle)$.
 
-  By construction, one can find a basis of $\langle \mU \rangle$ in
-  which the matrix of $\mN_\mU$ is block-companion, with $\mu \le m$
-  blocks (take the $\mN_\mU$-span of the first column of $\mU$, then of
-  the second column, working modulo the previous vector space, etc.). 
-  Thus, $\trsp{\mN}_\mU$ is similar to a block-companion matrix with $\mu$
-  blocks as well; since $\mat{J}_\mUt \mV$ has $m$ columns, the span of
-  the columns of
-  $\mat{J}_\mUt \mV,  \trsp{\mN}_\mU\mat{J}_\mUt \mV,\dots$
-  has full dimension $D_\mU$ for a
-  generic $\mat{J}_\mUt \mV$, and thus for a generic $\mV$, since $\mat{J}_\mU$ has rank
-  $D_\mU$. As a result, for generic choices of $\mU$ and $\mV$,
-  $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$; this proves the first item in the theorem.
+%% First, we prove that for any $\mU$ in $\K^{D \times m}$, for a generic
+%% $\mV$ in $\K^{D\times m}$, $\mat{P}_{\mU}=\mat{P}_{\mU,\mV}$.  Indeed,
+%% by~\citep[Lemma~4.2]{Villard97a},
+%% there exist matrices $\mat{J}_\mU$ in $\K^{D\times D_\mU}$ and
+%% $\mN_\mU \in \K^{D_\mU \times D_\mU}$, with $\mat{J}_\mU$ of full rank
+%% $D_\mU$, and where $\mN_\mU$ is a matrix of the restriction of
+%% $\trsp{\mM}$ to $\langle \mU \rangle$, such that
+%% $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$ if and only if the dimension of the
+%% vector space generated by the rows of the span of
+%% $\trsp{\mV}\mat{J}_\mU, \trsp{\mV} \mat{J}_\mU \mN_\mU, \trsp{\mV}
+%% \mat{J}_\mU \mN_\mU^2,\dots$ is equal to $D_\mU$.
+%%   %% , with $\mB_\mV=\trsp{\mM}_\mV$
+%%   %% and $\mZ=\mat{P}_\trsp{\mV} \mU \in \K^{D_\mV \times m}$.
 
-  Let us next introduce a matrix $\scrU$ of indeterminates of size $D
-  \times m$, and let $\mat{P}_{\scrU}$ be the minimal matrix generator
-  in Popov form of the ``generic'' sequence $(\trsp{\scrU} \mM^s)_{s
-    \ge 0}$. The notation $\langle \scrU \rangle$ and $D_\scrU$ are
-  defined as above.  In particular,
-  by~\citep[Proposition~6.1]{Villard97a}, $\mat{P}_{\scrU}$ has degree
-  $\delta$ and determinantal degree $\nu$.
+%%   By construction, one can find a basis of $\langle \mU \rangle$ in
+%%   which the matrix of $\mN_\mU$ is block-companion, with $\mu \le m$
+%%   blocks (take the $\mN_\mU$-span of the first column of $\mU$, then of
+%%   the second column, working modulo the previous vector space, etc.). 
+%%   Thus, $\trsp{\mN}_\mU$ is similar to a block-companion matrix with $\mu$
+%%   blocks as well; since $\mat{J}_\mUt \mV$ has $m$ columns, the span of
+%%   the columns of
+%%   $\mat{J}_\mUt \mV,  \trsp{\mN}_\mU\mat{J}_\mUt \mV,\dots$
+%%   has full dimension $D_\mU$ for a
+%%   generic $\mat{J}_\mUt \mV$, and thus for a generic $\mV$, since $\mat{J}_\mU$ has rank
+%%   $D_\mU$. As a result, for generic choices of $\mU$ and $\mV$,
+%%   $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$; this proves the first item in the theorem.
 
-  Now, for a generic $\mU$ in $\K^{D\times m}$, $D_\mU=D_\scrU$. On
-  the other hand, by~\citep[Lemma~4.3]{Villard97a}, for any $\mU$
-  (including $\scrU$), the degree of $\mat{P}_{\mU}$ is equal to the
-  first index $d$ such that the dimension of the span of the rows of
-  $\mUt,\mUt \mM,\dots, \mUt \mM^{d-1}$ is $D_\mU$. As a result, for
-  generic $\mU$, $\mat{P}_{\mU}$ and $\mat{P}_{\scrU}$ have the same
-  degree, that is, $\delta$. Since then
-  $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$, we see that the second item is
-  proved as well.
+%%   Let us next introduce a matrix $\scrU$ of indeterminates of size $D
+%%   \times m$, and let $\mat{P}_{\scrU}$ be the minimal matrix generator
+%%   in Popov form of the ``generic'' sequence $(\trsp{\scrU} \mM^s)_{s
+%%     \ge 0}$. The notation $\langle \scrU \rangle$ and $D_\scrU$ are
+%%   defined as above.  In particular,
+%%   by~\citep[Proposition~6.1]{Villard97a}, $\mat{P}_{\scrU}$ has degree
+%%   $\delta$ and determinantal degree $\nu$.
 
-  We conclude by proving that for generic $\mU,\mV$, the invariant
-  factors $\sigma_1,\dots,\sigma_m$ of $\mat{P}_{\mU,\mV}$ are
-  $s_1,\dots,s_m$.  By~\citep[Theorem~2.12]{KaVi04} (which considers 
-  right-generators as well), for any $\mU$ and
-  $\mV$ in $\K^{D\times m}$, for $i=1,\dots,m$, the $i$-th invariant
-  factor $\sigma_i$ of $\mat{P}_{\mU,\mV}$ divides $s_i$, so that
-  $\deg(\det(\mat{P}_{\mU,\mV}))\le\nu$, with equality if and only
-  if $\sigma_i=s_i$ for all $i \le m$.
-  For $\mU$ as above and any integers $e,d$, we let ${\rm
-  Hk}_{e,d}(\mU)$ be the block Hankel matrix
-  $$ {\rm Hk}_{d,e}(\mU) =
-  \begin{bmatrix}
-    \mUt \\     \mUt \mM \\     \mUt \mM^2 \\ \vdots  \\      \mUt\mM^{d-1}
-  \end{bmatrix}
-  \begin{bmatrix}
-    \mI_D & \mM & \mM^2 &\cdots& \mM^{e-1}
-  \end{bmatrix}.
-  $$ By~\citep[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{d,e}(\mU)) =
-  \deg(\det(\mat{P}_{\mU}))$ for $d \ge \deg(\mat{P}_{\mU})$
-  and $e \ge D$.  We take $e=D$, so that ${\rm rank}({\rm
-  Hk}_{d,D}(\mU)) = \deg(\det(\mat{P}_{\mU}))$ for $d \ge
-  \deg(\mat{P}_{\mU})$. On the other hand, the sequence ${\rm
-  rank}({\rm Hk}_{d,D}(\mU))$ is constant for $d \ge D$; as a
-  result, ${\rm rank}({\rm Hk}_{D,D}(\mU)) =
-  \deg(\det(\mat{P}_{\mU}))$. For the same reason, we also have ${\rm
-  rank}({\rm Hk}_{D,D}(\scrU)) = \deg(\det(\mat{P}_{\scrU}))$, so that
-  for a generic $\mU$, $\mat{P}_{\mU}$ and $\mat{P}_{\scrU}$
-  have the same determinantal degree, that is, $\nu$.  As a result,
-  for generic $\mU$ and $\mV$, we also have
-  $\deg(\det(\mat{P}_{\mU,\mV}))=\deg(\det(\mat{P}_{\mU}))=\nu$, and the conclusion follows.
+%%   Now, for a generic $\mU$ in $\K^{D\times m}$, $D_\mU=D_\scrU$. On
+%%   the other hand, by~\citep[Lemma~4.3]{Villard97a}, for any $\mU$
+%%   (including $\scrU$), the degree of $\mat{P}_{\mU}$ is equal to the
+%%   first index $d$ such that the dimension of the span of the rows of
+%%   $\mUt,\mUt \mM,\dots, \mUt \mM^{d-1}$ is $D_\mU$. As a result, for
+%%   generic $\mU$, $\mat{P}_{\mU}$ and $\mat{P}_{\scrU}$ have the same
+%%   degree, that is, $\delta$. Since then
+%%   $\mat{P}_{\mU,\mV}=\mat{P}_{\mU}$, we see that the second item is
+%%   proved as well.
+
+%%   We conclude by proving that for generic $\mU,\mV$, the invariant
+%%   factors $\sigma_1,\dots,\sigma_m$ of $\mat{P}_{\mU,\mV}$ are
+%%   $s_1,\dots,s_m$.  By~\citep[Theorem~2.12]{KaVi04} (which considers 
+%%   right-generators as well), for any $\mU$ and
+%%   $\mV$ in $\K^{D\times m}$, for $i=1,\dots,m$, the $i$-th invariant
+%%   factor $\sigma_i$ of $\mat{P}_{\mU,\mV}$ divides $s_i$, so that
+%%   $\deg(\det(\mat{P}_{\mU,\mV}))\le\nu$, with equality if and only
+%%   if $\sigma_i=s_i$ for all $i \le m$.
+%%   For $\mU$ as above and any integers $e,d$, we let ${\rm
+%%   Hk}_{e,d}(\mU)$ be the block Hankel matrix
+%%   $$ {\rm Hk}_{d,e}(\mU) =
+%%   \begin{bmatrix}
+%%     \mUt \\     \mUt \mM \\     \mUt \mM^2 \\ \vdots  \\      \mUt\mM^{d-1}
+%%   \end{bmatrix}
+%%   \begin{bmatrix}
+%%     \mI_D & \mM & \mM^2 &\cdots& \mM^{e-1}
+%%   \end{bmatrix}.
+%%   $$ By~\citep[Eq.~(2.6)]{KaVi04}, ${\rm rank}({\rm Hk}_{d,e}(\mU)) =
+%%   \deg(\det(\mat{P}_{\mU}))$ for $d \ge \deg(\mat{P}_{\mU})$
+%%   and $e \ge D$.  We take $e=D$, so that ${\rm rank}({\rm
+%%   Hk}_{d,D}(\mU)) = \deg(\det(\mat{P}_{\mU}))$ for $d \ge
+%%   \deg(\mat{P}_{\mU})$. On the other hand, the sequence ${\rm
+%%   rank}({\rm Hk}_{d,D}(\mU))$ is constant for $d \ge D$; as a
+%%   result, ${\rm rank}({\rm Hk}_{D,D}(\mU)) =
+%%   \deg(\det(\mat{P}_{\mU}))$. For the same reason, we also have ${\rm
+%%   rank}({\rm Hk}_{D,D}(\scrU)) = \deg(\det(\mat{P}_{\scrU}))$, so that
+%%   for a generic $\mU$, $\mat{P}_{\mU}$ and $\mat{P}_{\scrU}$
+%%   have the same determinantal degree, that is, $\nu$.  As a result,
+%%   for generic $\mU$ and $\mV$, we also have
+%%   $\deg(\det(\mat{P}_{\mU,\mV}))=\deg(\det(\mat{P}_{\mU}))=\nu$, and the conclusion follows.
 
 
 
