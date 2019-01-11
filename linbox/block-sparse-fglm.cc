@@ -16,7 +16,6 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
-#include <NTL/lzz_pX.h>
 
 using namespace LinBox;
 using namespace std;
@@ -333,13 +332,13 @@ vector<size_t> PolMatDom::pmbasis( PolMatDom::PMatrix &approx, const PolMatDom::
  * \param pmat: input polynomial matrix
  * \return the shifted minimal degree of the kernel basis (or the shifted pivot degree and index?)
  */
-/* Not: for simplicity, specific to the present situation -> in general, it might return only a part of the kernel basis */
+/* Note: for simplicity, specific to the present situation -> in general, it might return only a part of the kernel basis */
 void PolMatDom::kernel_basis( PMatrix & kerbas, const PMatrix & pmat )
 {
 	size_t m = pmat.rowdim();
 	size_t n = pmat.coldim();
 	size_t d = pmat.size()-1;
-	size_t order = 1 + floor( (m*d) / (double) (m-n));  // specific to uniform shift; large enough to return whole basis?
+	size_t order = 1 + floor( (m*d) / (double) (m-n));  // specific to uniform shift
 	PolMatDom::PMatrix appbas(this->field(), m, m, order );
 	PolMatDom::PMatrix series(this->field(), m, n, order );
 	for ( size_t k=0; k<=d; ++k )
