@@ -2031,14 +2031,14 @@ $\balpha_i=(\alpha_{i,1},\dots,\alpha_{i,n}) \in \Kbar{}^n$ for all $i$.
 
 \subsection{Overview}
 
-The algorithm will decompose $V$ into two parts: for the first part,
+The algorithm decomposes $V$ into two parts: for the first part,
 we will be able to use $X_1$ as a linear form in our zero-dimensional
-parametrization; the remaining points will be dealt with using a
+parametrization; for the remaining points, we will use a
 random linear form $\lf=t_1 X_1 + \cdots + t_n X_n$ as
 above. Throughout, we rely on the following operations: evaluations of
 linear forms on successive powers of a given element in $\residueI$
 (such as $1,X_1,X_2^2,\dots$ or $1,\lf,\lf^2,\dots$), linear
-algebra over univariate polynomials, as we did before, as well as some
+algebra over univariate polynomials, and some
 operations on univariate polynomials related to the so-called {\em
   power projection}~\citep{Shoup94,Shoup99}.
 
@@ -2070,11 +2070,11 @@ main structure; the subroutines are detailed in the next subsections.
 \end{algorithm}
 
 The call to $\mathsf{BlockParametrizationX}_1$ computes a zero-dimensional
-parametrization of a subset $V'$ of $V$, such that $X_1$ separates the
+parametrization of a subset $V'$ of $V$ such that $X_1$ separates the
 points of $V'$ (that is, takes pairwise distinct values on the points
 of $V'$); this is done by using sequences of the form $(\mUt
-\mM_1^s \mV)_{s \ge 0}$. The next stage computes three 
-sequences of correction matrices, using objects that were computed 
+\mM_1^s \mV)_{s \ge 0}$. The next step finds three 
+sequences of correction matrices, using objects computed 
 in the call to  $\mathsf{BlockParametrizationX}_1$.
 
 We then apply a modified version of Algorithm $\mainalgoname$, which we call
@@ -2082,7 +2082,7 @@ We then apply a modified version of Algorithm $\mainalgoname$, which we call
 parametrization of $V''=V\setminus V'$ using sequences such as $(\mUt
 \mM^s \mV)_{s \ge 0} - \mat{\Delta}_s$, where $\mM= t_1 \mM_1 + \cdots
 + t_n \mM_n$. Subtracting the correction terms $\mat{\Delta}_s$ has
-the effect of removing from $V$ the points in $V'$; in those ``lucky''
+the effect of removing from $V$ the points in $V'$; in those
 cases where $V'$ is a large subset of $V$, then $V''=V\setminus V'$ contains
 a few points, and few values for the latter sequences will be needed.
 The last step involves changing coordinates in $((F,G_1,\dots,G_n),X_1)$ to use
@@ -2147,23 +2147,23 @@ $\mu_j=1$.
   such that $\mu_j=1$, and let $\mathfrak{f}=\{1,\dots,c\}-\mathfrak{e}$;
   this definition allows us to split the generating series
   of sequence $(\ell(X_1^s))_{s\ge 0}$ as
-  \begin{align*}
+  \[
     \sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}  }
-  &= \sum_{j \in \{1,\dots,c\}}\sum_{i\in T_j} 
-  \sum_{s \ge 0} \frac{\ell_i(X_1^s)}{T^{s+1}}  \\
-  &=\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \frac{\ell_i(X_1^s)}{T^{s+1}} +
+  = \sum_{j \in \{1,\dots,c\}}\sum_{i\in T_j} 
+  \sum_{s \ge 0} \frac{\ell_i(X_1^s)}{T^{s+1}} 
+  =\sum_{j \in \mathfrak{e}}\sum_{i\in T_j}\sum_{s \ge 0}  \frac{\ell_i(X_1^s)}{T^{s+1}} +
   \sum_{j \in \mathfrak{f}}\sum_{i\in T_j}\sum_{s \ge 0}  \frac{\ell_i(X_1^s)}{T^{s+1}}.
-  \end{align*}
+  \]
   Using \cref{lemma:formula} with $\lf=X_1$ and $v=1$, any sum $\sum_{s \ge 0} \ell_i(X_1^s)/T^{s+1}$ 
   in the second summand
   can be rewritten as 
-  $$\frac{E_i}{(T-r_j)^{v_i}},$$
+  $E_i/(T-r_j)^{v_i}$,
   for some integer $v_i$, and for some polynomial $E_i \in \Kbar[T]$ of degree less than
   $v_j$. Next, take $j$ in $\mathfrak{e}$. Since $\mu_j=1$, $\nu_i=1$ for all $i$ in $T_j$,
   so that
-  each such $\ell_i$ takes the form 
-  $$\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i),$$ where $\Lambda_{i}$
-  is a differential operator that does not involve $\partial/\partial
+  each $\ell_i$ takes the form 
+  $\ell_i: f \mapsto (\Lambda_{i}(f))(\balpha_i)$, 
+  for a differential operator $\Lambda_{i}$ that does not involve $\partial/\partial
   X_1$. Since all terms of positive order in $\Lambda_i$ involve one of
   $\partial/\partial X_2,\dots,\partial/\partial X_n$, they cancel
   $X_1^s$ for $s\ge 0$. Thus, $\ell_i(X_1^s)$ can be rewritten 
@@ -2172,15 +2172,15 @@ $\mu_j=1$.
   $$\frac {\ell_{i,1}}{T-\alpha_{i,1}}=\frac {\ell_{i,1}}{T-r_j}.$$
   Remarking  that we can write $\ell_{i,1}=\ell_i(1)$,
   altogether, the sum in question can be written
-  \begin{align*}
+  \[
     \sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}  }
-  &=\sum_{j \in \mathfrak{e}} 
+  =\sum_{j \in \mathfrak{e}} 
   \frac{ \sum_{i\in T_j}  \ell_{i}(1) }{T-r_j }
-  + \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}\\
-  &= \sum_{j \in \mathfrak{e}} 
+  + \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}
+  = \sum_{j \in \mathfrak{e}} 
   \frac{ \lambda_j(1) }{T-r_j }
   + \sum_{j \in \mathfrak{f}} \frac{D_j}{(T-r_j )^{x_j}}
-  \end{align*}
+  \]
   for some integers $\{x_j \mid j \in \mathfrak{f}\}$ and
   polynomials $\{D_j \mid j \in \mathfrak{f}\}$ such that
   $\deg(D_j) < x_j$ holds, and with $D_j$ and $T-r_j $
@@ -2222,7 +2222,7 @@ in $V'$ if and only if:
   \item for $i'$ in $\{1,\dots,\dg\}$, with $i'\ne i$, $\alpha_{i',1} \ne
     \alpha_{i,1}$;
   \item $\residueI_i$ is a reduced algebra, or equivalently, $I_i$ is radical (see \cref{ssec:dual} 
-    for the notation used here).
+    for the notation $\residueI_i,I_i$).
 \end{itemize}
 We denote by $\mathfrak{A}\subset \{1,\dots,\dg\}$ the set of
 corresponding indices $i$, and we let
@@ -2242,8 +2242,7 @@ we will use the following lemma to perform the decomposition.
   Let $j$ be in $\{1,\dots,c\}$ such that $\mu_j=1$, let $\lambda$ be
   a linear form over $\prod_{i \in T_j} \residueI_i$ and let $\mf=y_2
   X_2 + \cdots + y_n X_n$, for some $y_2,\dots,y_n$ in $\K$. Define constants
-  $a,b,c$ in $\Kbar$ by
-  $$a=\lambda(1),\quad b=\lambda(\mf),\quad c=\lambda(\mf^2).$$
+  $a=\lambda(1)$, $b=\lambda(\mf)$, $c=\lambda(\mf^2)$ in $\Kbar$.
   Then, $j$ is in $\mathfrak{a}$
   if and only if, for a generic choice of $\lambda$ and $\mf$, $ac=b^2$.
 \end{lemma}
@@ -2274,11 +2273,11 @@ we will use the following lemma to perform the decomposition.
   \end{align*}
   which gives
   \begin{align*}
-    a  &= \sum_{i\in T_j}u_{i,1} \\
-    b  &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r \\
-    c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2  +2  \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r    
-   \\ & \phantom{{ }= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2}
-   +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})y_ry_s.
+    a &= \sum_{i\in T_j}u_{i,1} \\
+    b &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i) +\sum_{i \in T_j, 2 \le r \le n}P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r \\
+    c &= \sum_{i\in T_j}u_{i,1} \mf(\balpha_i)^2
+        +2 \sum_{i \in T_j, 2 \le r \le n}\mf(\balpha_i) P_{i,r}(u_{i,2},\dots,u_{i,D_i})y_r    
+        +2 \sum_{i \in T_j, 2 \le r \le s \le n} P_{i,r,s}(u_{i,2},\dots,u_{i,D_i})y_ry_s.
   \end{align*}
   Suppose first that $j$ is in $\mathfrak{a}$. Then, $T_j=\{\sigma_j\}$, so we 
   have only one term $\Lambda_{\sigma_j}$ to consider, and $\residueI_{\sigma_j}$ 
@@ -2306,8 +2305,8 @@ we will use the following lemma to perform the decomposition.
   to $0$, for $\sigma'$ in $T_j-\{\sigma\}$, as well as $u_{\sigma,1}$,
   and all $y_r$ for $r\ne \rho$. Then, under this specialization,
   $ac-b^2$ becomes
-  $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})y_\rho)^2$,
-  which is nonzero, so that $ac-b^2$ itself must be nonzero.
+  $-(P_{\sigma,\rho}(u_{\sigma,2},\dots,u_{\sigma,D_\sigma})y_\rho)^2$
+  which is nonzero, hence $ac-b^2$ itself is nonzero.
 
   Else, since $j$ is not in $\mathfrak{a}$, we can assume that $T_j$
   has cardinality at least $2$, with $\residueI_\sigma$ reduced for all $\sigma$
@@ -2489,11 +2488,11 @@ $s=0,\dots,\tau-1$.
 Let $E=M/F$; the division is exact and  $E$ and $F$ are coprime, by construction.
 The equality $\ell= \ell_{\mathfrak{A}} + \ell_{\mathfrak{B}}$ implies
 an equality between generating series
-\begin{align*}
-  \sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}} & = \sum_{s \ge 0}\frac{\ell_\mathfrak{A}(X_1^s)}{T^{s+1}}  
-  +\sum_{s \ge 0} \frac{\ell_\mathfrak{B}(X_1^s)}{T^{s+1}}\\
-                                             & = \frac{A}{F} + \frac{B}{E},
-\end{align*}
+\[
+  \sum_{s \ge 0} \frac{\ell(X_1^s)}{T^{s+1}} = \sum_{s \ge 0}\frac{\ell_\mathfrak{A}(X_1^s)}{T^{s+1}}  
+                                              +\sum_{s \ge 0} \frac{\ell_\mathfrak{B}(X_1^s)}{T^{s+1}}
+                                             = \frac{A}{F} + \frac{B}{E},
+\]
 for some polynomials $A,B$ in $\K[T]$, with $\deg(A) < \deg(F)$ and
 $\deg(B) < \deg(E)$. With  $C=\Omega( (\ell(X_1^s))_{s \ge 0}, M)$, we deduce the equality
 $$\frac{C}{M}=\frac{A}{F} + \frac{B}{E},$$ from which we find $A = C/E
@@ -2613,9 +2612,9 @@ in analogy with the definition of $d$ used so far.
     to $\ell_{i,\mathfrak{A}}(\lf^s)$.
 \end{itemize}
 
-In terms of cost, we need to compute all vectors $\row{a}_i$, for
-$i=1,\dots,m$; using~\cref{eqn:hol_cost}, this takes
-$O(m^{\omega} \M(D) \log(D) \log(m))$ operations in $\K$.  Then, the total time
+In terms of cost, computing the vectors $\row{a}_i$, for
+$i=1,\dots,m$, uses $O(m^{\omega} \M(D) \log(D) \log(m))$ operations in $\K$
+(see \cref{eqn:hol_cost}).  Then, the total time
 spent in {\sf ScalarNumerator} is $m(m+n+1)$ times the cost reported in
 \cref{ssec:scalar_numer}, which was $O(D^2 + m\M(D))$; similarly, the total
 cost incurred by ${\sf Decompose}$ is $m(m+n+1)$ times the cost of a single
@@ -2710,18 +2709,19 @@ $Q_\mathfrak{B}$, and $R$ its squarefree part.
 
 The same considerations justify the computation of $C_1$ and
 $C_{X_1},\dots,C_{X_n}$. Indeed, subtracting the correction matrices
-implies that 
-$$C_1 = \Omega( (\ell_1(\lf^s)-\ell_{1,\mathfrak{A}}(\lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(\lf^s))_{s \ge 0}, S)$$
-and
-$$C_{X_i} = \Omega( (\ell_1(X_i \lf^s)-\ell_{1,\mathfrak{A}}(X_i \lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(X_i\lf^s))_{s \ge 0}, S),$$
-for $i=1,\dots,n$. As shown in \cref{ssec:abstractlago}, these are precisely 
-the polynomials we need to compute a zero-dimensional parametrization
+implies
+\begin{align*}
+  C_1 &= \Omega( (\ell_1(\lf^s)-\ell_{1,\mathfrak{A}}(\lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(\lf^s))_{s \ge 0}, S), \\
+  C_{X_i} &= \Omega( (\ell_1(X_i \lf^s)-\ell_{1,\mathfrak{A}}(X_i \lf^s))_{s \ge 0}, S) =  \Omega( (\ell_{1,\mathfrak{B}}(X_i\lf^s))_{s \ge 0}, S) \;\;\;\text{for } i=1,\dots,n.
+\end{align*}
+As shown in \cref{ssec:abstractlago}, these are precisely 
+the polynomials we need in order to compute a zero-dimensional parametrization
 of $V_\mathfrak{B}$.
 
 The cost analysis is similar to that of Algorithm $\mainalgoname$,
 with the important exception that the sequence length $d=\lceil
-D/m\rceil$ can then be replaced by the (hopefully much smaller)
-$d_\mathfrak{B}=\lceil D_\mathfrak{B}/m\rceil$.
+D/m\rceil$ can then be replaced by $d_\mathfrak{B}=\lceil
+D_\mathfrak{B}/m\rceil$  (which is hopefully much smaller).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2729,7 +2729,7 @@ $d_\mathfrak{B}=\lceil D_\mathfrak{B}/m\rceil$.
 \subsection{Experimental results}
 
 The algorithms in this section were implemented using the same
-platform as the one in the previous section, using in particular NTL's
+framework as in the previous section, using in particular NTL's
 built-in implementation of power projection.
 
 In \cref{tbl:comparison_algos}, we give the ratio of the runtime of
@@ -2740,26 +2740,6 @@ $V_\mathfrak{A}$, that is, $D_\mathfrak{A}$, compared to the total
 degree of $I$, which is $D=D_\mathfrak{A}+D_\mathfrak{B}$. The inputs,
 the machine used for timings and the prime field are the same as in
 \cref{section:ex}.
-
-The performance of $\mathsf{BlockParametrizationWithSplitting}$
-depends on the density of $\mM_1$ and the number of points
-$D_\mathfrak{A}$. For generic inputs, with no multiplicity,
-$D_\mathfrak{A}=D$, so it actually will not spend any time
-computing correction matrices or running $\mainalgoname{\sf
-Residual}$. On the other hand, in the worst case, if
-$D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
-{\sf BlockParametriza}{\sf -tionWithSplitting} may take more than twice as
-long as $\mainalgoname$ (due to the two calls to respectively
-$\mathsf{BlockParametrizationX}_1$ and
-$\mathsf{BlockParametrizationResidual}$, together with the overhead induced 
-by power projection).
-
-This unlucky case was seldom seen in our experiments, since the
-systems with multiplicities generated randomly had few multiple
-points, and thus were favorable to us. An unfavorable case is system
-sot1, where $V_\mathfrak{A}$ only accounts for $1012$ points out of
-$7682$ points in the variety. 
-
 
 \begin{table}[ht]
   \centering
@@ -2791,6 +2771,27 @@ $7682$ points in the variety.
     katsura10&11 &1024&0.557&0.661&0.652& 1024/1024
   \end{tabular}
 \end{table}
+
+The performance of $\mathsf{BlockParametrizationWithSplitting}$
+depends on the density of $\mM_1$ and the number of points
+$D_\mathfrak{A}$. For generic inputs, with no multiplicity,
+$D_\mathfrak{A}=D$, so it actually will not spend any time
+computing correction matrices or running $\mainalgoname{\sf
+Residual}$. On the other hand, in the worst case, if
+$D_\mathfrak{A}=0$, so that $D_\mathfrak{B}=D$, then Algorithm
+{\sf BlockParametriza}{\sf -tionWithSplitting} may take more than twice as
+long as $\mainalgoname$ (due to the two calls to respectively
+$\mathsf{BlockParametrizationX}_1$ and
+$\mathsf{BlockParametrizationResidual}$, together with the overhead induced 
+by power projection).
+
+This unlucky case was seldom seen in our experiments, since the
+systems with multiplicities generated randomly had few multiple
+points, and thus were favorable to us. An unfavorable case is system
+``sot1'', where $V_\mathfrak{A}$ only accounts for $1012$ points out of
+$7682$ points in the variety. 
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2824,7 +2825,7 @@ to \citep[Theorem~4.5]{Turner02}.
   In this proof, for a $u \times v$ polynomial matrix $\mat{Q}$, we denote by
   $\cdeg{\mat{Q}}$ the size-$v$ vector of the degrees of the columns of
   \(\mat{Q}\).  Consider a minimal right generator $\relbas \in
-  \polMatSpace[\rdim]$ in Popov form (defined in \citep{Popov72,Kailath80}).
+  \polMatSpace[\rdim]$ in Popov form (as defined e.g. in \citep{Kailath80}).
   Then, we have $\relbas = \mat{L}\,\diag{\var^{t_1},\ldots,\var^{t_{\rdim}}} -
   \mat{Q}$, where $\cdeg{\mat{Q}} < \cdeg{\relbas} = (t_1,\ldots,t_{\rdim})$
   termwise and $\mat{L} \in \matSpace[\rdim]$ is unit upper triangular. Define
