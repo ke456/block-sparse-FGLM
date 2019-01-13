@@ -1,0 +1,176 @@
+\documentclass[final,1p,times,authoryear]{elsarticle}
+
+\usepackage{bm} % for bold \bm
+\usepackage{mathrsfs} % for \mathscr
+\usepackage{algorithm} % for algorithms
+
+% for enumerate / itemize: define reasonable margins
+\usepackage[shortlabels]{enumitem}
+\setlist{topsep=0.25\baselineskip,partopsep=0pt,itemsep=1pt,parsep=0pt}
+
+% math and theorem names
+\usepackage{amsmath,amsfonts,amssymb,amsthm,thmtools}
+\declaretheoremstyle[headfont=\normalfont\bfseries,bodyfont=\normalfont]{myremark}
+\declaretheorem[style=plain,parent=section]{definition}
+\declaretheorem[sibling=definition]{theorem}
+\declaretheorem[sibling=definition]{corollary}
+\declaretheorem[sibling=definition]{proposition}
+\declaretheorem[sibling=definition]{lemma}
+\declaretheorem[style=myremark,sibling=definition,qed={\qedsymbol}]{remark}
+\declaretheorem[style=remark,sibling=definition,qed={\qedsymbol}]{example}
+
+% references / hyperlinks
+\usepackage[linkcolor=black,colorlinks=true,citecolor=blue,urlcolor=blue]{hyperref} 
+\usepackage[capitalise]{cleveref}
+
+%% ------------------------------------------------
+%% --------- FOR MATRIX BERLEKAMP-MASSEY ----------
+%% ------------------------------------------------
+%%% 
+%%%notation
+%misc
+\newcommand{\storeArg}{} % aux, not to be used in document!!
+\newcounter{notationCounter}
+%spaces
+\newcommand{\NN}{\mathbb{N}} % nonnegative integers
+\newcommand{\var}{T} % variable for univariate polynomials
+\newcommand{\field}{\mathbb{K}} % base field
+\newcommand{\polRing}{\field[\var]} % polynomial ring
+\newcommand{\Pox}{[\mkern-3mu[ \var ]\mkern-3.2mu]}
+\newcommand{\Poxi}{[\mkern-3mu[ \var^{-1} ]\mkern-3.2mu]}
+\newcommand{\psRing}{\field\Pox}
+\newcommand{\matSpace}[1][\rdim]{\renewcommand\storeArg{#1}\matSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\matSpaceAux}[1][\storeArg]{\field^{\storeArg \times #1}} % not to be used in document
+\newcommand{\polMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\polMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\polMatSpaceAux}[1][\storeArg]{\polRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\psMatSpace}[1][\rdim]{\renewcommand\storeArg{#1}\psMatSpaceAux} % polynomial matrix space, 2 opt args
+\newcommand{\psMatSpaceAux}[1][\storeArg]{\psRing^{\storeArg \times #1}} % not to be used in document
+\newcommand{\mat}[1]{\bm{\MakeUppercase{#1}}} % for a matrix
+\newcommand{\row}[1]{\bm{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\col}[1]{\bm{\MakeLowercase{#1}}} % for a matrix
+\newcommand{\matCoeff}[1]{\MakeLowercase{#1}} % for a coefficient in a matrix
+\newcommand{\rdim}{m} % row dimension
+\newcommand{\cdim}{{m'}} % column dimension
+\newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
+\newcommand{\seqelt}[1]{\bm{F}_{#1}} % element of sequence of matrices
+\newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
+\newcommand{\sseqeltSpace}{\matSpace[\rdim][\rdim]} % element of sequence of square matrices
+\newcommand{\seq}{\mat{\mathcal{F}}} % sequence of matrices
+\newcommand{\seqLelt}[1]{\bm{L}_{#1}} % element of sequence of matrices
+\newcommand{\seqL}{\mat{\mathcal{L}}} % sequence of matrices
+\newcommand{\seqpm}{\mat{Z}} % power series matrix from a sequence
+\newcommand{\rel}{\col{p}} % linear relation
+\newcommand{\relbas}{\mat{P}} % linear relation
+\newcommand{\relSpace}{\polMatSpace[1][\rdim]} % space for linear relations
+\newcommand{\relbasSpace}{\polMatSpace[\rdim][\rdim]} % space for linear relations
+\newcommand{\num}{\row{q}} % numerator for linear recurrence relation
+\newcommand{\nummat}{\mat{Q}} % numerator for linear recurrence relation basis
+\newcommand{\rem}{\row{r}} % remnant for linear recurrence relation
+\newcommand{\remmat}{\mat{R}} % remnant for linear recurrence relation basis
+\newcommand{\remSpace}{\polMatSpace[1][\cdim]} % space for linear relations
+\newcommand{\degBd}{d} % bound on degree of minimal generator
+\newcommand{\degBdr}{d_{r}} % bound on degree of a right minimal generator
+\newcommand{\degBdl}{d_{\ell}} % bound on degree of a left minimal generator
+\newcommand{\degDet}[1][\seq]{\operatorname{\Delta}(#1)}
+%\newcommand{\rdeg}[2][]{\mathrm{rdeg}_{{#1}}(#2)} % shifted row degree
+\newcommand{\cdeg}[2][]{\mathrm{cdeg}_{{#1}}(#2)} % shifted column degree
+\newcommand{\sys}{\mat{F}} % input matrix series to approximant basis
+\newcommand{\appMod}[2]{\mathcal{A}(#1,#2)} % module of approximants for #2 at order #1
+\newcommand{\basis}{\mathscr{B}}
+\newcommand{\trace}{\operatorname{trace}}
+\newcommand{\softO}[1]{O{\tilde{~}}(#1)} % module of approximants for #2 at order #1
+\newcommand{\genseries}{Z}
+\newcommand{\minpoly}{P}
+\newcommand{\mainalgoname}{\mathsf{ BlockParametrization}}
+\newcommand{\lf}{X}
+\newcommand{\mf}{Y}
+\newcommand{\residueI}{\mathscr{Q}}
+\newcommand{\sqfree}{Q}
+\newcommand{\trsp}[1]{#1^{\mathsf{T}}} % transpose of a matrix
+\newcommand{\itrsp}[1]{#1^{\mathsf{-T}}} % inverse transpose of a matrix
+
+
+\newcommand{\density}{\rho}
+
+\def\M {\ensuremath{\mathsf{M}}}
+\def\PP {\ensuremath{\mathsf{P}}}
+\def\Deg{D}
+\def\dg{\kappa}
+
+\def\C {\ensuremath{\mathbb{C}}}
+\def\Q {\ensuremath{\mathbb{Q}}}
+\def\N {\ensuremath{\mathbb{N}}}
+\def\R {\ensuremath{\mathbb{R}}}
+\def\Z {\ensuremath{\mathbb{Z}}}
+\def\F {\ensuremath{\mathbb{F}}}
+\def\H {\ensuremath{\mathbb{H}}}
+\def\K{\mathbb{K}}
+\def\K {\ensuremath{\mathbb{K}}}
+\def\Kbar {{\ensuremath{\overline{\mathbb{K}}}}}
+\def\A {\ensuremath{\mathbb{A}}}
+\def\D {\ensuremath{D}}
+\def\m {\ensuremath{\mathfrak{m}}}
+
+\def\scrY{\mathscr{Y}}
+\def\scrM {\ensuremath{\mathscr{M}}}
+\def\calL {\ensuremath{\mathcal{L}}}
+\def\scrP {\ensuremath{\mathscr{P}}}
+\def\scrS {\ensuremath{\mathscr{S}}}
+\def\scrU {\ensuremath{\mathscr{U}}}
+\def\scrV {\ensuremath{\mathscr{V}}}
+\def\ann {\ensuremath{\mathrm{ann}}}
+\def\rk {\ensuremath{\mathrm{rk}}}
+
+\DeclareBoldMathCommand{\bell}{\ell}
+\DeclareBoldMathCommand{\be}{e}
+\DeclareBoldMathCommand{\bu}{u}
+\DeclareBoldMathCommand{\bv}{v}
+\DeclareBoldMathCommand{\bX}{X}
+\DeclareBoldMathCommand{\bx}{x}
+\DeclareBoldMathCommand{\balpha}{\alpha}
+\DeclareBoldMathCommand{\bbeta}{\beta}
+\DeclareBoldMathCommand{\mA}{A}
+\DeclareBoldMathCommand{\mB}{B}
+\DeclareBoldMathCommand{\mD}{D}
+\DeclareBoldMathCommand{\mF}{F}
+\DeclareBoldMathCommand{\mG}{G}
+\DeclareBoldMathCommand{\mI}{I}
+\DeclareBoldMathCommand{\mM}{M}
+\DeclareBoldMathCommand{\mNs}{N^*}
+\DeclareBoldMathCommand{\mN}{N}
+\DeclareBoldMathCommand{\mS}{S}
+\DeclareBoldMathCommand{\mT}{T}
+\DeclareBoldMathCommand{\mU}{U}
+\DeclareBoldMathCommand{\mV}{V}
+\DeclareBoldMathCommand{\mW}{W}
+\DeclareBoldMathCommand{\mX}{X}
+\DeclareBoldMathCommand{\mY}{Y}
+\DeclareBoldMathCommand{\mZ}{Z}
+\DeclareBoldMathCommand{\bell}{\ell}
+\DeclareBoldMathCommand{\be}{e}
+\DeclareBoldMathCommand{\bu}{u}
+\DeclareBoldMathCommand{\bv}{v}
+\DeclareBoldMathCommand{\bX}{X}
+\DeclareBoldMathCommand{\bx}{x}
+\DeclareBoldMathCommand{\balpha}{\alpha}
+\DeclareBoldMathCommand{\bbeta}{\beta}
+
+\newcommand{\mUt}{\trsp{\mU}}
+
+
+\begin{document}
+
+We wish to thank the reviewer for their remarks, which we tried to follow
+to the best of our ability.
+
+In hindsight, we agree that the paper was too verbose at places, so we
+significantly reduced its length, without sacrificing contents. As
+suggested by the reviewer, certain proofs that were almost identical
+to existing ones were replaced by references to the literature. A few
+statements about linearly recurrent matrix sequences are now proved in
+appendix, to streamline Section 2.
+
+A few other minor corrections were made in the paper (mostly typos). Altogether
+We hope you will find the new version more readable (we certainly do).
+
+\end{document}
