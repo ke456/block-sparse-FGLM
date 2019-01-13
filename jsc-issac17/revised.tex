@@ -281,7 +281,7 @@ The algorithms of~\citet{AlBeRoWo94, BeWo96, Rouillier99} rely on
 Indeed, these algorithms compute sequences of values of the form
 $v_s=(\trace(\lf^s))_{s \ge 0}$ and 
 $v_{s,i}=(\trace(\lf^s X_i))_{s \ge 0}$, where $\trace: \residueI \to \K$ is the trace 
-form and $\lf=t_1 X_1 + \cdots + t_n X_n$ is some $\K$-linear combination of the variables.
+form and $\lf=t_1 X_1 + \cdots + t_n X_n$ is a generic $\K$-linear combination of the variables.
 From these values, one may then recover the output in~\cref{eq:RUR} by means
 of structured linear algebra calculations.
 
@@ -348,7 +348,7 @@ computation of a block-Krylov sequence; we show that once this
 sequence has been computed, not only $\sqfree$ but also all other
 polynomials in the zero-dimensional parametrization can be efficiently
 obtained. Compared with the algorithms of~\citep{FaMo17}, a notable
-difference is that our algorithm deals with any ideal zero-dimensional
+difference is that our algorithm deals with any  zero-dimensional ideal
 $I$ (for instance, we do not require shape position), but the
 base field must have sufficiently large characteristic (and our output is
 somewhat weaker than a Gr\"obner basis, since multiplicities are not
@@ -670,10 +670,11 @@ i\le\rdim$.  As in the scalar case, if $\mat{P}$ has degree $d$, we
 only need to know $\seqelt{0},\dots,\seqelt{d-1}$ to recover
 $\mat{\Omega}(\seq, \relbas)$ as
 \begin{align}\label{eq:computeOmega}
-  \mat{\Omega}(\seq, \relbas) =  \left ( \relbas \cdot \sum_{s=0}^{d-1} \seqelt{d-1-s} T^s \right ) \;\mathrm{div}\; T^d,
+  \mat{\Omega}(\seq, \relbas) =  \left ( \relbas \cdot \sum_{s=0}^{d-1} 
+    \seqelt{d-1-s} T^s \right ) \;\mathrm{div}\; T^d,
 \end{align}
 where ``$\mathrm{div}\; T^d$'' means we keep the quotient of each
-entry by $T^d$.  The cost of computing it is then $O(\rdim^\omega \M(d))$
+entry by $T^d$.  Given $\mat{P}$ and $\seqelt{0},\dots,\seqelt{d-1}$, the cost of computing $\mat{\Omega}(\seq, \relbas) $ is then $O(\rdim^\omega \M(d))$
 operations in $\K$.
 
 
@@ -1389,8 +1390,10 @@ with strict subsets.
 \begin{lemma}[{\citep[Proposition~3]{BoSaSc03}}]
   \label{lemma:para2}
   Let $\ell$ be a generic element of ${\rm
-  hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$ and $\lf$ be a generic
-  linear form. Then the output $((\sqfree,V_1,\dots,V_n),\lf)$ of
+  hom}_{\Kbar}(\residueI_\mathfrak{S},\Kbar)$ and 
+ $\lf = t_1 X_1 + \cdots + t_n X_n$
+ be a generic 
+  linear combination of $X_1,\dots,X_n$. Then the output $((\sqfree,V_1,\dots,V_n),\lf)$ of
   $\mathsf{Parametrization}(\ell,\lf)$ is a zero-dimensional
   parametrization of $V_{\mathfrak{S}}$.
 \end{lemma}
