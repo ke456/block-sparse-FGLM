@@ -53,7 +53,7 @@
 \newcommand{\cdim}{{m'}} % column dimension
 \newcommand{\diag}[1]{\mathrm{Diag}(#1)}  % diagonal matrix with diagonal entries #1
 \newcommand{\seqelt}[1]{\bm{F}_{#1}} % element of sequence of matrices
-\newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
+%\newcommand{\seqeltSpace}{\matSpace[\rdim][\cdim]} % element of sequence of matrices
 \newcommand{\sseqeltSpace}{\matSpace[\rdim][\rdim]} % element of sequence of square matrices
 \newcommand{\seq}{\mat{\mathcal{F}}} % sequence of matrices
 \newcommand{\seqLelt}[1]{\bm{L}_{#1}} % element of sequence of matrices
@@ -67,7 +67,7 @@
 \newcommand{\nummat}{\mat{Q}} % numerator for linear recurrence relation basis
 \newcommand{\rem}{\row{r}} % remnant for linear recurrence relation
 \newcommand{\remmat}{\mat{R}} % remnant for linear recurrence relation basis
-\newcommand{\remSpace}{\polMatSpace[1][\cdim]} % space for linear relations
+\newcommand{\remSpace}{\polMatSpace[1][\rdim]} % space for linear relations
 \newcommand{\degBd}{d} % bound on degree of minimal generator
 \newcommand{\degBdr}{d_{r}} % bound on degree of a right minimal generator
 \newcommand{\degBdl}{d_{\ell}} % bound on degree of a left minimal generator
@@ -2860,7 +2860,7 @@ to \citep[Theorem~4.5]{Turner02}.
 The next result is similar to \citep[Theorem~4.6]{Turner02} (see also
 Theorems~4.7 to~4.10 in that reference).  We recall from
 \citep{BarBul92,BecLab94} that, given a matrix $\sys \in
-\polMatSpace[\rdim][\rdim]$ and an integer $d \in \NN$, the set of
+\polMatSpace[\rdim][k]$ and a positive integer $d$, the set of
 \emph{approximants for $\sys$ at order $d$} is defined as
 \[
   \appMod{\sys}{d} = \{ \rel \in \relSpace \mid \rel \sys = \row{0} \bmod \var^d \}.
@@ -2880,40 +2880,41 @@ involving the first $\degBdl+\degBdr$ entries of $\seq$.
     \sys =
     \begin{bmatrix}
       \sum_{0\le s < \degBd} \seqelt{s} \var^{\degBd-s-1} \\ - \mat{I}_{\rdim}
-    \end{bmatrix} \in \polMatSpace[(\rdim+\rdim)][\rdim].
+    \end{bmatrix} \in \polMatSpace[2\rdim][\rdim].
   \]
-  Suppose that  $\degBd \ge \degBdr+1$ and let $\mat{B} \in \polMatSpace[(\rdim+\rdim)][(\rdim+\rdim)]$
-  be a basis of $\appMod{\sys}{\degBdl+\degBdr+1}$. Then,
+  Suppose that  $\degBd \ge \degBdl+\degBdr+1$ and let $\mat{B} \in \polMatSpace[2\rdim][2\rdim]$
+  be a basis of $\appMod{\sys}{\degBd}$. Then,
  %% if $\mat{B}$ is in Popov form, then its $\rdim\times\rdim$ leading
  %%      principal submatrix is the minimal matrix generator for $\seq$ that is in Popov form;
  %%    \item
       if $\mat{B}$ is row reduced, it has exactly $\rdim$ rows of
       degree $\le\degBdl$, and they form a submatrix $[\relbas \;\; \remmat] \in
-      \polMatSpace[\rdim][(\rdim+\rdim)]$ of $\mat{B}$ such that $\relbas$ is a
+      \polMatSpace[\rdim][2\rdim]$ of $\mat{B}$ such that $\relbas$ is a
       minimal matrix generator for~$\seq$.
 \end{theorem}
 \begin{proof}
-  We first observe that for any relation $\rel \in \relSpace$ for $\seq$, there exists $\rem \in
-  \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel \;\; \rem]
-  \in \appMod{\sys}{\degBd}$. Indeed, if $\rel$ is a relation for
-  $\seq$ then $\num = \rel \seqpm$ has polynomial entries, where
-  $\seqpm = \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then the vector
-  $\rem = - \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$
-  has polynomial entries, has degree less than $\deg(\rel)$, and is
-  such that $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
+  We first observe that for any relation $\rel \in \relSpace$ for $\seq$, there
+  exists $\rem \in \remSpace$ such that $\deg(\rem) < \deg(\rel)$ and $[\rel
+  \;\; \rem] \in \appMod{\sys}{\degBd}$ for any \(\degBd>0\). Indeed, if $\rel$
+  is a relation for $\seq$ then $\num = \rel \seqpm$ has polynomial entries,
+  where $\seqpm = \sum_{s\ge 0} \seqelt{s} \var^{-s-1}$. Then,
+  the vector $\rem = - \rel (\sum_{s \ge \degBd} \seqelt{s} \var^{\degBd-s-1})$
+  has polynomial entries, has degree less than $\deg(\rel)$, and is such that
+  $[\rel \;\; \rem] \sys = \num \var^{\degBd}$.
 
-  Conversely, we show that for any vectors $\rel \in \relSpace$ and $\rem
-  \in \remSpace$, if $[\rel \;\; \rem] \in\appMod{\sys}{\degBd}$ and
-  $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$, then $\rel$ is a
-  relation for $\seq$. Indeed, if $[\rel \;\; \rem]
-  \in\appMod{\sys}{\degBd}$ we have $\rel (\sum_{0\le s< \degBd}
-  \seqelt{s} \var^{\degBd-s-1}) = \rem \bmod \var^\degBd$. Since
-  $\degBd\ge\degBdr+1$ and $\deg([\rel \;\;
-  \rem])\le\degBd-\degBdr-1$, this implies that the coefficients of
-  degree $\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le s <
+  Conversely, we show that for any vectors $\rel \in \relSpace$ and $\rem \in
+  \remSpace$ and any order \(\degBd\ge\degBdr+1\), if $[\rel \;\; \rem]
+  \in\appMod{\sys}{\degBd}$ and $\deg([\rel \;\; \rem])\le\degBd-\degBdr-1$,
+  then $\rel$ is a relation for $\seq$. Indeed, if $[\rel \;\; \rem]
+  \in\appMod{\sys}{\degBd}$ we have $\rel (\sum_{0\le s< \degBd} \seqelt{s}
+  \var^{\degBd-s-1}) = \rem \bmod \var^\degBd$. Since $\deg([\rel \;\;
+  \rem])\le\degBd-\degBdr-1$ with $\degBd\ge\degBdr+1$, this implies that the
+  coefficients of degree $\degBd-\degBdr$ to $\degBd-1$ of $\rel(\sum_{0\le s <
   \degBd} \seqelt{s} \var^{\degBd-s-1})$ are zero. Then,
-  \cref{lem:finitely_many_terms} shows that $\rel$ is a relation for
-  $\seq$. The theorem follows.
+  \cref{lem:finitely_many_terms} shows that $\rel$ is a relation for $\seq$.
+
+  From these two paragraphs, taking $\degBd \ge \degBdl+\degBdr+1$, the theorem
+  follows.
 \end{proof}
 
 
