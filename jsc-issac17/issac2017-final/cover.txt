@@ -49,29 +49,43 @@ Name of Journal    : Journal of Symbolic Computation
 Journal Acronym    : YJSCO
 Issue Type         : Special Issue  
 
-Title of manuscript: ?
-Number of pages    : ?
+Title of manuscript: Block-Krylov techniques in the context of sparse-FGLM algorithms
+Number of pages    : 32
 
 Corresponding author's
-  Name             : ?
-  Department       : ?  
-  Institution      : ? 
-  Univ./Org.       : ?
-  Address          : ?
-  c/o Room         : ?
-  City, State, Zip : ?
-  Country          : ?
-  PHONE            : ?
-  FAX              : ?
-  EMAIL            : ?
+ Name             : Vincent Neiger
+ Affiliation as it must appear on the paper: Univ. Limoges, CNRS, XLIM, UMR 7252, F-87000 Limoges, France
+
+ Department       : ?
+ Institution      : XLIM Research Institute
+ Univ./Org.       : Université de Limoges
+ Address          : 123 avenue Albert Thomas
+ c/o Room         : ?
+ City, State, Zip : 87000 Limoges
+ Country          : France
+ PHONE            : (+33) 587 506 807
+ FAX              : ?
+ EMAIL            : vincent.neiger@unilim.fr
+
 -----------------------------------------------------
 Partial Information for each remaining authors: 
 -----------------------------------------------------
-  Name			   : ?
-  Affiliation	   : ?
-  Address		   : ?
-  EMAIL			   : ?
+
+  Name			   : Seung Gyu Hyun
+  Affiliation	           : Cheriton School of Computer Science, University of Waterloo
+  Address		   : David R. Cheriton School of Computer Science, University of Waterloo, Waterloo, Ontario, Canada N2L 3G1
+  EMAIL			   : kevin.hyun@edu.uwaterloo.ca
+
+  Name			   : Hamid Rahkooy
+  Affiliation	           : Cheriton School of Computer Science, University of Waterloo
+  Address		   : David R. Cheriton School of Computer Science, University of Waterloo, Waterloo, Ontario, Canada N2L 3G1
+  EMAIL			   : hamid.rahkooy@uwaterloo.ca
+
+  Name			   : Éric Schost
+  Affiliation	           : Cheriton School of Computer Science, University of Waterloo
+  Address		   : David R. Cheriton School of Computer Science, University of Waterloo, Waterloo, Ontario, Canada N2L 3G1
+  EMAIL			   : eschost@uwaterloo.ca
+
 -----------------------------------------------------
 END of MANUSCRIPT TRANSMITTAL FORM
 -----------------------------------------------------
-
