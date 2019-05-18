@@ -1,0 +1,77 @@
+SUBJECT: SUBMISSION OF PACKAGE FOR ISSAC 2017 SPECIAL ISSUE
+
+Dear Corresponding Author,
+
+You are to send us a single zipped folder as explained below.
+After we have received your folder, we will package
+the entire issue to send to the editor-in-chief, Hoon Hong.
+Thereafter, you will be communicating with the publisher
+and/or the editor-in-chief.
+
+If you have any questions about the following instructions,
+please do not hesitate to contact us.
+
+--Chee Yap and Mohab Safey El-Din
+	Guest Editors
+	ISSAC 2017 SPECIAL ISSUE
+
+enclosed: cover.txt, JSC_latex.zip
+
+-----------------------------------------------
+INSTRUCTIONS:
+-----------------------------------------------
+	Please send us (editors of this issue) a zip folder called
+			"issac2017-final-XXX.zip"
+	where XXX is the last name of corresponding author.
+	This folder should contain:
+		(1) A filled-in copy of "cover.txt" (i.e., this file).
+				Please fill ? in the "MANUSCRIPT TRANSMITTAL FORM" below.
+		(2) A pdf file called "paper.pdf" (your paper)
+		(3) Folder called  "source" which should 
+				contain a file called "paper.tex".
+				Pdflatex of "paper.tex" should produce your final paper.
+				It should be prepared using the
+				macros found in JSC_latex.zip (enclosed).
+		        Put all needed latex files in this folder.
+
+	General JSC instructions in the following link may be helpful
+	for some specific issues:
+	https://www.elsevier.com/journals/journal-of-symbolic-computation/0747-7171/guide-for-authors
+
+    If you have further questions, please contact us
+	-- Chee and Mohab
+
+---------------------------
+MANUSCRIPT TRANSMITTAL FORM
+Please Fill in "?"
+---------------------------
+Name of Journal    : Journal of Symbolic Computation
+Journal Acronym    : YJSCO
+Issue Type         : Special Issue  
+
+Title of manuscript: ?
+Number of pages    : ?
+
+Corresponding author's
+  Name             : ?
+  Department       : ?  
+  Institution      : ? 
+  Univ./Org.       : ?
+  Address          : ?
+  c/o Room         : ?
+  City, State, Zip : ?
+  Country          : ?
+  PHONE            : ?
+  FAX              : ?
+  EMAIL            : ?
+-----------------------------------------------------
+Partial Information for each remaining authors: 
+-----------------------------------------------------
+  Name			   : ?
+  Affiliation	   : ?
+  Address		   : ?
+  EMAIL			   : ?
+-----------------------------------------------------
+END of MANUSCRIPT TRANSMITTAL FORM
+-----------------------------------------------------
+
